@@ -256,6 +256,17 @@ void AeroDms::ajouterUneCotisationEnBdd()
 
 void AeroDms::ajouterUnPiloteEnBdd()
 {
+    AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
+    AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
+
+    if (resultat == AeroDmsTypes::ResultatCreationPilote_SUCCES)
+    {
+        statusBar()->showMessage("Pilote ajouté avec succès");
+    }
+    else
+    {
+        statusBar()->showMessage("Echec ajout pilote");
+    }
 
     //On met à jour les listes de pilotes
     peuplerListesPilotes();
@@ -292,6 +303,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
 
 void AeroDms::genererPdf()
 {
+    pdf->imprimerLesDemandesDeSubvention();
 }
 
 void AeroDms::enregistrerUnVol()

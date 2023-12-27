@@ -19,6 +19,12 @@ public:
         FlightTableElement_MAX = 0x8
     };
 
+    enum ResultatCreationPilote {
+        ResultatCreationPilote_SUCCES = 0x0,
+        ResultatCreationPilote_PILOTE_EXISTE = 0x1,
+        ResultatCreationPilote_AUTRE = 0x2
+    };
+
 
     struct Pilote {
         QString idPilote;

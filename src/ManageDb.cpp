@@ -239,13 +239,46 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
         AeroDmsTypes::DemandeRemboursement demande;
         demande.typeDeVol = query.value(0).toString();
         demande.piloteId = query.value(1).toString();
-        demande.montantARembourser = query.value(2).toFloat();
-        demande.annee = query.value(3).toInt();
-        demande.nomFichierFacture = query.value(5).toString();
+        demande.montantARembourser = query.value(3).toFloat();
+        demande.annee = query.value(2).toInt();
+        //demande.nomFichierFacture = query.value(5).toString();
         liste.append(demande);
     }
     
     return liste;
+}
+
+QString ManageDb::recupererAeroclub(QString p_piloteId)
+{
+    QSqlQuery query;
+    query.prepare("SELECT aeroclub FROM pilote WHERE piloteId = :piloteId");
+    query.bindValue(":piloteId", p_piloteId);
+
+    query.exec();
+    query.next();
+    return query.value(0).toString();
+}
+
+QString ManageDb::recupererNomPrenomPilote(QString p_piloteId)
+{
+    QSqlQuery query;
+    query.prepare("SELECT prenom, nom FROM pilote WHERE piloteId = :piloteId");
+    query.bindValue(":piloteId", p_piloteId);
+
+    query.exec();
+    query.next();
+    return query.value(0).toString().append(" ").append(query.value(1).toString());
+}
+
+int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)
+{
+    QSqlQuery query;
+    query.prepare("SELECT identifiantCompta FROM typeDeRecetteDepense WHERE typeDeRecetteDepenseId = :typeDeRecetteDepenseId");
+    query.bindValue(":typeDeRecetteDepenseId", p_typeDeRecetteDepenseId);
+
+    query.exec();
+    query.next();
+    return query.value(0).toInt();
 }
 
 QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette)
@@ -325,5 +358,48 @@ void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisa
     query.bindValue(":annee", p_infosCotisation.annee);
     query.bindValue(":idRecette", idRecette);
     query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
-    query.exec();
+}
+
+//Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
+//dans la base de données
+AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(AeroDmsTypes::Pilote p_pilote)
+{
+    AeroDmsTypes::ResultatCreationPilote resultat = AeroDmsTypes::ResultatCreationPilote_SUCCES;
+    
+    //creation
+    if (p_pilote.idPilote == "")
+    {
+        QString piloteId = p_pilote.prenom.toLower();
+        piloteId.append(".");
+        piloteId.append(p_pilote.nom.toLower());
+
+        piloteId.replace(" ", "");
+        piloteId.replace("é", "e");
+        piloteId.replace("è", "e");
+        piloteId.replace("à", "a");
+        piloteId.replace("â", "a");
+
+        //Verifier si le pilote n'existe pas
+        //TODO
+
+        QSqlQuery query;
+        query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque)");
+        query.bindValue(":piloteId", piloteId);
+        query.bindValue(":nom", p_pilote.nom);
+        query.bindValue(":prenom", p_pilote.prenom);
+        query.bindValue(":aeroclub", p_pilote.aeroclub);
+        query.bindValue(":estAyantDroit", p_pilote.estAyantDroit);
+        query.bindValue(":mail", p_pilote.mail);
+        query.bindValue(":telephone", p_pilote.telephone);
+        query.bindValue(":remarque", p_pilote.remarque);
+
+        query.exec();
+    }
+    //mise à jour
+    else
+    {
+        //TODO
+    }
+
+    return resultat;
 }

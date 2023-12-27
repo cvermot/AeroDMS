@@ -73,6 +73,13 @@ public:
 
     QStringList recupererBaladesEtSorties();
     AeroDmsTypes::ListeSortie recupererListeSorties();
+    QString recupererAeroclub(QString p_piloteId);
+    QString recupererNomPrenomPilote(QString p_piloteId);
+
+    int recupererLigneCompta(QString p_typeDeRecetteDepenseId);
+    
+    AeroDmsTypes::ResultatCreationPilote creerPilote(AeroDmsTypes::Pilote p_pilote);
+    
 
 public slots:
 
