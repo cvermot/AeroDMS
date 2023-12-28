@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. déc. 27 18:12:25 2023
+-- File generated with SQLiteStudio v3.4.4 on jeu. déc. 28 16:59:24 2023
 --
 -- Text encoding used: UTF-8
 --
@@ -35,6 +35,41 @@ CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE N
 
 -- Table: xAssociationRecette-Vol
 CREATE TABLE IF NOT EXISTS "xAssociationRecette-Vol" (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, recetteId INTEGER REFERENCES recettes (recetteId) NOT NULL, volId INTEGER REFERENCES vol (volId) NOT NULL);
+
+-- View: cotisationsASoumettreCe
+CREATE VIEW IF NOT EXISTS cotisationsASoumettreCe AS SELECT cotisation.pilote,
+       cotisation.annee,
+       cotisation.cotisationId,
+       cotisation.idRecette,
+       pilote.nom,
+       recettes.montant,
+       recettes.Intitule
+FROM cotisation
+     INNER JOIN pilote ON cotisation.pilote = pilote.piloteId
+     INNER JOIN recettes ON recettes.recetteId = cotisation.idRecette
+WHERE 
+      recettes.identifiantFormulaireSoumissionCe IS NULL
+ORDER BY cotisation.annee;
+
+-- View: recettesASoumettreCe
+CREATE VIEW IF NOT EXISTS recettesASoumettreCe AS SELECT recettes.typeDeRecette,
+       recettes.montant,
+       vol.date,
+       vol.volId,
+       strftime('%Y', vol.date) AS annee,
+       vol.duree,
+       vol.montantRembourse,
+       vol.cout,
+       recettes.recetteId
+FROM recettes
+INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
+INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId
+WHERE recettes.identifiantFormulaireSoumissionCe IS NULL
+GROUP BY recettes.recetteId;
+
+-- View: recettesASoumettreCeParTypeEtParAnnee
+CREATE VIEW IF NOT EXISTS recettesASoumettreCeParTypeEtParAnnee AS SELECT typeDeRecette, annee, SUM(montant) FROM recettesASoumettreCe
+GROUP BY annee, typeDeRecette;
 
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 

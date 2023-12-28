@@ -300,14 +300,16 @@ QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVol
     return liste;
 }
 
-QStringList ManageDb::recupererBaladesEtSorties()
+QStringList ManageDb::recupererBaladesEtSorties(QString p_typeDeVol)
 {
-    QString sql = "SELECT * FROM 'volsBaladesEtSorties'";
-    qDebug() << sql;
+    //QString sql = "SELECT * FROM 'volsBaladesEtSorties'";
+    //qDebug() << sql;
 
     QStringList liste;
     QSqlQuery query;
-    query.exec(sql);
+    query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
+    query.bindValue(":typeDeVol", p_typeDeVol);
+    query.exec();
     while (query.next()) {
         liste.append(query.value(2).toString());
     }
@@ -379,21 +381,33 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(AeroDmsTypes::Pilote 
         piloteId.replace("à", "a");
         piloteId.replace("â", "a");
 
-        //Verifier si le pilote n'existe pas
-        //TODO
-
+        //Verifier si le pilote existe
         QSqlQuery query;
-        query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque)");
+        query.prepare("SELECT * FROM pilote WHERE piloteId = :piloteId");
         query.bindValue(":piloteId", piloteId);
-        query.bindValue(":nom", p_pilote.nom);
-        query.bindValue(":prenom", p_pilote.prenom);
-        query.bindValue(":aeroclub", p_pilote.aeroclub);
-        query.bindValue(":estAyantDroit", p_pilote.estAyantDroit);
-        query.bindValue(":mail", p_pilote.mail);
-        query.bindValue(":telephone", p_pilote.telephone);
-        query.bindValue(":remarque", p_pilote.remarque);
-
         query.exec();
+        query.next();
+        if (query.size() > 0)
+        {
+            resultat = AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE;
+        }
+        else
+        {
+            query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque)");
+            query.bindValue(":piloteId", piloteId);
+            query.bindValue(":nom", p_pilote.nom);
+            query.bindValue(":prenom", p_pilote.prenom);
+            query.bindValue(":aeroclub", p_pilote.aeroclub);
+            query.bindValue(":estAyantDroit", p_pilote.estAyantDroit);
+            query.bindValue(":mail", p_pilote.mail);
+            query.bindValue(":telephone", p_pilote.telephone);
+            query.bindValue(":remarque", p_pilote.remarque);
+
+            if (!query.exec())
+            {
+                resultat = AeroDmsTypes::ResultatCreationPilote_AUTRE;
+            }
+        } 
     }
     //mise à jour
     else
@@ -402,4 +416,13 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(AeroDmsTypes::Pilote 
     }
 
     return resultat;
+}
+
+void ManageDb::creerSortie(AeroDmsTypes::Sortie p_sortie)
+{
+    QSqlQuery query;
+    query.prepare("INSERT INTO sortie ('nom','date') VALUES (:nom,:date)");
+    query.bindValue(":nom",p_sortie.nom);
+    query.bindValue(":date", p_sortie.date.toString("yyyy-MM-dd"));
+    query.exec();
 }

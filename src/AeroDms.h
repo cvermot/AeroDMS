@@ -9,6 +9,7 @@
 #include "PdfRenderer.h"
 #include "DialogueGestionPilote.h"
 #include "DialogueAjouterCotisation.h"
+#include "DialogueAjouterSortie.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -42,6 +43,7 @@ private:
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
     DialogueAjouterCotisation* dialogueAjouterCotisation;
+    DialogueAjouterSortie* dialogueAjouterSortie;
 
     int factureIdEnBdd;
 
@@ -79,9 +81,13 @@ public slots:
     void enregistrerUneRecette();
     void genererPdf();
     void prevaliderDonnnesSaisies();
+    void prevaliderDonnneesSaisiesRecette();
     void changerInfosVolSurSelectionTypeVol();
+    void chargerBaladesSorties();
     void ajouterUnPilote();
     void ajouterUnPiloteEnBdd();
+    void ajouterUneSortie();
+    void ajouterUneSortieEnBdd();
     void ajouterUneCotisation();
     void ajouterUneCotisationEnBdd();
 

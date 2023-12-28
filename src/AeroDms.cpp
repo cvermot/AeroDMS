@@ -139,19 +139,21 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     typeDeRecette = new QComboBox(this);
     qDebug() << "ComboBox typeRecetteVol";
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
+    connect(typeDeRecette, &QComboBox::currentIndexChanged, this, &AeroDms::chargerBaladesSorties);
     //typeDeRecette->setCurrentIndex(2);
     QLabel* typeDeRecetteLabel = new QLabel(tr("Type de vol : "), this);
 
     intituleRecette = new QLineEdit(this);
-    QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this);
+    QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this); 
+    connect(intituleRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     montantRecette = new QDoubleSpinBox(this);
-    //prixDuVol->setInputMask("009,00€");
     montantRecette->setRange(0.0, 2000.0);
     montantRecette->setSingleStep(1.0);
     montantRecette->setDecimals(2);
     montantRecette->setSuffix("€");
     QLabel* montantRecetteLabel = new QLabel(tr("Montant : "), this);
+    connect(montantRecette, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     validerLaRecette = new QPushButton("Valider la recette", this);
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
@@ -206,7 +208,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     const QIcon iconeAjouterSortie = QIcon("./ressources/transit-connection-variant.svg");
     QAction* bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("&Ajouter une sortie"), this);
     bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
-    //connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
+    connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
 
     QToolBar* SelectionToolBar = addToolBar(tr(""));
@@ -220,7 +222,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     listeDeroulantePilote = new QComboBox;
     SelectionToolBar->addWidget(listeDeroulantePilote);
 
-
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
@@ -228,10 +229,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     dialogueAjouterCotisation = new DialogueAjouterCotisation(db, this);
     connect(dialogueAjouterCotisation, SIGNAL(accepted()), this, SLOT(ajouterUneCotisationEnBdd()));
 
+    dialogueAjouterSortie = new DialogueAjouterSortie(this);
+    connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
+
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
     prevaliderDonnnesSaisies();
+    prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
 }
 
@@ -254,22 +259,49 @@ void AeroDms::ajouterUneCotisationEnBdd()
     }
 }
 
+void AeroDms::chargerBaladesSorties()
+{
+    peuplerListeBaladesEtSorties();
+}
+
 void AeroDms::ajouterUnPiloteEnBdd()
 {
     AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
     AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
 
-    if (resultat == AeroDmsTypes::ResultatCreationPilote_SUCCES)
+    switch (resultat)
     {
-        statusBar()->showMessage("Pilote ajouté avec succès");
-    }
-    else
-    {
-        statusBar()->showMessage("Echec ajout pilote");
+        case AeroDmsTypes::ResultatCreationPilote_SUCCES:
+        {
+            statusBar()->showMessage("Pilote ajouté avec succès");
+            break;
+        } 
+        case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
+        {
+            statusBar()->showMessage("Echec ajout pilote : le pilote existe déjà");
+            QMessageBox::critical(this, "Echec ajoute pilote", "Un pilote existe avec ce nom\nexiste déjà. Ajout impossible.");
+            break;
+        }
+        case AeroDmsTypes::ResultatCreationPilote_AUTRE:
+        {
+            statusBar()->showMessage("Echec ajout pilote : erreur indéterminée");
+            QMessageBox::critical(this, "Echec ajoute pilote", "Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible.");
+            break;
+        }
     }
 
     //On met à jour les listes de pilotes
     peuplerListesPilotes();
+}
+
+void AeroDms::ajouterUneSortieEnBdd()
+{
+    AeroDmsTypes::Sortie sortie = dialogueAjouterSortie->recupererInfosSortieAAjouter();
+
+    db->creerSortie(sortie);
+    statusBar()->showMessage("Sortie ajoutée");
+    peuplerListeBaladesEtSorties();
+    peuplerListeSorties();
 }
 
 void AeroDms::selectionnerUneFacture()
@@ -525,7 +557,7 @@ void AeroDms::peuplerListeBaladesEtSorties()
 {
     listeBaladesEtSorties->clear();
 
-    QStringList itemLabels = db->recupererBaladesEtSorties();
+    QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
     QStringListIterator it(itemLabels);
     while (it.hasNext())
     {
@@ -551,6 +583,17 @@ void AeroDms::prevaliderDonnnesSaisies()
     } 
 }
 
+void AeroDms::prevaliderDonnneesSaisiesRecette()
+{
+    validerLaRecette->setEnabled(true);
+
+    if ( montantRecette->value() == 0 
+         || intituleRecette->text() == "")
+    {
+        validerLaRecette->setEnabled(false);
+    }
+}
+
 void AeroDms::changerInfosVolSurSelectionTypeVol()
 {
     qDebug() << typeDeVol->currentText();
@@ -574,6 +617,11 @@ void AeroDms::changerInfosVolSurSelectionTypeVol()
 void AeroDms::ajouterUnPilote()
 {
     dialogueGestionPilote->exec();
+}
+
+void AeroDms::ajouterUneSortie()
+{
+    dialogueAjouterSortie->exec();
 }
 
 void AeroDms::ajouterUneCotisation()

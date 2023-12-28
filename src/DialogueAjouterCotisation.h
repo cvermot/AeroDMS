@@ -14,9 +14,6 @@ public:
     void mettreAJourLeContenuDeLaFenetre();
     AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
 
-    //QUasShared::UasMaintenanceOperationToDb getMaintenanceData();
-    //void updateWindowContentFromDb();
-
 private:
     QComboBox* listePilote;
     QComboBox* annee;
@@ -31,17 +28,6 @@ private:
     QWidget* extension;
 
     void peuplerListePilote();
-
-    /*void populateMecanicianComboBox();
-    void populateEquipementTypeComboBox(const int droneTypeId = -1);
-    void populateDroneImmatComboBox(const int eqptTypeId = -1);
-    void populateOperationComboBox(const int eqptTypeId = -1);
-
-private slots:
-    void manageEquipementTypeChanged();
-    void manageEquipementChanged();
-    void updateScenarioList();
-    void updateOperationDescription();*/
 };
 
 #endif // DIALOGUEAJOUTERCOTISATION_H

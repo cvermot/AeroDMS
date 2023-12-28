@@ -71,7 +71,7 @@ public:
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
-    QStringList recupererBaladesEtSorties();
+    QStringList recupererBaladesEtSorties(QString p_typeDeVol);
     AeroDmsTypes::ListeSortie recupererListeSorties();
     QString recupererAeroclub(QString p_piloteId);
     QString recupererNomPrenomPilote(QString p_piloteId);
@@ -79,6 +79,7 @@ public:
     int recupererLigneCompta(QString p_typeDeRecetteDepenseId);
     
     AeroDmsTypes::ResultatCreationPilote creerPilote(AeroDmsTypes::Pilote p_pilote);
+    void creerSortie(AeroDmsTypes::Sortie p_sortie);
     
 
 public slots:

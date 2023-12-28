@@ -33,36 +33,26 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
 
     okButton = new QPushButton(tr("&Ajouter"), this);
-    //okButton->setCheckable(true);
+    okButton->setDisabled(true);
     okButton->setDefault(true);
+    okButton->setToolTip("Remplir à minima les champs nom, prénom et aéroclub");
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
     buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
     buttonBox->addButton(cancelButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(okButton, QDialogButtonBox::ActionRole);
 
-    /*mecanician = new QComboBox(this);
-    QLabel* mecanicianLabel = new QLabel(tr("Mécanicien : "), this);
-
-    eqptList = new QComboBox(this);
-    equipementTypeList = new QComboBox(this);
-    QLabel* equipementTypeLabel = new QLabel(tr("Équipement : "), this);
-
-    date = new QDateEdit(this);
-    date->setDate(QDate::currentDate());
-    QLabel* dateLabel = new QLabel(tr("Date : "), this);
-
-    operation = new QComboBox(this);
-    QLabel* scenarioLabel = new QLabel(tr("Type d'opération : "), this);*/
-
     nom = new QLineEdit(this);
     QLabel* nomLabel = new QLabel(tr("Nom : "), this);
+    connect(nom, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
     prenom = new QLineEdit(this);
     QLabel* prenomLabel = new QLabel(tr("Prénom : "), this);
+    connect(prenom, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
     aeroclub = new QLineEdit(this);
     QLabel* aeroclubLabel = new QLabel(tr("Aéroclub : "), this);
+    connect(aeroclub, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
     estAyantDroit = new QCheckBox(this);
     QLabel* estAyantDroitLabel = new QLabel(tr("Ayant droit : "), this);
@@ -111,13 +101,6 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     setLayout(mainLayout);
 
     setWindowTitle(tr("Ajouter un pilote"));
-
-    //updateWindowContentFromDb();
-
-    /*connect(equipementTypeList, SIGNAL(activated(int)), this, SLOT(manageEquipementTypeChanged()));
-    connect(eqptList, SIGNAL(activated(int)), this, SLOT(manageEquipementChanged()));
-    connect(operation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateOperationDescription()));
-    connect(eqptList, SIGNAL(currentIndexChanged(int)), this, SLOT(updateScenarioList()));*/
 }
 
 AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
@@ -146,99 +129,14 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     return pilote;
 }
 
-/*QUasShared::UasMaintenanceOperationToDb MaintenanceDialog::getMaintenanceData()
+void DialogueGestionPilote::prevaliderDonneesSaisies()
 {
-    QUasShared::UasMaintenanceOperationToDb maintenanceData;
-    maintenanceData.date = date->date();
-    maintenanceData.equipementId = eqptList->itemData(eqptList->currentIndex()).toInt();
-    maintenanceData.mecanicianId = mecanician->itemData(mecanician->currentIndex()).toInt();
-    maintenanceData.operationId = operation->itemData(operation->currentIndex()).toInt();
-    maintenanceData.observation = observation->text();
+    okButton->setDisabled(false);
 
-    return maintenanceData;
-}*/
-
-/*void MaintenanceDialog::populateMecanicianComboBox()
-{
-    mecanician->clear();
-
-    const QUasShared::UasPilotList mecanicians = database->getPilots();
-    for (int i = 0; i < mecanicians.size(); i++)
+    if (nom->text() == ""
+        || prenom->text() == ""
+        || aeroclub->text() == "")
     {
-        mecanician->addItem(mecanicians.at(i).name, mecanicians.at(i).id);
+        okButton->setDisabled(true);
     }
 }
-
-void MaintenanceDialog::populateEquipementTypeComboBox(const int droneTypeId)
-{
-    equipementTypeList->clear();
-
-    equipementTypeList->addItem("Tous", -1);
-
-    const QUasShared::UasUasTypeList list = database->getEquipmentsType();
-    for (int i = 0; i < list.size(); i++)
-    {
-        equipementTypeList->addItem(list.at(i).name, list.at(i).id);
-    }
-}
-
-void MaintenanceDialog::populateOperationComboBox(const int eqptTypeId)
-{
-    operation->clear();
-
-    const QUasShared::UasMaintenanceOperationTypeList scenarioList = database->getMaintenanceOperationList(eqptTypeId);
-
-    for (int i = 0; i < scenarioList.size(); i++)
-    {
-        operation->addItem(scenarioList.at(i).name, scenarioList.at(i).id);
-    }
-
-}
-
-void MaintenanceDialog::populateDroneImmatComboBox(const int eqptTypeId)
-{
-    eqptList->clear();
-
-    const QUasShared::UasEqptList eqpt = database->getEquipments(eqptTypeId);
-    for (int i = 0; i < eqpt.size(); i++)
-    {
-        eqptList->addItem(eqpt.at(i).name + " (S/N " + eqpt.at(i).serial + ")", eqpt.at(i).id);
-    }
-}
-
-void MaintenanceDialog::manageEquipementTypeChanged()
-{
-    populateDroneImmatComboBox(equipementTypeList->itemData(equipementTypeList->currentIndex()).toInt());
-}
-
-void MaintenanceDialog::manageEquipementChanged()
-{
-    const int typeId = database->getEqptTypeById(eqptList->itemData(eqptList->currentIndex()).toInt());
-    const int index = equipementTypeList->findData(typeId);
-    qDebug() << typeId << " " << index;
-    equipementTypeList->setCurrentIndex(index);
-
-    populateOperationComboBox();
-}
-
-void MaintenanceDialog::updateScenarioList()
-{
-    populateOperationComboBox(equipementTypeList->itemData(equipementTypeList->currentIndex()).toInt());
-}
-
-void MaintenanceDialog::updateOperationDescription()
-{
-    const QString operationDesc = database->getMaintenanceOperationDescription(operation->itemData(operation->currentIndex()).toInt());
-    operationDescription->setText(operationDesc);
-}
-
-void MaintenanceDialog::updateWindowContentFromDb()
-{
-    populateMecanicianComboBox();
-    populateEquipementTypeComboBox();
-    populateDroneImmatComboBox();
-    populateOperationComboBox();
-
-    updateOperationDescription();
-    updateScenarioList();
-}*/

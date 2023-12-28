@@ -13,9 +13,6 @@ public:
 
     AeroDmsTypes::Pilote recupererInfosPilote();
 
-    //QUasShared::UasMaintenanceOperationToDb getMaintenanceData();
-    //void updateWindowContentFromDb();
-
 private:
     QLineEdit *nom;
     QLineEdit* prenom;
@@ -32,18 +29,10 @@ private:
     QDialogButtonBox* buttonBox;
     QPushButton* cancelButton;
     QPushButton* okButton;
-    QWidget* extension;
-
-    /*void populateMecanicianComboBox();
-    void populateEquipementTypeComboBox(const int droneTypeId = -1);
-    void populateDroneImmatComboBox(const int eqptTypeId = -1);
-    void populateOperationComboBox(const int eqptTypeId = -1);
+    //QWidget* extension;
 
 private slots:
-    void manageEquipementTypeChanged();
-    void manageEquipementChanged();
-    void updateScenarioList();
-    void updateOperationDescription();*/
+    void prevaliderDonneesSaisies();
 };
 
 #endif // DIALOGUEGESTIONPILOTE_H

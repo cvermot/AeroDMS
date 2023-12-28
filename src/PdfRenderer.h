@@ -24,14 +24,15 @@ private :
 	int nombreFacturesATraiter;
 
 	void imprimerLaProchaineDemandeDeSubvention();
+	void remplirLeChampMontant(QString& p_html, const float p_montant);
 
 signals:
 	void mettreAJourNombreFactureTraitees(int nombreFacturesATraiter, int nombreFactureTraitees);
 
 public slots:
-    void wevLoadFinished(bool retour);
-    void wevPdfPrintingFinished(const QString& filePath, bool success);
-    void wevLoadTerminationStatus(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode);
+    void chargementTermine(bool retour);
+    void impressionTerminee(const QString& filePath, bool success);
+    void statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode);
 
 };
 
