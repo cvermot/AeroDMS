@@ -47,6 +47,13 @@ public:
     };
     typedef QList<DemandeRemboursement> ListeDemandeRemboursement;
 
+    struct Recette {
+        QString intitule;
+        float montant;
+        int annee;
+    };
+    typedef QList<Recette> ListeRecette;
+
     struct Sortie {
         int id;
         QString nom;

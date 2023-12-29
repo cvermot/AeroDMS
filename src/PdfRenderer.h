@@ -21,6 +21,8 @@ private :
 	QString templateCe;
 
 	int nombreFacturesTraitees;
+	int nombreCotisationsTraitees;
+	int nombreRecettesBaladeSortieTraitees;
 	int nombreFacturesATraiter;
 
 	void imprimerLaProchaineDemandeDeSubvention();

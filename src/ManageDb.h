@@ -56,6 +56,12 @@ public:
                                          const int p_facture,
                                          const int p_idSortie,
                                          const QString& p_remarque);
+    void enregistrerUneFacture( const QString& p_payeur,
+                                const int factureId,
+                                const QDate& p_date,
+                                const float p_montantFacture,
+                                const int p_idSortie,
+                                const QString& p_remarqueFacture);
 
     void ajouterUneRecetteAssocieeAVol( const QStringList& p_listeVols,
                                         const QString& p_typeDeRecette,
@@ -68,11 +74,15 @@ public:
     void ajouterCotisation ( AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
 
     AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
+    AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();
+    AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre();
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
     QStringList recupererBaladesEtSorties(QString p_typeDeVol);
     AeroDmsTypes::ListeSortie recupererListeSorties();
+    AeroDmsTypes::ListeSortie recupererListeBalade();
+    AeroDmsTypes::ListeSortie recupererListeDepensesPouvantAvoirUneFacture();
     QString recupererAeroclub(QString p_piloteId);
     QString recupererNomPrenomPilote(QString p_piloteId);
 

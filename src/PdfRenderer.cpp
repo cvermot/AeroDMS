@@ -25,14 +25,13 @@ void PdfRenderer::chargementTermine(bool retour)
 {
     qDebug() << "Chargement termine QWEV" << view->url() << retour;
     //view->save("C:/Users/cleme/source/AeroDms/AeroDms/testWV.html", QWebEngineDownloadRequest::SingleHtmlSaveFormat);
-    view->printToPdf(QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees)).append(".pdf"));
+    view->printToPdf(QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees+nombreCotisationsTraitees+ nombreRecettesBaladeSortieTraitees)).append(".pdf"));
 }
 
 void PdfRenderer::impressionTerminee(const QString& filePath, bool success)
 {
     qDebug() << "Impression termine QWEV" << filePath << success;
 
-    nombreFacturesTraitees++;
     emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
     imprimerLaProchaineDemandeDeSubvention();
 }
@@ -47,6 +46,8 @@ int PdfRenderer::imprimerLesDemandesDeSubvention()
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
+    nombreCotisationsTraitees = 0;
+    nombreRecettesBaladeSortieTraitees = 0;
     emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
 
     imprimerLaProchaineDemandeDeSubvention();
@@ -75,6 +76,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     templateCeTmp.replace("xxSignataire", "Cl&eacute;ment VERMOT-DESROCHES");
 
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
+    AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
+    AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
+
     if (nombreFacturesTraitees < listeDesRemboursements.size())
     {    
         //Depense
@@ -106,7 +110,63 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         //On envoie le HTML en génération
         view->setHtml(templateCeTmp);
+
+        nombreFacturesTraitees++;
     }
+    //Recettes "Cotisations"
+    else if (nombreCotisationsTraitees < listeDesCotisations.size())
+    {
+        //Depense
+        templateCeTmp.replace("xxD", "");
+        //Recette
+        templateCeTmp.replace("xxR", "X");
+        //Cheque a retirer au CE par le demandeur => non coché
+        templateCeTmp.replace("zzC", "");
+        //Bénéficaire : le CSE
+        templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
+        //Montant
+        remplirLeChampMontant(templateCeTmp, listeDesCotisations.at(nombreCotisationsTraitees).montant);
+        //Observation
+        templateCeTmp.replace("xxObservation", listeDesCotisations.at(nombreCotisationsTraitees).intitule);
+
+        //Année / Budget
+        QString ligneBudget = QString::number(db->recupererLigneCompta("Cotisation"));
+        ligneBudget.append(" / ");
+        ligneBudget.append(QString::number(listeDesCotisations.at(nombreCotisationsTraitees).annee));
+        templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
+
+        view->setHtml(templateCeTmp);
+
+        nombreCotisationsTraitees++;
+    }
+    //Recettes "passagers" des sorties et balades
+    else if (nombreRecettesBaladeSortieTraitees < listeDesRecettesBaladesSorties.size())
+    {
+        //Depense
+        templateCeTmp.replace("xxD", "");
+        //Recette
+        templateCeTmp.replace("xxR", "X");
+        //Cheque a retirer au CE par le demandeur => non coché
+        templateCeTmp.replace("zzC", "");
+        //Bénéficaire : le CSE
+        templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
+
+        //Montant
+        remplirLeChampMontant(templateCeTmp, listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees).montant);
+        //Observation
+        templateCeTmp.replace("xxObservation", QString("Participations ").append(listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees).intitule));
+
+        //Année / Budget
+        QString ligneBudget = QString::number(db->recupererLigneCompta(listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees).intitule));
+        ligneBudget.append(" / ");
+        ligneBudget.append(QString::number(listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees).annee));
+        templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
+
+        view->setHtml(templateCeTmp);
+
+        nombreRecettesBaladeSortieTraitees++;
+    }
+
 
 }
 

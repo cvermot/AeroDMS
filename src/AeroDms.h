@@ -51,7 +51,7 @@ private:
 
     QTabWidget* mainTabWidget;
 
-    //Onglet "Ajouter Vol"
+    //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;
     QComboBox* choixPilote;
     QDateTimeEdit* dateDuVol;
@@ -60,6 +60,13 @@ private:
     QComboBox* choixBalade;
     QLineEdit* remarqueVol;
     QPushButton* validerLeVol;
+
+    QComboBox* choixPayeur;
+    QDateEdit* dateDeFacture;
+    QDoubleSpinBox* montantFacture;
+    QLineEdit* remarqueFacture;
+    QComboBox* choixBaladeFacture;
+    QPushButton* validerLaFacture;
 
     //Onglet "Ajouter recette"
     QListWidget* listeBaladesEtSorties;
@@ -78,6 +85,7 @@ private:
 public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
+    void enregistrerUneFacture();
     void enregistrerUneRecette();
     void genererPdf();
     void prevaliderDonnnesSaisies();

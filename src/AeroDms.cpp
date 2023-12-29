@@ -56,11 +56,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
     mainTabWidget->addTab(vueVols, "Vols");
 
-    //==========Onglet Ajout vol
+    //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
     QWidget* widgetAjoutVol = new QWidget(this);
     widgetAjoutVol->setLayout(ajoutVol);
-    mainTabWidget->addTab(widgetAjoutVol, "Ajout vol");
+    mainTabWidget->addTab(widgetAjoutVol, "Ajout dépense");
 
     pdfDocument = new QPdfDocument(this);
     QPdfView* pdfView = new QPdfView(this);
@@ -68,6 +68,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     pdfView->setPageMode(QPdfView::PageMode::MultiPage);
     ajoutVol->addWidget(pdfView, 3);
 
+    QTabWidget *depenseTabWidget = new QTabWidget(this);
+    ajoutVol->addWidget(depenseTabWidget, 1);
+    
+
+    //==========Sous onglet vol de l'onglet "Ajout dépense"
     typeDeVol = new QComboBox(this);
     typeDeVol->addItems(db->recupererTypesDesVol());
     typeDeVol->setCurrentIndex(2);
@@ -86,12 +91,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* dateDuVolLabel = new QLabel(tr("Date du vol : "), this);
 
     dureeDuVol = new QTimeEdit(this);
-    //dureeDuVol->setInputMask("9:99");
     QLabel* dureeDuVolLabel = new QLabel(tr("Durée du vol : "), this);
     connect(dureeDuVol, &QTimeEdit::timeChanged, this, &AeroDms::prevaliderDonnnesSaisies);
 
     prixDuVol = new QDoubleSpinBox(this);
-    //prixDuVol->setInputMask("009,00€");
     prixDuVol->setRange(0.0, 2000.0);
     prixDuVol->setSingleStep(1.0);
     prixDuVol->setDecimals(2);
@@ -110,7 +113,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(validerLeVol, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
 
     QGridLayout* infosVol = new QGridLayout(this);
-    ajoutVol->addLayout(infosVol,1);
+    QWidget* widgetDepenseVol = new QWidget(this);
+    widgetDepenseVol->setLayout(infosVol);
+    depenseTabWidget->addTab(widgetDepenseVol, "Vol");
     infosVol->addWidget(typeDeVolLabel,   0, 0);
     infosVol->addWidget(typeDeVol,        0, 1);
     infosVol->addWidget(choixPiloteLabel, 1, 0);
@@ -126,6 +131,57 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosVol->addWidget(remarqueVolLabel, 6, 0);
     infosVol->addWidget(remarqueVol,      6, 1);
     infosVol->addWidget(validerLeVol,     7, 0, 2, 0);
+
+    //==========Sous onglet facture de l'onglet "Ajout dépense"
+    choixPayeur = new QComboBox(this);
+    QLabel* choixPayeurLabel = new QLabel(tr("Payeur : "), this);
+    connect(choixPayeur, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
+    /*typeDeVol = new QComboBox(this);
+    typeDeVol->addItems(db->recupererTypesDesVol());
+    typeDeVol->setCurrentIndex(2);
+    QLabel* typeDeVolLabel = new QLabel(tr("Type de vol : "), this);
+    connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::changerInfosVolSurSelectionTypeVol);
+    connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);*/
+
+    dateDeFacture = new QDateEdit(this);
+    dateDeFacture->setDisplayFormat("dd/MM/yyyy");
+    dateDeFacture->setCalendarPopup(true);
+    dateDeFacture->setDate(QDate::currentDate());
+    QLabel* dateDeFactureLabel = new QLabel(tr("Date de la facture : "), this);
+
+    choixBaladeFacture = new QComboBox(this);
+    QLabel* choixBaladeFactureLabel = new QLabel(tr("Sortie : "), this);
+    connect(choixBaladeFacture, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
+
+    montantFacture = new QDoubleSpinBox(this);
+    montantFacture->setRange(0.0, 2000.0);
+    montantFacture->setSingleStep(1.0);
+    montantFacture->setDecimals(2);
+    montantFacture->setSuffix("€");
+    QLabel* montantFactureLabel = new QLabel(tr("Montant facture : "), this);
+    connect(montantFacture, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnnesSaisies);
+
+    remarqueFacture = new QLineEdit(this);
+    QLabel* remarqueFactureLabel = new QLabel(tr("Remarque : "), this);
+
+    validerLaFacture = new QPushButton("Valider la facture", this);
+    connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
+
+    QGridLayout* infosFacture = new QGridLayout(this);
+    QWidget* widgetDepenseFacture = new QWidget(this);
+    widgetDepenseFacture->setLayout(infosFacture);
+    depenseTabWidget->addTab(widgetDepenseFacture, "Facture");
+    infosFacture->addWidget(choixPayeurLabel, 1, 0);
+    infosFacture->addWidget(choixPayeur, 1, 1);
+    infosFacture->addWidget(dateDeFactureLabel, 2, 0);
+    infosFacture->addWidget(dateDeFacture, 2, 1);
+    infosFacture->addWidget(montantFactureLabel, 4, 0);
+    infosFacture->addWidget(montantFacture, 4, 1);
+    infosFacture->addWidget(choixBaladeFactureLabel, 5, 0);
+    infosFacture->addWidget(choixBaladeFacture, 5, 1);
+    infosFacture->addWidget(remarqueFactureLabel, 6, 0);
+    infosFacture->addWidget(remarqueFacture, 6, 1);
+    infosFacture->addWidget(validerLaFacture, 7, 0, 2, 0);
 
     //==========Onglet Ajout recette
     QHBoxLayout* ajoutRecette = new QHBoxLayout(this);
@@ -144,6 +200,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* typeDeRecetteLabel = new QLabel(tr("Type de vol : "), this);
 
     intituleRecette = new QLineEdit(this);
+    intituleRecette->setToolTip(tr("Format recommandé : 'NOM EMETTEUR CHEQUE / Banque numéro de chèque'"));
     QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this); 
     connect(intituleRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
@@ -166,10 +223,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosRecette->addWidget(intituleRecette, 1, 1);
     infosRecette->addWidget(montantRecetteLabel, 2, 0);
     infosRecette->addWidget(montantRecette, 2, 1);
-    /*infosRecette->addWidget(dureeDuVolLabel, 3, 0);
-    infosRecette->addWidget(dureeDuVol, 3, 1);
-    infosRecette->addWidget(prixDuVolLabel, 4, 0);
-    infosRecette->addWidget(prixDuVol, 4, 1);*/
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 
     //=============General
@@ -250,7 +303,7 @@ void AeroDms::ajouterUneCotisationEnBdd()
     AeroDmsTypes::CotisationAnnuelle infosCotisation = dialogueAjouterCotisation->recupererInfosCotisationAAjouter();
     if (db->piloteEstAJourDeCotisation(infosCotisation.idPilote, infosCotisation.annee))
     {
-        QMessageBox::critical(this, "Cotisation déja reglée", "Le pilote indiqué est déjà à jour de \nsa cotisation pour l'année saisie.");
+        QMessageBox::critical(this, "Cotisation déja reglée", "Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie.");
     }
     //Si le pilote n'a pas deja une cotisation pour cette année la, on ajoute la cotisation en BDD
     else
@@ -338,12 +391,103 @@ void AeroDms::genererPdf()
     pdf->imprimerLesDemandesDeSubvention();
 }
 
+void AeroDms::enregistrerUneFacture()
+{
+    bool estEnEchec = false;
+    const int anneeRenseignee = dateDeFacture->date().year();
+    const QString idPilote = choixPayeur->currentData().toString();
+    const int idSortie = choixBaladeFacture->currentData().toInt();
+
+    //On verifie si le pilote est a jour de sa cotisation pour l'année de la facture
+    if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
+    {
+        estEnEchec = true;
+        QMessageBox::critical(this, tr("AeroDMS"),
+            tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
+               "Impossible d'enregistrer une facture à rembourser à son profit."), QMessageBox::Cancel);
+    }
+
+    //On effectue d'abord quelques contrôles pour savoir si la facture est enregistrable :
+    //1) on a une facture chargée
+    //2) les données (pilote, date du vol, durée, cout) sont renseignées
+    //3) on est pas en echec sur une des étapes précédentes
+    if (pdfDocument->status() == QPdfDocument::Status::Ready
+        && !estEnEchec)
+    {
+        if (choixPayeur->isEnabled())
+        {
+            QString nomDeLaFacture = "";
+            //Le comboBox choixPayeur est activé : la facture n'est pas encore soumise
+            //1) on sauvegarde la facture avec les autres, en le renommant
+            //2) on la référence en BDD
+            pdfDocument->close();
+            //On forme le nom du fichier sous forme annee.nomSortie.intitule.idFactureBdd.pdf
+            int idFactureBdd = db->recupererProchainNumeroFacture();
+            nomDeLaFacture.append(QString::number(anneeRenseignee));
+            nomDeLaFacture.append(".");
+            nomDeLaFacture.append(idPilote);
+            nomDeLaFacture.append(".facture.");
+            nomDeLaFacture.append(QString::number(idFactureBdd));
+            nomDeLaFacture.append(".pdf");
+            qDebug() << "nom fichier" << nomDeLaFacture << " / chemin " << cheminStockageFacturesTraitees;
+            QString cheminComplet = cheminStockageFacturesTraitees;
+            cheminComplet.append(nomDeLaFacture);
+            QFile gestionnaireDeFichier;
+            if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
+            {
+                qDebug() << gestionnaireDeFichier.errorString();
+                factureIdEnBdd = db->ajouterFacture(nomDeLaFacture);
+                pdfDocument->load(cheminComplet);
+                gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
+                cheminDeLaFactureCourante = cheminComplet;
+            }
+            else
+            {
+                statusBar()->showMessage("Impossible de déplacer la facture : arrêt.");
+                estEnEchec = true;
+            }
+        }
+        //On desactive le choix du payeur (la facture ne concerne qu'un seul et unique payeur)
+        choixPayeur->setEnabled(false);
+
+        //Ensuite :
+        //3) on enregistre la paiement en BDD, si on est pas en echec
+        if (!estEnEchec)
+        {
+            db->enregistrerUneFacture(idPilote,
+                factureIdEnBdd,
+                dateDeFacture->date(),
+                montantFacture->value(),
+                choixBaladeFacture->currentData().toInt(),
+                remarqueFacture->text());
+
+            statusBar()->showMessage(QString("Vol ")
+                + typeDeVol->currentText()
+                + " du "
+                + dateDuVol->date().toString("dd/MM/yyyy")
+                + " ("
+                + dureeDuVol->time().toString("hh:mm")
+                + "/"
+                + QString::number(prixDuVol->value())
+                + "€) ajouté. Montant subvention : "
+                //+ QString::number(montantSubventionne)
+                + "€ / Subvention entrainement restante : "
+                //+ QString::number(subventionRestante)
+                + "€");
+        }
+        else
+        {
+            statusBar()->showMessage("Erreur ajout");
+        }
+    } 
+}
+
+
 void AeroDms::enregistrerUnVol()
 {
     bool estEnEchec = false;
     const int anneeRenseignee = dateDuVol->date().year();
     const QString idPilote = choixPilote->currentData().toString();
-
 
     //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
     if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
@@ -358,12 +502,10 @@ void AeroDms::enregistrerUnVol()
     //1) on a une facture chargée
     //2) les données (pilote, date du vol, durée, cout) sont renseignées
     //3) on est pas en echec sur une des étapes précédentes
-
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec )
     {
         QString nomDeLaFacture = "";
-        //qDebug() << dureeDuVol->displayText();
         if (choixPilote->isEnabled())
         {
             //Le comboBox choixPilote est activé : on est sur le premier vol de cette facture :
@@ -399,70 +541,66 @@ void AeroDms::enregistrerUnVol()
         //On desactive le choix du pilote (la facture ne concerne qu'un seul et unique pilote)
         choixPilote->setEnabled(false);
 
-        //Ensuite :
+        //Ensuite, si on est pas en echec :
         //1) on récupère la subvention restante pour le pilote
         //2) on calcul la subvention allouable pour le vol
         //3) on enregistre le vol en BDD
         
-        float subventionRestante = db->recupererSubventionRestante(idPilote, anneeRenseignee);
-        //On initialise le montant subventionné sur la base du prix du vol (cas vols type sortie)
-        float montantSubventionne = prixDuVol->value();
-        if (typeDeVol->currentText() == "Balade")
-        {
-            qDebug() << "Balade";
-            float proportionPriseEnCharge = 1.0;
-            montantSubventionne = prixDuVol->value() * proportionPriseEnCharge; 
-        }
-        //Si on est en vol d'entrainement, calculs spécifiques et enregistrement spécifique
-        if (typeDeVol->currentText() == "Entrainement")
-        { 
-            qDebug() << "Entrainement";
-            float coutHoraire = calculerCoutHoraire();
-            if (coutHoraire > 150)
-            {
-                coutHoraire = 150;
-            }
-            montantSubventionne = (coutHoraire * (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()) / 60.0)*0.50;
-            if (montantSubventionne > subventionRestante)
-            {
-                montantSubventionne = subventionRestante;
-            }
-            qDebug() << "montant subvention : " << montantSubventionne << "Subvention restante : " << subventionRestante;
-            db->enregistrerUnVolDEntrainement(idPilote,
-                 typeDeVol->currentText(),
-                dateDuVol->date(),
-                dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
-                prixDuVol->value(),
-                montantSubventionne,
-                factureIdEnBdd,
-                remarqueVol->text());
+		if (!estEnEchec)
+		{
+			float subventionRestante = db->recupererSubventionRestante(idPilote, anneeRenseignee);
+			//On initialise le montant subventionné sur la base du prix du vol (cas vols type sortie)
+			float montantSubventionne = prixDuVol->value();
+			if (typeDeVol->currentText() == "Balade")
+			{
+				qDebug() << "Balade";
+				float proportionPriseEnCharge = 1.0;
+				montantSubventionne = prixDuVol->value() * proportionPriseEnCharge;
+			}
+			//Si on est en vol d'entrainement, calculs spécifiques et enregistrement spécifique
+			if (typeDeVol->currentText() == "Entrainement")
+			{
+				qDebug() << "Entrainement";
+				float coutHoraire = calculerCoutHoraire();
+				if (coutHoraire > 150)
+				{
+					coutHoraire = 150;
+				}
+				montantSubventionne = (coutHoraire * (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()) / 60.0) * 0.50;
+				if (montantSubventionne > subventionRestante)
+				{
+					montantSubventionne = subventionRestante;
+				}
+				qDebug() << "montant subvention : " << montantSubventionne << "Subvention restante : " << subventionRestante;
+				db->enregistrerUnVolDEntrainement(idPilote,
+					typeDeVol->currentText(),
+					dateDuVol->date(),
+					dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
+					prixDuVol->value(),
+					montantSubventionne,
+					factureIdEnBdd,
+					remarqueVol->text());
 
-            subventionRestante = subventionRestante - montantSubventionne;
-        }
-        //Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
-        else
-        {
-            qDebug() << "Id de la balade/sortie enregistrée" << choixBalade->currentData().toInt();
-            db->enregistrerUnVolSortieOuBalade(idPilote,
-                typeDeVol->currentText(),
-                dateDuVol->date(),
-                dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
-                prixDuVol->value(),
-                montantSubventionne,
-                factureIdEnBdd,
-                choixBalade->currentData().toInt(),
-                remarqueVol->text());
+				subventionRestante = subventionRestante - montantSubventionne;
+			}
+			//Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
+			else
+			{
+				qDebug() << "Id de la balade/sortie enregistrée" << choixBalade->currentData().toInt();
+				db->enregistrerUnVolSortieOuBalade(idPilote,
+					typeDeVol->currentText(),
+					dateDuVol->date(),
+					dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
+					prixDuVol->value(),
+					montantSubventionne,
+					factureIdEnBdd,
+					choixBalade->currentData().toInt(),
+					remarqueVol->text());
 
-            //On met a jour la liste des vols balades/sorties dans l'onglet des recettes
-            peuplerListeBaladesEtSorties();
-        }
+				//On met a jour la liste des vols balades/sorties dans l'onglet des recettes
+				peuplerListeBaladesEtSorties();
+			}
 
-        dureeDuVol->setTime(QTime::QTime(0,0));
-        prixDuVol->setValue(0);
-        remarqueVol->clear();
-
-        if (!estEnEchec)
-        {
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
                 + " du " 
@@ -476,11 +614,15 @@ void AeroDms::enregistrerUnVol()
                 + "€ / Subvention entrainement restante : "
                 + QString::number(subventionRestante)
                 + "€");
+
+            dureeDuVol->setTime(QTime::QTime(0, 0));
+            prixDuVol->setValue(0);
+            remarqueVol->clear();
         }
-    }
-    else
-    {
-        statusBar()->showMessage("Erreur ajout");
+        else
+        {
+            statusBar()->showMessage("Erreur ajout");
+        }
     }
 }
 
@@ -514,10 +656,6 @@ void AeroDms::enregistrerUneRecette()
 
 float AeroDms::calculerCoutHoraire()
 {
-    //qDebug() << "Durée en minutes " << dureeDuVol->time().hour() * 60 + dureeDuVol->time().minute();
-    //qDebug() << prixDuVol->value();
-    //qDebug() << "Cout horaire " << (prixDuVol->value()/ (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()))*60.0;
-
     return (prixDuVol->value() / (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute())) * 60.0;
 }
 
@@ -530,27 +668,49 @@ void AeroDms::peuplerListesPilotes()
 
     listeDeroulantePilote->addItem("Tous", "*");
     choixPilote->addItem("", "aucun");
+    choixPayeur->addItem("", "aucun");
     for (int i = 0; i < pilotes.size(); i++)
     {
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
         listeDeroulantePilote->addItem(nomPrenom, pilote.idPilote);
         choixPilote->addItem(nomPrenom, pilote.idPilote);
+        choixPayeur->addItem(nomPrenom, pilote.idPilote);
     }
 }
 
 void AeroDms::peuplerListeSorties()
 {
-    AeroDmsTypes::ListeSortie sorties = db->recupererListeSorties();
-
     choixBalade->clear();
-
+    choixBaladeFacture->clear();
     choixBalade->addItem("", -1);
+    choixBaladeFacture->addItem("", -1);
+
+    AeroDmsTypes::ListeSortie sorties;
+    if (typeDeVol->currentText() == "Balade")
+    {
+        sorties = db->recupererListeBalade();
+    }
+    else if (typeDeVol->currentText() == "Sortie")
+    {
+        sorties = db->recupererListeSorties();
+    }
+    
     for (int i = 0; i < sorties.size(); i++)
     {
         AeroDmsTypes::Sortie sortie = sorties.at(i);
-        choixBalade->addItem(sortie.nom.append(" ").append(sortie.date.toString("dd/MM/yyyy")), sortie.id);
+        sortie.nom.append(" ").append(sortie.date.toString("dd/MM/yyyy"));
+        choixBalade->addItem(sortie.nom, sortie.id);
     }
+
+    sorties = db->recupererListeDepensesPouvantAvoirUneFacture();
+    for (int i = 0; i < sorties.size(); i++)
+    {
+        AeroDmsTypes::Sortie sortie = sorties.at(i);
+        sortie.nom.append(" ").append(sortie.date.toString("dd/MM/yyyy"));
+        choixBaladeFacture->addItem(sortie.nom, sortie.id);
+    }
+
 }
 
 void AeroDms::peuplerListeBaladesEtSorties()
@@ -596,7 +756,7 @@ void AeroDms::prevaliderDonnneesSaisiesRecette()
 
 void AeroDms::changerInfosVolSurSelectionTypeVol()
 {
-    qDebug() << typeDeVol->currentText();
+    peuplerListeSorties();
     if (typeDeVol->currentText() == "Entrainement")
     {
         choixBalade->setEnabled(false);
