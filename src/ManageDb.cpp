@@ -55,7 +55,7 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
     AeroDmsTypes::ListePilotes listeDesPilotes;
 
     const QString sql = "SELECT * FROM pilote";
-    qDebug() << sql;
+    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -80,7 +80,7 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
 int ManageDb::recupererProchainNumeroFacture()
 {
     const QString sql = "SELECT seq FROM sqlite_sequence WHERE name = 'fichiersFacture'";
-    qDebug() << sql;
+    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -93,7 +93,7 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
     QString sql = "INSERT INTO 'fichiersFacture' ('nomFichier') VALUES('";
     sql.append(p_nomFichier);
     sql.append("')");
-    qDebug() << sql;
+    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -102,7 +102,7 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
     sql = "SELECT * FROM 'fichiersFacture' WHERE nomFichier='";
     sql.append(p_nomFichier);
     sql.append("'");
-    qDebug() << sql;
+    //qDebug() << sql;
 
     query.exec(sql);
     query.next();
@@ -118,7 +118,7 @@ float ManageDb::recupererSubventionRestante(const QString& p_piloteId, const int
     //query.prepare("SELECT subventionAllouee FROM subventionEntrainementAlloueeParPiloteEtParAnnee WHERE pilote = :piloteId AND annee = :annee");
     //query.bindValue(":piloteId", p_piloteId);
     //query.bindValue(":annee", p_annee);
-    qDebug() << sql;
+    //qDebug() << sql;
     query.exec(sql);
     query.next();
     return 750.0 - query.value(0).toFloat();
@@ -216,7 +216,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         query.next();
         const int numeroDeVol = query.value(0).toInt();
 
-        qDebug() << numeroDeVol << numeroDeRecetteCree;
+        //qDebug() << numeroDeVol << numeroDeRecetteCree;
 
         query.prepare("INSERT INTO 'xAssociationRecette-Vol' ('recetteId','volId') VALUES (:recetteId, :volId)");
         query.bindValue(":recetteId", numeroDeRecetteCree);
@@ -234,7 +234,7 @@ bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, const int a
     sql.append("' AND annee='");
     sql.append(QString::number(annee));
     sql.append("'");
-    qDebug() << sql;
+    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -247,7 +247,7 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
 {
     //Recuperation de l'ID de facture
     QString sql = "SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'";
-    qDebug() << sql;
+    //qDebug() << sql;
 
     AeroDmsTypes::ListeDemandeRemboursement liste;
     QSqlQuery query;
@@ -265,65 +265,152 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
     return liste;
 }
 
+QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTypes::DemandeRemboursement p_demande)
+{
+    QStringList listeFactures;
+
+    QSqlQuery query;
+    QString sql = "SELECT * FROM volARembourserParFacture WHERE typeDeVol = ':typeDeVol' AND pilote = ':pilote' AND annee = ':annee'";
+    sql.replace(":typeDeVol", p_demande.typeDeVol);
+    sql.replace(":pilote", p_demande.piloteId);
+    sql.replace(":annee", QString::number(p_demande.annee));
+    
+    query.exec(sql);
+    while (query.next())
+    {
+        listeFactures.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(query.value(5).toString()));
+    }
+
+    return listeFactures;
+}
+
+void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_demande)
+{
+    //On créé l'entrée dans demandeRemboursementSoumises
+    QSqlQuery query;
+    query.prepare("INSERT INTO demandeRemboursementSoumises (dateDemande, montant, nomBeneficiaire, typeDeDemande) VALUES (:dateDemande, :montant, :nomBeneficiaire, :typeDeDemande) RETURNING demandeRemboursementSoumises.demandeId");
+    query.bindValue(":dateDemande", QDate::currentDate().toString("yyyy-MM-dd"));
+    query.bindValue(":montant", p_demande.montant);
+    query.bindValue(":nomBeneficiaire", p_demande.nomBeneficiaire);
+    query.bindValue(":typeDeDemande", p_demande.typeDeVol);
+    query.exec();
+    query.next();
+    const int idDemandeRemboursement = query.value(0).toInt();
+
+    if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_HEURE_DE_VOL)
+    {
+        query.prepare("UPDATE vol SET demandeRemboursement = :idDemandeRemboursement WHERE strftime('%Y', vol.date) = :annee AND vol.pilote = :pilote AND vol.typeDeVol = :typeDeVol");
+        query.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
+        query.bindValue(":annee", QString::number(p_demande.annee));
+        query.bindValue(":pilote", p_demande.idPilote);
+        query.bindValue(":typeDeVol", p_demande.typeDeVol);
+        query.exec();    
+    }
+    else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_COTISATION)
+    {
+        query.prepare(QString("SELECT idRecette FROM cotisationsASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
+        //query.bindValue(":annee", QString::number(p_demande.annee));
+        query.exec();
+
+        qDebug() << "Ajout cotisation soumise CE en BDD " << query.size() << p_demande.annee << query.lastQuery();
+
+        while (query.next())
+        {
+            QSqlQuery queryCotisation;
+            queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
+            queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
+            queryCotisation.bindValue(":recetteId", query.value(0).toInt());
+            qDebug() << "Ajout cotisation soumise CE en BDD " << query.size() << query.value(0).toInt() << idDemandeRemboursement;
+            queryCotisation.exec();
+        }
+    }
+    else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
+    {
+        //query.prepare(QString("SELECT idRecette FROM recettesASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
+        query.prepare("SELECT idRecette FROM recettesASoumettreCe WHERE annee = :annee AND nom = :nomSortie");
+        query.bindValue(":annee", QString::number(p_demande.annee));
+        query.bindValue(":nomSortie", p_demande.typeDeVol);
+        query.exec();
+
+        while (query.next())
+        {
+            QSqlQuery queryCotisation;
+            queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
+            queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
+            queryCotisation.bindValue(":recetteId", query.value(0).toInt());
+            qDebug() << "Ajout paiement sortie soumise CE en BDD " << query.size() << query.value(0).toInt() << idDemandeRemboursement;
+            queryCotisation.exec();
+        }
+    }
+    
+
+}
+
 AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
 {
     //Récupérationd des cotisation à soumettre au CE
-    QString sql = "SELECT * FROM 'cotisationsASoumettreCe'";
-    qDebug() << sql;
+    //QString sql = "SELECT * FROM 'cotisationsASoumettreCe'";
+    //qDebug() << sql;
 
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
-    query.exec(sql);
+    query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe");
+    query.exec();
+
     AeroDmsTypes::Recette recette;
     recette.annee = 0;
-    while (query.next()) {
-        if (query.value(1).toInt() != recette.annee)
-        {
-            //On est sur l'année suivante
-            //On ajoute l'année actuelle, si on est pas au premier tour (premier tour si annee = 0)
-            if (recette.annee != 0)
+    qDebug() << "Nb cotisations" << query.size() << query.lastError().text() << query.lastQuery() ;
+    if (query.size() > 0)
+    {
+        while (query.next()) {
+            if (query.value(0).toInt() != recette.annee)
             {
-                //On retire le dernier /, soit le dernier caractère...
-                recette.intitule.chop(1);
-                //... et on ferme la parenthèse
-                recette.intitule.append(")");
-                liste.append(recette);
+                //On est sur l'année suivante
+                //On ajoute l'année actuelle, si on est pas au premier tour (premier tour si annee = 0)
+                if (recette.annee != 0)
+                {
+                    //On retire le dernier /, soit le dernier caractère...
+                    recette.intitule.chop(1);
+                    //... et on ferme la parenthèse
+                    recette.intitule.append(")");
+                    liste.append(recette);
+                }
+
+                //On rince l'item recette pour la suite
+                recette.intitule = "Cotisation (";
+                recette.montant = 0;
+                recette.annee = query.value(0).toInt();
             }
 
-            //On rince l'item recette pour la suite
-            recette.intitule = "Cotisation (";
-            recette.montant = 0;
-            recette.annee = query.value(1).toInt();
+            //On ajoute le nom du pilote
+            //Si la longueur de la chaine après ajout du pilote dépasse 55 caractères, on split sur 2 lignes en ajoutant un <br>
+            //avant d'insérer le nom du pilote :
+            //-division entière de la taille de la chaine avant et après l'ajout,
+            //-si l'entier est différent c'est qu'on change de ligne
+            const int nbLigneAvant = recette.intitule.size() / 55;
+            const int nbLigneApres = (recette.intitule.size() + query.value(1).toString().size()) / 55;
+            if (nbLigneAvant != nbLigneApres)
+            {
+                recette.intitule.append("<br />");
+            }
+            recette.intitule.append(query.value(1).toString()).append("/");
+            recette.montant = recette.montant+ query.value(2).toFloat();
+            recette.annee = query.value(0).toInt();
         }
-
-        //On ajoute le nom du pilote
-        //Si la longueur de la chaine après ajout du pilote dépasse 55 caractères, on split sur 2 lignes en ajoutant un <br>
-        //avant d'insérer le nom du pilote :
-        //-division entière de la taille de la chaine avant et après l'ajout,
-        //-si l'entier est différent c'est qu'on change de ligne
-        const int nbLigneAvant = recette.intitule.size() / 55;
-        const int nbLigneApres = (recette.intitule.size() + query.value(4).toString().size()) / 55;
-        if (nbLigneAvant != nbLigneApres)
-        {
-            recette.intitule.append("<br />");
-        }
-        recette.intitule.append(query.value(4).toString()).append("/");
-        recette.montant = recette.montant+ query.value(5).toFloat();
-        recette.annee = query.value(1).toInt();
+        //On oublie pas d'ajouter la dernière année...
+        //On retire le dernier /, soit le dernier caractère...
+        recette.intitule.chop(1);
+        //... et on ferme la parenthèse
+        recette.intitule.append(")");
+        liste.append(recette);
     }
-    //On oublie pas d'ajouter la dernière année...
-    //On retire le dernier /, soit le dernier caractère...
-    recette.intitule.chop(1);
-    //... et on ferme la parenthèse
-    recette.intitule.append(")");
-    liste.append(recette);
 
     return liste;
 }
 
 AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettre()
 {
-    //Récupérationd des cotisation à soumettre au CE
+    //Récupération des cotisation à soumettre au CE
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
     query.prepare("SELECT * FROM 'recettesASoumettreCeParTypeEtParAnnee'");
@@ -331,10 +418,40 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
     
     while (query.next()) {
         AeroDmsTypes::Recette recette;
-        recette.intitule = query.value(0).toString();
+        recette.typeDeSortie = query.value(0).toString();
+        recette.intitule = query.value(3).toString();
         recette.annee = query.value(1).toInt();
         recette.montant = query.value(2).toFloat();
         liste.append(recette);
+    }
+
+    return liste;
+}
+
+AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre()
+{
+    //Récupérationd des demandes de remboursement à soumettre au CE
+    AeroDmsTypes::ListeDemandeRemboursementFacture liste;
+    QSqlQuery query;
+    query.prepare("SELECT * FROM 'facturesARembourser'");
+    query.exec();
+
+    while (query.next()) {
+        AeroDmsTypes::DemandeRemboursementFacture demandeRemboursement;
+        /*demandeRemboursement.typeDeSortie = query.value(0).toString();
+        demandeRemboursement.intitule = query.value(3).toString();
+        demandeRemboursement.annee = query.value(1).toInt();
+        demandeRemboursement.montant = query.value(2).toFloat();*/
+        demandeRemboursement.id = query.value(0).toInt();
+        demandeRemboursement.intitule = query.value(1).toString();
+        demandeRemboursement.montant = query.value(2).toFloat();
+        demandeRemboursement.payeur = query.value(4).toString().append(" ").append(query.value(3).toString());
+        demandeRemboursement.nomSortie = query.value(5).toString();
+        demandeRemboursement.typeDeSortie = query.value(6).toString();
+        demandeRemboursement.annee = query.value(7).toInt();
+        demandeRemboursement.nomFacture = query.value(8).toString();
+
+        liste.append(demandeRemboursement);
     }
 
     return liste;
@@ -380,7 +497,7 @@ QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVol
     {
         sql.append(" AND estRecette = 1");
     }
-    qDebug() << sql;
+    //qDebug() << sql;
 
     QStringList liste;
     QSqlQuery query;
@@ -471,11 +588,10 @@ void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisa
     QSqlQuery query;
     query.prepare("SELECT nom, prenom FROM 'pilote' WHERE piloteId = :piloteId");
     query.bindValue(":piloteId", p_infosCotisation.idPilote);
-    qDebug() << query.lastQuery();
+    //qDebug() << query.lastQuery();
     query.exec();
     query.next();
     const QString intitule = QString("Cotisation ").append(query.value(0).toString()).append(" ").append(query.value(1).toString()).append(" ").append(QString::number(p_infosCotisation.annee));
-
 
     query.prepare("INSERT INTO 'recettes' ('typeDeRecette','Intitule','montant') VALUES ('Cotisation', :intitule, :montant) RETURNING recetteId");
     query.bindValue(":intitule", intitule);
@@ -490,6 +606,7 @@ void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisa
     query.bindValue(":annee", p_infosCotisation.annee);
     query.bindValue(":idRecette", idRecette);
     query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
+    query.exec();
 }
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote

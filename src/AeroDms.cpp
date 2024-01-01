@@ -12,16 +12,35 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
+
+    qDebug() << "DirPath : " << QCoreApplication::applicationDirPath();
     
-    if (settings.value("database/databasePath", "") == "")
+    if (settings.value("baseDeDonnees/chemin", "") == "")
     {
-        settings.beginGroup("database");
-        settings.setValue("databasePath", QCoreApplication::applicationDirPath());
-        settings.setValue("databaseName", "AeroDMS.sqlite");
+        settings.beginGroup("baseDeDonnees");
+        settings.setValue("chemin", QCoreApplication::applicationDirPath());
+        settings.setValue("nom", "AeroDMS.sqlite");
         settings.endGroup();
     }
 
-    const QString database = settings.value("database/databasePath", "").toString() + QString("/") + settings.value("database/databaseName", "").toString();
+    if (settings.value("dossiers/facturesATraiter", "") == "")
+    {
+        settings.beginGroup("dossiers");
+        settings.setValue("facturesATraiter", QCoreApplication::applicationDirPath());
+        settings.setValue("facturesSaisies", QCoreApplication::applicationDirPath());
+        //settings.setValue("fichiersAImprimer", QCoreApplication::applicationDirPath());
+        settings.endGroup();
+    }
+
+    if (settings.value("parametresMetier/montantSubventionEntrainement", "") == "")
+    {
+        settings.beginGroup("parametresMetier");
+        settings.setValue("montantSubventionEntrainement", "750");
+        settings.setValue("montantCotisationPilote", "15");
+        settings.endGroup();
+    }
+
+    const QString database = settings.value("baseDeDonnees/chemin", "").toString() + QString("/") + settings.value("baseDeDonnees/nom", "").toString();
 
     db = new ManageDb(database);
     pdf = new PdfRenderer(db);
@@ -345,6 +364,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
 
     //On met à jour les listes de pilotes
     peuplerListesPilotes();
+    dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
 }
 
 void AeroDms::ajouterUneSortieEnBdd()
@@ -461,19 +481,16 @@ void AeroDms::enregistrerUneFacture()
                 choixBaladeFacture->currentData().toInt(),
                 remarqueFacture->text());
 
-            statusBar()->showMessage(QString("Vol ")
-                + typeDeVol->currentText()
+            statusBar()->showMessage(QString("Facture ")
+                + remarqueFacture->text()
                 + " du "
-                + dateDuVol->date().toString("dd/MM/yyyy")
+                + dateDeFacture->date().toString("dd/MM/yyyy")
                 + " ("
-                + dureeDuVol->time().toString("hh:mm")
-                + "/"
-                + QString::number(prixDuVol->value())
-                + "€) ajouté. Montant subvention : "
-                //+ QString::number(montantSubventionne)
-                + "€ / Subvention entrainement restante : "
-                //+ QString::number(subventionRestante)
-                + "€");
+                + QString::number(montantFacture->value())
+                + "€) ajoutée.");
+
+            montantFacture->setValue(0);
+            remarqueFacture->clear();
         }
         else
         {
@@ -544,8 +561,7 @@ void AeroDms::enregistrerUnVol()
         //Ensuite, si on est pas en echec :
         //1) on récupère la subvention restante pour le pilote
         //2) on calcul la subvention allouable pour le vol
-        //3) on enregistre le vol en BDD
-        
+        //3) on enregistre le vol en BDD    
 		if (!estEnEchec)
 		{
 			float subventionRestante = db->recupererSubventionRestante(idPilote, anneeRenseignee);

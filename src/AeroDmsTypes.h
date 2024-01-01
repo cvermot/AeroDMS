@@ -25,6 +25,22 @@ public:
         ResultatCreationPilote_AUTRE = 0x2
     };
 
+    enum PdfTypeDeDemande {
+        PdfTypeDeDemande_HEURE_DE_VOL,
+        PdfTypeDeDemande_COTISATION,
+        PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE,
+        PdfTypeDeDemande_FACTURE
+    };
+
+    struct DemandeEnCoursDeTraitement {
+        PdfTypeDeDemande typeDeDemande;
+        QString idPilote;
+        QString typeDeVol;
+        QString nomBeneficiaire;
+        float montant;
+        int annee;
+        //int idFacture;
+    };
 
     struct Pilote {
         QString idPilote;
@@ -49,6 +65,7 @@ public:
 
     struct Recette {
         QString intitule;
+        QString typeDeSortie;
         float montant;
         int annee;
     };
@@ -67,6 +84,18 @@ public:
         float montantSubvention;
         float montant;
     };
+    
+    struct DemandeRemboursementFacture {
+        int id;
+        QString intitule;
+        float montant;
+        QString payeur;
+        QString nomSortie;
+        QString typeDeSortie;
+        int annee;
+        QString nomFacture;
+    };
+    typedef QList<DemandeRemboursementFacture> ListeDemandeRemboursementFacture;
 
 };
 

@@ -76,6 +76,9 @@ public:
     AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre();
+    AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre();
+
+    QStringList recupererListeFacturesAssocieeASubvention(const  AeroDmsTypes::DemandeRemboursement p_demande);
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
@@ -90,6 +93,8 @@ public:
     
     AeroDmsTypes::ResultatCreationPilote creerPilote(AeroDmsTypes::Pilote p_pilote);
     void creerSortie(AeroDmsTypes::Sortie p_sortie);
+
+    void ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
     
 
 public slots:

@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. déc. 29 22:32:16 2023
+-- File generated with SQLiteStudio v3.4.4 on lun. janv. 1 22:57:09 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -10,7 +10,7 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL);
 
 -- Table: demandeRemboursementSoumises
-CREATE TABLE IF NOT EXISTS demandeRemboursementSoumises (demandeId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, piloteId TEXT REFERENCES pilote (piloteId), dateDemande TEXT NOT NULL, montant REAL NOT NULL, nomBeneficiaire TEXT NOT NULL, typeDeDemande TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL);
+CREATE TABLE IF NOT EXISTS demandeRemboursementSoumises (demandeId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, dateDemande TEXT NOT NULL, montant REAL NOT NULL, nomBeneficiaire TEXT NOT NULL, typeDeDemande TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL);
 
 -- Table: facturesSorties
 CREATE TABLE IF NOT EXISTS facturesSorties (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, sortie INTEGER REFERENCES sortie (sortieId) NOT NULL, facture INTEGER REFERENCES fichiersFacture (factureId) NOT NULL, date TEXT, montant REAL NOT NULL, intitule TEXT, payeur TEXT NOT NULL REFERENCES pilote (piloteId), demandeRemboursement NUMERIC REFERENCES demandeRemboursementSoumises (demandeId));
@@ -25,10 +25,17 @@ CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, no
 CREATE TABLE IF NOT EXISTS recettes (recetteId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeRecette TEXT NOT NULL REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId), Intitule TEXT NOT NULL, montant REAL NOT NULL, identifiantFormulaireSoumissionCe INTEGER REFERENCES demandeRemboursementSoumises (demandeId));
 
 -- Table: sortie
-CREATE TABLE IF NOT EXISTS sortie (sortieId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, nom TEXT NOT NULL, date TEXT);
+CREATE TABLE IF NOT EXISTS sortie (sortieId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, nom TEXT NOT NULL, date TEXT, typeDeDepense TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL DEFAULT Sortie);
+INSERT INTO sortie (sortieId, nom, date, typeDeDepense) VALUES (1, 'Balade', NULL, 'Balade');
+INSERT INTO sortie (sortieId, nom, date, typeDeDepense) VALUES (2, 'Fonctionnement', NULL, 'Fonctionnement');
 
 -- Table: typeDeRecetteDepense
 CREATE TABLE IF NOT EXISTS typeDeRecetteDepense (typeDeRecetteDepenseId TEXT PRIMARY KEY UNIQUE NOT NULL, identifiantCompta INTEGER NOT NULL, estRecette INTEGER, estDepense INTEGER, estVol NUMERIC NOT NULL);
+INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Balade', 1, 1, 1, 1);
+INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Sortie', 2, 1, 1, 1);
+INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Entrainement', 3, 0, 1, 1);
+INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Cotisation', 5, 1, 0, 0);
+INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Fonctionnement', 6, 0, 1, 0);
 
 -- Table: vol
 CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT);
@@ -51,6 +58,23 @@ WHERE
       recettes.identifiantFormulaireSoumissionCe IS NULL
 ORDER BY cotisation.annee;
 
+-- View: facturesARembourser
+CREATE VIEW IF NOT EXISTS facturesARembourser AS SELECT 
+facturesSorties.id, 
+facturesSorties.intitule, 
+facturesSorties.montant, 
+pilote.nom, 
+pilote.prenom, 
+sortie.nom AS nomSortie, 
+sortie.typeDeDepense ,
+strftime('%Y', facturesSorties.date) AS annee,
+fichiersFacture.nomFichier AS nomFacture
+FROM facturesSorties
+INNER JOIN pilote ON facturesSorties.payeur = pilote.piloteId
+INNER JOIN sortie ON facturesSorties.sortie = sortie.sortieId
+INNER JOIN fichiersFacture ON facturesSorties.facture = fichiersFacture.factureId
+WHERE facturesSorties.demandeRemboursement IS NULL;
+
 -- View: recettesASoumettreCe
 CREATE VIEW IF NOT EXISTS recettesASoumettreCe AS SELECT recettes.typeDeRecette,
        recettes.montant,
@@ -60,16 +84,24 @@ CREATE VIEW IF NOT EXISTS recettesASoumettreCe AS SELECT recettes.typeDeRecette,
        vol.duree,
        vol.montantRembourse,
        vol.cout,
-       recettes.recetteId
+       recettes.recetteId,
+       recettes.Intitule,
+       sortie.nom,
+       sortie.date
 FROM recettes
 INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
 INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId
+INNER JOIN sortie ON vol.sortie = sortie.sortieId
 WHERE recettes.identifiantFormulaireSoumissionCe IS NULL
 GROUP BY recettes.recetteId;
 
 -- View: recettesASoumettreCeParTypeEtParAnnee
-CREATE VIEW IF NOT EXISTS recettesASoumettreCeParTypeEtParAnnee AS SELECT typeDeRecette, annee, SUM(montant) FROM recettesASoumettreCe
-GROUP BY annee, typeDeRecette;
+CREATE VIEW IF NOT EXISTS recettesASoumettreCeParTypeEtParAnnee AS SELECT typeDeRecette, 
+annee, 
+SUM(montant),
+nom
+FROM recettesASoumettreCe
+GROUP BY annee, typeDeRecette, nom;
 
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 
