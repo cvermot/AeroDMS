@@ -92,6 +92,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DialogueAjouterCotisation.cpp" />
+    <ClCompile Include="DialogueAjouterSortie.cpp" />
     <ClCompile Include="DialogueGestionPilote.cpp" />
     <ClCompile Include="ManageDb.cpp" />
     <ClCompile Include="PdfRenderer.cpp" />
@@ -106,6 +107,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AeroDmsTypes.h" />
+    <QtMoc Include="DialogueAjouterSortie.h" />
     <QtMoc Include="DialogueAjouterCotisation.h" />
     <QtMoc Include="DialogueGestionPilote.h" />
     <QtMoc Include="PdfRenderer.h" />

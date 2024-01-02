@@ -86,9 +86,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
     AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
 
-
-    qDebug() << "Nb remboursement" << listeDesRemboursements.size() << "Nb cotisations" << listeDesCotisations.size() << "Nb balade sortie" << listeDesRecettesBaladesSorties.size() << "Nb factures" << listeDesRemboursementsFactures.size();
-
     //if (nombreFacturesTraitees < listeDesRemboursements.size())
     if (listeDesRemboursements.size() > 0)
     {    
@@ -176,11 +173,11 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         nombreCotisationsTraitees++;
     }
     //Recettes "passagers" des sorties et balades
-    else if (nombreRecettesBaladeSortieTraitees < listeDesRecettesBaladesSorties.size())
-    //else if (listeDesRecettesBaladesSorties.size() > 0)
+    //else if (nombreRecettesBaladeSortieTraitees < listeDesRecettesBaladesSorties.size())
+    else if (listeDesRecettesBaladesSorties.size() > 0)
     {
-        //const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(0);
-        const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees);
+        const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(0);
+        //const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees);
         //Depense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -213,8 +210,11 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         nombreRecettesBaladeSortieTraitees++;
     }
     //Factures payées par les pilotes à rembourser
-    else if (nombreRemboursementFacturesTraitees < listeDesRemboursementsFactures.size())
+    else if (listeDesRemboursementsFactures.size() > 0)
+    //else if (nombreRemboursementFacturesTraitees < listeDesRemboursementsFactures.size())
     {
+        //const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees);
+        const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = listeDesRemboursementsFactures.at(0);
         //Depense
         templateCeTmp.replace("xxD", "X");
         //Recette
@@ -222,24 +222,29 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         //Cheque a retirer au CE par le demandeur => coché
         templateCeTmp.replace("zzC", "X");
         //Bénéficaire : le CSE
-        templateCeTmp.replace("xxBeneficiaire", listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).payeur);
+        templateCeTmp.replace("xxBeneficiaire", demandeRembousement.payeur);
 
         //Montant
-        remplirLeChampMontant(templateCeTmp, listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).montant);
+        remplirLeChampMontant(templateCeTmp, demandeRembousement.montant);
         //Observation
-        templateCeTmp.replace("xxObservation", listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).intitule);
+        templateCeTmp.replace("xxObservation", demandeRembousement.intitule);
 
         //Année / Budget
-        QString ligneBudget = QString::number(db->recupererLigneCompta(listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).typeDeSortie));
+        QString ligneBudget = QString::number(db->recupererLigneCompta(demandeRembousement.typeDeSortie));
         ligneBudget.append(" / ");
-        ligneBudget.append(QString::number(listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).annee));
+        ligneBudget.append(QString::number(demandeRembousement.annee));
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
         view->setHtml(templateCeTmp);
-        listeDesFichiers.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees).nomFacture));
+        listeDesFichiers.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(demandeRembousement.nomFacture));
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_FACTURE;
+        //L'annee n'est pas utile pour la facture => on fourni directement l'ID facture
+        demandeEnCours.annee = demandeRembousement.id;
+        demandeEnCours.typeDeVol = demandeRembousement.intitule;
+        demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
+        demandeEnCours.montant = demandeRembousement.montant;
         
         nombreRemboursementFacturesTraitees++;
     }

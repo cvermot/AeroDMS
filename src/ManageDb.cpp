@@ -327,23 +327,32 @@ void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
     {
         //query.prepare(QString("SELECT idRecette FROM recettesASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
-        query.prepare("SELECT idRecette FROM recettesASoumettreCe WHERE annee = :annee AND nom = :nomSortie");
+        query.prepare("SELECT recetteId FROM recettesASoumettreCe WHERE annee = :annee AND nom = :nomSortie");
         query.bindValue(":annee", QString::number(p_demande.annee));
         query.bindValue(":nomSortie", p_demande.typeDeVol);
         query.exec();
 
+        qDebug() << "ajout sortie balade" << query.size() << QString::number(p_demande.annee) << p_demande.typeDeVol;
+
         while (query.next())
         {
-            QSqlQuery queryCotisation;
-            queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
-            queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
-            queryCotisation.bindValue(":recetteId", query.value(0).toInt());
+            QSqlQuery querySortie;
+            querySortie.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
+            querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
+            querySortie.bindValue(":recetteId", query.value(0).toInt());
             qDebug() << "Ajout paiement sortie soumise CE en BDD " << query.size() << query.value(0).toInt() << idDemandeRemboursement;
-            queryCotisation.exec();
+            querySortie.exec();
         }
     }
-    
-
+    else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_FACTURE)
+    {
+        //query.prepare(QString("SELECT idRecette FROM recettesASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
+        query.prepare("UPDATE facturesSorties SET demandeRemboursement = :idDemandeRemboursement WHERE id = :id");
+        query.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
+        //L'année contient en fait l'ID de facture pour une facture...
+        query.bindValue(":id", p_demande.annee);
+        query.exec();
+    }
 }
 
 AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()

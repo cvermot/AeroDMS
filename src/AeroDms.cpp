@@ -12,8 +12,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
-
-    qDebug() << "DirPath : " << QCoreApplication::applicationDirPath();
     
     if (settings.value("baseDeDonnees/chemin", "") == "")
     {
@@ -44,10 +42,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     db = new ManageDb(database);
     pdf = new PdfRenderer(db);
-    //TODO to delete
-    AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
-    qDebug() << "Nb cotisation init" << listeDesCotisations.size();
-    //End to delte
 
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -159,12 +153,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     choixPayeur = new QComboBox(this);
     QLabel* choixPayeurLabel = new QLabel(tr("Payeur : "), this);
     connect(choixPayeur, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
-    /*typeDeVol = new QComboBox(this);
-    typeDeVol->addItems(db->recupererTypesDesVol());
-    typeDeVol->setCurrentIndex(2);
-    QLabel* typeDeVolLabel = new QLabel(tr("Type de vol : "), this);
-    connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::changerInfosVolSurSelectionTypeVol);
-    connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);*/
 
     dateDeFacture = new QDateEdit(this);
     dateDeFacture->setDisplayFormat("dd/MM/yyyy");
@@ -185,9 +173,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(montantFacture, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnnesSaisies);
 
     remarqueFacture = new QLineEdit(this);
-    QLabel* remarqueFactureLabel = new QLabel(tr("Remarque : "), this);
+    connect(remarqueFacture, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnnesSaisies);
+    QLabel* remarqueFactureLabel = new QLabel(tr("Intitulé : "), this);
 
     validerLaFacture = new QPushButton("Valider la facture", this);
+    validerLaFacture->setToolTip("Validation possible si : facture chargée, montant de la facture renseignée, payeur et sortie séléctionnés, intitulé saisi");
     connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
 
     QGridLayout* infosFacture = new QGridLayout(this);
@@ -216,7 +206,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     ajoutRecette->addWidget(listeBaladesEtSorties);
 
     typeDeRecette = new QComboBox(this);
-    qDebug() << "ComboBox typeRecetteVol";
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
     connect(typeDeRecette, &QComboBox::currentIndexChanged, this, &AeroDms::chargerBaladesSorties);
     //typeDeRecette->setCurrentIndex(2);
@@ -397,11 +386,8 @@ void AeroDms::selectionnerUneFacture()
 
 void AeroDms::chargerUneFacture(QString p_fichier)
 {
-    //qDebug() << "fichier validé";
-    qDebug() << p_fichier;
     cheminDeLaFactureCourante = p_fichier;
     factureIdEnBdd = -1;
-    //qDebug() << "deplacement " << cheminDeLaFactureCourante <<  QFile::rename(cheminDeLaFactureCourante, cheminStockageFacturesTraitees.append("test.pdf"));
     pdfDocument->load(p_fichier);
 
     choixPilote->setEnabled(true);
@@ -453,13 +439,11 @@ void AeroDms::enregistrerUneFacture()
             nomDeLaFacture.append(".facture.");
             nomDeLaFacture.append(QString::number(idFactureBdd));
             nomDeLaFacture.append(".pdf");
-            qDebug() << "nom fichier" << nomDeLaFacture << " / chemin " << cheminStockageFacturesTraitees;
             QString cheminComplet = cheminStockageFacturesTraitees;
             cheminComplet.append(nomDeLaFacture);
             QFile gestionnaireDeFichier;
             if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
             {
-                qDebug() << gestionnaireDeFichier.errorString();
                 factureIdEnBdd = db->ajouterFacture(nomDeLaFacture);
                 pdfDocument->load(cheminComplet);
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
@@ -541,13 +525,11 @@ void AeroDms::enregistrerUnVol()
             nomDeLaFacture.append(".");
             nomDeLaFacture.append(QString::number(idFactureBdd));
             nomDeLaFacture.append(".pdf");
-            qDebug() << "nom fichier" << nomDeLaFacture << " / chemin " << cheminStockageFacturesTraitees;
             QString cheminComplet = cheminStockageFacturesTraitees;
             cheminComplet.append(nomDeLaFacture);
             QFile gestionnaireDeFichier;
             if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
             {
-                qDebug() << gestionnaireDeFichier.errorString();
                 factureIdEnBdd = db->ajouterFacture(nomDeLaFacture);
                 pdfDocument->load(cheminComplet);
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
@@ -573,14 +555,12 @@ void AeroDms::enregistrerUnVol()
 			float montantSubventionne = prixDuVol->value();
 			if (typeDeVol->currentText() == "Balade")
 			{
-				qDebug() << "Balade";
 				float proportionPriseEnCharge = 1.0;
 				montantSubventionne = prixDuVol->value() * proportionPriseEnCharge;
 			}
 			//Si on est en vol d'entrainement, calculs spécifiques et enregistrement spécifique
 			if (typeDeVol->currentText() == "Entrainement")
 			{
-				qDebug() << "Entrainement";
 				float coutHoraire = calculerCoutHoraire();
 				if (coutHoraire > 150)
 				{
@@ -591,7 +571,7 @@ void AeroDms::enregistrerUnVol()
 				{
 					montantSubventionne = subventionRestante;
 				}
-				qDebug() << "montant subvention : " << montantSubventionne << "Subvention restante : " << subventionRestante;
+
 				db->enregistrerUnVolDEntrainement(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
@@ -606,7 +586,6 @@ void AeroDms::enregistrerUnVol()
 			//Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
 			else
 			{
-				qDebug() << "Id de la balade/sortie enregistrée" << choixBalade->currentData().toInt();
 				db->enregistrerUnVolSortieOuBalade(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
@@ -655,7 +634,6 @@ void AeroDms::enregistrerUneRecette()
         if (listeBaladesEtSorties->item(i)->checkState() == Qt::Checked)
         {
             volsCoches.append(listeBaladesEtSorties->item(i)->data(Qt::DisplayRole).toString());
-            qDebug() << listeBaladesEtSorties->item(i)->data(Qt::DisplayRole).toString();
         }
     }
 
@@ -750,8 +728,7 @@ void AeroDms::peuplerListeBaladesEtSorties()
 void AeroDms::prevaliderDonnnesSaisies()
 {
     validerLeVol->setEnabled(true);
-
-    qDebug() << choixPilote->currentIndex();
+    validerLaFacture->setEnabled(true);
 
     if ( prixDuVol->value() == 0
          || dureeDuVol->time() == QTime::QTime(0,0)
@@ -760,6 +737,15 @@ void AeroDms::prevaliderDonnnesSaisies()
          || ( typeDeVol->currentText() != "Entrainement" && choixBalade->currentIndex() == 0))
     {
         validerLeVol->setEnabled(false);
+    }
+
+    if ( choixBaladeFacture->currentIndex() == 0
+         || choixPayeur->currentIndex() == 0
+         || montantFacture->value() == 0
+         || remarqueFacture->text() == ""
+         || pdfDocument->status() != QPdfDocument::Status::Ready )
+    {
+        validerLaFacture->setEnabled(false);
     } 
 }
 
