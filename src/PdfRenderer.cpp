@@ -80,10 +80,12 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     //Signataire => toujours celui qui exécute le logiciel
     templateCeTmp.replace("xxSignataire", "Cl&eacute;ment VERMOT-DESROCHES");
 
-    const AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
-    const AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
-    const AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
-    const AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
+
+    AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
+    AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
+    AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
+    AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
+
 
     qDebug() << "Nb remboursement" << listeDesRemboursements.size() << "Nb cotisations" << listeDesCotisations.size() << "Nb balade sortie" << listeDesRecettesBaladesSorties.size() << "Nb factures" << listeDesRemboursementsFactures.size();
 

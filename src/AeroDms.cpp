@@ -44,6 +44,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     db = new ManageDb(database);
     pdf = new PdfRenderer(db);
+    //TODO to delete
+    AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
+    qDebug() << "Nb cotisation init" << listeDesCotisations.size();
+    //End to delte
 
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);

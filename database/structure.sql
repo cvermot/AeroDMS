@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on lun. janv. 1 22:57:09 2024
+-- File generated with SQLiteStudio v3.4.4 on lun. janv. 1 23:01:41 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS facturesSorties (id INTEGER PRIMARY KEY AUTOINCREMENT
 
 -- Table: fichiersFacture
 CREATE TABLE IF NOT EXISTS fichiersFacture (factureId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, nomFichier TEXT UNIQUE NOT NULL);
+INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePourInit');
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT);

@@ -348,19 +348,16 @@ void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_
 
 AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
 {
-    //Récupérationd des cotisation à soumettre au CE
-    //QString sql = "SELECT * FROM 'cotisationsASoumettreCe'";
-    //qDebug() << sql;
-
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
     query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe");
-    query.exec();
+    const bool result = query.exec();
 
     AeroDmsTypes::Recette recette;
     recette.annee = 0;
-    qDebug() << "Nb cotisations" << query.size() << query.lastError().text() << query.lastQuery() ;
-    if (query.size() > 0)
+    qDebug() << "Nb cotisations" << result << query.size()  << query.lastError().text() << query.lastQuery() << query.isActive();
+    qDebug() << db.isOpen() << db.isValid() ;
+    //if (query.size() > 0)
     {
         while (query.next()) {
             if (query.value(0).toInt() != recette.annee)
@@ -402,9 +399,9 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
         recette.intitule.chop(1);
         //... et on ferme la parenthèse
         recette.intitule.append(")");
-        liste.append(recette);
+        if(recette.intitule != ")")
+            liste.append(recette);
     }
-
     return liste;
 }
 
