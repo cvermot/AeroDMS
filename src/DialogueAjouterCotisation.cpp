@@ -1,6 +1,6 @@
 /******************************************************************************\
-<QUas : a Free Software logbook for UAS operators>
-Copyright (C) 2023 Clément VERMOT-DESROCHES (clement@vermot.net)
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

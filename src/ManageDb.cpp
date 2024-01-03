@@ -1,6 +1,6 @@
 /******************************************************************************\
-<QUas : a Free Software logbook for UAS operators>
-Copyright (C) 2023 Clément VERMOT-DESROCHES (clement@vermot.net)
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
     AeroDmsTypes::ListePilotes listeDesPilotes;
 
     const QString sql = "SELECT * FROM pilote";
-    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -80,7 +79,6 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
 int ManageDb::recupererProchainNumeroFacture()
 {
     const QString sql = "SELECT seq FROM sqlite_sequence WHERE name = 'fichiersFacture'";
-    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -88,12 +86,87 @@ int ManageDb::recupererProchainNumeroFacture()
     return query.value(0).toInt() + 1 ;
 }
 
+AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(int p_annee)
+{
+    QSqlQuery query;
+    query.prepare("SELECT *  FROM volParTypeParAnEtParPilote");
+    query.exec();
+
+    QString idPilote = "";
+    int annee = 0;
+
+    AeroDmsTypes::ListeSubventionsParPilotes liste;
+
+    AeroDmsTypes::SubventionsParPilote subvention;
+
+    while (query.next())
+    {
+        if (idPilote != query.value("pilote").toString()
+            || annee != query.value("annee").toInt())
+        {
+            if (annee != 0)
+            {
+                liste.append(subvention);
+            }
+            annee = query.value("annee").toInt();
+            idPilote = query.value("pilote").toString();
+            subvention.idPilote = query.value("pilote").toString();
+            subvention.annee = query.value("annee").toInt();
+            subvention.nom = query.value("nom").toString();
+            subvention.prenom = query.value("prenom").toString();
+            subvention.aeroclub = query.value("aeroclub").toString();
+            subvention.sortie.heuresDeVol = "0h00";
+            subvention.sortie.montantRembourse = 0;
+            subvention.entrainement.heuresDeVol = "0h00";
+            subvention.entrainement.montantRembourse = 0;
+            subvention.balade.heuresDeVol = "0h00";
+            subvention.balade.montantRembourse = 0;
+        }
+
+        if (query.value("typeDeVol").toString() == "Entrainement")
+        {
+            subvention.entrainement.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
+            subvention.entrainement.montantRembourse = query.value("montantRembourse").toFloat();
+        }
+        else if (query.value("typeDeVol").toString() == "Sortie")
+        {
+            subvention.sortie.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
+            subvention.sortie.montantRembourse = query.value("montantRembourse").toFloat();
+        }
+        else if(query.value("typeDeVol").toString() == "Balade")
+        {
+            subvention.balade.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
+            subvention.balade.montantRembourse = query.value("montantRembourse").toFloat();
+        }
+    }
+
+    //Si année différente de 0, c'est qu'on était sur une liste non nulle, on ajoute le dernier élement
+    if (annee != 0)
+    {
+        liste.append(subvention);
+    }
+
+    return liste;
+}
+
+QString ManageDb::convertirMinutesEnHeuresMinutes(const int p_minutes)
+{
+    const int heures = p_minutes / 60;
+    const int minutes = p_minutes % 60;
+    QString minutesString = QString::number(minutes);
+    if (minutesString.size() == 1)
+    {
+        minutesString = QString("0").append(minutesString);
+    }
+    QString heuresMinutes = QString::number(heures).append("h").append(minutesString);
+    return heuresMinutes;
+}
+
 int ManageDb::ajouterFacture(QString& p_nomFichier)
 {
     QString sql = "INSERT INTO 'fichiersFacture' ('nomFichier') VALUES('";
     sql.append(p_nomFichier);
     sql.append("')");
-    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -102,7 +175,6 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
     sql = "SELECT * FROM 'fichiersFacture' WHERE nomFichier='";
     sql.append(p_nomFichier);
     sql.append("'");
-    //qDebug() << sql;
 
     query.exec(sql);
     query.next();
@@ -115,12 +187,9 @@ float ManageDb::recupererSubventionRestante(const QString& p_piloteId, const int
 {
     QString sql = QString("SELECT subventionAllouee FROM subventionEntrainementAlloueeParPiloteEtParAnnee WHERE pilote = ':piloteId' AND annee = ':annee'").replace(":piloteId", p_piloteId).replace(":annee", QString::number(p_annee));
     QSqlQuery query;
-    //query.prepare("SELECT subventionAllouee FROM subventionEntrainementAlloueeParPiloteEtParAnnee WHERE pilote = :piloteId AND annee = :annee");
-    //query.bindValue(":piloteId", p_piloteId);
-    //query.bindValue(":annee", p_annee);
-    //qDebug() << sql;
     query.exec(sql);
     query.next();
+    //TODO => chercher le montant en BDD
     return 750.0 - query.value(0).toFloat();
 }
 
@@ -216,8 +285,6 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         query.next();
         const int numeroDeVol = query.value(0).toInt();
 
-        //qDebug() << numeroDeVol << numeroDeRecetteCree;
-
         query.prepare("INSERT INTO 'xAssociationRecette-Vol' ('recetteId','volId') VALUES (:recetteId, :volId)");
         query.bindValue(":recetteId", numeroDeRecetteCree);
         query.bindValue(":volId", numeroDeVol);
@@ -234,7 +301,6 @@ bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, const int a
     sql.append("' AND annee='");
     sql.append(QString::number(annee));
     sql.append("'");
-    //qDebug() << sql;
 
     QSqlQuery query;
     query.exec(sql);
@@ -247,7 +313,6 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
 {
     //Recuperation de l'ID de facture
     QString sql = "SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'";
-    //qDebug() << sql;
 
     AeroDmsTypes::ListeDemandeRemboursement liste;
     QSqlQuery query;
@@ -309,10 +374,8 @@ void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_COTISATION)
     {
         query.prepare(QString("SELECT idRecette FROM cotisationsASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
-        //query.bindValue(":annee", QString::number(p_demande.annee));
         query.exec();
 
-        qDebug() << "Ajout cotisation soumise CE en BDD " << query.size() << p_demande.annee << query.lastQuery();
 
         while (query.next())
         {
@@ -320,7 +383,6 @@ void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_
             queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             queryCotisation.bindValue(":recetteId", query.value(0).toInt());
-            qDebug() << "Ajout cotisation soumise CE en BDD " << query.size() << query.value(0).toInt() << idDemandeRemboursement;
             queryCotisation.exec();
         }
     }
@@ -332,15 +394,12 @@ void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_
         query.bindValue(":nomSortie", p_demande.typeDeVol);
         query.exec();
 
-        qDebug() << "ajout sortie balade" << query.size() << QString::number(p_demande.annee) << p_demande.typeDeVol;
-
         while (query.next())
         {
             QSqlQuery querySortie;
             querySortie.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             querySortie.bindValue(":recetteId", query.value(0).toInt());
-            qDebug() << "Ajout paiement sortie soumise CE en BDD " << query.size() << query.value(0).toInt() << idDemandeRemboursement;
             querySortie.exec();
         }
     }
@@ -364,8 +423,6 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
 
     AeroDmsTypes::Recette recette;
     recette.annee = 0;
-    qDebug() << "Nb cotisations" << result << query.size()  << query.lastError().text() << query.lastQuery() << query.isActive();
-    qDebug() << db.isOpen() << db.isValid() ;
     //if (query.size() > 0)
     {
         while (query.next()) {
@@ -503,7 +560,6 @@ QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVol
     {
         sql.append(" AND estRecette = 1");
     }
-    //qDebug() << sql;
 
     QStringList liste;
     QSqlQuery query;
@@ -517,9 +573,6 @@ QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVol
 
 QStringList ManageDb::recupererBaladesEtSorties(QString p_typeDeVol)
 {
-    //QString sql = "SELECT * FROM 'volsBaladesEtSorties'";
-    //qDebug() << sql;
-
     QStringList liste;
     QSqlQuery query;
     query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
@@ -594,7 +647,6 @@ void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisa
     QSqlQuery query;
     query.prepare("SELECT nom, prenom FROM 'pilote' WHERE piloteId = :piloteId");
     query.bindValue(":piloteId", p_infosCotisation.idPilote);
-    //qDebug() << query.lastQuery();
     query.exec();
     query.next();
     const QString intitule = QString("Cotisation ").append(query.value(0).toString()).append(" ").append(query.value(1).toString()).append(" ").append(QString::number(p_infosCotisation.annee));

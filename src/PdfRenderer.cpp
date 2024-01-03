@@ -1,3 +1,20 @@
+/******************************************************************************\
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/******************************************************************************/
 #include "PdfRenderer.h"
 
 #include <QFile>
@@ -24,8 +41,6 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
 
 void PdfRenderer::chargementTermine(bool retour)
 {
-    //qDebug() << "Chargement termine QWEV" << view->url() << retour;
-    //view->save("C:/Users/cleme/source/AeroDms/AeroDms/testWV.html", QWebEngineDownloadRequest::SingleHtmlSaveFormat);
     QString nomFichier = QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees + nombreCotisationsTraitees + nombreRecettesBaladeSortieTraitees + nombreRemboursementFacturesTraitees)).append(".pdf");
     view->printToPdf(nomFichier);
     listeDesFichiers.append(nomFichier);
@@ -33,7 +48,6 @@ void PdfRenderer::chargementTermine(bool retour)
 
 void PdfRenderer::impressionTerminee(const QString& filePath, bool success)
 {
-    //qDebug() << "Impression termine QWEV" << filePath << success;
     db->ajouterDemandeCeEnBdd(demandeEnCours);
     emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
     imprimerLaProchaineDemandeDeSubvention();
@@ -122,7 +136,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
         listeDesFichiers.append(facturesAssociees);
-        //qDebug() << "liste fichiers" << listeDesFichiers;
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_HEURE_DE_VOL;
@@ -167,8 +180,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = "Cotisation";
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
-
-        qDebug() << "Ajout cotisation" << nombreCotisationsTraitees << recette.annee << recette.intitule << listeDesCotisations.size();
 
         nombreCotisationsTraitees++;
     }
@@ -285,22 +296,12 @@ void PdfRenderer::produireFichierPdfGlobal()
             pdfWriter->newPage();
             QPainter painter(pdfWriter);
             painter.drawImage(QPointF(0, 0), image);
-            qDebug() << "Ajout";
         }
         
         //printer.
     }
 
     fichierSortie->close();
-
-    /*QTemporaryFile temp;
-    if (temp.open()) // causes file creation
-        temp.close();
-    printer.setOutputFileName(temp.fileName());
-    // paint
-    if (temp.open()) {
-        pdf = temp.readAll();
-    }*/
 }
 
 void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)

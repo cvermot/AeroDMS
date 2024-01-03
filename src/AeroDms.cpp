@@ -1,3 +1,20 @@
+/******************************************************************************\
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/******************************************************************************/
 #include "AeroDms.h"
 #include "AeroDmsTypes.h"
 
@@ -47,20 +64,19 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     setCentralWidget(mainTabWidget);
 
     //==========Onglet Pilotes
-    QTableWidget* vuePilotes = new QTableWidget(0, 4, this);
-    vuePilotes->setHorizontalHeaderItem(0, new QTableWidgetItem("Nom"));
-    vuePilotes->setHorizontalHeaderItem(1, new QTableWidgetItem("Prénom"));
-    vuePilotes->setHorizontalHeaderItem(2, new QTableWidgetItem("Heures subventionnées"));
-    vuePilotes->setHorizontalHeaderItem(3, new QTableWidgetItem("Montant subventionné"));
+    vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem("Prénom"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem("Année"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
     mainTabWidget->addTab(vuePilotes, "Pilotes");
-
-    vuePilotes->setRowCount(10);
-    for (int i = 0; i < 10; i++)
-    {
-        vuePilotes->setItem(i, 0, new QTableWidgetItem("Test"));
-    }
 
     //==========Onglet Vols
     QTableWidget* vueVols = new QTableWidget(0, 6, this);;
@@ -300,6 +316,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
+    peuplerTablePilotes();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
@@ -307,6 +324,27 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
 AeroDms::~AeroDms()
 {
+}
+
+void AeroDms::peuplerTablePilotes()
+{
+    //TODO peupler vue pilote
+
+    AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes();
+    vuePilotes->setRowCount(listeSubventions.size());
+    for (int i = 0; i < listeSubventions.size(); i++)
+    {
+        const AeroDmsTypes::SubventionsParPilote subvention = listeSubventions.at(i);
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem(subvention.nom));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem(subvention.prenom));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem(QString::number(subvention.annee)));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem(subvention.entrainement.heuresDeVol));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.entrainement.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem(subvention.balade.heuresDeVol));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.balade.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem(subvention.sortie.heuresDeVol));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.sortie.montantRembourse).append(" €")));
+    }
 }
 
 void AeroDms::ajouterUneCotisationEnBdd()

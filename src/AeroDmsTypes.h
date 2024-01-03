@@ -1,3 +1,21 @@
+/******************************************************************************\
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/******************************************************************************/
+
 #ifndef AERODMSTYPES_H
 #define AERODMSTYPES_H
 
@@ -7,16 +25,17 @@ class AeroDmsTypes
 {
 public:
 
-    enum FlightTableElement {
-        FlightTableElement_DATE = 0x0,
-        FlightTableElement_DRONE = 0x1,
-        FlightTableElement_IMMAT = 0x2,
-        FlightTableElement_DUREE = 0x3,
-        FlightTableElement_SCENARIO = 0x4,
-        FlightTableElement_OBSERVATION = 0x5,
-        FlightTableElement_PILOTE = 0x6,
-        FlightTableElement_NIGHT_FLIGHT = 0x7,
-        FlightTableElement_MAX = 0x8
+    enum PiloteTableElement {
+        PiloteTableElement_NOM = 0x0,
+        PiloteTableElement_PRENOM = 0x1,
+        PiloteTableElement_ANNEE = 0x2,
+        PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES = 0x3,
+        PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE = 0x4,
+        PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES = 0x5,
+        PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE = 0x6,
+        PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES = 0x7,
+        PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE = 0x8,
+        PiloteTableElement_NB_COLONNES = 0x9,
     };
 
     enum ResultatCreationPilote {
@@ -53,6 +72,23 @@ public:
         QString remarque;
     };
     typedef QList<Pilote> ListePilotes;
+
+    struct HeureDeVolRemboursement
+    {
+        float montantRembourse;
+        QString heuresDeVol;
+    };
+    struct SubventionsParPilote {
+        QString idPilote;
+        int annee;
+        QString nom;
+        QString prenom;
+        QString aeroclub;
+        HeureDeVolRemboursement entrainement;
+        HeureDeVolRemboursement balade;
+        HeureDeVolRemboursement sortie;
+    };
+    typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;
 
     struct DemandeRemboursement {
         QString typeDeVol;
