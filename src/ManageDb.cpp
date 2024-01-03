@@ -149,6 +149,36 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(i
     return liste;
 }
 
+AeroDmsTypes::ListeVols ManageDb::recupererVols(int p_annee, QString p_piloteId)
+{
+    AeroDmsTypes::ListeVols liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT *  FROM vols");
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::Vol vol;
+        vol.coutVol = query.value("cout").toFloat();
+        vol.date = query.value("date").toDate();
+        vol.duree = convertirMinutesEnHeuresMinutes(query.value("duree").toInt());
+        vol.estSoumisCe = "Oui";
+        if(query.value("demandeRemboursement").isNull())
+            vol.estSoumisCe = "Non";
+        vol.idPilote = query.value("pilote").toString();
+        vol.montantRembourse = query.value("montantRembourse").toFloat();
+        vol.nomPilote = query.value("nom").toString();
+        vol.prenomPilote = query.value("prenom").toString();
+        vol.remarque = query.value("remarque").toString();
+        vol.typeDeVol = query.value("typeDeVol").toString();
+ 
+        liste.append(vol);
+    }
+
+    return liste;
+}
+
 QString ManageDb::convertirMinutesEnHeuresMinutes(const int p_minutes)
 {
     const int heures = p_minutes / 60;
@@ -185,12 +215,18 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
 //type Entrainement (heures perso), les autres types de vols ne sont pas plafonnés
 float ManageDb::recupererSubventionRestante(const QString& p_piloteId, const int p_annee)
 {
-    QString sql = QString("SELECT subventionAllouee FROM subventionEntrainementAlloueeParPiloteEtParAnnee WHERE pilote = ':piloteId' AND annee = ':annee'").replace(":piloteId", p_piloteId).replace(":annee", QString::number(p_annee));
     QSqlQuery query;
+
+    QString sql = QString("SELECT montantSubventionAnnuelleEntrainement FROM cotisation WHERE pilote = ':piloteId' AND annee = ':annee'").replace(":piloteId", p_piloteId).replace(":annee", QString::number(p_annee));
     query.exec(sql);
     query.next();
-    //TODO => chercher le montant en BDD
-    return 750.0 - query.value(0).toFloat();
+    float montantAlloue = query.value(0).toFloat();
+
+    sql = QString("SELECT subventionAllouee FROM subventionEntrainementAlloueeParPiloteEtParAnnee WHERE pilote = ':piloteId' AND annee = ':annee'").replace(":piloteId", p_piloteId).replace(":annee", QString::number(p_annee));
+    query.exec(sql);
+    query.next();
+    
+    return montantAlloue - query.value(0).toFloat();
 }
 
 void ManageDb::enregistrerUnVolDEntrainement( const QString& p_piloteId,

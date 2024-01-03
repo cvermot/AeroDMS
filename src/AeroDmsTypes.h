@@ -38,6 +38,18 @@ public:
         PiloteTableElement_NB_COLONNES = 0x9,
     };
 
+    enum VolTableElement {
+        VolTableElement_PILOTE = 0x0,
+        VolTableElement_DATE = 0x1,
+        VolTableElement_TYPE_DE_VOL = 0x2,
+        VolTableElement_DUREE = 0x3,
+        VolTableElement_COUT = 0x4,
+        VolTableElement_SUBVENTION = 0x5,
+        VolTableElement_SOUMIS_CE = 0x6,
+        VolTableElement_REMARQUE = 0x7,
+        VolTableElement_NB_COLONNES = 0x8,
+    };
+
     enum ResultatCreationPilote {
         ResultatCreationPilote_SUCCES = 0x0,
         ResultatCreationPilote_PILOTE_EXISTE = 0x1,
@@ -89,6 +101,20 @@ public:
         HeureDeVolRemboursement sortie;
     };
     typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;
+
+    struct Vol {
+        QString idPilote;
+        QDate date;
+        QString nomPilote;
+        QString prenomPilote;
+        QString typeDeVol;
+        QString duree;
+        QString remarque;
+        QString estSoumisCe;
+        float coutVol;
+        float montantRembourse;
+    };
+    typedef QList<Vol> ListeVols;
 
     struct DemandeRemboursement {
         QString typeDeVol;

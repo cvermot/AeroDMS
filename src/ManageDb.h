@@ -78,6 +78,7 @@ public:
     AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre();
     AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre();
     AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes(int p_annee = -1);
+    AeroDmsTypes::ListeVols recupererVols(int p_annee = -1, QString p_piloteId = "");
 
     QStringList recupererListeFacturesAssocieeASubvention(const  AeroDmsTypes::DemandeRemboursement p_demande);
 

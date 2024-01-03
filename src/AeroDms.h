@@ -52,6 +52,7 @@ private:
     void peuplerListeSorties();
     void peuplerListeBaladesEtSorties();
     void peuplerTablePilotes();
+    void peuplerTableVols();
 
     float calculerCoutHoraire();
 
@@ -70,6 +71,7 @@ private:
     QTabWidget* mainTabWidget;
 
     QTableWidget* vuePilotes;
+    QTableWidget* vueVols;
 
     //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;

@@ -34,9 +34,6 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(renderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus, bool)), this, SLOT(statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminationStatus, bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
-
-    //QUrl url = QUrl::fromLocalFile("C:/Users/cleme/OneDrive/Projets/HTML/COMPTA_2023.htm");
-    //view->load(url);
 }
 
 void PdfRenderer::chargementTermine(bool retour)

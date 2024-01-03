@@ -79,14 +79,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(vuePilotes, "Pilotes");
 
     //==========Onglet Vols
-    QTableWidget* vueVols = new QTableWidget(0, 6, this);;
-    vueVols->setHorizontalHeaderItem(0, new QTableWidgetItem("Pilote"));
-    vueVols->setHorizontalHeaderItem(1, new QTableWidgetItem("Date"));
-    vueVols->setHorizontalHeaderItem(2, new QTableWidgetItem("Durée"));
-    vueVols->setHorizontalHeaderItem(3, new QTableWidgetItem("Coût"));
-    vueVols->setHorizontalHeaderItem(4, new QTableWidgetItem("Subvention"));
-    vueVols->setHorizontalHeaderItem(5, new QTableWidgetItem("Soumis CE"));
+    vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);;
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem("Pilote"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem("Date"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem("Type"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem("Durée"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem("Coût"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem("Subvention"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
     mainTabWidget->addTab(vueVols, "Vols");
 
     //==========Onglet Ajout dépense
@@ -317,6 +320,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
     peuplerTablePilotes();
+    peuplerTableVols();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
@@ -328,8 +332,6 @@ AeroDms::~AeroDms()
 
 void AeroDms::peuplerTablePilotes()
 {
-    //TODO peupler vue pilote
-
     AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes();
     vuePilotes->setRowCount(listeSubventions.size());
     for (int i = 0; i < listeSubventions.size(); i++)
@@ -347,6 +349,26 @@ void AeroDms::peuplerTablePilotes()
     }
 }
 
+void AeroDms::peuplerTableVols()
+{
+    AeroDmsTypes::ListeVols listeVols = db->recupererVols();
+    vueVols->setRowCount(listeVols.size());
+    qDebug() << "ajout vol " << listeVols.size();
+    for (int i = 0; i < listeVols.size(); i++)
+    {
+        qDebug() << "ajout vol rang" << i;
+        const AeroDmsTypes::Vol vol = listeVols.at(i);
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol).append(" €")));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
+    }
+}
+
 void AeroDms::ajouterUneCotisationEnBdd()
 {
     //On contrôle que le pilote n'a pas déjà une cotisation pour cette année
@@ -359,6 +381,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
     else
     {
         db->ajouterCotisation(infosCotisation);
+        //On met à jour la table des pilotes
+        peuplerTablePilotes();
     }
 }
 
@@ -661,6 +685,9 @@ void AeroDms::enregistrerUnVol()
             statusBar()->showMessage("Erreur ajout");
         }
     }
+    //On met à jour la table des pilotes et celle des vols
+    peuplerTablePilotes();
+    peuplerTableVols();
 }
 
 void AeroDms::enregistrerUneRecette()
