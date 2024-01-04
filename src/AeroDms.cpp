@@ -334,7 +334,8 @@ AeroDms::~AeroDms()
 
 void AeroDms::peuplerTablePilotes()
 {
-    const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes(listeDeroulanteAnnee->currentData().toInt());
+    const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes( listeDeroulanteAnnee->currentData().toInt(), 
+                                                                                                       listeDeroulantePilote->currentData().toString());
     vuePilotes->setRowCount(listeSubventions.size());
     for (int i = 0; i < listeSubventions.size(); i++)
     {
@@ -353,12 +354,11 @@ void AeroDms::peuplerTablePilotes()
 
 void AeroDms::peuplerTableVols()
 {
-    AeroDmsTypes::ListeVols listeVols = db->recupererVols();
+    AeroDmsTypes::ListeVols listeVols = db->recupererVols( listeDeroulanteAnnee->currentData().toInt(),
+                                                           listeDeroulantePilote->currentData().toString());
     vueVols->setRowCount(listeVols.size());
-    qDebug() << "ajout vol " << listeVols.size();
     for (int i = 0; i < listeVols.size(); i++)
     {
-        qDebug() << "ajout vol rang" << i;
         const AeroDmsTypes::Vol vol = listeVols.at(i);
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));

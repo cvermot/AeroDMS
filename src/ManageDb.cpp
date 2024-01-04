@@ -86,18 +86,29 @@ int ManageDb::recupererProchainNumeroFacture()
     return query.value(0).toInt() + 1 ;
 }
 
-AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(const int p_annee)
+AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( const int p_annee, 
+                                                                                const QString p_piloteId)
 {
     QSqlQuery query;
-    if (p_annee == -1)
+    if (p_annee != -1 && p_piloteId != "*")
     {
-        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote");
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee AND pilote = :piloteId");    
+    }
+    else if (p_annee != -1)
+    {
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee");
+    }
+    else if (p_piloteId != "*")
+    {
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE pilote = :piloteId");
     }
     else
     {
-        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee");
-        query.bindValue(":annee", QString::number(p_annee));
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote");
     }
+    query.bindValue(":annee", QString::number(p_annee));
+    query.bindValue(":piloteId", p_piloteId);
+
     query.exec();
 
     QString idPilote = "";
@@ -157,12 +168,34 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(c
     return liste;
 }
 
-AeroDmsTypes::ListeVols ManageDb::recupererVols(int p_annee, QString p_piloteId)
+AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
+                                                 const QString p_piloteId)
 {
     AeroDmsTypes::ListeVols liste;
 
+    qDebug() << p_annee << p_piloteId;
+
     QSqlQuery query;
-    query.prepare("SELECT *  FROM vols");
+    if (p_annee != -1 && p_piloteId != "*")
+    {
+        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId");
+    }
+    else if (p_annee != -1)
+    {
+        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee");
+    }
+    else if (p_piloteId != "*")
+    {
+        query.prepare("SELECT *  FROM vols WHERE pilote = :piloteId");
+    }
+    else
+    {
+        query.prepare("SELECT *  FROM vols");
+    }
+    query.bindValue(":annee", QString::number(p_annee));
+    query.bindValue(":piloteId", p_piloteId);
+
+    
     query.exec();
 
     while (query.next())
