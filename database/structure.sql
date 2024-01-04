@@ -140,6 +140,52 @@ GROUP BY volARembourserParFacture.typeDeVol,
 volARembourserParFacture.pilote,
 volARembourserParFacture.annee;
 
+-- View: volParTypeParAnEtParPilote
+CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote AS SELECT 
+    vol.pilote,
+    vol.typeDeVol,
+    pilote.nom,
+    pilote.prenom,
+    pilote.aeroclub,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+GROUP BY vol.pilote, vol.typeDeVol, annee
+ORDER BY annee, vol.pilote, typeDeVol;
+
+-- View: volParTypeParAnEtParPiloteSoumis
+CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis AS SELECT 
+    vol.pilote,
+    vol.typeDeVol,
+    pilote.nom,
+    pilote.prenom,
+    pilote.aeroclub,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+WHERE vol.demandeRemboursement IS NOT NULL
+GROUP BY vol.pilote, vol.typeDeVol, annee
+ORDER BY annee, vol.pilote, typeDeVol;
+
+-- View: vols
+CREATE VIEW IF NOT EXISTS vols AS SELECT 
+    vol.date,
+    vol.pilote,
+    pilote.nom,
+    pilote.prenom,
+    vol.typeDeVol,
+    vol.montantRembourse,
+    vol.cout,
+    vol.duree,
+    vol.remarque,
+    vol.demandeRemboursement
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId;
+
 -- View: volsBaladesEtSorties
 CREATE VIEW IF NOT EXISTS volsBaladesEtSorties AS SELECT 
     vol.volId,
