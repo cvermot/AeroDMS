@@ -51,8 +51,7 @@ private:
     void peuplerListesPilotes();
     void peuplerListeSorties();
     void peuplerListeBaladesEtSorties();
-    void peuplerTablePilotes();
-    void peuplerTableVols();
+    void peuplerListeDeroulanteAnnee();
 
     float calculerCoutHoraire();
 
@@ -120,6 +119,8 @@ public slots:
     void ajouterUneSortieEnBdd();
     void ajouterUneCotisation();
     void ajouterUneCotisationEnBdd();
+    void peuplerTablePilotes();
+    void peuplerTableVols();
 
 
 };

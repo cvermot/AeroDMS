@@ -86,10 +86,18 @@ int ManageDb::recupererProchainNumeroFacture()
     return query.value(0).toInt() + 1 ;
 }
 
-AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(int p_annee)
+AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes(const int p_annee)
 {
     QSqlQuery query;
-    query.prepare("SELECT *  FROM volParTypeParAnEtParPilote");
+    if (p_annee == -1)
+    {
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote");
+    }
+    else
+    {
+        query.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
     query.exec();
 
     QString idPilote = "";
@@ -565,6 +573,20 @@ QString ManageDb::recupererAeroclub(QString p_piloteId)
     query.exec();
     query.next();
     return query.value(0).toString();
+}
+
+QList<int> ManageDb::recupererAnnees()
+{
+    QList<int> listeAnnees;
+    QSqlQuery query;
+    query.prepare("SELECT annee FROM cotisation GROUP BY annee");
+
+    query.exec();
+    while (query.next())
+    {
+        listeAnnees.append(query.value("annee").toInt());
+    }
+    return listeAnnees;
 }
 
 QString ManageDb::recupererNomPrenomPilote(QString p_piloteId)

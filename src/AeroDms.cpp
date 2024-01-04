@@ -297,13 +297,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QToolBar* SelectionToolBar = addToolBar(tr(""));
 
-    listeDeroulanteAnnee = new QComboBox;
-    listeDeroulanteAnnee->addItem("Toutes");
-    listeDeroulanteAnnee->addItem("2023");
-    listeDeroulanteAnnee->addItem("2024");
+    listeDeroulanteAnnee = new QComboBox(this);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     SelectionToolBar->addWidget(listeDeroulanteAnnee);
 
-    listeDeroulantePilote = new QComboBox;
+    listeDeroulantePilote = new QComboBox(this);
+    connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
+    connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     SelectionToolBar->addWidget(listeDeroulantePilote);
 
     //Fenêtres
@@ -321,6 +322,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerListeBaladesEtSorties();
     peuplerTablePilotes();
     peuplerTableVols();
+    peuplerListeDeroulanteAnnee();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
@@ -332,7 +334,7 @@ AeroDms::~AeroDms()
 
 void AeroDms::peuplerTablePilotes()
 {
-    AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes();
+    const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes(listeDeroulanteAnnee->currentData().toInt());
     vuePilotes->setRowCount(listeSubventions.size());
     for (int i = 0; i < listeSubventions.size(); i++)
     {
@@ -369,6 +371,17 @@ void AeroDms::peuplerTableVols()
     }
 }
 
+void AeroDms::peuplerListeDeroulanteAnnee()
+{
+    listeDeroulanteAnnee->clear();
+    listeDeroulanteAnnee->addItem("Toutes", -1);
+    QList<int> listeAnnees = db->recupererAnnees();
+    for (int i = 0; i < listeAnnees.size(); i++)
+    {
+        listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
+    }
+}
+
 void AeroDms::ajouterUneCotisationEnBdd()
 {
     //On contrôle que le pilote n'a pas déjà une cotisation pour cette année
@@ -383,6 +396,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
         db->ajouterCotisation(infosCotisation);
         //On met à jour la table des pilotes
         peuplerTablePilotes();
+        //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
+        peuplerListeDeroulanteAnnee();
     }
 }
 
