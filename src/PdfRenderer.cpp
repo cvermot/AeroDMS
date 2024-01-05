@@ -38,7 +38,7 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
 
 void PdfRenderer::chargementTermine(bool retour)
 {
-    QString nomFichier = QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees + nombreCotisationsTraitees + nombreRecettesBaladeSortieTraitees + nombreRemboursementFacturesTraitees)).append(".pdf");
+    QString nomFichier = QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
     view->printToPdf(nomFichier);
     listeDesFichiers.append(nomFichier);
 }
@@ -61,9 +61,6 @@ int PdfRenderer::imprimerLesDemandesDeSubvention()
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
-    nombreCotisationsTraitees = 0;
-    nombreRecettesBaladeSortieTraitees = 0;
-    nombreRemboursementFacturesTraitees = 0;
     listeDesFichiers.clear();
     emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
 
@@ -75,16 +72,17 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 {
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
     QFile f("./ressources/HTML/COMPTA_2023.htm");
+    QString templateCeTmp = "";
     if (f.open(QFile::ReadOnly | QFile::Text))
     {
         QTextStream in(&f);
-        templateCe = in.readAll();
+        templateCeTmp = in.readAll();
     }
     else
     {
         qDebug() << "Erreur ouverture fichier";
     }
-    QString templateCeTmp = templateCe;
+    //QString templateCeTmp = templateCe;
     //Date de la demande
     templateCeTmp.replace("xxDate", QDate::currentDate().toString("dd/MM/yyyy"));
     //Investissement => toujours décoché, pour le moment non géré par le logiciel
@@ -102,11 +100,50 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     if (listeAnnees.size() > 0)
     {
         const int annee = listeAnnees.takeFirst();
-        db->recupererLesSubventionesDejaAllouees(annee);
-    }
 
-    //if (nombreFacturesTraitees < listeDesRemboursements.size())
-    if (listeDesRemboursements.size() > 0)
+        QFile table("./ressources/HTML/TableauRecap.html");
+        QFile tableItem("./ressources/HTML/TableauRecapItem.html");
+        QString templateTable = "";
+        QString templateTableItem = "";
+        if (table.open(QFile::ReadOnly | QFile::Text) && tableItem.open(QFile::ReadOnly | QFile::Text))
+        {
+            QTextStream inTable(&table);
+            QTextStream inTableItem(&tableItem);
+            templateTable = inTable.readAll();
+            templateTableItem = inTableItem.readAll();
+        }
+        else
+        {
+            qDebug() << "Erreur ouverture fichier";
+        }
+        templateTable.replace("__date__", QDate::currentDate().toString("dd/MM/yyyy"));
+        templateTable.replace("__exercice__", QString::number(annee));
+
+        AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererLesSubventionesDejaAllouees(annee);
+        for (int i = 0; i < listePilotesDeCetteAnnee.size(); i++)
+        {
+            QString item = templateTableItem;
+            item.replace("__pilote__", QString(listePilotesDeCetteAnnee.at(i).nom).append(" ").append(listePilotesDeCetteAnnee.at(i).prenom));
+            item.replace("__HdvEnt__", listePilotesDeCetteAnnee.at(i).entrainement.heuresDeVol);
+            item.replace("__CouEnt__", QString::number(listePilotesDeCetteAnnee.at(i).entrainement.coutTotal));
+            item.replace("__SubEnt__", QString::number(listePilotesDeCetteAnnee.at(i).entrainement.montantRembourse));
+            item.replace("__HdVBal__", listePilotesDeCetteAnnee.at(i).balade.heuresDeVol);
+            item.replace("__CouBal__", QString::number(listePilotesDeCetteAnnee.at(i).balade.coutTotal));
+            item.replace("__SubBal__", QString::number(listePilotesDeCetteAnnee.at(i).balade.montantRembourse));
+            item.replace("__HdVSor__", listePilotesDeCetteAnnee.at(i).sortie.heuresDeVol);
+            item.replace("__CouSor__", QString::number(listePilotesDeCetteAnnee.at(i).sortie.coutTotal));
+            item.replace("__SubSor__", QString::number(listePilotesDeCetteAnnee.at(i).sortie.montantRembourse));
+            item.replace("__HdvTot__", listePilotesDeCetteAnnee.at(i).totaux.heuresDeVol);
+            item.replace("__CouTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.coutTotal));
+            item.replace("__SubTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.montantRembourse));
+           
+
+            templateTable.replace("<!--Accroche-->", item);
+        }
+
+        view->setHtml(templateTable);
+    }
+    else if (listeDesRemboursements.size() > 0)
     {    
         const AeroDmsTypes::DemandeRemboursement demande = listeDesRemboursements.at(0);
         //Depense
@@ -150,13 +187,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.nomBeneficiaire = db->recupererAeroclub(demande.piloteId);
         demandeEnCours.montant = demande.montantARembourser;
 
-        nombreFacturesTraitees++;
     }
     //Recettes "Cotisations"
     else if (listeDesCotisations.size() > 0)
-    //else if (nombreCotisationsTraitees < listeDesCotisations.size())
     {
-        //AeroDmsTypes::Recette recette = listeDesCotisations.at(nombreCotisationsTraitees);
         const AeroDmsTypes::Recette recette = listeDesCotisations.at(0);
         //Depense
         templateCeTmp.replace("xxD", "");
@@ -185,15 +219,11 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = "Cotisation";
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
-
-        nombreCotisationsTraitees++;
     }
     //Recettes "passagers" des sorties et balades
-    //else if (nombreRecettesBaladeSortieTraitees < listeDesRecettesBaladesSorties.size())
     else if (listeDesRecettesBaladesSorties.size() > 0)
     {
         const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(0);
-        //const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(nombreRecettesBaladeSortieTraitees);
         //Depense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -222,14 +252,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = recette.intitule;
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
-
-        nombreRecettesBaladeSortieTraitees++;
     }
     //Factures payées par les pilotes à rembourser
     else if (listeDesRemboursementsFactures.size() > 0)
-    //else if (nombreRemboursementFacturesTraitees < listeDesRemboursementsFactures.size())
     {
-        //const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = listeDesRemboursementsFactures.at(nombreRemboursementFacturesTraitees);
         const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = listeDesRemboursementsFactures.at(0);
         //Depense
         templateCeTmp.replace("xxD", "X");
@@ -261,13 +287,12 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = demandeRembousement.intitule;
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
         demandeEnCours.montant = demandeRembousement.montant;
-        
-        nombreRemboursementFacturesTraitees++;
     }
     else
     {
         //produireFichierPdfGlobal();
     }
+    nombreFacturesTraitees++;
 
 
 }

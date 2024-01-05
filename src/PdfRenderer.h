@@ -35,14 +35,11 @@ private :
 	QWebEnginePage* view;
 	ManageDb *db;
 
-	QString templateCe;
 	QStringList listeDesFichiers;
 	AeroDmsTypes::DemandeEnCoursDeTraitement demandeEnCours;
+	QList<int> listeAnnees;
 
 	int nombreFacturesTraitees;
-	int nombreCotisationsTraitees;
-	int nombreRecettesBaladeSortieTraitees;
-	int nombreRemboursementFacturesTraitees;
 	int nombreFacturesATraiter;
 
 	void imprimerLaProchaineDemandeDeSubvention();
