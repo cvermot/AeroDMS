@@ -29,11 +29,14 @@ public:
 	PdfRenderer();
 	PdfRenderer(ManageDb *p_db, QWidget* parent = nullptr);
 
-	int imprimerLesDemandesDeSubvention(const QString p_nomTresorier);
+	int imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
+		                                 const QString p_cheminSortieFichiersGeneres);
 
 private :
 	QWebEnginePage* view;
 	ManageDb *db;
+
+	QString cheminSortieFichiersGeneres;
 
 	QStringList listeDesFichiers;
 	AeroDmsTypes::DemandeEnCoursDeTraitement demandeEnCours;

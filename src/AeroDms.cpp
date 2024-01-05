@@ -43,7 +43,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settings.beginGroup("dossiers");
         settings.setValue("facturesATraiter", QCoreApplication::applicationDirPath());
         settings.setValue("facturesSaisies", QCoreApplication::applicationDirPath());
-        //settings.setValue("fichiersAImprimer", QCoreApplication::applicationDirPath());
+        settings.setValue("sortieFichiersGeneres", QCoreApplication::applicationDirPath());
         settings.endGroup();
     }
 
@@ -67,6 +67,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() + QString("/") + settings.value("baseDeDonnees/nom", "").toString();
     cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
+    cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
 
     parametresMetiers.montantSubventionEntrainement = settings.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
     parametresMetiers.montantCotisationPilote = settings.value("parametresMetier/montantCotisationPilote", "").toFloat();
@@ -497,7 +498,8 @@ void AeroDms::chargerUneFacture(QString p_fichier)
 
 void AeroDms::genererPdf()
 {
-    pdf->imprimerLesDemandesDeSubvention(parametresMetiers.nomTresorier);
+    pdf->imprimerLesDemandesDeSubvention( parametresMetiers.nomTresorier,
+                                          cheminSortieFichiersGeneres);
 }
 
 void AeroDms::enregistrerUneFacture()

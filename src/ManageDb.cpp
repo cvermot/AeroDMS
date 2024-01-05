@@ -134,6 +134,9 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.balade.heuresDeVol = "0h00";
         subvention.balade.montantRembourse = 0;
         subvention.balade.coutTotal = 0;
+        subvention.totaux.heuresDeVol = "0h00";
+        subvention.totaux.montantRembourse = 0;
+        subvention.totaux.coutTotal = 0;
 
         QSqlQuery queryVolAnneePilote;
         queryVolAnneePilote.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee AND pilote = :piloteId");

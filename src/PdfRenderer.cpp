@@ -38,7 +38,7 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
 
 void PdfRenderer::chargementTermine(bool retour)
 {
-    QString nomFichier = QString("C:/Users/cleme/source/AeroDms/AeroDms/fomulaire_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
+    QString nomFichier = QString(cheminSortieFichiersGeneres).append("fomulaire_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
     view->printToPdf(nomFichier);
     listeDesFichiers.append(nomFichier);
 }
@@ -55,17 +55,28 @@ void PdfRenderer::statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminat
     //qDebug() << "QWEV erreur" << terminationStatus << exitCode;
 }
 
-int PdfRenderer::imprimerLesDemandesDeSubvention(const QString p_nomTresorier)
+int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
+                                                  const QString p_cheminSortieFichiersGeneres )
 {
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
     demandeEnCours.nomTresorier = p_nomTresorier;
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
-    listeDesFichiers.clear();
-    emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
+    cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
+    QDir().mkdir(cheminSortieFichiersGeneres);
+    if(QDir(cheminSortieFichiersGeneres).exists())
+    { 
+        cheminSortieFichiersGeneres.append("/");
+        listeDesFichiers.clear();
+        emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
 
-    imprimerLaProchaineDemandeDeSubvention();
+        imprimerLaProchaineDemandeDeSubvention();
+    }
+    else
+    {
+        qDebug() << "Erreur création repertoire";
+    }
     return listeDesRemboursements.size();
 }
 

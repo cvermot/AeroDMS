@@ -101,6 +101,7 @@ private:
 
     QString cheminStockageFacturesTraitees;
     QString cheminStockageFacturesATraiter;
+    QString cheminSortieFichiersGeneres;
     QString cheminDeLaFactureCourante;
 
     AeroDmsTypes::ParametresMetier parametresMetiers;
