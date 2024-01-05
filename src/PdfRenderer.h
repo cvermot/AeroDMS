@@ -30,13 +30,15 @@ public:
 	PdfRenderer(ManageDb *p_db, QWidget* parent = nullptr);
 
 	int imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
-		                                 const QString p_cheminSortieFichiersGeneres);
+		                                 const QString p_cheminSortieFichiersGeneres,
+		                                 const QString p_cheminStockageFactures);
 
 private :
 	QWebEnginePage* view;
 	ManageDb *db;
 
 	QString cheminSortieFichiersGeneres;
+	QString repertoireDesFactures;
 
 	QStringList listeDesFichiers;
 	AeroDmsTypes::DemandeEnCoursDeTraitement demandeEnCours;
@@ -44,10 +46,15 @@ private :
 
 	int nombreFacturesTraitees;
 	int nombreFacturesATraiter;
+	int indiceFichier;
 
 	void imprimerLaProchaineDemandeDeSubvention();
 	void remplirLeChampMontant(QString& p_html, const float p_montant);
 	void produireFichierPdfGlobal();
+
+	void recopierFacture(const QString p_nomFacture);
+	void recopierFactures(const QStringList p_listeFactures);
+	QString numeroFichierSur3Digits();
 
 signals:
 	void mettreAJourNombreFactureTraitees(int nombreFacturesATraiter, int nombreFactureTraitees);

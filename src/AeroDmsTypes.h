@@ -71,6 +71,7 @@ public:
         float montant;
         int annee;
         QString nomTresorier;
+        QString nomFichier;
         //int idFacture;
     };
 

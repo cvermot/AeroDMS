@@ -499,7 +499,8 @@ void AeroDms::chargerUneFacture(QString p_fichier)
 void AeroDms::genererPdf()
 {
     pdf->imprimerLesDemandesDeSubvention( parametresMetiers.nomTresorier,
-                                          cheminSortieFichiersGeneres);
+                                          cheminSortieFichiersGeneres,
+                                          cheminStockageFacturesTraitees);
 }
 
 void AeroDms::enregistrerUneFacture()

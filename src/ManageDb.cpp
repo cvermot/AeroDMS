@@ -454,7 +454,8 @@ QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTy
     query.exec(sql);
     while (query.next())
     {
-        listeFactures.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(query.value(5).toString()));
+        //listeFactures.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(query.value(5).toString()));
+        listeFactures.append(query.value(5).toString());
     }
 
     return listeFactures;

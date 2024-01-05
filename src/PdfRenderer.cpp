@@ -36,9 +36,25 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
 }
 
+QString PdfRenderer::numeroFichierSur3Digits()
+{
+    QString numero = QString::number(indiceFichier);
+    if (numero.size() == 1)
+    {
+        numero = QString("00").append(numero);
+    }
+    else if (numero.size() == 2)
+    {
+        numero = QString("0").append(numero);
+    }
+    indiceFichier++;
+
+    return numero;
+}
+
 void PdfRenderer::chargementTermine(bool retour)
 {
-    QString nomFichier = QString(cheminSortieFichiersGeneres).append("fomulaire_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
+    QString nomFichier = QString(cheminSortieFichiersGeneres).append(numeroFichierSur3Digits()).append(demandeEnCours.nomFichier).append("_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
     view->printToPdf(nomFichier);
     listeDesFichiers.append(nomFichier);
 }
@@ -56,14 +72,17 @@ void PdfRenderer::statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminat
 }
 
 int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
-                                                  const QString p_cheminSortieFichiersGeneres )
+                                                  const QString p_cheminSortieFichiersGeneres,
+                                                  const QString p_cheminStockageFactures)
 {
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
     demandeEnCours.nomTresorier = p_nomTresorier;
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
+    indiceFichier = 0;
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
+    repertoireDesFactures = p_cheminStockageFactures;
     QDir().mkdir(cheminSortieFichiersGeneres);
     if(QDir(cheminSortieFichiersGeneres).exists())
     { 
@@ -155,6 +174,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         }
 
         view->setHtml(templateTable);
+
+        demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(annee));
     }
     else if (listeDesRemboursements.size() > 0)
     {    
@@ -190,6 +211,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         view->setHtml(templateCeTmp);
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
+        recopierFactures(facturesAssociees);
         listeDesFichiers.append(facturesAssociees);
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
@@ -199,6 +221,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = demande.typeDeVol;
         demandeEnCours.nomBeneficiaire = db->recupererAeroclub(demande.piloteId);
         demandeEnCours.montant = demande.montantARembourser;
+        demandeEnCours.nomFichier = QString(".HdV_").append(demande.piloteId).append("_").append(QString::number(demande.annee));
 
     }
     //Recettes "Cotisations"
@@ -232,6 +255,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = "Cotisation";
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
+        demandeEnCours.nomFichier = QString(".Cotisations_").append(QString::number(demandeEnCours.annee));
     }
     //Recettes "passagers" des sorties et balades
     else if (listeDesRecettesBaladesSorties.size() > 0)
@@ -265,6 +289,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = recette.intitule;
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
+        demandeEnCours.nomFichier = QString(".RecetteBalades_").append(QString::number(demandeEnCours.annee));
     }
     //Factures payées par les pilotes à rembourser
     else if (listeDesRemboursementsFactures.size() > 0)
@@ -291,7 +316,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
         view->setHtml(templateCeTmp);
-        listeDesFichiers.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(demandeRembousement.nomFacture));
+        recopierFacture(demandeRembousement.nomFacture);
+        listeDesFichiers.append(QString(repertoireDesFactures).append(demandeRembousement.nomFacture));
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_FACTURE;
@@ -300,14 +326,33 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = demandeRembousement.intitule;
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
         demandeEnCours.montant = demandeRembousement.montant;
+        demandeEnCours.nomFichier = QString(".DemandeRemboursementFacturePayeeParPilote");
     }
     else
     {
         //produireFichierPdfGlobal();
     }
     nombreFacturesTraitees++;
+}
 
-
+//Recopie une facture de nom p_nomFacture de repertoire des factures vers le repertoire ou est sont génerés les autres fichiers
+void PdfRenderer::recopierFacture(const QString p_nomFacture)
+{
+    QFile gestionnaireDeFichier;
+    QString cheminDeLaFactureCourante = QString(repertoireDesFactures).append(p_nomFacture);
+    QString cheminDeDestination = QString(cheminSortieFichiersGeneres).append(numeroFichierSur3Digits()).append(".").append(p_nomFacture);
+    if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminDeDestination))
+    {
+    
+    }
+    //indiceFichier++;
+}
+void PdfRenderer::recopierFactures(const QStringList p_listeFactures)
+{
+    for (int i = 0 ; i < p_listeFactures.size() ; i++)
+    {
+        recopierFacture(p_listeFactures.at(i));
+    }
 }
 
 void PdfRenderer::produireFichierPdfGlobal()
