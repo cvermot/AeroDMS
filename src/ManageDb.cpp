@@ -113,6 +113,7 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
 
     QString idPilote = "";
     int annee = 0;
+    int heuresDeVolEnMinutes = 0;
 
     AeroDmsTypes::ListeSubventionsParPilotes liste;
 
@@ -136,27 +137,38 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
             subvention.aeroclub = query.value("aeroclub").toString();
             subvention.sortie.heuresDeVol = "0h00";
             subvention.sortie.montantRembourse = 0;
+            subvention.sortie.coutTotal = 0;
             subvention.entrainement.heuresDeVol = "0h00";
             subvention.entrainement.montantRembourse = 0;
+            subvention.entrainement.coutTotal = 0;
             subvention.balade.heuresDeVol = "0h00";
             subvention.balade.montantRembourse = 0;
+            subvention.balade.coutTotal = 0;
+            heuresDeVolEnMinutes = 0;
         }
 
         if (query.value("typeDeVol").toString() == "Entrainement")
         {
             subvention.entrainement.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
             subvention.entrainement.montantRembourse = query.value("montantRembourse").toFloat();
+            subvention.entrainement.coutTotal = query.value("cout").toFloat();
         }
         else if (query.value("typeDeVol").toString() == "Sortie")
         {
             subvention.sortie.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
             subvention.sortie.montantRembourse = query.value("montantRembourse").toFloat();
+            subvention.sortie.coutTotal = query.value("cout").toFloat();
         }
         else if(query.value("typeDeVol").toString() == "Balade")
         {
             subvention.balade.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVol").toInt());
             subvention.balade.montantRembourse = query.value("montantRembourse").toFloat();
+            subvention.balade.coutTotal = query.value("cout").toFloat();
         }
+        heuresDeVolEnMinutes = heuresDeVolEnMinutes + query.value("tempsDeVol").toInt();
+        subvention.totaux.heuresDeVol = convertirMinutesEnHeuresMinutes(heuresDeVolEnMinutes);
+        subvention.totaux.montantRembourse = subvention.totaux.montantRembourse + query.value("montantRembourse").toFloat();
+        subvention.totaux.coutTotal = subvention.totaux.coutTotal + query.value("cout").toFloat();
     }
 
     //Si année différente de 0, c'est qu'on était sur une liste non nulle, on ajoute le dernier élement
@@ -335,6 +347,33 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
     query.bindValue(":payeur", p_payeur);
 
     query.exec();
+}
+
+QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
+{
+    QSqlQuery query;
+    query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL GROUP BY annee");
+    query.exec();
+
+    QList<int> listeAnnees;
+
+    while (query.next())
+    {
+        listeAnnees.append(query.value("annee").toInt());
+    }
+
+    return listeAnnees;
+}
+
+AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventionesDejaAllouees(const int annee)
+{
+    AeroDmsTypes::ListeSubventionsParPilotes liste;
+
+    //On recupère la liste des pilotes ayant reglé une cotisation pour l'année en cours
+
+    //Pour chaque pilote, on récupère les montants et heures de vol déjà subventionnées
+
+    return liste;
 }
 
 void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,

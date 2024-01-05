@@ -58,6 +58,7 @@ void PdfRenderer::statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminat
 int PdfRenderer::imprimerLesDemandesDeSubvention()
 {
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
+    listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
     nombreCotisationsTraitees = 0;
@@ -96,6 +97,13 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
     AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
     AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
+
+    //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
+    if (listeAnnees.size() > 0)
+    {
+        const int annee = listeAnnees.takeFirst();
+        db->recupererLesSubventionesDejaAllouees(annee);
+    }
 
     //if (nombreFacturesTraitees < listeDesRemboursements.size())
     if (listeDesRemboursements.size() > 0)

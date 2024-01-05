@@ -88,6 +88,7 @@ public:
     struct HeureDeVolRemboursement
     {
         float montantRembourse;
+        float coutTotal;
         QString heuresDeVol;
     };
     struct SubventionsParPilote {
@@ -99,6 +100,7 @@ public:
         HeureDeVolRemboursement entrainement;
         HeureDeVolRemboursement balade;
         HeureDeVolRemboursement sortie;
+        HeureDeVolRemboursement totaux;
     };
     typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;
 
