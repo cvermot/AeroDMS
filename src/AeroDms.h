@@ -99,9 +99,11 @@ private:
     QComboBox* listeDeroulanteAnnee;
     QComboBox* listeDeroulantePilote;
 
-    QString cheminStockageFacturesTraitees = "C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/";
-    QString cheminStockageFacturesATraiter = "C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesATraiter/";
-    QString cheminDeLaFactureCourante = "";
+    QString cheminStockageFacturesTraitees;
+    QString cheminStockageFacturesATraiter;
+    QString cheminDeLaFactureCourante;
+
+    AeroDmsTypes::ParametresMetier parametresMetiers;
 
 public slots:
     void selectionnerUneFacture();

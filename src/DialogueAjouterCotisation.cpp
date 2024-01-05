@@ -24,7 +24,10 @@ DialogueAjouterCotisation::DialogueAjouterCotisation()
 
 }
 
-DialogueAjouterCotisation::DialogueAjouterCotisation(ManageDb* db, QWidget* parent) : QDialog(parent)
+DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db, 
+                                                      float montantCotisation, 
+                                                      float budgetEntrainement, 
+                                                      QWidget* parent) : QDialog(parent)
 {
     database = db;
 
@@ -56,7 +59,7 @@ DialogueAjouterCotisation::DialogueAjouterCotisation(ManageDb* db, QWidget* pare
     montant->setRange(0.0, 2000.0);
     montant->setSingleStep(1.0);
     montant->setDecimals(2);
-    montant->setValue(15);
+    montant->setValue(montantCotisation);
     montant->setSuffix("€");
 
     montantSubventionAnnuelle = new QDoubleSpinBox(this);
@@ -64,7 +67,7 @@ DialogueAjouterCotisation::DialogueAjouterCotisation(ManageDb* db, QWidget* pare
     montantSubventionAnnuelle->setRange(0.0, 2000.0);
     montantSubventionAnnuelle->setSingleStep(1.0);
     montantSubventionAnnuelle->setDecimals(2);
-    montantSubventionAnnuelle->setValue(750);
+    montantSubventionAnnuelle->setValue(budgetEntrainement);
     montantSubventionAnnuelle->setSuffix("€");
 
     QGridLayout* mainLayout = new QGridLayout(this);

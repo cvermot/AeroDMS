@@ -26,7 +26,10 @@ class DialogueAjouterCotisation : public QDialog
 
 public:
     DialogueAjouterCotisation();
-    DialogueAjouterCotisation(ManageDb* db, QWidget* parent = nullptr);
+    DialogueAjouterCotisation( ManageDb* db, 
+                               float montantCotisation, 
+                               float budgetEntrainement, 
+                               QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();
     AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();

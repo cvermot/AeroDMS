@@ -47,15 +47,34 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settings.endGroup();
     }
 
+    if (settings.value("noms/nomTresorier", "") == "")
+    {
+        settings.beginGroup("noms");
+        settings.setValue("nomTresorier", "");
+    }
+
     if (settings.value("parametresMetier/montantSubventionEntrainement", "") == "")
     {
         settings.beginGroup("parametresMetier");
         settings.setValue("montantSubventionEntrainement", "750");
         settings.setValue("montantCotisationPilote", "15");
+        settings.setValue("proportionRemboursementEntrainement", "0.5");
+        settings.setValue("plafondHoraireRemboursementEntrainement", "150");
+        settings.setValue("proportionRemboursementBalade", "0.875");
         settings.endGroup();
     }
 
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() + QString("/") + settings.value("baseDeDonnees/nom", "").toString();
+    cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
+    cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
+
+    parametresMetiers.montantSubventionEntrainement = settings.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
+    parametresMetiers.montantCotisationPilote = settings.value("parametresMetier/montantCotisationPilote", "").toFloat();
+    parametresMetiers.proportionRemboursementEntrainement = settings.value("parametresMetier/proportionRemboursementEntrainement", "").toFloat();
+    parametresMetiers.plafondHoraireRemboursementEntrainement = settings.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
+    parametresMetiers.proportionRemboursementBalade = settings.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
+    parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
+
 
     db = new ManageDb(database);
     pdf = new PdfRenderer(db);
@@ -266,8 +285,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QToolBar* toolBar = addToolBar(tr(""));
     const QIcon iconeAjouterUnVol = QIcon("./ressources/airplane-plus.svg");
-    QAction* bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter un vol"), this);
-    bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol"));
+    QAction* bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter une vol/dépense"), this);
+    bouttonAjouterUnVol->setStatusTip(tr("Ajouter une vol/dépense"));
     connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(bouttonAjouterUnVol);
 
@@ -311,7 +330,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
 
-    dialogueAjouterCotisation = new DialogueAjouterCotisation(db, this);
+    dialogueAjouterCotisation = new DialogueAjouterCotisation( db, 
+                                                               parametresMetiers.montantCotisationPilote, 
+                                                               parametresMetiers.montantSubventionEntrainement, 
+                                                               this);
     connect(dialogueAjouterCotisation, SIGNAL(accepted()), this, SLOT(ajouterUneCotisationEnBdd()));
 
     dialogueAjouterSortie = new DialogueAjouterSortie(this);
@@ -475,7 +497,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
 
 void AeroDms::genererPdf()
 {
-    pdf->imprimerLesDemandesDeSubvention();
+    pdf->imprimerLesDemandesDeSubvention(parametresMetiers.nomTresorier);
 }
 
 void AeroDms::enregistrerUneFacture()
@@ -632,22 +654,24 @@ void AeroDms::enregistrerUnVol()
 			float montantSubventionne = prixDuVol->value();
 			if (typeDeVol->currentText() == "Balade")
 			{
-				float proportionPriseEnCharge = 1.0;
-				montantSubventionne = prixDuVol->value() * proportionPriseEnCharge;
+				montantSubventionne = prixDuVol->value() * parametresMetiers.proportionRemboursementBalade;
 			}
 			//Si on est en vol d'entrainement, calculs spécifiques et enregistrement spécifique
 			if (typeDeVol->currentText() == "Entrainement")
 			{
 				float coutHoraire = calculerCoutHoraire();
-				if (coutHoraire > 150)
+                qDebug() << coutHoraire << parametresMetiers.plafondHoraireRemboursementEntrainement;
+				if (coutHoraire > parametresMetiers.plafondHoraireRemboursementEntrainement)
 				{
-					coutHoraire = 150;
+					coutHoraire = parametresMetiers.plafondHoraireRemboursementEntrainement;
 				}
-				montantSubventionne = (coutHoraire * (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()) / 60.0) * 0.50;
-				if (montantSubventionne > subventionRestante)
+				montantSubventionne = (coutHoraire * (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()) / 60.0) * parametresMetiers.proportionRemboursementEntrainement;
+                qDebug() << montantSubventionne;
+                if (montantSubventionne > subventionRestante)
 				{
 					montantSubventionne = subventionRestante;
 				}
+                qDebug() << montantSubventionne;
 
 				db->enregistrerUnVolDEntrainement(idPilote,
 					typeDeVol->currentText(),

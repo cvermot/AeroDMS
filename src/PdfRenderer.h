@@ -29,7 +29,7 @@ public:
 	PdfRenderer();
 	PdfRenderer(ManageDb *p_db, QWidget* parent = nullptr);
 
-	int imprimerLesDemandesDeSubvention();
+	int imprimerLesDemandesDeSubvention(const QString p_nomTresorier);
 
 private :
 	QWebEnginePage* view;

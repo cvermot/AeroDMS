@@ -70,6 +70,7 @@ public:
         QString nomBeneficiaire;
         float montant;
         int annee;
+        QString nomTresorier;
         //int idFacture;
     };
 
@@ -160,6 +161,15 @@ public:
         QString nomFacture;
     };
     typedef QList<DemandeRemboursementFacture> ListeDemandeRemboursementFacture;
+
+    struct ParametresMetier {
+        float montantSubventionEntrainement;
+        float montantCotisationPilote;
+        float proportionRemboursementEntrainement;
+        float proportionRemboursementBalade;
+        float plafondHoraireRemboursementEntrainement;
+        QString nomTresorier;
+    };
 
 };
 

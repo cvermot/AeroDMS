@@ -55,9 +55,10 @@ void PdfRenderer::statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminat
     //qDebug() << "QWEV erreur" << terminationStatus << exitCode;
 }
 
-int PdfRenderer::imprimerLesDemandesDeSubvention()
+int PdfRenderer::imprimerLesDemandesDeSubvention(const QString p_nomTresorier)
 {
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
+    demandeEnCours.nomTresorier = p_nomTresorier;
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
@@ -88,7 +89,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     //Investissement => toujours décoché, pour le moment non géré par le logiciel
     templateCeTmp.replace("xxI", "");
     //Signataire => toujours celui qui exécute le logiciel
-    templateCeTmp.replace("xxSignataire", "Cl&eacute;ment VERMOT-DESROCHES");
+    templateCeTmp.replace("xxSignataire", demandeEnCours.nomTresorier);
+    //Signature => Vide (on signe à la main)
+    templateCeTmp.replace("xxSignature", "");
 
 
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
@@ -135,8 +138,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
             item.replace("__SubSor__", QString::number(listePilotesDeCetteAnnee.at(i).sortie.montantRembourse));
             item.replace("__HdvTot__", listePilotesDeCetteAnnee.at(i).totaux.heuresDeVol);
             item.replace("__CouTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.coutTotal));
-            item.replace("__SubTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.montantRembourse));
-           
+            item.replace("__SubTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.montantRembourse));    
 
             templateTable.replace("<!--Accroche-->", item);
         }
