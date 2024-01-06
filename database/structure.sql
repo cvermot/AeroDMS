@@ -149,6 +149,7 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote AS SELECT
     pilote.aeroclub,
     strftime('%Y', vol.date) AS annee,
     SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.cout) AS cout,
     SUM(vol.duree) AS tempsDeVol
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
@@ -164,6 +165,7 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis AS SELECT
     pilote.aeroclub,
     strftime('%Y', vol.date) AS annee,
     SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.cout) AS cout,
     SUM(vol.duree) AS tempsDeVol
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
