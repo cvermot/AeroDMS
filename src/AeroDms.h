@@ -130,6 +130,7 @@ public slots:
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
+    void aPropos();
 
 
 };

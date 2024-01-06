@@ -351,6 +351,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
 
+    //========================Menu
+    QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
+    QAction *aboutQtAction = new QAction(tr("À propos de &Qt"), this);
+    aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
+    helpMenu->addAction(aboutQtAction);
+    connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    QAction *aboutAction = new QAction(tr("À propos de &AeroDms"), this);
+    aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
+    helpMenu->addAction(aboutAction);
+    connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
+
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
@@ -930,5 +941,28 @@ void AeroDms::ajouterUneSortie()
 void AeroDms::ajouterUneCotisation()
 {
     dialogueAjouterCotisation->exec();
+}
+
+void AeroDms::aPropos()
+{
+    QMessageBox::about(this, tr("À propos de AeroDms"),
+        "<b>AeroDms v 1.0</b> < br />< br /> "
+        "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
+        "Le code source de ce programme est disponible sous GitHub"
+        " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
+        "Les icones sont issues de <a href=\"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
+        "Mentions légales : <br />"
+        " This program is free software: you can redistribute it and/or modify"
+        " it under the terms of the GNU General Public License as published by"
+        " the Free Software Foundation, either version 3 of the License, or"
+        " (at your option) any later version."
+        "<br />< br/>"
+        "This program is distributed in the hope that it will be useful,"
+        " but WITHOUT ANY WARRANTY; without even the implied warranty of"
+        " MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the"
+        " GNU General Public License for more details."
+        "<br />< br/>"
+        "You should have received a copy of the GNU General Public License"
+        " along with this program.  If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.");
 }
 
