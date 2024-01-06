@@ -80,6 +80,8 @@ public:
     AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee = -1, 
                                                                           const QString p_piloteId = "*",
                                                                           const bool p_volsSoumisUniquement = false);
+    AeroDmsTypes::SubventionsParPilote recupererTotauxAnnuel( const int p_annee,
+                                                              const bool p_volsSoumisUniquement = false);
     AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
     AeroDmsTypes::ListeVols recupererVols( const int p_annee = -1, 
                                            const QString p_piloteId = "*");

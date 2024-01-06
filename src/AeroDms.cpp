@@ -28,6 +28,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
+    qDebug() << "Chemin parametres" << QCoreApplication::applicationDirPath();
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
     
     if (settings.value("baseDeDonnees/chemin", "") == "")
@@ -50,18 +51,21 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     if (settings.value("noms/nomTresorier", "") == "")
     {
         settings.beginGroup("noms");
-        settings.setValue("nomTresorier", "");
+        settings.setValue("nomTresorier", "Trésorier");
     }
 
-    if (settings.value("parametresMetier/montantSubventionEntrainement", "") == "")
+    //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
+    QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, "AeroDMS");
+    if (settingsMetier.value("parametresMetier/montantSubventionEntrainement", "") == "")
     {
-        settings.beginGroup("parametresMetier");
-        settings.setValue("montantSubventionEntrainement", "750");
-        settings.setValue("montantCotisationPilote", "15");
-        settings.setValue("proportionRemboursementEntrainement", "0.5");
-        settings.setValue("plafondHoraireRemboursementEntrainement", "150");
-        settings.setValue("proportionRemboursementBalade", "0.875");
-        settings.endGroup();
+        settingsMetier.beginGroup("parametresMetier");
+        settingsMetier.setValue("montantSubventionEntrainement", "750");
+        settingsMetier.setValue("montantCotisationPilote", "15");
+        settingsMetier.setValue("proportionRemboursementEntrainement", "0.5");
+        settingsMetier.setValue("plafondHoraireRemboursementEntrainement", "150");
+        settingsMetier.setValue("proportionRemboursementBalade", "0.875");
+        settingsMetier.endGroup();
     }
 
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() + QString("/") + settings.value("baseDeDonnees/nom", "").toString();
@@ -69,11 +73,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
 
-    parametresMetiers.montantSubventionEntrainement = settings.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
-    parametresMetiers.montantCotisationPilote = settings.value("parametresMetier/montantCotisationPilote", "").toFloat();
-    parametresMetiers.proportionRemboursementEntrainement = settings.value("parametresMetier/proportionRemboursementEntrainement", "").toFloat();
-    parametresMetiers.plafondHoraireRemboursementEntrainement = settings.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
-    parametresMetiers.proportionRemboursementBalade = settings.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
+    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
+    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "").toFloat();
+    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "").toFloat();
+    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
+    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
 
 
@@ -88,12 +92,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem("Prénom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem("Année"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem("Heures subventionnées"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem("Montant subventionné"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem("HdV Entrainement"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem("Subvention Entrainement"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem("HdV Balade"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem("Subvention Balade"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem("HdV Sortie"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem("Subvention Sortie"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem("HdV Totales"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem("Subvention Totale"));
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
     mainTabWidget->addTab(vuePilotes, "Pilotes");
@@ -286,14 +292,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QToolBar* toolBar = addToolBar(tr(""));
     const QIcon iconeAjouterUnVol = QIcon("./ressources/airplane-plus.svg");
-    QAction* bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter une vol/dépense"), this);
-    bouttonAjouterUnVol->setStatusTip(tr("Ajouter une vol/dépense"));
+    QAction* bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter un vol/une dépense"), this);
+    bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
     connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(bouttonAjouterUnVol);
 
     const QIcon iconeGenerePdf = QIcon("./ressources/file-pdf-box.svg");
-    QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&PDF"), this);
-    bouttonGenerePdf->setStatusTip(tr("PDF"));
+    QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
+    bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
     connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
     toolBar->addAction(bouttonGenerePdf);
 
@@ -413,7 +419,10 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.balade.montantRembourse).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem(subvention.sortie.heuresDeVol));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.sortie.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem(subvention.totaux.heuresDeVol));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse).append(" €")));
     }
+    vuePilotes->resizeColumnsToContents();
 }
 
 void AeroDms::peuplerTableVols()
@@ -433,6 +442,7 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
     }
+    vueVols->resizeColumnsToContents();
 }
 
 void AeroDms::peuplerListeDeroulanteAnnee()

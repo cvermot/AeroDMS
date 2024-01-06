@@ -179,6 +179,69 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
     return liste;
 }
 
+AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_annee,
+                                                                    const bool p_volsSoumisUniquement)
+{
+    AeroDmsTypes::SubventionsParPilote totaux;
+    totaux.idPilote = "";
+    totaux.annee = p_annee;
+    totaux.nom = "Totaux";
+    totaux.prenom = "";
+    totaux.aeroclub = "";
+    totaux.sortie.heuresDeVol = "0h00";
+    totaux.sortie.montantRembourse = 0;
+    totaux.sortie.coutTotal = 0;
+    totaux.entrainement.heuresDeVol = "0h00";
+    totaux.entrainement.montantRembourse = 0;
+    totaux.entrainement.coutTotal = 0;
+    totaux.balade.heuresDeVol = "0h00";
+    totaux.balade.montantRembourse = 0;
+    totaux.balade.coutTotal = 0;
+    totaux.totaux.heuresDeVol = "0h00";
+    totaux.totaux.montantRembourse = 0;
+    totaux.totaux.coutTotal = 0;
+
+    int heuresDeVolEnMinutes = 0;
+
+    QSqlQuery query;
+    query.prepare("SELECT typeDeVol, annee, SUM(montantRembourse) AS subventionTotale, SUM(cout) AS coutTotal, SUM(tempsDeVol) AS tempsDeVolTotal FROM volParTypeParAnEtParPilote WHERE annee = :annee GROUP BY annee, typeDeVol");
+    //Si on veut uniquement les totaux des vols déjà soumis au CSE, on remplace la vue volParTypeParAnEtParPilote par volParTypeParAnEtParPiloteSoumis
+    if (p_volsSoumisUniquement)
+    {
+        query.prepare("SELECT typeDeVol, annee, SUM(montantRembourse) AS subventionTotale, SUM(cout) AS coutTotal, SUM(tempsDeVol) AS tempsDeVolTotal FROM volParTypeParAnEtParPiloteSoumis WHERE annee = :annee GROUP BY annee, typeDeVol");
+    }
+    query.bindValue(":annee", QString::number(p_annee));
+    query.exec();
+
+    while (query.next())
+    {
+        if (query.value("typeDeVol").toString() == "Entrainement")
+        {
+            totaux.entrainement.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVolTotal").toInt());
+            totaux.entrainement.montantRembourse = query.value("subventionTotale").toFloat();
+            totaux.entrainement.coutTotal = query.value("coutTotal").toFloat();
+        }
+        else if (query.value("typeDeVol").toString() == "Sortie")
+        {
+            totaux.sortie.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVolTotal").toInt());
+            totaux.sortie.montantRembourse = query.value("subventionTotale").toFloat();
+            totaux.sortie.coutTotal = query.value("coutTotal").toFloat();
+        }
+        else if (query.value("typeDeVol").toString() == "Balade")
+        {
+            totaux.balade.heuresDeVol = convertirMinutesEnHeuresMinutes(query.value("tempsDeVolTotal").toInt());
+            totaux.balade.montantRembourse = query.value("subventionTotale").toFloat();
+            totaux.balade.coutTotal = query.value("coutTotal").toFloat();
+        }
+        heuresDeVolEnMinutes = heuresDeVolEnMinutes + query.value("tempsDeVolTotal").toInt();
+        totaux.totaux.heuresDeVol = convertirMinutesEnHeuresMinutes(heuresDeVolEnMinutes);
+        totaux.totaux.montantRembourse = totaux.totaux.montantRembourse + query.value("subventionTotale").toFloat();
+        totaux.totaux.coutTotal = totaux.totaux.coutTotal + query.value("coutTotal").toFloat();
+    }
+
+    return totaux;
+}
+
 AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
                                                  const QString p_piloteId)
 {

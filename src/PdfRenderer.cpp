@@ -182,6 +182,21 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
             templateTable.replace("<!--Accroche-->", item);
         }
 
+        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(annee, true);
+
+        templateTable.replace("__TotHdvEnt__", totaux.entrainement.heuresDeVol);
+        templateTable.replace("__TotCouEnt__", QString::number(totaux.entrainement.coutTotal));
+        templateTable.replace("__TotSubEnt__", QString::number(totaux.entrainement.montantRembourse));
+        templateTable.replace("__TotHdVBal__", totaux.balade.heuresDeVol);
+        templateTable.replace("__TotCouBal__", QString::number(totaux.balade.coutTotal));
+        templateTable.replace("__TotSubBal__", QString::number(totaux.balade.montantRembourse));
+        templateTable.replace("__TotHdVSor__", totaux.sortie.heuresDeVol);
+        templateTable.replace("__TotCouSor__", QString::number(totaux.sortie.coutTotal));
+        templateTable.replace("__TotSubSor__", QString::number(totaux.sortie.montantRembourse));
+        templateTable.replace("__TotHdvTot__", totaux.totaux.heuresDeVol);
+        templateTable.replace("__TotCouTot__", QString::number(totaux.totaux.coutTotal));
+        templateTable.replace("__TotSubTot__", QString::number(totaux.totaux.montantRembourse));
+
         view->setHtml(templateTable);
 
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;

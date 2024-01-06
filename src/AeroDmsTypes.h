@@ -35,7 +35,9 @@ public:
         PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE = 0x6,
         PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES = 0x7,
         PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE = 0x8,
-        PiloteTableElement_NB_COLONNES = 0x9,
+        PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES = 0x9,
+        PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE = 0xA,
+        PiloteTableElement_NB_COLONNES = 0xB,
     };
 
     enum VolTableElement {
