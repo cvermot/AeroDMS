@@ -104,6 +104,9 @@ private:
     QString cheminSortieFichiersGeneres;
     QString cheminDeLaFactureCourante;
 
+    //Barre de progression
+    QProgressDialog *progressionGenerationPdf;
+
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
 public slots:
@@ -124,6 +127,9 @@ public slots:
     void ajouterUneCotisationEnBdd();
     void peuplerTablePilotes();
     void peuplerTableVols();
+    void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
+    void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
+    void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
 
 
 };

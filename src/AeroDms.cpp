@@ -340,6 +340,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     dialogueAjouterSortie = new DialogueAjouterSortie(this);
     connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
 
+    //Dialogue de progression de génération PDF
+    progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "Fermer", 0, 0, this);
+    progressionGenerationPdf->setAutoClose(false);
+    progressionGenerationPdf->setWindowModality(Qt::WindowModal);
+    progressionGenerationPdf->close();
+    progressionGenerationPdf->setAutoReset(false);
+
+    connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
+    connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
+    connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
+
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
@@ -349,6 +360,25 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
+}
+
+void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
+{
+    progressionGenerationPdf->setLabelText("Génération PDF en cours");
+    progressionGenerationPdf->reset();
+    progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
+    progressionGenerationPdf->setValue(0);
+    progressionGenerationPdf->show();
+}
+void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
+{
+    progressionGenerationPdf->setValue(p_nombreDeFacturesTraitees);
+}
+void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier)
+{
+    progressionGenerationPdf->setLabelText("Génération PDF terminée");
+    const QString status = QString("Génération terminée. Fichiers disponibles sous ").append(p_cheminDossier);
+    statusBar()->showMessage(status);
 }
 
 AeroDms::~AeroDms()

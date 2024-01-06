@@ -32,7 +32,6 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
 	view = new QWebEnginePage(this);
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
-    connect(view, SIGNAL(renderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus, bool)), this, SLOT(statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminationStatus, bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
 }
 
@@ -55,20 +54,23 @@ QString PdfRenderer::numeroFichierSur3Digits()
 void PdfRenderer::chargementTermine(bool retour)
 {
     QString nomFichier = QString(cheminSortieFichiersGeneres).append(numeroFichierSur3Digits()).append(demandeEnCours.nomFichier).append("_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
-    view->printToPdf(nomFichier);
+
+    //De base le format est portrait
+    QPageLayout pageLayout(QPageLayout(QPageSize(QPageSize::A4), QPageLayout::Portrait, QMarginsF()));
+    if (demandeEnCours.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL)
+    {
+        pageLayout.setOrientation(QPageLayout::Landscape);
+    }
+
+    view->printToPdf(nomFichier, pageLayout);
     listeDesFichiers.append(nomFichier);
 }
 
 void PdfRenderer::impressionTerminee(const QString& filePath, bool success)
 {
     db->ajouterDemandeCeEnBdd(demandeEnCours);
-    emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
+    emit mettreAJourNombreFacturesTraitees(nombreFacturesTraitees);
     imprimerLaProchaineDemandeDeSubvention();
-}
-
-void PdfRenderer::statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode)
-{
-    //qDebug() << "QWEV erreur" << terminationStatus << exitCode;
 }
 
 int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
@@ -88,7 +90,14 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     { 
         cheminSortieFichiersGeneres.append("/");
         listeDesFichiers.clear();
-        emit mettreAJourNombreFactureTraitees(nombreFacturesATraiter, nombreFacturesTraitees);
+        const int nombreFacturesATraiter = db->recupererLesSubventionsAEmettre().size() +
+            db->recupererLesCotisationsAEmettre().size() +
+            db->recupererLesRecettesBaladesEtSortiesAEmettre().size() +
+            db->recupererLesDemandesDeRembousementAEmettre().size()+
+            listeAnnees.size();
+
+        emit mettreAJourNombreFacturesATraiter(nombreFacturesATraiter);
+        emit mettreAJourNombreFacturesTraitees(0);
 
         imprimerLaProchaineDemandeDeSubvention();
     }
@@ -175,6 +184,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         view->setHtml(templateTable);
 
+        demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
         demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(annee));
     }
     else if (listeDesRemboursements.size() > 0)
@@ -331,6 +341,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     else
     {
         //produireFichierPdfGlobal();
+        emit generationTerminee(cheminSortieFichiersGeneres);
     }
     nombreFacturesTraitees++;
 }
@@ -345,7 +356,6 @@ void PdfRenderer::recopierFacture(const QString p_nomFacture)
     {
     
     }
-    //indiceFichier++;
 }
 void PdfRenderer::recopierFactures(const QStringList p_listeFactures)
 {

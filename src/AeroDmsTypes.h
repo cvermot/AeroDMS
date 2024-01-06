@@ -57,6 +57,7 @@ public:
     };
 
     enum PdfTypeDeDemande {
+        PdfTypeDeDemande_RECAP_ANNUEL,
         PdfTypeDeDemande_HEURE_DE_VOL,
         PdfTypeDeDemande_COTISATION,
         PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE,

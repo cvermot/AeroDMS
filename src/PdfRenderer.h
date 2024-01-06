@@ -57,12 +57,13 @@ private :
 	QString numeroFichierSur3Digits();
 
 signals:
-	void mettreAJourNombreFactureTraitees(int nombreFacturesATraiter, int nombreFactureTraitees);
+	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
+	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);
+	void generationTerminee(QString p_cheminFichiers);
 
 public slots:
     void chargementTermine(bool retour);
     void impressionTerminee(const QString& filePath, bool success);
-    void statusDeChargementAVarie(QWebEnginePage::RenderProcessTerminationStatus terminationStatus, int exitCode);
 
 };
 
