@@ -297,12 +297,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(bouttonAjouterUnVol);
 
-    const QIcon iconeGenerePdf = QIcon("./ressources/file-pdf-box.svg");
-    QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
-    bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
-    connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
-    toolBar->addAction(bouttonGenerePdf);
-
     const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
     QAction* bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("&Ajouter un pilote"), this);
     bouttonAjouterPilote->setStatusTip(tr("Ajouter un pilote"));
@@ -320,6 +314,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
     connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
+
+    toolBar->addSeparator();
+
+    const QIcon iconeGenerePdf = QIcon("./ressources/file-pdf-box.svg");
+    QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
+    bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
+    connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
+    toolBar->addAction(bouttonGenerePdf);
 
     QToolBar* SelectionToolBar = addToolBar(tr(""));
 
@@ -956,7 +958,7 @@ void AeroDms::ajouterUneCotisation()
 void AeroDms::aPropos()
 {
     QMessageBox::about(this, tr("À propos de AeroDms"),
-        "<b>AeroDms v 1.0</b> < br />< br /> "
+        "<b>AeroDms v 1.1 beta</b> < br />< br /> "
         "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous GitHub"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
