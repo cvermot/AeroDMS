@@ -26,10 +26,12 @@ PdfRenderer::PdfRenderer()
     view = new QWebEnginePage(this);
 }
 
-PdfRenderer::PdfRenderer(ManageDb *p_db, QWidget* parent)
+PdfRenderer::PdfRenderer(ManageDb *p_db, QString p_cheminTemplatesHtml, QWidget* parent)
 {
     db = p_db;
 	view = new QWebEnginePage(this);
+
+    ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
@@ -111,7 +113,8 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 {
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
-    QFile f("./ressources/HTML/COMPTA_2023.htm");
+    //QFile f("./ressources/HTML/COMPTA_2023.htm");
+    QFile f(QString(ressourcesHtml.toLocalFile()).append("COMPTA_2023.htm"));
     QString templateCeTmp = "";
     if (f.open(QFile::ReadOnly | QFile::Text))
     {
@@ -143,8 +146,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     {
         const int annee = listeAnnees.takeFirst();
 
-        QFile table("./ressources/HTML/TableauRecap.html");
-        QFile tableItem("./ressources/HTML/TableauRecapItem.html");
+        //QFile table("./ressources/HTML/TableauRecap.html");
+        QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
+        //QFile tableItem("./ressources/HTML/TableauRecapItem.html");
+        QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
         QString templateTable = "";
         QString templateTableItem = "";
         if (table.open(QFile::ReadOnly | QFile::Text) && tableItem.open(QFile::ReadOnly | QFile::Text))
@@ -197,7 +202,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         templateTable.replace("__TotCouTot__", QString::number(totaux.totaux.coutTotal));
         templateTable.replace("__TotSubTot__", QString::number(totaux.totaux.montantRembourse));
 
-        view->setHtml(templateTable);
+        view->setHtml( templateTable,
+                       ressourcesHtml);
 
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
         demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(annee));
@@ -233,7 +239,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
         //On envoie le HTML en génération
-        view->setHtml(templateCeTmp);
+        view->setHtml( templateCeTmp, 
+                       ressourcesHtml);
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
         recopierFactures(facturesAssociees);
@@ -272,7 +279,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         ligneBudget.append(QString::number(recette.annee));
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
-        view->setHtml(templateCeTmp);
+        view->setHtml( templateCeTmp,
+                       ressourcesHtml);
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_COTISATION;
@@ -306,7 +314,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         ligneBudget.append(QString::number(recette.annee));
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
-        view->setHtml(templateCeTmp);
+        view->setHtml( templateCeTmp,
+                       ressourcesHtml);
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE;
@@ -340,7 +349,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         ligneBudget.append(QString::number(demandeRembousement.annee));
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
-        view->setHtml(templateCeTmp);
+        view->setHtml( templateCeTmp,
+                       ressourcesHtml);
         recopierFacture(demandeRembousement.nomFacture);
         listeDesFichiers.append(QString(repertoireDesFactures).append(demandeRembousement.nomFacture));
 

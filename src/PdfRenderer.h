@@ -27,7 +27,9 @@ class PdfRenderer : public QWidget {
 
 public:
 	PdfRenderer();
-	PdfRenderer(ManageDb *p_db, QWidget* parent = nullptr);
+	PdfRenderer( ManageDb *p_db,
+		         QString p_cheminTemplatesHtml, 
+		         QWidget* parent = nullptr);
 
 	int imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 		                                 const QString p_cheminSortieFichiersGeneres,
@@ -36,6 +38,7 @@ public:
 private :
 	QWebEnginePage* view;
 	ManageDb *db;
+	QUrl ressourcesHtml;
 
 	QString cheminSortieFichiersGeneres;
 	QString repertoireDesFactures;

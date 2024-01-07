@@ -68,7 +68,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settingsMetier.endGroup();
     }
 
-    const QString database = settings.value("baseDeDonnees/chemin", "").toString() + QString("/") + settings.value("baseDeDonnees/nom", "").toString();
+    const QString database = settings.value("baseDeDonnees/chemin", "").toString() + 
+        QString("/") + 
+        settings.value("baseDeDonnees/nom", "").toString();
+    const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() + 
+        QString("/ressources/HTML") ;
     cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
@@ -82,7 +86,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
 
     db = new ManageDb(database);
-    pdf = new PdfRenderer(db);
+    pdf = new PdfRenderer( db, 
+                           ressourcesHtml);
 
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
