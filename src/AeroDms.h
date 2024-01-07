@@ -63,8 +63,6 @@ private:
     DialogueAjouterCotisation* dialogueAjouterCotisation;
     DialogueAjouterSortie* dialogueAjouterSortie;
 
-    int factureIdEnBdd;
-
     QPdfDocument* pdfDocument;
 
     QTabWidget* mainTabWidget;
@@ -107,8 +105,11 @@ private:
 
     //Barre de progression
     QProgressDialog *progressionGenerationPdf;
-
     AeroDmsTypes::ParametresMetier parametresMetiers;
+
+    //Données internes
+    QString piloteAEditer;
+    int factureIdEnBdd;
 
 public slots:
     void selectionnerUneFacture();
@@ -132,6 +133,8 @@ public slots:
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
     void aPropos();
+    void menuContextuelPilotes(const QPoint& pos);
+    void editerPilote();
 
 
 };

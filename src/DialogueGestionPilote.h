@@ -29,6 +29,7 @@ public:
     DialogueGestionPilote(ManageDb* db, QWidget* parent = nullptr);
 
     AeroDmsTypes::Pilote recupererInfosPilote();
+    void preparerMiseAJourPilote(const QString p_piloteId);
 
 private:
     QLineEdit *nom;
@@ -50,6 +51,7 @@ private:
 
 private slots:
     void prevaliderDonneesSaisies();
+    void annulationOuFinSaisie();
 };
 
 #endif // DIALOGUEGESTIONPILOTE_H

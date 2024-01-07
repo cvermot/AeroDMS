@@ -24,12 +24,18 @@ PdfRenderer::PdfRenderer()
 {
     db = new ManageDb();
     view = new QWebEnginePage(this);
+    nombreFacturesTraitees = 0;
+    nombreFacturesATraiter = 0;
+    indiceFichier = 0;
 }
 
 PdfRenderer::PdfRenderer(ManageDb *p_db, QString p_cheminTemplatesHtml, QWidget* parent)
 {
     db = p_db;
 	view = new QWebEnginePage(this);
+    nombreFacturesTraitees = 0;
+    nombreFacturesATraiter = 0;
+    indiceFichier = 0;
 
     ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
 

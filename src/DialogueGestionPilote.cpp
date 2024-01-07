@@ -31,6 +31,8 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(cancelButton, SIGNAL(rejected()), this, SLOT(annulationOuFinSaisie()));
+    connect(this, SIGNAL(rejected()), this, SLOT(annulationOuFinSaisie()));
 
     okButton = new QPushButton(tr("&Ajouter"), this);
     okButton->setDisabled(true);
@@ -96,8 +98,6 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
 
     mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
 
-   // mainLayout->setRowStretch(2, 1);
-
     setLayout(mainLayout);
 
     setWindowTitle(tr("Ajouter un pilote"));
@@ -108,7 +108,7 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     AeroDmsTypes::Pilote pilote;
 
     pilote.idPilote = idPilote;
-    pilote.nom = nom->text();
+    pilote.nom = nom->text().toUpper();
     pilote.prenom = prenom->text();
     pilote.estAyantDroit = estAyantDroit->checkState() == Qt::Checked ;
     pilote.aeroclub = aeroclub->text();
@@ -116,15 +116,8 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.telephone = telephone->text();
     pilote.remarque = remarque->text();
 
-    //On rince en vue de l'eventuel ajout du pilote suivant
-    idPilote = "";
-    nom->clear();
-    prenom->clear();
-    estAyantDroit->setChecked(Qt::Unchecked);
-    aeroclub->clear();
-    mail->clear();
-    telephone->clear();
-    remarque->clear();
+    //On rince l'affichage en vue d'une éventuelle autre saisie
+    annulationOuFinSaisie();
 
     return pilote;
 }
@@ -139,4 +132,44 @@ void DialogueGestionPilote::prevaliderDonneesSaisies()
     {
         okButton->setDisabled(true);
     }
+}
+
+void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
+{
+    const AeroDmsTypes::Pilote pilote = database->recupererPilote(p_piloteId);
+
+    idPilote = pilote.idPilote;
+    nom->setText(pilote.nom);
+    prenom->setText(pilote.prenom);
+    if (pilote.estAyantDroit)
+    {
+        estAyantDroit->setChecked(true);
+    }
+    else
+    {
+        estAyantDroit->setChecked(false);
+    }     
+    aeroclub->setText(pilote.aeroclub);
+    mail->setText(pilote.mail);
+    telephone->setText(pilote.telephone);
+    remarque->setText(pilote.remarque);
+
+    setWindowTitle(tr("Mettre à jour le pilote"));
+    okButton->setText(tr("&Modifier"));
+}
+
+void DialogueGestionPilote::annulationOuFinSaisie()
+{
+    //On rince en vue de l'eventuel ajout du pilote suivant
+    idPilote = "";
+    nom->clear();
+    prenom->clear();
+    estAyantDroit->setChecked(Qt::Unchecked);
+    aeroclub->clear();
+    mail->clear();
+    telephone->clear();
+    remarque->clear();
+
+    setWindowTitle(tr("Ajouter un pilote"));
+    okButton->setText(tr("&Ajouter"));
 }

@@ -28,7 +28,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
-    qDebug() << "Chemin parametres" << QCoreApplication::applicationDirPath();
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
     
     if (settings.value("baseDeDonnees/chemin", "") == "")
@@ -105,9 +104,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem("Subvention Sortie"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem("HdV Totales"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem("Subvention Totale"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem("Pilote Id (masqué)"));
+    vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vuePilotes->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vuePilotes, "Pilotes");
+    connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
 
     //==========Onglet Vols
     vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);;
@@ -384,6 +387,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
 
+    //========================Initialisation des autres attributs
+    piloteAEditer = "";
+    factureIdEnBdd = 0;
+
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
@@ -437,6 +444,7 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.sortie.montantRembourse).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem(subvention.totaux.heuresDeVol));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
     }
     vuePilotes->resizeColumnsToContents();
 }
@@ -501,14 +509,21 @@ void AeroDms::chargerBaladesSorties()
 
 void AeroDms::ajouterUnPiloteEnBdd()
 {
-    AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
-    AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
+    const AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
+    const AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
 
     switch (resultat)
     {
         case AeroDmsTypes::ResultatCreationPilote_SUCCES:
         {
-            statusBar()->showMessage("Pilote ajouté avec succès");
+            if (pilote.idPilote == "")
+            {
+                statusBar()->showMessage("Pilote ajouté avec succès");
+            }
+            else
+            {
+                statusBar()->showMessage("Pilote modifié avec succès");
+            } 
             break;
         } 
         case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
@@ -528,6 +543,14 @@ void AeroDms::ajouterUnPiloteEnBdd()
     //On met à jour les listes de pilotes
     peuplerListesPilotes();
     dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
+
+    //Si on est sur une mise à jour, on met à jour les élements d'IMH susceptibles d'être impacté par des changements
+    if (pilote.idPilote != "")
+    {
+        peuplerListeBaladesEtSorties();
+        peuplerTablePilotes();
+        peuplerTableVols();
+    }
 }
 
 void AeroDms::ajouterUneSortieEnBdd()
@@ -733,18 +756,17 @@ void AeroDms::enregistrerUnVol()
 			if (typeDeVol->currentText() == "Entrainement")
 			{
 				float coutHoraire = calculerCoutHoraire();
-                qDebug() << coutHoraire << parametresMetiers.plafondHoraireRemboursementEntrainement;
 				if (coutHoraire > parametresMetiers.plafondHoraireRemboursementEntrainement)
 				{
 					coutHoraire = parametresMetiers.plafondHoraireRemboursementEntrainement;
 				}
 				montantSubventionne = (coutHoraire * (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute()) / 60.0) * parametresMetiers.proportionRemboursementEntrainement;
-                qDebug() << montantSubventionne;
+           
                 if (montantSubventionne > subventionRestante)
 				{
 					montantSubventionne = subventionRestante;
 				}
-                qDebug() << montantSubventionne;
+                
 
 				db->enregistrerUnVolDEntrainement(idPilote,
 					typeDeVol->currentText(),
@@ -979,7 +1001,7 @@ void AeroDms::ajouterUneCotisation()
 void AeroDms::aPropos()
 {
     QMessageBox::about(this, tr("À propos de AeroDms"),
-        "<b>AeroDms v 1.1 beta</b> < br />< br /> "
+        "<b>AeroDms v 1.1</b> < br />< br /> "
         "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous GitHub"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
@@ -997,5 +1019,28 @@ void AeroDms::aPropos()
         "<br />< br/>"
         "You should have received a copy of the GNU General Public License"
         " along with this program.  If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.");
+}
+
+void AeroDms::menuContextuelPilotes(const QPoint& pos)
+{
+    if (vuePilotes->itemAt(pos) != nullptr)
+    {
+        QMenu menuClicDroitVol(tr("Menu contextuel"), this);
+        const int ligneSelectionnee = vuePilotes->itemAt(pos)->row();
+        piloteAEditer = vuePilotes->item( ligneSelectionnee, 
+                                           AeroDmsTypes::PiloteTableElement_PILOTE_ID)->text();
+
+        const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
+        QAction editer(iconeAjouterPilote,"Editer le pilote", this);
+        connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
+        menuClicDroitVol.addAction(&editer);
+        menuClicDroitVol.exec(vuePilotes->mapToGlobal(pos));
+    }
+}
+
+void AeroDms::editerPilote()
+{
+    dialogueGestionPilote->preparerMiseAJourPilote(piloteAEditer);
+    dialogueGestionPilote->exec();
 }
 

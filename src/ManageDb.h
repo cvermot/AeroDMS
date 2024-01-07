@@ -32,6 +32,7 @@ public:
 
     QString getLastError();
     AeroDmsTypes::ListePilotes recupererPilotes();
+    AeroDmsTypes::Pilote recupererPilote(const QString p_idPilote);
 
     int recupererProchainNumeroFacture();
     int ajouterFacture(QString& nomFichier);
