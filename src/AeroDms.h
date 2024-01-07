@@ -75,6 +75,7 @@ private:
     //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;
     QComboBox* choixPilote;
+    QLineEdit* aeroclubPiloteSelectionne;
     QDateTimeEdit* dateDuVol;
     QTimeEdit* dureeDuVol;
     QDoubleSpinBox* prixDuVol;

@@ -151,6 +151,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* choixPiloteLabel = new QLabel(tr("Pilote : "), this);
     connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
 
+    aeroclubPiloteSelectionne = new QLineEdit(this);
+    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote séléctionné et au nom duquel le\n" 
+                                              "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
+                                              "l'aéroclub du pilote avant de générer les demandes de subvention."));
+    aeroclubPiloteSelectionne->setEnabled(false);
+    QLabel* aeroclubPiloteSelectionneLabel = new QLabel(tr("Aéroclub : "), this);
+
     dateDuVol = new QDateTimeEdit(this);
     dateDuVol->setDisplayFormat("dd/MM/yyyy");
     dateDuVol->setCalendarPopup(true);
@@ -183,21 +190,23 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QWidget* widgetDepenseVol = new QWidget(this);
     widgetDepenseVol->setLayout(infosVol);
     depenseTabWidget->addTab(widgetDepenseVol, "Vol");
-    infosVol->addWidget(typeDeVolLabel,   0, 0);
-    infosVol->addWidget(typeDeVol,        0, 1);
-    infosVol->addWidget(choixPiloteLabel, 1, 0);
-    infosVol->addWidget(choixPilote,      1, 1);
-    infosVol->addWidget(dateDuVolLabel,   2, 0);
-    infosVol->addWidget(dateDuVol,        2, 1);
-    infosVol->addWidget(dureeDuVolLabel,  3, 0);
-    infosVol->addWidget(dureeDuVol,       3, 1);
-    infosVol->addWidget(prixDuVolLabel,   4, 0);
-    infosVol->addWidget(prixDuVol,        4, 1);
-    infosVol->addWidget(choixBaladeLabel, 5, 0);
-    infosVol->addWidget(choixBalade,      5, 1);
-    infosVol->addWidget(remarqueVolLabel, 6, 0);
-    infosVol->addWidget(remarqueVol,      6, 1);
-    infosVol->addWidget(validerLeVol,     7, 0, 2, 0);
+    infosVol->addWidget(typeDeVolLabel,                 0, 0);
+    infosVol->addWidget(typeDeVol,                      0, 1);
+    infosVol->addWidget(choixPiloteLabel,               1, 0);
+    infosVol->addWidget(choixPilote,                    1, 1);
+    infosVol->addWidget(aeroclubPiloteSelectionneLabel, 2, 0);
+    infosVol->addWidget(aeroclubPiloteSelectionne,      2, 1);
+    infosVol->addWidget(dateDuVolLabel,                 3, 0);
+    infosVol->addWidget(dateDuVol,                      3, 1);
+    infosVol->addWidget(dureeDuVolLabel,                4, 0);
+    infosVol->addWidget(dureeDuVol,                     4, 1);
+    infosVol->addWidget(prixDuVolLabel,                 5, 0);
+    infosVol->addWidget(prixDuVol,                      5, 1);
+    infosVol->addWidget(choixBaladeLabel,               6, 0);
+    infosVol->addWidget(choixBalade,                    6, 1);
+    infosVol->addWidget(remarqueVolLabel,               7, 0);
+    infosVol->addWidget(remarqueVol,                    7, 1);
+    infosVol->addWidget(validerLeVol,                   8, 0, 2, 0);
 
     //==========Sous onglet facture de l'onglet "Ajout dépense"
     choixPayeur = new QComboBox(this);
@@ -916,7 +925,9 @@ void AeroDms::prevaliderDonnnesSaisies()
          || pdfDocument->status() != QPdfDocument::Status::Ready )
     {
         validerLaFacture->setEnabled(false);
-    } 
+    }
+
+    aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()
