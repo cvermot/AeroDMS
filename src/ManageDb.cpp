@@ -54,7 +54,7 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
 {
     AeroDmsTypes::ListePilotes listeDesPilotes;
 
-    const QString sql = "SELECT * FROM pilote";
+    const QString sql = "SELECT * FROM pilote ORDER BY pilote.prenom";
 
     QSqlQuery query;
     query.exec(sql);
