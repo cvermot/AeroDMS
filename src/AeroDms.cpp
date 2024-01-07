@@ -461,6 +461,8 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     {
         listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
     }
+    //On affiche de base les infos de l'année courante
+    listeDeroulanteAnnee->setCurrentText(QDate::currentDate().toString("yyyy"));
 }
 
 void AeroDms::ajouterUneCotisationEnBdd()
@@ -479,6 +481,7 @@ void AeroDms::ajouterUneCotisationEnBdd()
         peuplerTablePilotes();
         //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
         peuplerListeDeroulanteAnnee();
+        statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
     }
 }
 
@@ -523,7 +526,7 @@ void AeroDms::ajouterUneSortieEnBdd()
     AeroDmsTypes::Sortie sortie = dialogueAjouterSortie->recupererInfosSortieAAjouter();
 
     db->creerSortie(sortie);
-    statusBar()->showMessage("Sortie ajoutée");
+    statusBar()->showMessage("Sortie " + sortie.nom + " ajoutée");
     peuplerListeBaladesEtSorties();
     peuplerListeSorties();
 }
@@ -764,6 +767,8 @@ void AeroDms::enregistrerUnVol()
 
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
+                + " de "
+                + db->recupererNomPrenomPilote(idPilote)
                 + " du " 
                 + dateDuVol->date().toString("dd/MM/yyyy") 
                 + " (" 
