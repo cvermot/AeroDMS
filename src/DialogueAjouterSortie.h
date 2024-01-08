@@ -38,6 +38,9 @@ private:
     QDialogButtonBox* buttonBox;
     QPushButton* cancelButton;
     QPushButton* okButton;
+
+public slots:
+    void prevaliderDonneesSaisies();
 };
 
 #endif // DIALOGUEAJOUTERSORTIE_H

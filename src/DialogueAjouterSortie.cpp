@@ -40,6 +40,7 @@ DialogueAjouterSortie::DialogueAjouterSortie(QWidget* parent) : QDialog(parent)
 
     nomSortie = new QLineEdit(this);
     QLabel* nomSortieLabel = new QLabel(tr("Nom de la sortie : "), this);
+    connect(nomSortie, &QLineEdit::textChanged, this, &DialogueAjouterSortie::prevaliderDonneesSaisies);
 
     date = new QDateEdit(this);
     date->setDisplayFormat("dd/MM/yyyy");
@@ -61,6 +62,7 @@ DialogueAjouterSortie::DialogueAjouterSortie(QWidget* parent) : QDialog(parent)
     setLayout(mainLayout);
 
     setWindowTitle(tr("Ajouter une sortie"));
+    prevaliderDonneesSaisies();
 }
 
 AeroDmsTypes::Sortie DialogueAjouterSortie::recupererInfosSortieAAjouter()
@@ -70,5 +72,17 @@ AeroDmsTypes::Sortie DialogueAjouterSortie::recupererInfosSortieAAjouter()
     sortie.nom = nomSortie->text();
     sortie.date = date->date();
 
+    nomSortie->clear();
+
     return sortie;
+}
+
+void DialogueAjouterSortie::prevaliderDonneesSaisies()
+{
+    okButton->setDisabled(false);
+
+    if (nomSortie->text() == "")
+    {
+        okButton->setDisabled(true);
+    }
 }
