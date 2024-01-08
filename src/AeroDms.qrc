@@ -1,4 +1,5 @@
 <RCC>
-    <qresource prefix="AeroDms">
+    <qresource prefix="/AeroDms">
+        <file>ressources/shield-airplane.ico</file>
     </qresource>
 </RCC>

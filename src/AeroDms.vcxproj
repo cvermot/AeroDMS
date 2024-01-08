@@ -107,10 +107,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AeroDmsTypes.h" />
+    <ClInclude Include="resource.h" />
     <QtMoc Include="DialogueAjouterSortie.h" />
     <QtMoc Include="DialogueAjouterCotisation.h" />
     <QtMoc Include="DialogueGestionPilote.h" />
     <QtMoc Include="PdfRenderer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AeroDms.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

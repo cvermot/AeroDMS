@@ -28,6 +28,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
     QApplication::setApplicationVersion("1.2");
+    QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
