@@ -274,19 +274,19 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     QSqlQuery query;
     if (p_annee != -1 && p_piloteId != "*")
     {
-        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId");
+        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId ORDER BY date");
     }
     else if (p_annee != -1)
     {
-        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee");
+        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee ORDER BY date");
     }
     else if (p_piloteId != "*")
     {
-        query.prepare("SELECT *  FROM vols WHERE pilote = :piloteId");
+        query.prepare("SELECT *  FROM vols WHERE pilote = :piloteId ORDER BY date");
     }
     else
     {
-        query.prepare("SELECT *  FROM vols");
+        query.prepare("SELECT *  FROM vols ORDER BY date");
     }
     query.bindValue(":annee", QString::number(p_annee));
     query.bindValue(":piloteId", p_piloteId);

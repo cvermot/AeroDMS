@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
+    QApplication::setApplicationName("AeroDms");
+    QApplication::setApplicationVersion("1.2");
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
@@ -109,7 +111,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
     vuePilotes->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vuePilotes, "Pilotes");
+    mainTabWidget->addTab(vuePilotes, QIcon("./ressources/account-tie-hat.svg"), "Pilotes");
     connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
 
     //==========Onglet Vols
@@ -124,13 +126,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mainTabWidget->addTab(vueVols, "Vols");
+    mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
 
     //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
     QWidget* widgetAjoutVol = new QWidget(this);
     widgetAjoutVol->setLayout(ajoutVol);
-    mainTabWidget->addTab(widgetAjoutVol, "Ajout dépense");
+    mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), "Ajout dépense");
 
     pdfDocument = new QPdfDocument(this);
     QPdfView* pdfView = new QPdfView(this);
@@ -192,7 +194,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QGridLayout* infosVol = new QGridLayout(this);
     QWidget* widgetDepenseVol = new QWidget(this);
     widgetDepenseVol->setLayout(infosVol);
-    depenseTabWidget->addTab(widgetDepenseVol, "Vol");
+    depenseTabWidget->addTab(widgetDepenseVol, QIcon("./ressources/airplane-clock.svg"), "Heures de vol");
     infosVol->addWidget(typeDeVolLabel,                 0, 0);
     infosVol->addWidget(typeDeVol,                      0, 1);
     infosVol->addWidget(choixPiloteLabel,               1, 0);
@@ -245,7 +247,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QGridLayout* infosFacture = new QGridLayout(this);
     QWidget* widgetDepenseFacture = new QWidget(this);
     widgetDepenseFacture->setLayout(infosFacture);
-    depenseTabWidget->addTab(widgetDepenseFacture, "Facture");
+    depenseTabWidget->addTab(widgetDepenseFacture, QIcon("./ressources/file-document.svg"), "Facture");
     infosFacture->addWidget(choixPayeurLabel, 1, 0);
     infosFacture->addWidget(choixPayeur, 1, 1);
     infosFacture->addWidget(dateDeFactureLabel, 2, 0);
@@ -262,7 +264,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QHBoxLayout* ajoutRecette = new QHBoxLayout(this);
     QWidget* widgetAjoutRecette = new QWidget(this);
     widgetAjoutRecette->setLayout(ajoutRecette);
-    mainTabWidget->addTab(widgetAjoutRecette, "Ajout recette");
+    mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
 
     listeBaladesEtSorties = new QListWidget(this);
     ajoutRecette->addWidget(listeBaladesEtSorties);
@@ -334,7 +336,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     toolBar->addSeparator();
 
-    const QIcon iconeGenerePdf = QIcon("./ressources/file-pdf-box.svg");
+    const QIcon iconeGenerePdf = QIcon("./ressources/file-cog.svg");
     QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
     bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
     connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
@@ -416,8 +418,13 @@ void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFac
 }
 void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier)
 {
+    //On met à jour la table des vols (champ Soumis CE)
+    peuplerTableVols();
+
+    //On met à jour la fenêtre de progression
     progressionGenerationPdf->setLabelText("Génération PDF terminée");
-    const QString status = QString("Génération terminée. Fichiers disponibles sous ").append(p_cheminDossier);
+    const QString status = "Génération terminée. Fichiers disponibles sous "
+                            +p_cheminDossier;
     statusBar()->showMessage(status);
 }
 
@@ -472,7 +479,7 @@ void AeroDms::peuplerTableVols()
 void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
-    listeDeroulanteAnnee->addItem("Toutes", -1);
+    listeDeroulanteAnnee->addItem("Toutes les années", -1);
     QList<int> listeAnnees = db->recupererAnnees();
     for (int i = 0; i < listeAnnees.size(); i++)
     {
@@ -865,7 +872,7 @@ void AeroDms::peuplerListesPilotes()
     listeDeroulantePilote->clear();
     choixPilote->clear();
 
-    listeDeroulantePilote->addItem("Tous", "*");
+    listeDeroulantePilote->addItem("Tous les pilotes", "*");
     choixPilote->addItem("", "aucun");
     choixPayeur->addItem("", "aucun");
     for (int i = 0; i < pilotes.size(); i++)
@@ -1001,7 +1008,7 @@ void AeroDms::ajouterUneCotisation()
 void AeroDms::aPropos()
 {
     QMessageBox::about(this, tr("À propos de AeroDms"),
-        "<b>AeroDms v 1.1</b> < br />< br /> "
+        "<b>AeroDms v"+QApplication::applicationVersion() + "</b> < br />< br /> "
         "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous GitHub"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
