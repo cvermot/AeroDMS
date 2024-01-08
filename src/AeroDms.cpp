@@ -381,11 +381,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Menu
     QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
-    QAction *aboutQtAction = new QAction(tr("À propos de &Qt"), this);
+    QAction *aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    QAction *aboutAction = new QAction(tr("À propos de &AeroDms"), this);
+    QAction *aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
