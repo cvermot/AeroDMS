@@ -29,7 +29,9 @@ PdfRenderer::PdfRenderer()
     laDemandeEstPourUnDocumentUnique = false;
 }
 
-PdfRenderer::PdfRenderer(ManageDb *p_db, QString p_cheminTemplatesHtml, QWidget* parent)
+PdfRenderer::PdfRenderer( ManageDb *p_db, 
+                          QString p_cheminTemplatesHtml, 
+                          QWidget* parent)
 {
     db = p_db;
 	view = new QWebEnginePage(this);
@@ -74,7 +76,8 @@ void PdfRenderer::chargementTermine(bool retour)
     listeDesFichiers.append(nomFichier);
 }
 
-void PdfRenderer::impressionTerminee(const QString& filePath, bool success)
+void PdfRenderer::impressionTerminee( const QString& filePath, 
+                                      bool success)
 {
     db->ajouterDemandeCeEnBdd(demandeEnCours);
     emit mettreAJourNombreFacturesTraitees(nombreFacturesTraitees);
@@ -185,11 +188,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     //Signature => Vide (on signe à la main)
     templateCeTmp.replace("xxSignature", "");
 
-
-    AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
-    AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
-    AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
-    AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
+    const AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
+    const AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
+    const AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
+    const AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
 
     //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)

@@ -72,7 +72,7 @@ public:
     bool piloteEstAJourDeCotisation( const QString& p_piloteId, 
                                      const int annee);
 
-    void ajouterCotisation ( AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
+    void ajouterCotisation (const AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
 
     AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();
@@ -91,21 +91,21 @@ public:
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
-    QStringList recupererBaladesEtSorties(QString p_typeDeVol);
+    QStringList recupererBaladesEtSorties(const QString p_typeDeVol);
     QList<int> recupererAnnees();
     QList<int> recupererAnneesAvecVolNonSoumis();
     AeroDmsTypes::ListeSortie recupererListeSorties();
     AeroDmsTypes::ListeSortie recupererListeBalade();
     AeroDmsTypes::ListeSortie recupererListeDepensesPouvantAvoirUneFacture();
-    QString recupererAeroclub(QString p_piloteId);
-    QString recupererNomPrenomPilote(QString p_piloteId);
+    QString recupererAeroclub(const QString p_piloteId);
+    QString recupererNomPrenomPilote(const QString p_piloteId);
 
-    int recupererLigneCompta(QString p_typeDeRecetteDepenseId);
+    int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);
     
-    AeroDmsTypes::ResultatCreationPilote creerPilote(AeroDmsTypes::Pilote p_pilote);
-    void creerSortie(AeroDmsTypes::Sortie p_sortie);
+    AeroDmsTypes::ResultatCreationPilote creerPilote(const AeroDmsTypes::Pilote p_pilote);
+    void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
-    void ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
+    void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
 
     QString convertirMinutesEnHeuresMinutes(const int minutes);
     

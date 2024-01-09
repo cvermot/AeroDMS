@@ -350,7 +350,8 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
 
 //Recupère le subvention restante pour l'année p_annne et pour le pilote p_piloteId. Ne concerne que les vols de
 //type Entrainement (heures perso), les autres types de vols ne sont pas plafonnés
-float ManageDb::recupererSubventionRestante(const QString& p_piloteId, const int p_annee)
+float ManageDb::recupererSubventionRestante( const QString& p_piloteId, 
+                                             const int p_annee)
 {
     QSqlQuery query;
 
@@ -546,7 +547,7 @@ QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTy
     return listeFactures;
 }
 
-void ManageDb::ajouterDemandeCeEnBdd(AeroDmsTypes::DemandeEnCoursDeTraitement p_demande)
+void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande)
 {
     //On créé l'entrée dans demandeRemboursementSoumises
     QSqlQuery query;
@@ -717,7 +718,7 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeR
     return liste;
 }
 
-QString ManageDb::recupererAeroclub(QString p_piloteId)
+QString ManageDb::recupererAeroclub(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT aeroclub FROM pilote WHERE piloteId = :piloteId");
@@ -742,7 +743,7 @@ QList<int> ManageDb::recupererAnnees()
     return listeAnnees;
 }
 
-QString ManageDb::recupererNomPrenomPilote(QString p_piloteId)
+QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT prenom, nom FROM pilote WHERE piloteId = :piloteId");
@@ -764,7 +765,7 @@ int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)
     return query.value(0).toInt();
 }
 
-QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette)
+QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesTypesDeVolAvecRecette)
 {
     QString sql = "SELECT * FROM 'typeDeRecetteDepense' WHERE estVol = 1";
     if (recupererUniquementLesTypesDeVolAvecRecette)
@@ -782,7 +783,7 @@ QStringList ManageDb::recupererTypesDesVol(bool recupererUniquementLesTypesDeVol
     return liste;
 }
 
-QStringList ManageDb::recupererBaladesEtSorties(QString p_typeDeVol)
+QStringList ManageDb::recupererBaladesEtSorties(const QString p_typeDeVol)
 {
     QStringList liste;
     QSqlQuery query;
@@ -853,7 +854,7 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeBalade()
     return liste;
 }
 
-void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisation)
+void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infosCotisation)
 {
     QSqlQuery query;
     query.prepare("SELECT nom, prenom FROM 'pilote' WHERE piloteId = :piloteId");
@@ -880,7 +881,7 @@ void ManageDb::ajouterCotisation(AeroDmsTypes::CotisationAnnuelle& p_infosCotisa
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
 //dans la base de données
-AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(AeroDmsTypes::Pilote p_pilote)
+AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::Pilote p_pilote)
 {
     AeroDmsTypes::ResultatCreationPilote resultat = AeroDmsTypes::ResultatCreationPilote_SUCCES;
 
@@ -949,7 +950,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(AeroDmsTypes::Pilote 
     return resultat;
 }
 
-void ManageDb::creerSortie(AeroDmsTypes::Sortie p_sortie)
+void ManageDb::creerSortie(const AeroDmsTypes::Sortie p_sortie)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO sortie ('nom','date') VALUES (:nom,:date)");
