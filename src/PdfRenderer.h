@@ -55,9 +55,12 @@ private :
 	int indiceFichier;
 
 	void imprimerLaProchaineDemandeDeSubvention();
-	void remplirLeChampMontant(QString& p_html, const float p_montant);
+	void remplirLeChampMontant( QString& p_html, 
+		                        const float p_montant);
 
-	void imprimerLeFichierPdfDeRecapAnnuel(const int p_annee, const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee);
+	void imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
+		                                    const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
+		                                    const AeroDmsTypes::SubventionsParPilote p_totaux);
 	void produireFichierPdfGlobal();
 
 	void recopierFacture(const QString p_nomFacture);

@@ -114,7 +114,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
                                                                                                                    "*",
                                                                                                                    false);
-        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee);
+        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
+        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux);
 
         nombreFacturesTraitees++;
     }
@@ -195,67 +196,12 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     {
         const int annee = listeAnnees.takeFirst();
 
-        //QFile table("./ressources/HTML/TableauRecap.html");
-        QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
-        //QFile tableItem("./ressources/HTML/TableauRecapItem.html");
-        QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
-        QString templateTable = "";
-        QString templateTableItem = "";
-        if (table.open(QFile::ReadOnly | QFile::Text) && tableItem.open(QFile::ReadOnly | QFile::Text))
-        {
-            QTextStream inTable(&table);
-            QTextStream inTableItem(&tableItem);
-            templateTable = inTable.readAll();
-            templateTableItem = inTableItem.readAll();
-        }
-        else
-        {
-            qDebug() << "Erreur ouverture fichier";
-        }
-        templateTable.replace("__date__", QDate::currentDate().toString("dd/MM/yyyy"));
-        templateTable.replace("__exercice__", QString::number(annee));
-
-        AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererLesSubventionesDejaAllouees(annee);
-        for (int i = 0; i < listePilotesDeCetteAnnee.size(); i++)
-        {
-            QString item = templateTableItem;
-            item.replace("__pilote__", QString(listePilotesDeCetteAnnee.at(i).nom).append(" ").append(listePilotesDeCetteAnnee.at(i).prenom));
-            item.replace("__HdvEnt__", listePilotesDeCetteAnnee.at(i).entrainement.heuresDeVol);
-            item.replace("__CouEnt__", QString::number(listePilotesDeCetteAnnee.at(i).entrainement.coutTotal));
-            item.replace("__SubEnt__", QString::number(listePilotesDeCetteAnnee.at(i).entrainement.montantRembourse));
-            item.replace("__HdVBal__", listePilotesDeCetteAnnee.at(i).balade.heuresDeVol);
-            item.replace("__CouBal__", QString::number(listePilotesDeCetteAnnee.at(i).balade.coutTotal));
-            item.replace("__SubBal__", QString::number(listePilotesDeCetteAnnee.at(i).balade.montantRembourse));
-            item.replace("__HdVSor__", listePilotesDeCetteAnnee.at(i).sortie.heuresDeVol);
-            item.replace("__CouSor__", QString::number(listePilotesDeCetteAnnee.at(i).sortie.coutTotal));
-            item.replace("__SubSor__", QString::number(listePilotesDeCetteAnnee.at(i).sortie.montantRembourse));
-            item.replace("__HdvTot__", listePilotesDeCetteAnnee.at(i).totaux.heuresDeVol);
-            item.replace("__CouTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.coutTotal));
-            item.replace("__SubTot__", QString::number(listePilotesDeCetteAnnee.at(i).totaux.montantRembourse));    
-
-            templateTable.replace("<!--Accroche-->", item);
-        }
-
-        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(annee, true);
-
-        templateTable.replace("__TotHdvEnt__", totaux.entrainement.heuresDeVol);
-        templateTable.replace("__TotCouEnt__", QString::number(totaux.entrainement.coutTotal));
-        templateTable.replace("__TotSubEnt__", QString::number(totaux.entrainement.montantRembourse));
-        templateTable.replace("__TotHdVBal__", totaux.balade.heuresDeVol);
-        templateTable.replace("__TotCouBal__", QString::number(totaux.balade.coutTotal));
-        templateTable.replace("__TotSubBal__", QString::number(totaux.balade.montantRembourse));
-        templateTable.replace("__TotHdVSor__", totaux.sortie.heuresDeVol);
-        templateTable.replace("__TotCouSor__", QString::number(totaux.sortie.coutTotal));
-        templateTable.replace("__TotSubSor__", QString::number(totaux.sortie.montantRembourse));
-        templateTable.replace("__TotHdvTot__", totaux.totaux.heuresDeVol);
-        templateTable.replace("__TotCouTot__", QString::number(totaux.totaux.coutTotal));
-        templateTable.replace("__TotSubTot__", QString::number(totaux.totaux.montantRembourse));
-
-        view->setHtml( templateTable,
-                       ressourcesHtml);
-
-        demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
-        demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(annee));
+        const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererLesSubventionesDejaAllouees(annee);
+        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel( annee, 
+                                                                                     true );
+        imprimerLeFichierPdfDeRecapAnnuel( annee, 
+                                           listePilotesDeCetteAnnee, 
+                                           totaux);
     }
     else if (listeDesRemboursements.size() > 0)
     {    
@@ -440,11 +386,10 @@ void PdfRenderer::recopierFactures(const QStringList p_listeFactures)
 }
 
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
-                                                     const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee)
+                                                     const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
+                                                     const AeroDmsTypes::SubventionsParPilote p_totaux)
 {
-    //QFile table("./ressources/HTML/TableauRecap.html");
     QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
-    //QFile tableItem("./ressources/HTML/TableauRecapItem.html");
     QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
     QString templateTable = "";
     QString templateTableItem = "";
@@ -482,20 +427,18 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         templateTable.replace("<!--Accroche-->", item);
     }
 
-    const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, true);
-
-    templateTable.replace("__TotHdvEnt__", totaux.entrainement.heuresDeVol);
-    templateTable.replace("__TotCouEnt__", QString::number(totaux.entrainement.coutTotal));
-    templateTable.replace("__TotSubEnt__", QString::number(totaux.entrainement.montantRembourse));
-    templateTable.replace("__TotHdVBal__", totaux.balade.heuresDeVol);
-    templateTable.replace("__TotCouBal__", QString::number(totaux.balade.coutTotal));
-    templateTable.replace("__TotSubBal__", QString::number(totaux.balade.montantRembourse));
-    templateTable.replace("__TotHdVSor__", totaux.sortie.heuresDeVol);
-    templateTable.replace("__TotCouSor__", QString::number(totaux.sortie.coutTotal));
-    templateTable.replace("__TotSubSor__", QString::number(totaux.sortie.montantRembourse));
-    templateTable.replace("__TotHdvTot__", totaux.totaux.heuresDeVol);
-    templateTable.replace("__TotCouTot__", QString::number(totaux.totaux.coutTotal));
-    templateTable.replace("__TotSubTot__", QString::number(totaux.totaux.montantRembourse));
+    templateTable.replace("__TotHdvEnt__", p_totaux.entrainement.heuresDeVol);
+    templateTable.replace("__TotCouEnt__", QString::number(p_totaux.entrainement.coutTotal));
+    templateTable.replace("__TotSubEnt__", QString::number(p_totaux.entrainement.montantRembourse));
+    templateTable.replace("__TotHdVBal__", p_totaux.balade.heuresDeVol);
+    templateTable.replace("__TotCouBal__", QString::number(p_totaux.balade.coutTotal));
+    templateTable.replace("__TotSubBal__", QString::number(p_totaux.balade.montantRembourse));
+    templateTable.replace("__TotHdVSor__", p_totaux.sortie.heuresDeVol);
+    templateTable.replace("__TotCouSor__", QString::number(p_totaux.sortie.coutTotal));
+    templateTable.replace("__TotSubSor__", QString::number(p_totaux.sortie.montantRembourse));
+    templateTable.replace("__TotHdvTot__", p_totaux.totaux.heuresDeVol);
+    templateTable.replace("__TotCouTot__", QString::number(p_totaux.totaux.coutTotal));
+    templateTable.replace("__TotSubTot__", QString::number(p_totaux.totaux.montantRembourse));
 
     view->setHtml(templateTable,
         ressourcesHtml);

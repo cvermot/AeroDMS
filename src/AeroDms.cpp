@@ -483,7 +483,7 @@ void AeroDms::peuplerTableVols()
     vueVols->resizeColumnsToContents();
 
     bouttonGenerePdfRecapHdv->setEnabled(true);
-    //On desactive la génération du récap annuel si on est sur la séléction "Toutes les années)
+    //On desactive la génération du récap annuel si on est sur la séléction "Toutes les années"
     if (listeDeroulanteAnnee->currentData().toInt() == -1)
     {
         bouttonGenerePdfRecapHdv->setEnabled(false);
