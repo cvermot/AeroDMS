@@ -50,7 +50,8 @@ public:
         VolTableElement_SUBVENTION = 0x5,
         VolTableElement_SOUMIS_CE = 0x6,
         VolTableElement_REMARQUE = 0x7,
-        VolTableElement_NB_COLONNES = 0x8,
+        VolTableElement_VOL_ID = 0x8,
+        VolTableElement_NB_COLONNES = 0x9,
     };
 
     enum ResultatCreationPilote {
@@ -121,6 +122,7 @@ public:
         QString estSoumisCe;
         float coutVol;
         float montantRembourse;
+        int volId;
     };
     typedef QList<Vol> ListeVols;
 

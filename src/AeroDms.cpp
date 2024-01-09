@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("1.3");
+    QApplication::setApplicationVersion("1.4");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
@@ -125,9 +125,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem("Subvention"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem("ID"));
+    vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vueVols->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
+    connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
 
     //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
@@ -398,6 +402,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Initialisation des autres attributs
     piloteAEditer = "";
+    volAEditer = "";
     factureIdEnBdd = 0;
 
     peuplerListesPilotes();
@@ -479,6 +484,7 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
     }
     vueVols->resizeColumnsToContents();
 
@@ -1053,16 +1059,19 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
 {
     if (vuePilotes->itemAt(pos) != nullptr)
     {
-        QMenu menuClicDroitVol(tr("Menu contextuel"), this);
+        QMenu menuClicDroitPilote(tr("Menu contextuel"), this);
         const int ligneSelectionnee = vuePilotes->itemAt(pos)->row();
         piloteAEditer = vuePilotes->item( ligneSelectionnee, 
-                                           AeroDmsTypes::PiloteTableElement_PILOTE_ID)->text();
+                                          AeroDmsTypes::PiloteTableElement_PILOTE_ID)->text();
 
         const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
         QAction editer(iconeAjouterPilote,"Editer le pilote", this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
-        menuClicDroitVol.addAction(&editer);
-        menuClicDroitVol.exec(vuePilotes->mapToGlobal(pos));
+        menuClicDroitPilote.addAction(&editer);
+
+        //Afficher le menu sur la vue des pilotes
+        //menuClicDroitPilote.exec(vuePilotes->mapToGlobal(pos));
+        menuClicDroitPilote.exec(vuePilotes->mapToGlobal(QCursor::pos()));
     }
 }
 
@@ -1070,5 +1079,74 @@ void AeroDms::editerPilote()
 {
     dialogueGestionPilote->preparerMiseAJourPilote(piloteAEditer);
     dialogueGestionPilote->exec();
+}
+
+void AeroDms::menuContextuelVols(const QPoint& pos)
+{
+    if (vueVols->itemAt(pos) != nullptr)
+    {
+        QMenu menuClicDroitVol(tr("Menu contextuel"), this);
+        const int ligneSelectionnee = vueVols->itemAt(pos)->row();
+        volAEditer = vueVols->item( ligneSelectionnee,
+                                    AeroDmsTypes::VolTableElement_VOL_ID)->text();
+
+        const bool leVolEstSupprimable = (vueVols->item(ligneSelectionnee, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text() == "Non");
+
+
+        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Editer le vol", this);
+        connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
+        menuClicDroitVol.addAction(&editerLeVol);
+        //TODO : pour le moment fonction non disponible : on desactive le bouton
+        editerLeVol.setEnabled(false);
+
+        QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), "Supprimer le vol", this);
+        connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
+        menuClicDroitVol.addAction(&supprimerLeVol);
+        supprimerLeVol.setEnabled(leVolEstSupprimable);
+
+        //Afficher le menu sur la vue des vols
+        //menuClicDroitVol.exec(vueVols->mapToGlobal(pos));
+        menuClicDroitVol.exec(vueVols->mapToGlobal(QCursor::pos()));
+    }
+}
+
+void AeroDms::editerVol()
+{
+    //TODO
+}
+
+void AeroDms::supprimerVol()
+{
+    QMessageBox demandeConfirmationSuppression;
+    demandeConfirmationSuppression.setText("Voulez vous réellement supprimer le vol ?");
+    demandeConfirmationSuppression.setWindowTitle("Suppression d'un vol");
+    demandeConfirmationSuppression.setIcon(QMessageBox::Question);
+    demandeConfirmationSuppression.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    
+    const int ret = demandeConfirmationSuppression.exec();
+    
+    switch (ret) 
+    {
+        case QMessageBox::Yes:
+        {
+            if (db->supprimerUnVol(volAEditer))
+            {
+                statusBar()->showMessage("Vol supprimé avec succès.");
+            }
+            else
+            {
+                statusBar()->showMessage("Vol non supprimé : le vol est associé à une recette d'une sortie. Suppression impossible.");
+            }
+            peuplerTablePilotes();
+            peuplerTableVols();
+        }
+        break;
+        case QMessageBox::No:
+        default:
+        {
+            //Rien à faire
+        }
+        break;
+    }
 }
 

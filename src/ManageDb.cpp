@@ -309,6 +309,7 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
         vol.prenomPilote = query.value("prenom").toString();
         vol.remarque = query.value("remarque").toString();
         vol.typeDeVol = query.value("typeDeVol").toString();
+        vol.volId = query.value("volId").toInt();
  
         liste.append(vol);
     }
@@ -413,6 +414,24 @@ void ManageDb::enregistrerUnVolSortieOuBalade(const QString& p_piloteId,
     query.bindValue(":remarque", p_remarque);
 
     query.exec();
+}
+
+bool ManageDb::supprimerUnVol(const QString p_volAEditer)
+{
+    QSqlQuery query;
+    query.prepare("SELECT * 'xAssociationRecette-Vol' WHERE volId = :volId");
+    query.bindValue(":volId", p_volAEditer);
+    query.exec();
+    if (query.size() != 0)
+    {
+        //Le vol est associé a une recette de sortie : on refuse la suppression
+        return false;
+    }
+
+    //Sinon on poursuit
+    query.prepare("DELETE FROM 'vol' WHERE volId = :volId");
+    query.bindValue(":volId", p_volAEditer);
+    return query.exec();
 }
 
 void ManageDb::enregistrerUneFacture( const QString& p_payeur,

@@ -57,6 +57,7 @@ public:
                                          const int p_facture,
                                          const int p_idSortie,
                                          const QString& p_remarque);
+    bool supprimerUnVol(const QString p_volAEditer);
     void enregistrerUneFacture( const QString& p_payeur,
                                 const int factureId,
                                 const QDate& p_date,

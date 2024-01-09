@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on lun. janv. 1 23:01:41 2024
+-- File generated with SQLiteStudio v3.4.4 on mar. janv. 9 21:38:21 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -175,6 +175,7 @@ ORDER BY annee, vol.pilote, typeDeVol;
 
 -- View: vols
 CREATE VIEW IF NOT EXISTS vols AS SELECT 
+    vol.volId,
     vol.date,
     vol.pilote,
     pilote.nom,

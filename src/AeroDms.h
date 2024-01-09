@@ -112,6 +112,7 @@ private:
 
     //Données internes
     QString piloteAEditer;
+    QString volAEditer;
     int factureIdEnBdd;
 
 public slots:
@@ -139,6 +140,9 @@ public slots:
     void aPropos();
     void menuContextuelPilotes(const QPoint& pos);
     void editerPilote();
+    void editerVol();
+    void supprimerVol();
+    void menuContextuelVols(const QPoint& pos);
 
 
 };
