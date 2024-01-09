@@ -343,6 +343,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
     toolBar->addAction(bouttonGenerePdf);
 
+    const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
+    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année séléctionnée"), this);
+    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année séléctionnée"));
+    connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
+    toolBar->addAction(bouttonGenerePdfRecapHdv);
+
     QToolBar* SelectionToolBar = addToolBar(tr(""));
 
     listeDeroulanteAnnee = new QComboBox(this);
@@ -475,6 +481,13 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
     }
     vueVols->resizeColumnsToContents();
+
+    bouttonGenerePdfRecapHdv->setEnabled(true);
+    //On desactive la génération du récap annuel si on est sur la séléction "Toutes les années)
+    if (listeDeroulanteAnnee->currentData().toInt() == -1)
+    {
+        bouttonGenerePdfRecapHdv->setEnabled(false);
+    }
 }
 
 void AeroDms::peuplerListeDeroulanteAnnee()
@@ -602,6 +615,13 @@ void AeroDms::genererPdf()
     pdf->imprimerLesDemandesDeSubvention( parametresMetiers.nomTresorier,
                                           cheminSortieFichiersGeneres,
                                           cheminStockageFacturesTraitees);
+}
+
+void AeroDms::genererPdfRecapHdV()
+{
+    pdf->imprimerLeRecapitulatifDesHeuresDeVol( listeDeroulanteAnnee->currentData().toInt(),
+                                                cheminSortieFichiersGeneres,
+                                                cheminStockageFacturesTraitees);
 }
 
 void AeroDms::enregistrerUneFacture()

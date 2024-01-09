@@ -34,6 +34,9 @@ public:
 	int imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 		                                 const QString p_cheminSortieFichiersGeneres,
 		                                 const QString p_cheminStockageFactures);
+	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
+		                                        const QString p_cheminSortieFichiersGeneres,
+		                                        const QString p_cheminStockageFactures);
 
 private :
 	QWebEnginePage* view;
@@ -42,17 +45,19 @@ private :
 
 	QString cheminSortieFichiersGeneres;
 	QString repertoireDesFactures;
+	bool laDemandeEstPourUnDocumentUnique;
 
 	QStringList listeDesFichiers;
 	AeroDmsTypes::DemandeEnCoursDeTraitement demandeEnCours;
 	QList<int> listeAnnees;
 
 	int nombreFacturesTraitees;
-	int nombreFacturesATraiter;
 	int indiceFichier;
 
 	void imprimerLaProchaineDemandeDeSubvention();
 	void remplirLeChampMontant(QString& p_html, const float p_montant);
+
+	void imprimerLeFichierPdfDeRecapAnnuel(const int p_annee, const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee);
 	void produireFichierPdfGlobal();
 
 	void recopierFacture(const QString p_nomFacture);

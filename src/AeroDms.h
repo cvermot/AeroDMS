@@ -107,6 +107,9 @@ private:
     QProgressDialog *progressionGenerationPdf;
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
+    //Bouttons
+    QAction* bouttonGenerePdfRecapHdv;
+
     //Données internes
     QString piloteAEditer;
     int factureIdEnBdd;
@@ -117,6 +120,7 @@ public slots:
     void enregistrerUneFacture();
     void enregistrerUneRecette();
     void genererPdf();
+    void genererPdfRecapHdV();
     void prevaliderDonnnesSaisies();
     void prevaliderDonnneesSaisiesRecette();
     void changerInfosVolSurSelectionTypeVol();

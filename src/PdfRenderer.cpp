@@ -25,8 +25,8 @@ PdfRenderer::PdfRenderer()
     db = new ManageDb();
     view = new QWebEnginePage(this);
     nombreFacturesTraitees = 0;
-    nombreFacturesATraiter = 0;
     indiceFichier = 0;
+    laDemandeEstPourUnDocumentUnique = false;
 }
 
 PdfRenderer::PdfRenderer(ManageDb *p_db, QString p_cheminTemplatesHtml, QWidget* parent)
@@ -34,8 +34,8 @@ PdfRenderer::PdfRenderer(ManageDb *p_db, QString p_cheminTemplatesHtml, QWidget*
     db = p_db;
 	view = new QWebEnginePage(this);
     nombreFacturesTraitees = 0;
-    nombreFacturesATraiter = 0;
     indiceFichier = 0;
+    laDemandeEstPourUnDocumentUnique = false;
 
     ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
 
@@ -78,7 +78,50 @@ void PdfRenderer::impressionTerminee(const QString& filePath, bool success)
 {
     db->ajouterDemandeCeEnBdd(demandeEnCours);
     emit mettreAJourNombreFacturesTraitees(nombreFacturesTraitees);
-    imprimerLaProchaineDemandeDeSubvention();
+
+    //Si la demande ne concerne pas un document unique, on fait les demandes suivantes
+    if (!laDemandeEstPourUnDocumentUnique)
+    {
+        imprimerLaProchaineDemandeDeSubvention();
+    }
+    //Sinon on emet directement la fin d'impression
+    else
+    {
+        emit generationTerminee(cheminSortieFichiersGeneres);
+    }
+   
+}
+
+void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
+                                                         const QString p_cheminSortieFichiersGeneres,
+                                                         const QString p_cheminStockageFactures)
+{
+    nombreFacturesTraitees = 0;
+    indiceFichier = 0;
+    laDemandeEstPourUnDocumentUnique = true;
+
+    cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
+    repertoireDesFactures = p_cheminStockageFactures;
+    QDir().mkdir(cheminSortieFichiersGeneres);
+    if (QDir(cheminSortieFichiersGeneres).exists())
+    {
+        cheminSortieFichiersGeneres.append("/");
+        listeDesFichiers.clear();
+
+        emit mettreAJourNombreFacturesATraiter(1);
+        emit mettreAJourNombreFacturesTraitees(0);
+
+        const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
+                                                                                                                   "*",
+                                                                                                                   false);
+        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee);
+
+        nombreFacturesTraitees++;
+    }
+    else
+    {
+        qDebug() << "Erreur création repertoire";
+    }
 }
 
 int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
@@ -88,9 +131,9 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
     demandeEnCours.nomTresorier = p_nomTresorier;
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
-    nombreFacturesATraiter = listeDesRemboursements.size();
     nombreFacturesTraitees = 0 ;
     indiceFichier = 0;
+    laDemandeEstPourUnDocumentUnique = false;
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
     QDir().mkdir(cheminSortieFichiersGeneres);
@@ -394,6 +437,71 @@ void PdfRenderer::recopierFactures(const QStringList p_listeFactures)
     {
         recopierFacture(p_listeFactures.at(i));
     }
+}
+
+void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
+                                                     const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee)
+{
+    //QFile table("./ressources/HTML/TableauRecap.html");
+    QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
+    //QFile tableItem("./ressources/HTML/TableauRecapItem.html");
+    QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
+    QString templateTable = "";
+    QString templateTableItem = "";
+    if (table.open(QFile::ReadOnly | QFile::Text) && tableItem.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream inTable(&table);
+        QTextStream inTableItem(&tableItem);
+        templateTable = inTable.readAll();
+        templateTableItem = inTableItem.readAll();
+    }
+    else
+    {
+        qDebug() << "Erreur ouverture fichier";
+    }
+    templateTable.replace("__date__", QDate::currentDate().toString("dd/MM/yyyy"));
+    templateTable.replace("__exercice__", QString::number(p_annee));
+
+    for (int i = 0; i < p_listePilotesDeCetteAnnee.size(); i++)
+    {
+        QString item = templateTableItem;
+        item.replace("__pilote__", QString(p_listePilotesDeCetteAnnee.at(i).nom).append(" ").append(p_listePilotesDeCetteAnnee.at(i).prenom));
+        item.replace("__HdvEnt__", p_listePilotesDeCetteAnnee.at(i).entrainement.heuresDeVol);
+        item.replace("__CouEnt__", QString::number(p_listePilotesDeCetteAnnee.at(i).entrainement.coutTotal));
+        item.replace("__SubEnt__", QString::number(p_listePilotesDeCetteAnnee.at(i).entrainement.montantRembourse));
+        item.replace("__HdVBal__", p_listePilotesDeCetteAnnee.at(i).balade.heuresDeVol);
+        item.replace("__CouBal__", QString::number(p_listePilotesDeCetteAnnee.at(i).balade.coutTotal));
+        item.replace("__SubBal__", QString::number(p_listePilotesDeCetteAnnee.at(i).balade.montantRembourse));
+        item.replace("__HdVSor__", p_listePilotesDeCetteAnnee.at(i).sortie.heuresDeVol);
+        item.replace("__CouSor__", QString::number(p_listePilotesDeCetteAnnee.at(i).sortie.coutTotal));
+        item.replace("__SubSor__", QString::number(p_listePilotesDeCetteAnnee.at(i).sortie.montantRembourse));
+        item.replace("__HdvTot__", p_listePilotesDeCetteAnnee.at(i).totaux.heuresDeVol);
+        item.replace("__CouTot__", QString::number(p_listePilotesDeCetteAnnee.at(i).totaux.coutTotal));
+        item.replace("__SubTot__", QString::number(p_listePilotesDeCetteAnnee.at(i).totaux.montantRembourse));
+
+        templateTable.replace("<!--Accroche-->", item);
+    }
+
+    const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, true);
+
+    templateTable.replace("__TotHdvEnt__", totaux.entrainement.heuresDeVol);
+    templateTable.replace("__TotCouEnt__", QString::number(totaux.entrainement.coutTotal));
+    templateTable.replace("__TotSubEnt__", QString::number(totaux.entrainement.montantRembourse));
+    templateTable.replace("__TotHdVBal__", totaux.balade.heuresDeVol);
+    templateTable.replace("__TotCouBal__", QString::number(totaux.balade.coutTotal));
+    templateTable.replace("__TotSubBal__", QString::number(totaux.balade.montantRembourse));
+    templateTable.replace("__TotHdVSor__", totaux.sortie.heuresDeVol);
+    templateTable.replace("__TotCouSor__", QString::number(totaux.sortie.coutTotal));
+    templateTable.replace("__TotSubSor__", QString::number(totaux.sortie.montantRembourse));
+    templateTable.replace("__TotHdvTot__", totaux.totaux.heuresDeVol);
+    templateTable.replace("__TotCouTot__", QString::number(totaux.totaux.coutTotal));
+    templateTable.replace("__TotSubTot__", QString::number(totaux.totaux.montantRembourse));
+
+    view->setHtml(templateTable,
+        ressourcesHtml);
+
+    demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
+    demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(p_annee));
 }
 
 void PdfRenderer::produireFichierPdfGlobal()
