@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("1.4");
+    QApplication::setApplicationVersion("1.5");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());

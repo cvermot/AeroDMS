@@ -23,6 +23,12 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QTranslator* translator = new QTranslator();
+    if (translator->load("qt_fr", QCoreApplication::applicationDirPath()+"/translations")) 
+    {
+        a.installTranslator(translator);
+    }
+
     AeroDms w;
     w.show();
     return a.exec();
