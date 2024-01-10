@@ -109,6 +109,7 @@ private:
 
     //Bouttons
     QAction* bouttonGenerePdfRecapHdv;
+    QAction* boutonModeDebug;
 
     //Données internes
     QString piloteAEditer;
@@ -143,6 +144,7 @@ public slots:
     void editerVol();
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);
+    void switchModeDebug();
 
 
 };

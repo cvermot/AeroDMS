@@ -391,6 +391,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Menu
     QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
+    boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
+    helpMenu->addAction(boutonModeDebug);
+    connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
+    helpMenu->addSeparator();
     QAction *aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
     helpMenu->addAction(aboutQtAction);
@@ -885,6 +889,9 @@ void AeroDms::enregistrerUneRecette()
         statusBar()->showMessage("Recette ajoutee");
     }
 
+    intituleRecette->clear();
+    montantRecette->clear();
+
 }
 
 float AeroDms::calculerCoutHoraire()
@@ -1071,7 +1078,7 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
 
         //Afficher le menu sur la vue des pilotes
         //menuClicDroitPilote.exec(vuePilotes->mapToGlobal(pos));
-        menuClicDroitPilote.exec(vuePilotes->mapToGlobal(QCursor::pos()));
+        menuClicDroitPilote.exec(vuePilotes->mapToParent(QCursor::pos()));
     }
 }
 
@@ -1106,7 +1113,7 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
 
         //Afficher le menu sur la vue des vols
         //menuClicDroitVol.exec(vueVols->mapToGlobal(pos));
-        menuClicDroitVol.exec(vueVols->mapToGlobal(QCursor::pos()));
+        menuClicDroitVol.exec(vueVols->mapToParent(QCursor::pos()));
     }
 }
 
@@ -1147,6 +1154,26 @@ void AeroDms::supprimerVol()
             //Rien à faire
         }
         break;
+    }
+}
+
+void AeroDms::switchModeDebug()
+{
+    //Si le mode debug n'est pas actif
+    if (boutonModeDebug->text() == "Activer le mode &debug")
+    {
+        boutonModeDebug->setText("Désactiver le mode &debug");
+        boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
+        vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, false);
+        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, false);
+    }
+    //Sinon, le mode est actif, on desactive
+    else
+    {
+        boutonModeDebug->setText("Activer le mode &debug");
+        boutonModeDebug->setIcon(QIcon("./ressources/bug.svg"));
+        vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
+        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
     }
 }
 

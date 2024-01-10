@@ -419,10 +419,10 @@ void ManageDb::enregistrerUnVolSortieOuBalade(const QString& p_piloteId,
 bool ManageDb::supprimerUnVol(const QString p_volAEditer)
 {
     QSqlQuery query;
-    query.prepare("SELECT * 'xAssociationRecette-Vol' WHERE volId = :volId");
+    query.prepare("SELECT * FROM 'xAssociationRecette-Vol' WHERE volId = :volId");
     query.bindValue(":volId", p_volAEditer);
     query.exec();
-    if (query.size() != 0)
+    if (query.next())
     {
         //Le vol est associé a une recette de sortie : on refuse la suppression
         return false;
@@ -431,6 +431,7 @@ bool ManageDb::supprimerUnVol(const QString p_volAEditer)
     //Sinon on poursuit
     query.prepare("DELETE FROM 'vol' WHERE volId = :volId");
     query.bindValue(":volId", p_volAEditer);
+
     return query.exec();
 }
 
