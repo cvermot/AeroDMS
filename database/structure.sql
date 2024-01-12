@@ -104,6 +104,16 @@ nom
 FROM recettesASoumettreCe
 GROUP BY annee, typeDeRecette, nom;
 
+-- View: stats_heuresDeVolParMois
+CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
+strftime('%m', vol.date) AS mois,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol,
+typeDeVol
+FROM vol
+GROUP BY mois, typeDeVol
+ORDER BY annee, mois;
+
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 
 pilote, 

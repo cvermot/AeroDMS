@@ -978,3 +978,78 @@ void ManageDb::creerSortie(const AeroDmsTypes::Sortie p_sortie)
     query.bindValue(":date", p_sortie.date.toString("yyyy-MM-dd"));
     query.exec();
 }
+
+AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles()
+{
+    AeroDmsTypes::ListeStatsHeuresDeVol liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM 'stats_heuresDeVolParMois'");
+    query.exec();
+
+    AeroDmsTypes::StatsHeuresDeVol heuresMensuelles;
+    heuresMensuelles.mois = "";
+    QDate moisPrecedent = QDate();
+
+    while (query.next()) {
+        const QDate mois = QDate( query.value("annee").toInt(), 
+                                  query.value("mois").toInt(), 
+                                  1);
+        //Si on change de mois
+        if (heuresMensuelles.mois != mois.toString("MMMM yyyy"))
+        {
+            //On ajoute les heures mensuelles courantes, si on est pas sur le premier tour...
+            if (heuresMensuelles.mois != "")
+            {
+                liste.append(heuresMensuelles);
+            }
+            //Au premier tour on initialise le mois precedent
+            else
+            {
+                moisPrecedent = mois;
+            }
+            //On rince
+            heuresMensuelles.minutesBalade = 0;
+            heuresMensuelles.minutesEntrainement = 0;
+            heuresMensuelles.minutesSortie = 0;
+
+            //On complète les trous, les mois ou éventuellement il n'y aurait pas eu de vol
+            if (moisPrecedent != mois)
+            {
+                while (moisPrecedent.addMonths(1) != mois)
+                {
+                    //On ajoute un mois
+                    moisPrecedent = moisPrecedent.addMonths(1);
+
+                    //Et on ajoute le mois à la liste
+                    heuresMensuelles.mois = moisPrecedent.toString("MMMM yyyy");
+                    liste.append(heuresMensuelles);
+                }
+            }
+
+            heuresMensuelles.mois = mois.toString("MMMM yyyy");
+            moisPrecedent = mois;
+        }
+       
+        if (query.value("typeDeVol").toString() == "Entrainement")
+        {
+            heuresMensuelles.minutesEntrainement = query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("typeDeVol").toString() == "Sortie")
+        {
+            heuresMensuelles.minutesSortie = query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("typeDeVol").toString() == "Balade")
+        {
+            heuresMensuelles.minutesBalade = query.value("tempsDeVol").toInt();
+        }
+    }
+
+    //On ajoute le dernier element à la liste, s'il existe...
+    if (heuresMensuelles.mois != "")
+    {
+        liste.append(heuresMensuelles);
+    }
+
+    return liste;
+}

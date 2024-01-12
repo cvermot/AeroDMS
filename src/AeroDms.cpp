@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDms.h"
 #include "AeroDmsTypes.h"
 
+#include "StatistiqueHistogrammeEmpile.h"
+
 #include <QtWidgets>
 #include <QToolBar>
 #include <QPdfDocument>
@@ -27,8 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("1.5");
+    QApplication::setApplicationVersion("1.6");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
+    mainTabWidget = new QTabWidget(this);
+    setCentralWidget(mainTabWidget);
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
@@ -90,9 +94,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     db = new ManageDb(database);
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
-
-    mainTabWidget = new QTabWidget(this);
-    setCentralWidget(mainTabWidget);
 
     //==========Onglet Pilotes
     vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
@@ -306,6 +307,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosRecette->addWidget(montantRecette, 2, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 
+    //Onglet graphiques
+    initialiserOngletGraphiques();
+
     //=============General
     statusBar()->showMessage("Pret");
 
@@ -418,6 +422,25 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
+}
+
+void AeroDms::initialiserOngletGraphiques()
+{
+    QHBoxLayout* graphiques = new QHBoxLayout(this);
+    QWidget* widgetGraphiques = new QWidget(this);
+    widgetGraphiques->setLayout(graphiques);
+    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques");
+
+    //QBoxLayout* layout;
+    StatistiqueWidget* m_activeWidget = nullptr;
+    QWidget* m_contentArea = nullptr;
+    m_activeWidget = new StatistiqueHistogrammeEmpile(db, m_contentArea);
+    //if (horizontal) {
+        //layout = new QHBoxLayout(this);
+        //layout->addWidget(m_listView);
+    graphiques->addWidget(m_activeWidget);
+        //m_listView->setMaximumWidth(220);
+        //setLayout(layout);
 }
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)

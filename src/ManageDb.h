@@ -109,6 +109,8 @@ public:
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
 
     QString convertirMinutesEnHeuresMinutes(const int minutes);
+
+    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles();
     
 
 public slots:

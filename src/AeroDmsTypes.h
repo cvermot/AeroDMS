@@ -169,6 +169,14 @@ public:
     };
     typedef QList<DemandeRemboursementFacture> ListeDemandeRemboursementFacture;
 
+    struct StatsHeuresDeVol {
+        QString mois;
+        int minutesEntrainement;
+        int minutesSortie;
+        int minutesBalade;
+    };
+    typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
+
     struct ParametresMetier {
         float montantSubventionEntrainement;
         float montantCotisationPilote;

@@ -53,6 +53,8 @@ private:
     void peuplerListeBaladesEtSorties();
     void peuplerListeDeroulanteAnnee();
 
+    void initialiserOngletGraphiques();
+
     float calculerCoutHoraire();
 
     ManageDb* db;
