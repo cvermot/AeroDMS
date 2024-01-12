@@ -307,7 +307,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosRecette->addWidget(montantRecette, 2, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 
-    //Onglet graphiques
+    //=============Onglet graphiques
     initialiserOngletGraphiques();
 
     //=============General
@@ -362,6 +362,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     listeDeroulanteAnnee = new QComboBox(this);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     SelectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
@@ -422,25 +423,31 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
+    peuplerStatistiques();
+
+    
 }
 
 void AeroDms::initialiserOngletGraphiques()
 {
-    QHBoxLayout* graphiques = new QHBoxLayout(this);
+    graphiques = new QHBoxLayout(this);
     QWidget* widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
-    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques");
+    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
+}
 
-    //QBoxLayout* layout;
-    StatistiqueWidget* m_activeWidget = nullptr;
-    QWidget* m_contentArea = nullptr;
-    m_activeWidget = new StatistiqueHistogrammeEmpile(db, m_contentArea);
-    //if (horizontal) {
-        //layout = new QHBoxLayout(this);
-        //layout->addWidget(m_listView);
+void AeroDms::peuplerStatistiques()
+{
+    if (m_activeWidget) {
+        m_activeWidget->setVisible(false);
+        m_activeWidget->deleteLater();
+    }
+
+    m_activeWidget = new StatistiqueHistogrammeEmpile(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
     graphiques->addWidget(m_activeWidget);
-        //m_listView->setMaximumWidth(220);
-        //setLayout(layout);
+
+    m_activeWidget->load();
+    m_activeWidget->setVisible(true);
 }
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
@@ -885,6 +892,9 @@ void AeroDms::enregistrerUnVol()
     //On met à jour la table des pilotes et celle des vols
     peuplerTablePilotes();
     peuplerTableVols();
+
+    //Et l'affichage des statistiques
+    peuplerStatistiques();
 }
 
 void AeroDms::enregistrerUneRecette()

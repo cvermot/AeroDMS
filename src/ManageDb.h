@@ -110,7 +110,7 @@ public:
 
     QString convertirMinutesEnHeuresMinutes(const int minutes);
 
-    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles();
+    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1);
     
 
 public slots:

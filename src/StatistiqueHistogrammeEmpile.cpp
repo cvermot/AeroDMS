@@ -11,10 +11,11 @@
 #include <QStackedBarSeries>
 #include <QValueAxis>
 
-StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, QWidget* parent)
+StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const int p_annee, QWidget* parent)
     : StatistiqueWidget(p_db, parent)
 {
-    const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles();
+    const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
+    qDebug() << "annee" << p_annee;
 
     //![1]
     auto entrainement = new QBarSet("Entrainement");

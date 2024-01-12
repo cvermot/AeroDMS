@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueGestionPilote.h"
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
+#include "StatistiqueWidget.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -118,6 +119,11 @@ private:
     QString volAEditer;
     int factureIdEnBdd;
 
+    //Statistiques
+    StatistiqueWidget* m_activeWidget = nullptr;
+    QWidget* m_contentArea = nullptr;
+    QHBoxLayout* graphiques;
+
 public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
@@ -147,7 +153,7 @@ public slots:
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);
     void switchModeDebug();
-
+    void peuplerStatistiques();
 
 };
 #endif // AERODMS_H

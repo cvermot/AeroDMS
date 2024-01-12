@@ -11,7 +11,7 @@ class StatistiqueHistogrammeEmpile : public StatistiqueWidget
 {
     Q_OBJECT
 public:
-    explicit StatistiqueHistogrammeEmpile(ManageDb* p_db, QWidget* parent = nullptr);
+    explicit StatistiqueHistogrammeEmpile(ManageDb* p_db, const int p_annee, QWidget* parent = nullptr);
 };
 
 #endif

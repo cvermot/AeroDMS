@@ -979,12 +979,20 @@ void ManageDb::creerSortie(const AeroDmsTypes::Sortie p_sortie)
     query.exec();
 }
 
-AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles()
+AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const int p_annee)
 {
     AeroDmsTypes::ListeStatsHeuresDeVol liste;
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM 'stats_heuresDeVolParMois'");
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM 'stats_heuresDeVolParMois' WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT * FROM 'stats_heuresDeVolParMois'");
+    }
     query.exec();
 
     AeroDmsTypes::StatsHeuresDeVol heuresMensuelles;
