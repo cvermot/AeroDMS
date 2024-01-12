@@ -997,6 +997,7 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
 
     AeroDmsTypes::StatsHeuresDeVol heuresMensuelles;
     heuresMensuelles.mois = "";
+    QLocale localeFrancaise(QLocale::French);
     QDate moisPrecedent = QDate();
 
     while (query.next()) {
@@ -1004,7 +1005,7 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
                                   query.value("mois").toInt(), 
                                   1);
         //Si on change de mois
-        if (heuresMensuelles.mois != mois.toString("MMMM yyyy"))
+        if (heuresMensuelles.mois != localeFrancaise.toString(mois, "MMMM yyyy"))
         {
             //On ajoute les heures mensuelles courantes, si on est pas sur le premier tour...
             if (heuresMensuelles.mois != "")
@@ -1030,12 +1031,12 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
                     moisPrecedent = moisPrecedent.addMonths(1);
 
                     //Et on ajoute le mois à la liste
-                    heuresMensuelles.mois = moisPrecedent.toString("MMMM yyyy");
+                    heuresMensuelles.mois = localeFrancaise.toString(moisPrecedent, "MMMM yyyy");
                     liste.append(heuresMensuelles);
                 }
             }
 
-            heuresMensuelles.mois = mois.toString("MMMM yyyy");
+            heuresMensuelles.mois = localeFrancaise.toString(mois, "MMMM yyyy");
             moisPrecedent = mois;
         }
        
