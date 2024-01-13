@@ -45,6 +45,7 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
 
     listePilote = new QComboBox(this);
     QLabel* listePiloteLabel = new QLabel(tr("Pilote : "), this);
+    connect(listePilote, &QComboBox::currentIndexChanged, this, &DialogueAjouterCotisation::prevaliderDonnnesSaisies);
 
     annee = new QComboBox(this);
     QLabel* anneeLabel = new QLabel(tr("Année : "), this);
@@ -94,6 +95,7 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     setWindowTitle(tr("Ajouter une cotisation pilote"));
 
     peuplerListePilote();
+    prevaliderDonnnesSaisies();
 }
 
 void DialogueAjouterCotisation::peuplerListePilote()
@@ -102,6 +104,7 @@ void DialogueAjouterCotisation::peuplerListePilote()
 
     const AeroDmsTypes::ListePilotes listePilotes = database->recupererPilotes();
 
+    listePilote->addItem("", "");
     for (int i = 0; i < listePilotes.size(); i++)
     {
         const AeroDmsTypes::Pilote pilote = listePilotes.at(i);
@@ -124,4 +127,14 @@ AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfosCotisa
     infosCotisation.montantSubvention = montantSubventionAnnuelle->value();
 
     return infosCotisation;
+}
+
+void DialogueAjouterCotisation::prevaliderDonnnesSaisies()
+{
+    okButton->setEnabled(true);
+
+    if (listePilote->currentIndex() == 0)
+    {
+        okButton->setEnabled(false);
+    }
 }

@@ -48,6 +48,9 @@ private:
     QWidget* extension;
 
     void peuplerListePilote();
+
+public slots:
+    void prevaliderDonnnesSaisies();
 };
 
 #endif // DIALOGUEAJOUTERCOTISATION_H
