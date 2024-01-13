@@ -265,11 +265,40 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
     return totaux;
 }
 
+AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
+{
+    AeroDmsTypes::Vol vol;
+
+    QSqlQuery query;
+    query.prepare("SELECT *  FROM vol WHERE volId = :volId");
+    query.bindValue(":volId", p_idVol);
+
+    query.exec();
+    query.next();
+
+    vol.coutVol = query.value("cout").toFloat();
+    vol.date = query.value("date").toDate();
+    vol.duree = convertirMinutesEnHeuresMinutes(query.value("duree").toInt());
+    vol.estSoumisCe = "Oui";
+    if (query.value("demandeRemboursement").isNull())
+        vol.estSoumisCe = "Non";
+    vol.idPilote = query.value("pilote").toString();
+    vol.montantRembourse = query.value("montantRembourse").toFloat();
+    vol.remarque = query.value("remarque").toString();
+    vol.typeDeVol = query.value("typeDeVol").toString();
+    vol.volId = query.value("volId").toInt();
+    vol.baladeId = -1;
+    if (!query.value("sortie").isNull())
+        vol.baladeId = query.value("sortie").toInt();
+        
+
+    return vol;
+}
+
 AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
                                                  const QString p_piloteId)
 {
     AeroDmsTypes::ListeVols liste;
-
 
     QSqlQuery query;
     if (p_annee != -1 && p_piloteId != "*")
@@ -310,6 +339,8 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
         vol.remarque = query.value("remarque").toString();
         vol.typeDeVol = query.value("typeDeVol").toString();
         vol.volId = query.value("volId").toInt();
+        if (!query.value("sortie").isNull())
+            vol.baladeId = query.value("sortie").toInt();
  
         liste.append(vol);
     }
@@ -772,6 +803,17 @@ QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
     query.exec();
     query.next();
     return query.value(0).toString().append(" ").append(query.value(1).toString());
+}
+
+QString ManageDb::recupererNomFacture(const int p_volId)
+{
+    QSqlQuery query;
+    query.prepare("SELECT fichiersFacture.nomFichier AS nomFichier FROM vol INNER JOIN fichiersFacture ON vol.facture = fichiersFacture.factureId WHERE volId = :volId");
+    query.bindValue(":volId", QString::number(p_volId));
+
+    query.exec();
+    query.next();
+    return query.value("nomFichier").toString();
 }
 
 int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)

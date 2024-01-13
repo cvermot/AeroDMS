@@ -702,7 +702,7 @@ void AeroDms::enregistrerUneFacture()
             nomDeLaFacture.append(".facture.");
             nomDeLaFacture.append(QString::number(idFactureBdd));
             nomDeLaFacture.append(".pdf");
-            QString cheminComplet = cheminStockageFacturesTraitees;
+            QString cheminComplet = cheminStockageFacturesTraitees + "/";
             cheminComplet.append(nomDeLaFacture);
             QFile gestionnaireDeFichier;
             if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
@@ -1137,7 +1137,7 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
         menuClicDroitVol.addAction(&editerLeVol);
         //TODO : pour le moment fonction non disponible : on desactive le bouton
-        editerLeVol.setEnabled(false);
+        //editerLeVol.setEnabled(false);
 
         QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), "Supprimer le vol", this);
         connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
@@ -1152,7 +1152,24 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
 
 void AeroDms::editerVol()
 {
-    //TODO
+    //On récupère le nom de la facture associée et on la charge
+    const QString cheminComplet = cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer.toInt());
+    chargerUneFacture(cheminComplet);
+    qDebug() << cheminComplet;
+
+    //On indique que c'est une facture déjà en BDD
+
+    //On récupère les infos du vol pour les réintegrer dans l'IHM
+    const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer.toInt());
+    choixPilote->setCurrentIndex(listeDeroulantePilote->findData(vol.idPilote));
+    typeDeVol->setCurrentIndex(typeDeVol->findText(vol.typeDeVol));
+    dateDuVol->setDate(vol.date);
+    QStringList hhmm = vol.duree.split("h");
+    dureeDuVol->setTime(QTime(hhmm.at(0).toInt(), hhmm.at(1).toInt(),0));
+    prixDuVol->setValue(vol.coutVol);
+    choixBalade->setCurrentIndex(choixBalade->findData(vol.baladeId));
+    remarqueVol->setText(vol.remarque);
+    
 }
 
 void AeroDms::supprimerVol()

@@ -87,6 +87,7 @@ public:
     AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
     AeroDmsTypes::ListeVols recupererVols( const int p_annee = -1, 
                                            const QString p_piloteId = "*");
+    AeroDmsTypes::Vol recupererVol(const int p_idVol);
 
     QStringList recupererListeFacturesAssocieeASubvention(const AeroDmsTypes::DemandeRemboursement p_demande);
 
@@ -100,6 +101,7 @@ public:
     AeroDmsTypes::ListeSortie recupererListeDepensesPouvantAvoirUneFacture();
     QString recupererAeroclub(const QString p_piloteId);
     QString recupererNomPrenomPilote(const QString p_piloteId);
+    QString recupererNomFacture(const int p_volId);
 
     int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);
     

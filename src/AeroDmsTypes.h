@@ -123,6 +123,7 @@ public:
         float coutVol;
         float montantRembourse;
         int volId;
+        int baladeId;
     };
     typedef QList<Vol> ListeVols;
 
