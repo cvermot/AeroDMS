@@ -115,9 +115,10 @@ private:
     QAction* boutonModeDebug;
 
     //Données internes
-    QString piloteAEditer;
-    QString volAEditer;
-    int factureIdEnBdd;
+    QString piloteAEditer = "";
+    int volAEditer = -1;
+    bool volPartiellementEditable = false;
+    int factureIdEnBdd = 0;
 
     //Statistiques
     StatistiqueWidget* m_activeWidget = nullptr;

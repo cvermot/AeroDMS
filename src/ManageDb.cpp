@@ -430,10 +430,27 @@ void ManageDb::enregistrerUnVolSortieOuBalade(const QString& p_piloteId,
     const float p_montantSubventionne,
     const int p_facture,
     const int p_idSortie,
-    const QString& p_remarque)
+    const QString& p_remarque,
+    const int p_idVolAEditer)
 {
     QSqlQuery query;
-    query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','sortie','remarque') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:sortie,:remarque)");
+    //Si on est sur un ajout
+    if (p_idVolAEditer == -1)
+    {
+        query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','remarque') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:remarque)");
+        //Si on est sur une sortie, on la renseigne
+        if (p_idSortie != -1)
+            query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','sortie','remarque') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:sortie,:remarque)");
+    }
+    //Sinon, un numéro de vol est renseigné : on est en édition
+    else
+    {
+        query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque WHERE volId = :volId");
+        if (p_idSortie != -1)
+            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque,'sortie' = :sortie WHERE volId = :volId");
+        query.bindValue(":volId", p_idVolAEditer);
+    }
+    
     query.bindValue(":typeDeVol", p_typeDeVol);
     query.bindValue(":pilote", p_piloteId);
     query.bindValue(":date", p_date.toString("yyyy-MM-dd"));
@@ -447,11 +464,11 @@ void ManageDb::enregistrerUnVolSortieOuBalade(const QString& p_piloteId,
     query.exec();
 }
 
-bool ManageDb::supprimerUnVol(const QString p_volAEditer)
+bool ManageDb::supprimerUnVol(const int p_volAEditer)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM 'xAssociationRecette-Vol' WHERE volId = :volId");
-    query.bindValue(":volId", p_volAEditer);
+    query.bindValue(":volId", QString::number(p_volAEditer));
     query.exec();
     if (query.next())
     {

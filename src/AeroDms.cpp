@@ -411,7 +411,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Initialisation des autres attributs
     piloteAEditer = "";
-    volAEditer = "";
+    volAEditer = -1;
     factureIdEnBdd = 0;
 
     peuplerListesPilotes();
@@ -635,6 +635,10 @@ void AeroDms::selectionnerUneFacture()
     if (!fichier.isNull())
     {
         chargerUneFacture(fichier);
+        //Si on passe ici, on est pas en édition de vol
+        volAEditer = -1;
+        //On restaure le texte du bouton de validation (qui a changé si on était en édition)
+        validerLeVol->setText("Valider le vol");
     }
 }
 
@@ -645,7 +649,18 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     pdfDocument->load(p_fichier);
 
     choixPilote->setEnabled(true);
+    dureeDuVol->setEnabled(true);
+    prixDuVol->setEnabled(true);
+    choixBalade->setEnabled(true);
+    typeDeVol->setEnabled(true);
+
     choixPilote->setCurrentIndex(0);
+    dureeDuVol->setTime(QTime::QTime(0, 0));
+    prixDuVol->setValue(0);
+    remarqueVol->clear();
+    typeDeVol->setCurrentIndex(2);
+    choixBalade->setCurrentIndex(0);
+    
     //On affiche le widget qui contient la fonction d'ajout de vol
     mainTabWidget->setCurrentIndex(2);
 }
@@ -750,7 +765,6 @@ void AeroDms::enregistrerUneFacture()
     } 
 }
 
-
 void AeroDms::enregistrerUnVol()
 {
     bool estEnEchec = false;
@@ -836,20 +850,21 @@ void AeroDms::enregistrerUnVol()
 				}
                 
 
-				db->enregistrerUnVolDEntrainement(idPilote,
+				/*db->enregistrerUnVolSortieOuBalade(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
 					dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
 					prixDuVol->value(),
 					montantSubventionne,
 					factureIdEnBdd,
-					remarqueVol->text());
+                    choixBalade->currentData().toInt(),
+					remarqueVol->text());*/
 
 				subventionRestante = subventionRestante - montantSubventionne;
 			}
 			//Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
-			else
-			{
+			//else
+			//{
 				db->enregistrerUnVolSortieOuBalade(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
@@ -858,11 +873,11 @@ void AeroDms::enregistrerUnVol()
 					montantSubventionne,
 					factureIdEnBdd,
 					choixBalade->currentData().toInt(),
-					remarqueVol->text());
+					remarqueVol->text(),
+                    volAEditer);
 
-				//On met a jour la liste des vols balades/sorties dans l'onglet des recettes
-				peuplerListeBaladesEtSorties();
-			}
+				
+			//}
 
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
@@ -883,6 +898,15 @@ void AeroDms::enregistrerUnVol()
             dureeDuVol->setTime(QTime::QTime(0, 0));
             prixDuVol->setValue(0);
             remarqueVol->clear();
+
+            //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
+            typeDeVol->setEnabled(true);
+            choixBalade->setEnabled(true);
+            dureeDuVol->setEnabled(true);
+            prixDuVol->setEnabled(true);
+
+            //On sort du mode édition, si on y etait...
+            volAEditer = -1;
         }
         else
         {
@@ -892,9 +916,14 @@ void AeroDms::enregistrerUnVol()
     //On met à jour la table des pilotes et celle des vols
     peuplerTablePilotes();
     peuplerTableVols();
+    //On met a jour la liste des vols balades/sorties dans l'onglet des recettes
+    peuplerListeBaladesEtSorties();
 
     //Et l'affichage des statistiques
     peuplerStatistiques();
+
+    //On restaure le texte du bouton de validation (qui a changé si on était en édition)
+    validerLeVol->setText("Valider le vol");
 }
 
 void AeroDms::enregistrerUneRecette()
@@ -1127,11 +1156,11 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
     {
         QMenu menuClicDroitVol(tr("Menu contextuel"), this);
         const int ligneSelectionnee = vueVols->itemAt(pos)->row();
-        volAEditer = vueVols->item( ligneSelectionnee,
-                                    AeroDmsTypes::VolTableElement_VOL_ID)->text();
+        volAEditer = (vueVols->item( ligneSelectionnee,
+                                    AeroDmsTypes::VolTableElement_VOL_ID)->text()).toInt();
 
         const bool leVolEstSupprimable = (vueVols->item(ligneSelectionnee, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text() == "Non");
-
+        volPartiellementEditable = !leVolEstSupprimable;
 
         QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Editer le vol", this);
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
@@ -1153,22 +1182,43 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
 void AeroDms::editerVol()
 {
     //On récupère le nom de la facture associée et on la charge
-    const QString cheminComplet = cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer.toInt());
+    const QString cheminComplet = cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer);
     chargerUneFacture(cheminComplet);
     qDebug() << cheminComplet;
 
     //On indique que c'est une facture déjà en BDD
 
     //On récupère les infos du vol pour les réintegrer dans l'IHM
-    const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer.toInt());
+    const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer);
     choixPilote->setCurrentIndex(listeDeroulantePilote->findData(vol.idPilote));
+    choixPilote->setEnabled(false);
+
+    //Type de vol jamais éditable
     typeDeVol->setCurrentIndex(typeDeVol->findText(vol.typeDeVol));
+    typeDeVol->setEnabled(false);
+
     dateDuVol->setDate(vol.date);
+
     QStringList hhmm = vol.duree.split("h");
     dureeDuVol->setTime(QTime(hhmm.at(0).toInt(), hhmm.at(1).toInt(),0));
+
     prixDuVol->setValue(vol.coutVol);
+
     choixBalade->setCurrentIndex(choixBalade->findData(vol.baladeId));
+    choixBalade->setEnabled(false);
+
     remarqueVol->setText(vol.remarque);
+
+    //Si le vol est déjà soumis au CE, on ne peut plus modifier les temps de vol et le coût du vol :
+    //(modifierait des montants de subventions déjà soumises au CE)
+    //On va chercher cette infos dans la table des vol
+    if (volPartiellementEditable)
+    {
+        dureeDuVol->setEnabled(false);
+        prixDuVol->setEnabled(false);
+    }
+
+    validerLeVol->setText("Modifier le vol");
     
 }
 
@@ -1205,6 +1255,9 @@ void AeroDms::supprimerVol()
         }
         break;
     }
+
+    //On sort du mode suppression de vol
+    volAEditer = -1;
 }
 
 void AeroDms::switchModeDebug()
