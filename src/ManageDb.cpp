@@ -399,30 +399,7 @@ float ManageDb::recupererSubventionRestante( const QString& p_piloteId,
     return montantAlloue - query.value(0).toFloat();
 }
 
-void ManageDb::enregistrerUnVolDEntrainement( const QString& p_piloteId,
-                                              const QString& p_typeDeVol,
-                                              const QDate& p_date,
-                                              const int p_dureeEnMinutes,
-                                              const float p_cout,
-                                              const float p_montantSubventionne,
-                                              const int p_facture,
-                                              const QString& p_remarque)
-{
-    QSqlQuery query;
-    query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','remarque') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:remarque)");
-    query.bindValue(":typeDeVol", p_typeDeVol);
-    query.bindValue(":pilote", p_piloteId);
-    query.bindValue(":date", p_date.toString("yyyy-MM-dd"));
-    query.bindValue(":duree", p_dureeEnMinutes);
-    query.bindValue(":cout", p_cout);
-    query.bindValue(":montantRembourse", p_montantSubventionne);
-    query.bindValue(":facture", p_facture);
-    query.bindValue(":remarque", p_remarque);
-
-    query.exec();
-}
-
-void ManageDb::enregistrerUnVolSortieOuBalade(const QString& p_piloteId,
+void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     const QString& p_typeDeVol,
     const QDate& p_date,
     const int p_dureeEnMinutes,

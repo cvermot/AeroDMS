@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("1.6");
+    QApplication::setApplicationVersion("1.7");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -865,7 +865,7 @@ void AeroDms::enregistrerUnVol()
 			//Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
 			//else
 			//{
-				db->enregistrerUnVolSortieOuBalade(idPilote,
+				db->enregistrerUnVol(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
 					dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
@@ -1139,7 +1139,6 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         menuClicDroitPilote.addAction(&editer);
 
         //Afficher le menu sur la vue des pilotes
-        //menuClicDroitPilote.exec(vuePilotes->mapToGlobal(pos));
         menuClicDroitPilote.exec(vuePilotes->mapToParent(QCursor::pos()));
     }
 }
@@ -1165,8 +1164,6 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Editer le vol", this);
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
         menuClicDroitVol.addAction(&editerLeVol);
-        //TODO : pour le moment fonction non disponible : on desactive le bouton
-        //editerLeVol.setEnabled(false);
 
         QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), "Supprimer le vol", this);
         connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
@@ -1174,7 +1171,6 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         supprimerLeVol.setEnabled(leVolEstSupprimable);
 
         //Afficher le menu sur la vue des vols
-        //menuClicDroitVol.exec(vueVols->mapToGlobal(pos));
         menuClicDroitVol.exec(vueVols->mapToParent(QCursor::pos()));
     }
 }

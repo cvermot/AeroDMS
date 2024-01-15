@@ -40,15 +40,7 @@ public:
     float recupererSubventionRestante( const QString& piloteId, 
                                        const int annee);
 
-    void enregistrerUnVolDEntrainement( const QString &p_piloteId, 
-                                        const QString &typeDeVol,
-                                        const QDate &p_date, 
-                                        const int p_dureeEnMinutes,
-                                        const float p_cout, 
-                                        const float p_montantSubventionne, 
-                                        const int p_facture,
-                                        const QString& p_remarque);
-    void enregistrerUnVolSortieOuBalade( const QString& p_piloteId,
+    void enregistrerUnVol( const QString& p_piloteId,
                                          const QString& p_typeDeVol,
                                          const QDate& p_date,
                                          const int p_dureeEnMinutes,
