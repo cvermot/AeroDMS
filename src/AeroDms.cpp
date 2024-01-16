@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDmsTypes.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
+#include "StatistiqueDiagrammeCirculaireWidget.h"
 
 #include <QtWidgets>
 #include <QToolBar>
@@ -89,7 +90,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
     parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
-
 
     db = new ManageDb(database);
     pdf = new PdfRenderer( db, 
@@ -370,6 +370,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     SelectionToolBar->addWidget(listeDeroulantePilote);
 
+    listeDeroulanteStatistique = new QComboBox(this);
+    listeDeroulanteStatistique->addItem("Statistiques mensuelles", 1);
+    listeDeroulanteStatistique->addItem("Statistiques par pilote", 2);
+    connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
+    SelectionToolBar->addWidget(listeDeroulanteStatistique);
+
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
@@ -424,8 +430,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
     peuplerStatistiques();
-
-    
 }
 
 void AeroDms::initialiserOngletGraphiques()
@@ -443,7 +447,19 @@ void AeroDms::peuplerStatistiques()
         m_activeWidget->deleteLater();
     }
 
-    m_activeWidget = new StatistiqueHistogrammeEmpile(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
+    switch (listeDeroulanteStatistique->currentData().toInt())
+    {
+        case 1:
+        {
+            m_activeWidget = new StatistiqueHistogrammeEmpile(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
+            break;
+        }
+        case 2:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
+            break;
+        }
+    }
     graphiques->addWidget(m_activeWidget);
 
     m_activeWidget->load();

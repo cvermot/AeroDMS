@@ -114,6 +114,18 @@ FROM vol
 GROUP BY mois, typeDeVol
 ORDER BY annee, mois;
 
+-- View: stats_heuresDeVolParPilote
+CREATE VIEW IF NOT EXISTS stats_heuresDeVolParPilote AS SELECT 
+vol.pilote,
+pilote.nom,
+pilote.prenom,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+GROUP BY pilote, annee
+ORDER BY pilote, annee;
+
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 
 pilote, 

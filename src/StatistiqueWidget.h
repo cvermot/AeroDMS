@@ -15,7 +15,7 @@ class StatistiqueWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit StatistiqueWidget(ManageDb* p_db, QWidget* parent = nullptr);
+    explicit StatistiqueWidget(QWidget* parent = nullptr);
 
     void load();
 

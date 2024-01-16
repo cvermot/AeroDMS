@@ -149,15 +149,19 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.prenom = query.value("prenom").toString();
         subvention.aeroclub = query.value("aeroclub").toString();
         subvention.sortie.heuresDeVol = "0h00";
+        subvention.sortie.tempsDeVolEnMinutes = 0;
         subvention.sortie.montantRembourse = 0;
         subvention.sortie.coutTotal = 0;
         subvention.entrainement.heuresDeVol = "0h00";
+        subvention.entrainement.tempsDeVolEnMinutes = 0;
         subvention.entrainement.montantRembourse = 0;
         subvention.entrainement.coutTotal = 0;
         subvention.balade.heuresDeVol = "0h00";
+        subvention.balade.tempsDeVolEnMinutes = 0;
         subvention.balade.montantRembourse = 0;
         subvention.balade.coutTotal = 0;
         subvention.totaux.heuresDeVol = "0h00";
+        subvention.totaux.tempsDeVolEnMinutes = 0;
         subvention.totaux.montantRembourse = 0;
         subvention.totaux.coutTotal = 0;
 
@@ -177,18 +181,21 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
             if (queryVolAnneePilote.value("typeDeVol").toString() == "Entrainement")
             {
                 subvention.entrainement.heuresDeVol = convertirMinutesEnHeuresMinutes(queryVolAnneePilote.value("tempsDeVol").toInt());
+                subvention.entrainement.tempsDeVolEnMinutes = queryVolAnneePilote.value("tempsDeVol").toInt();
                 subvention.entrainement.montantRembourse = queryVolAnneePilote.value("montantRembourse").toFloat();
                 subvention.entrainement.coutTotal = queryVolAnneePilote.value("cout").toFloat();
             }
             else if (queryVolAnneePilote.value("typeDeVol").toString() == "Sortie")
             {
                 subvention.sortie.heuresDeVol = convertirMinutesEnHeuresMinutes(queryVolAnneePilote.value("tempsDeVol").toInt());
+                subvention.sortie.tempsDeVolEnMinutes = queryVolAnneePilote.value("tempsDeVol").toInt();
                 subvention.sortie.montantRembourse = queryVolAnneePilote.value("montantRembourse").toFloat();
                 subvention.sortie.coutTotal = queryVolAnneePilote.value("cout").toFloat();
             }
             else if (queryVolAnneePilote.value("typeDeVol").toString() == "Balade")
             {
                 subvention.balade.heuresDeVol = convertirMinutesEnHeuresMinutes(queryVolAnneePilote.value("tempsDeVol").toInt());
+                subvention.balade.tempsDeVolEnMinutes = queryVolAnneePilote.value("tempsDeVol").toInt();
                 subvention.balade.montantRembourse = queryVolAnneePilote.value("montantRembourse").toFloat();
                 subvention.balade.coutTotal = queryVolAnneePilote.value("cout").toFloat();
             }

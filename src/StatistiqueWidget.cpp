@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-StatistiqueWidget::StatistiqueWidget(ManageDb* p_db, QWidget* parent)
+StatistiqueWidget::StatistiqueWidget(QWidget* parent)
     : QWidget(parent)
 {
 }

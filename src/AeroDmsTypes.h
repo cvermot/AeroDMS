@@ -97,6 +97,7 @@ public:
         float montantRembourse;
         float coutTotal;
         QString heuresDeVol;
+        int tempsDeVolEnMinutes;
     };
     struct SubventionsParPilote {
         QString idPilote;
@@ -186,6 +187,19 @@ public:
         float plafondHoraireRemboursementEntrainement;
         QString nomTresorier;
     };
+
+    inline static const QString convertirMinutesEnHeuresMinutes(const int p_minutes)
+    {
+        const int heures = p_minutes / 60;
+        const int minutes = p_minutes % 60;
+        QString minutesString = QString::number(minutes);
+        if (minutesString.size() == 1)
+        {
+            minutesString = QString("0").append(minutesString);
+        }
+        QString heuresMinutes = QString::number(heures).append("h").append(minutesString);
+        return heuresMinutes;
+    }
 
 };
 

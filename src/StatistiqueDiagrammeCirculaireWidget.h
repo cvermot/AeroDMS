@@ -1,0 +1,17 @@
+// Copyright (C) 2023 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+
+#ifndef PIEDRILLDOWNWIDGET_H
+#define PIEDRILLDOWNWIDGET_H
+
+#include "StatistiqueWidget.h"
+#include "ManageDb.h"
+
+class StatistiqueDiagrammeCirculaireWidget : public StatistiqueWidget
+{
+    Q_OBJECT
+public:
+    explicit StatistiqueDiagrammeCirculaireWidget(ManageDb* p_db, int p_annee, QWidget* parent = nullptr);
+};
+
+#endif

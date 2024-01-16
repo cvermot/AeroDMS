@@ -100,6 +100,7 @@ private:
 
     QComboBox* listeDeroulanteAnnee;
     QComboBox* listeDeroulantePilote;
+    QComboBox* listeDeroulanteStatistique;
 
     QString cheminStockageFacturesTraitees;
     QString cheminStockageFacturesATraiter;
