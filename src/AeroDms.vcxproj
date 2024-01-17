@@ -91,6 +91,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AeroDmsServices.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaireWidget.cpp" />
@@ -111,6 +112,7 @@
     <QtMoc Include="ManageDb.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AeroDmsServices.h" />
     <ClInclude Include="AeroDmsTypes.h" />
     <QtMoc Include="StatistiqueHistogrammeEmpile.h" />
     <QtMoc Include="StatistiqueWidget.h" />

@@ -3,6 +3,7 @@
 
 #include "StatistiqueDiagrammeCirculairePartie.h"
 #include "AeroDmsTypes.h"
+#include "AeroDmsServices.h"
 
 StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, QAbstractSeries* drilldownSeries)
     : m_drilldownSeries(drilldownSeries),
@@ -27,7 +28,7 @@ QAbstractSeries* StatistiqueDiagrammeCirculairePartie::drilldownSeries() const
 void StatistiqueDiagrammeCirculairePartie::updateLabel()
 {
     setLabel(QStringLiteral("%1 : %2, %3%").arg(m_prefix,
-        AeroDmsTypes::convertirMinutesEnHeuresMinutes(value()),
+        AeroDmsServices::convertirMinutesEnHeuresMinutes(value()),
         QString::number(percentage() * 100, 'f', 1)));
 }
 
