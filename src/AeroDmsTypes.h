@@ -68,6 +68,12 @@ public:
         PdfTypeDeDemande_FACTURE
     };
 
+    enum Statistiques {
+        Statistiques_HEURES_ANNUELLES,
+        Statistiques_HEURES_PAR_PILOTE,
+        Statistiques_HEURES_PAR_TYPE_DE_VOL
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande;
         QString idPilote;

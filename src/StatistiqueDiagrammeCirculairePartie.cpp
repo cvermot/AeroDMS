@@ -9,6 +9,10 @@ StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal
     m_prefix(prefix)
 {
     setValue(value);
+    if (value != 0)
+    {
+        setLabelVisible(true);
+    }  
     updateLabel();
     setLabelFont(QFont("Arial", 8));
     connect(this, &StatistiqueDiagrammeCirculairePartie::percentageChanged, this, &StatistiqueDiagrammeCirculairePartie::updateLabel);
@@ -29,6 +33,6 @@ void StatistiqueDiagrammeCirculairePartie::updateLabel()
 
 void StatistiqueDiagrammeCirculairePartie::showHighlight(bool show)
 {
-    setLabelVisible(show);
+    //setLabelVisible(show);
     setExploded(show);
 }

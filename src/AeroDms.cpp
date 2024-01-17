@@ -357,24 +357,25 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
 
-    QToolBar* SelectionToolBar = addToolBar(tr(""));
+    QToolBar* selectionToolBar = addToolBar(tr(""));
 
     listeDeroulanteAnnee = new QComboBox(this);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
-    SelectionToolBar->addWidget(listeDeroulanteAnnee);
+    selectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
-    SelectionToolBar->addWidget(listeDeroulantePilote);
+    selectionToolBar->addWidget(listeDeroulantePilote);
 
     listeDeroulanteStatistique = new QComboBox(this);
-    listeDeroulanteStatistique->addItem("Statistiques mensuelles", 1);
-    listeDeroulanteStatistique->addItem("Statistiques par pilote", 2);
+    listeDeroulanteStatistique->addItem("Statistiques mensuelles", AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
+    listeDeroulanteStatistique->addItem("Statistiques par pilote", AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
+    listeDeroulanteStatistique->addItem("Statistiques par type de vol", AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
-    SelectionToolBar->addWidget(listeDeroulanteStatistique);
+    selectionToolBar->addWidget(listeDeroulanteStatistique);
 
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
@@ -449,14 +450,20 @@ void AeroDms::peuplerStatistiques()
 
     switch (listeDeroulanteStatistique->currentData().toInt())
     {
-        case 1:
+        case AeroDmsTypes::Statistiques_HEURES_ANNUELLES:
         {
             m_activeWidget = new StatistiqueHistogrammeEmpile(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
             break;
         }
-        case 2:
+        case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
+        default:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, m_contentArea);
             break;
         }
     }
@@ -667,7 +674,6 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     choixPilote->setEnabled(true);
     dureeDuVol->setEnabled(true);
     prixDuVol->setEnabled(true);
-    choixBalade->setEnabled(true);
     typeDeVol->setEnabled(true);
 
     choixPilote->setCurrentIndex(0);
@@ -917,7 +923,6 @@ void AeroDms::enregistrerUnVol()
 
             //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
             typeDeVol->setEnabled(true);
-            choixBalade->setEnabled(true);
             dureeDuVol->setEnabled(true);
             prixDuVol->setEnabled(true);
 

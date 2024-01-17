@@ -11,7 +11,7 @@ class StatistiqueDiagrammeCirculaireWidget : public StatistiqueWidget
 {
     Q_OBJECT
 public:
-    explicit StatistiqueDiagrammeCirculaireWidget(ManageDb* p_db, int p_annee, QWidget* parent = nullptr);
+    explicit StatistiqueDiagrammeCirculaireWidget(ManageDb* p_db, const int p_annee, const AeroDmsTypes::Statistiques p_statistique, QWidget* parent = nullptr);
 };
 
 #endif
