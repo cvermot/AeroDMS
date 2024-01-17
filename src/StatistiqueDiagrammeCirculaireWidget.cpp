@@ -14,7 +14,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
     : StatistiqueWidget(parent)
 {
     auto* chart = new StatistiqueDiagrammeCirculaire;
-    chart->setTheme(QChart::ChartThemeBlueNcs);
+    chart->setTheme(QChart::ChartThemeLight);
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignRight);
