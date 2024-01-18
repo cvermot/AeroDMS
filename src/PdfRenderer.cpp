@@ -165,8 +165,10 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 
 void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 {
+    //On attend 200 ms pour tenter de résoudre un soucis de génération en double de certains fichiers issus du template
+    //=> hypothèse : la BDD est lue avant d'être vraiment à jour. A consolider par essais dans l'environnement de prod
+    QThread::msleep(200);
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
-    //QFile f("./ressources/HTML/COMPTA_2023.htm");
     QFile f(QString(ressourcesHtml.toLocalFile()).append("COMPTA_2023.htm"));
     QString templateCeTmp = "";
     if (f.open(QFile::ReadOnly | QFile::Text))
