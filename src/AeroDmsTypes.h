@@ -54,6 +54,20 @@ public:
         VolTableElement_NB_COLONNES = 0x9,
     };
 
+    enum FactureTableElement {
+        FactureTableElement_INTITULE = 0x0,
+        FactureTableElement_MONTANT = 0x1,
+        FactureTableElement_PAYEUR = 0x2,
+        FactureTableElement_NOM_SORTIE = 0x3,
+        FactureTableElement_TYPE_SORTIE = 0x4,
+        FactureTableElement_DATE = 0x5,
+        FactureTableElement_ANNEE = 0x6,
+        FactureTableElement_NOM_FACTURE = 0x7,
+        FactureTableElement_SOUMIS_CE = 0x8,
+        FactureTableElement_FACTURE_ID = 0x9,
+        FactureTableElement_NB_COLONNES = 0xA,
+    };
+
     enum ResultatCreationPilote {
         ResultatCreationPilote_SUCCES = 0x0,
         ResultatCreationPilote_PILOTE_EXISTE = 0x1,
@@ -172,7 +186,9 @@ public:
         QString payeur;
         QString nomSortie;
         QString typeDeSortie;
+        QDate date;
         int annee;
+        bool soumisCe;
         QString nomFacture;
     };
     typedef QList<DemandeRemboursementFacture> ListeDemandeRemboursementFacture;

@@ -134,6 +134,26 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
     connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
 
+    //==========Onglet Factures
+    vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);;
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem("Payeur"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_SORTIE, new QTableWidgetItem("Nom sortie"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_TYPE_SORTIE, new QTableWidgetItem("Type de dépense"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_DATE, new QTableWidgetItem("Date"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_ANNEE, new QTableWidgetItem("Année"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_FACTURE, new QTableWidgetItem("Nom facture"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem("Facture ID"));
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
+    vueFactures->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueFactures->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vueFactures->setContextMenuPolicy(Qt::CustomContextMenu);
+    mainTabWidget->addTab(vueFactures, QIcon("./ressources/file-document.svg"), "Factures");
+
     //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
     QWidget* widgetAjoutVol = new QWidget(this);
@@ -426,6 +446,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerListeBaladesEtSorties();
     peuplerTablePilotes();
     peuplerTableVols();
+    peuplerTableFactures();
     peuplerListeDeroulanteAnnee();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
@@ -551,6 +572,30 @@ void AeroDms::peuplerTableVols()
     {
         bouttonGenerePdfRecapHdv->setEnabled(false);
     }
+}
+
+void AeroDms::peuplerTableFactures()
+{
+    const AeroDmsTypes::ListeDemandeRemboursementFacture listeFactures = db->recupererToutesLesDemandesDeRemboursement(listeDeroulanteAnnee->currentData().toInt());
+    vueFactures->setRowCount(listeFactures.size());
+    for (int i = 0; i < listeFactures.size(); i++)
+    {
+        const AeroDmsTypes::DemandeRemboursementFacture facture = listeFactures.at(i);
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem(facture.intitule));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant).append(" €")));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem(facture.payeur));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_NOM_SORTIE, new QTableWidgetItem(facture.nomSortie));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_TYPE_SORTIE, new QTableWidgetItem(facture.typeDeSortie));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_DATE, new QTableWidgetItem(facture.date.toString("dd/MM/yyyy")));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_ANNEE, new QTableWidgetItem(QString::number(facture.annee)));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_NOM_FACTURE, new QTableWidgetItem(facture.nomFacture));
+        if(facture.soumisCe)
+            vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_SOUMIS_CE, new QTableWidgetItem("Oui"));
+        else
+            vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_SOUMIS_CE, new QTableWidgetItem("Non"));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem(QString::number(facture.id)));
+    }
+    vueFactures->resizeColumnsToContents();
 }
 
 void AeroDms::peuplerListeDeroulanteAnnee()
@@ -684,7 +729,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     choixBalade->setCurrentIndex(0);
     
     //On affiche le widget qui contient la fonction d'ajout de vol
-    mainTabWidget->setCurrentIndex(2);
+    mainTabWidget->setCurrentIndex(3);
 }
 
 void AeroDms::genererPdf()
@@ -784,7 +829,9 @@ void AeroDms::enregistrerUneFacture()
         {
             statusBar()->showMessage("Erreur ajout");
         }
-    } 
+    }
+    //On met à jour la vue
+    peuplerTableFactures();
 }
 
 void AeroDms::enregistrerUnVol()
@@ -1127,7 +1174,7 @@ void AeroDms::aPropos()
     QMessageBox::about(this, tr("À propos de AeroDms"),
         "<b>AeroDms v"+QApplication::applicationVersion() + "</b> < br />< br /> "
         "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
-        "Le code source de ce programme est disponible sous GitHub"
+        "Le code source de ce programme est disponible sous"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
         "Les icones sont issues de <a href=\"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
         "Mentions légales : <br />"
@@ -1286,6 +1333,9 @@ void AeroDms::switchModeDebug()
         boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
         vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, false);
         vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, false);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, false);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, false);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, false);
     }
     //Sinon, le mode est actif, on desactive
     else
@@ -1294,6 +1344,10 @@ void AeroDms::switchModeDebug()
         boutonModeDebug->setIcon(QIcon("./ressources/bug.svg"));
         vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
         vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
+        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
     }
 }
+
 

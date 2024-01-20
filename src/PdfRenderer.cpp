@@ -165,9 +165,6 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 
 void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 {
-    //On attend 200 ms pour tenter de résoudre un soucis de génération en double de certains fichiers issus du template
-    //=> hypothèse : la BDD est lue avant d'être vraiment à jour. A consolider par essais dans l'environnement de prod
-    QThread::msleep(200);
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
     QFile f(QString(ressourcesHtml.toLocalFile()).append("COMPTA_2023.htm"));
     QString templateCeTmp = "";
@@ -194,6 +191,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     const AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
     const AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
     const AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
+
+    qDebug() << "Nombre cotisations" << listeDesCotisations.size();
+    qDebug() << "Nombre balades/sorties" << listeDesRecettesBaladesSorties.size();
 
     //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)

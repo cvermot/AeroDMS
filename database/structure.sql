@@ -59,6 +59,24 @@ WHERE
       recettes.identifiantFormulaireSoumissionCe IS NULL
 ORDER BY cotisation.annee;
 
+-- View: factures
+CREATE VIEW IF NOT EXISTS factures AS SELECT 
+facturesSorties.id, 
+facturesSorties.intitule, 
+facturesSorties.montant, 
+pilote.nom, 
+pilote.prenom, 
+sortie.nom AS nomSortie, 
+sortie.typeDeDepense ,
+facturesSorties.date,
+strftime('%Y', facturesSorties.date) AS annee,
+fichiersFacture.nomFichier AS nomFacture,
+facturesSorties.demandeRemboursement
+FROM facturesSorties
+INNER JOIN pilote ON facturesSorties.payeur = pilote.piloteId
+INNER JOIN sortie ON facturesSorties.sortie = sortie.sortieId
+INNER JOIN fichiersFacture ON facturesSorties.facture = fichiersFacture.factureId;
+
 -- View: facturesARembourser
 CREATE VIEW IF NOT EXISTS facturesARembourser AS SELECT 
 facturesSorties.id, 

@@ -19,9 +19,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDms.h"
 #include <QtWidgets/QApplication>
 
+//Debug
+QtMessageHandler originalHandler = nullptr;
+
+void logToFile(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    QString message = qFormatLogMessage(type, context, msg);
+    static FILE* f = fopen("log.txt", "a");
+    fprintf(f, "%s\n", qPrintable(message));
+    fflush(f);
+
+    if (originalHandler)
+        originalHandler(type, context, msg);
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    originalHandler = qInstallMessageHandler(logToFile);
 
     QTranslator* translator = new QTranslator();
     if (translator->load("qt_fr", QCoreApplication::applicationDirPath()+"/translations")) 

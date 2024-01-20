@@ -276,6 +276,7 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
 AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 {
     AeroDmsTypes::Vol vol;
+    qDebug() << "SQL Recuperer vol";
 
     QSqlQuery query;
     query.prepare("SELECT *  FROM vol WHERE volId = :volId");
@@ -333,6 +334,7 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
 
     while (query.next())
     {
+        qDebug() << "SQL Recuperer vols";
         AeroDmsTypes::Vol vol;
         vol.coutVol = query.value("cout").toFloat();
         vol.date = query.value("date").toDate();
@@ -348,7 +350,11 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
         vol.typeDeVol = query.value("typeDeVol").toString();
         vol.volId = query.value("volId").toInt();
         if (!query.value("sortie").isNull())
+        {
+            qDebug() << "Sortie";
             vol.baladeId = query.value("sortie").toInt();
+        }
+            
  
         liste.append(vol);
     }
@@ -614,7 +620,6 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
         query.prepare(QString("SELECT idRecette FROM cotisationsASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
         query.exec();
 
-
         while (query.next())
         {
             QSqlQuery queryCotisation;
@@ -622,6 +627,8 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             queryCotisation.bindValue(":recetteId", query.value(0).toInt());
             queryCotisation.exec();
+            qDebug() << "Update Cotisation : recetteId" << query.value(0).toInt();
+            QThread::msleep(10);
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
@@ -639,6 +646,8 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             querySortie.bindValue(":recetteId", query.value(0).toInt());
             querySortie.exec();
+            qDebug() << "Update Balade/sortie : recetteId" << query.value(0).toInt();
+            QThread::msleep(10);
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_FACTURE)
@@ -703,8 +712,11 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
         recette.intitule.chop(1);
         //... et on ferme la parenthèse
         recette.intitule.append(")");
-        if(recette.intitule != ")")
+        if (recette.intitule != ")")
+        {
+            qDebug() << "Intitule recette Cotisation" << recette.intitule;
             liste.append(recette);
+        }
     }
     return liste;
 }
@@ -723,9 +735,9 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
         recette.intitule = query.value(3).toString();
         recette.annee = query.value(1).toInt();
         recette.montant = query.value(2).toFloat();
+        qDebug() << "Intitule recette balade/sortie" << recette.intitule;
         liste.append(recette);
     }
-
     return liste;
 }
 
@@ -739,10 +751,6 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeR
 
     while (query.next()) {
         AeroDmsTypes::DemandeRemboursementFacture demandeRemboursement;
-        /*demandeRemboursement.typeDeSortie = query.value(0).toString();
-        demandeRemboursement.intitule = query.value(3).toString();
-        demandeRemboursement.annee = query.value(1).toInt();
-        demandeRemboursement.montant = query.value(2).toFloat();*/
         demandeRemboursement.id = query.value(0).toInt();
         demandeRemboursement.intitule = query.value(1).toString();
         demandeRemboursement.montant = query.value(2).toFloat();
@@ -751,6 +759,36 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeR
         demandeRemboursement.typeDeSortie = query.value(6).toString();
         demandeRemboursement.annee = query.value(7).toInt();
         demandeRemboursement.nomFacture = query.value(8).toString();
+        demandeRemboursement.soumisCe = false;
+
+        liste.append(demandeRemboursement);
+    }
+
+    return liste;
+}
+
+AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDemandesDeRemboursement(const int p_annee)
+{
+    //Récupérationd des demandes de remboursement soumises ou non au CSE
+    AeroDmsTypes::ListeDemandeRemboursementFacture liste;
+    QSqlQuery query;
+    query.prepare("SELECT * FROM 'factures'");
+    query.exec();
+
+    while (query.next()) {
+        AeroDmsTypes::DemandeRemboursementFacture demandeRemboursement;
+        demandeRemboursement.id = query.value("id").toInt();
+        demandeRemboursement.intitule = query.value("intitule").toString();
+        demandeRemboursement.montant = query.value("montant").toFloat();
+        demandeRemboursement.payeur = query.value("prenom").toString().append(" ").append(query.value("nom").toString());
+        demandeRemboursement.nomSortie = query.value("nomSortie").toString();
+        demandeRemboursement.typeDeSortie = query.value("typeDeDepense").toString();
+        demandeRemboursement.annee = query.value("annee").toInt();
+        demandeRemboursement.date = query.value("date").toDate();
+        demandeRemboursement.soumisCe = true;
+        if(query.value("demandeRemboursement").isNull())
+            demandeRemboursement.soumisCe = false;
+        demandeRemboursement.nomFacture = query.value("nomFacture").toString();
 
         liste.append(demandeRemboursement);
     }

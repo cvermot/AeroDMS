@@ -72,6 +72,7 @@ private:
 
     QTableWidget* vuePilotes;
     QTableWidget* vueVols;
+    QTableWidget* vueFactures;
 
     //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;
@@ -145,6 +146,7 @@ public slots:
     void ajouterUneCotisationEnBdd();
     void peuplerTablePilotes();
     void peuplerTableVols();
+    void peuplerTableFactures();
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
