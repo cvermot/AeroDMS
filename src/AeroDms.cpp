@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("1.9");
+    QApplication::setApplicationVersion("1.10");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -75,6 +75,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settingsMetier.endGroup();
     }
 
+    if (settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "") == "")
+    {
+        settingsMetier.beginGroup("parametresSysteme");
+        settingsMetier.setValue("delaisDeGardeDbEnMs", "50");
+        settingsMetier.endGroup();
+    }
+
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() + 
         QString("/") + 
         settings.value("baseDeDonnees/nom", "").toString();
@@ -90,8 +97,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
     parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
+    parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
-    db = new ManageDb(database);
+    db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
 

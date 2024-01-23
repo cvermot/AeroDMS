@@ -24,7 +24,10 @@ ManageDb::ManageDb()
 {
 }
 
-ManageDb::ManageDb(const QString &database) {
+ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd) 
+{
+    delaisDeGardeBdd = p_delaisDeGardeBdd;
+
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(
             this,
@@ -276,7 +279,6 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
 AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 {
     AeroDmsTypes::Vol vol;
-    qDebug() << "SQL Recuperer vol";
 
     QSqlQuery query;
     query.prepare("SELECT *  FROM vol WHERE volId = :volId");
@@ -334,7 +336,6 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
 
     while (query.next())
     {
-        qDebug() << "SQL Recuperer vols";
         AeroDmsTypes::Vol vol;
         vol.coutVol = query.value("cout").toFloat();
         vol.date = query.value("date").toDate();
@@ -351,7 +352,6 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
         vol.volId = query.value("volId").toInt();
         if (!query.value("sortie").isNull())
         {
-            qDebug() << "Sortie";
             vol.baladeId = query.value("sortie").toInt();
         }
             
@@ -606,6 +606,8 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     query.next();
     const int idDemandeRemboursement = query.value(0).toInt();
 
+    QThread::msleep(delaisDeGardeBdd);
+
     if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_HEURE_DE_VOL)
     {
         query.prepare("UPDATE vol SET demandeRemboursement = :idDemandeRemboursement WHERE strftime('%Y', vol.date) = :annee AND vol.pilote = :pilote AND vol.typeDeVol = :typeDeVol");
@@ -622,13 +624,12 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
 
         while (query.next())
         {
+            QThread::msleep(delaisDeGardeBdd);
             QSqlQuery queryCotisation;
             queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             queryCotisation.bindValue(":recetteId", query.value(0).toInt());
             queryCotisation.exec();
-            qDebug() << "Update Cotisation : recetteId" << query.value(0).toInt();
-            QThread::msleep(10);
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
@@ -641,13 +642,12 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
 
         while (query.next())
         {
+            QThread::msleep(delaisDeGardeBdd);
             QSqlQuery querySortie;
             querySortie.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             querySortie.bindValue(":recetteId", query.value(0).toInt());
             querySortie.exec();
-            qDebug() << "Update Balade/sortie : recetteId" << query.value(0).toInt();
-            QThread::msleep(10);
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_FACTURE)
@@ -659,6 +659,8 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
         query.bindValue(":id", p_demande.annee);
         query.exec();
     }
+
+    QThread::msleep(delaisDeGardeBdd);
 }
 
 AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
@@ -714,7 +716,6 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
         recette.intitule.append(")");
         if (recette.intitule != ")")
         {
-            qDebug() << "Intitule recette Cotisation" << recette.intitule;
             liste.append(recette);
         }
     }
@@ -735,7 +736,6 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
         recette.intitule = query.value(3).toString();
         recette.annee = query.value(1).toInt();
         recette.montant = query.value(2).toFloat();
-        qDebug() << "Intitule recette balade/sortie" << recette.intitule;
         liste.append(recette);
     }
     return liste;

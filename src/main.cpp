@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    originalHandler = qInstallMessageHandler(logToFile);
+    //originalHandler = qInstallMessageHandler(logToFile);
 
     QTranslator* translator = new QTranslator();
     if (translator->load("qt_fr", QCoreApplication::applicationDirPath()+"/translations")) 

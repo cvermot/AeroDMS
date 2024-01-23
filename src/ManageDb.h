@@ -27,7 +27,7 @@ class ManageDb : public QWidget {
     Q_OBJECT
 
 public:
-    ManageDb(const QString& database);
+    ManageDb(const QString& database, const int p_delaisDeGardeBdd);
     ManageDb();
 
     QString getLastError();
@@ -110,6 +110,7 @@ public slots:
 
 private:
     QSqlDatabase db;
+    int delaisDeGardeBdd = 0;
 
 };
 

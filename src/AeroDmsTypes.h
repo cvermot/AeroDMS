@@ -208,6 +208,7 @@ public:
         float proportionRemboursementBalade;
         float plafondHoraireRemboursementEntrainement;
         QString nomTresorier;
+        int delaisDeGardeBdd;
     };
 
 };
