@@ -97,6 +97,7 @@ public:
         int annee;
         QString nomTresorier;
         QString nomFichier;
+        QStringList listeFactures;
         //int idFacture;
     };
 

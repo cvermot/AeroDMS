@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 #include "PdfRenderer.h"
+#include <podofo/podofo.h>
 
 #include <QFile>
 #include <QPrinter>
@@ -45,6 +46,33 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
 }
 
+void PdfRenderer::mergerPdf()
+{
+    PoDoFo::PdfMemDocument document;
+
+    const QString nomFichier = cheminSortieFichiersGeneres
+        + demandeEnCours.nomFichier;
+    document.Load(nomFichier.toStdString());
+    
+    for (int i = 0; i < demandeEnCours.listeFactures.size(); i++)
+    {
+        const QString nomFacture = repertoireDesFactures
+            + demandeEnCours.listeFactures.at(i);
+        qDebug() << nomFacture;
+        PoDoFo::PdfMemDocument facture;
+        facture.Load(nomFacture.toStdString());
+        document.GetPages().AppendDocumentPages(facture);
+    }
+
+    const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
+    document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
+    document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
+    document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
+    document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
+
+    document.SaveUpdate(nomFichier.toStdString());
+}
+
 QString PdfRenderer::numeroFichierSur3Digits()
 {
     QString numero = QString::number(indiceFichier);
@@ -63,7 +91,11 @@ QString PdfRenderer::numeroFichierSur3Digits()
 
 void PdfRenderer::chargementTermine(bool retour)
 {
-    QString nomFichier = QString(cheminSortieFichiersGeneres).append(numeroFichierSur3Digits()).append(demandeEnCours.nomFichier).append("_").append(QString::number(nombreFacturesTraitees)).append(".pdf");
+    demandeEnCours.nomFichier = numeroFichierSur3Digits()
+        +demandeEnCours.nomFichier
+        +(".pdf");
+    QString nomFichier = cheminSortieFichiersGeneres
+        + demandeEnCours.nomFichier;
 
     //De base le format est portrait
     QPageLayout pageLayout(QPageLayout(QPageSize(QPageSize::A4), QPageLayout::Portrait, QMarginsF()));
@@ -73,12 +105,14 @@ void PdfRenderer::chargementTermine(bool retour)
     }
 
     view->printToPdf(nomFichier, pageLayout);
-    listeDesFichiers.append(nomFichier);
+    listeDesFichiers.append(demandeEnCours.nomFichier);
 }
 
 void PdfRenderer::impressionTerminee( const QString& filePath, 
                                       bool success)
 {
+    mergerPdf();
+
     db->ajouterDemandeCeEnBdd(demandeEnCours);
     emit mettreAJourNombreFacturesTraitees(nombreFacturesTraitees);
 
@@ -134,6 +168,7 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 {
     AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
     demandeEnCours.nomTresorier = p_nomTresorier;
+    demandeEnCours.listeFactures = QStringList();
     listeAnnees = db->recupererAnneesAvecVolNonSoumis();
     nombreFacturesTraitees = 0 ;
     indiceFichier = 0;
@@ -242,7 +277,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
                        ressourcesHtml);
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
-        recopierFactures(facturesAssociees);
         listeDesFichiers.append(facturesAssociees);
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
@@ -252,7 +286,13 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = demande.typeDeVol;
         demandeEnCours.nomBeneficiaire = db->recupererAeroclub(demande.piloteId);
         demandeEnCours.montant = demande.montantARembourser;
-        demandeEnCours.nomFichier = QString(".HdV_").append(demande.piloteId).append("_").append(QString::number(demande.annee));
+        demandeEnCours.nomFichier = ".HdV_"
+            + (demande.typeDeVol) 
+            + "_" 
+            + (demande.piloteId) 
+            + ("_") 
+            + (QString::number(demande.annee));
+        demandeEnCours.listeFactures = facturesAssociees;
 
     }
     //Recettes "Cotisations"
@@ -287,7 +327,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = "Cotisation";
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
-        demandeEnCours.nomFichier = QString(".Cotisations_").append(QString::number(demandeEnCours.annee));
+        demandeEnCours.nomFichier = ".Cotisations_"
+            +(QString::number(demandeEnCours.annee));
+        demandeEnCours.listeFactures = QStringList();
     }
     //Recettes "passagers" des sorties et balades
     else if (listeDesRecettesBaladesSorties.size() > 0)
@@ -322,7 +364,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.typeDeVol = recette.intitule;
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
-        demandeEnCours.nomFichier = QString(".RecetteBalades_").append(QString::number(demandeEnCours.annee));
+        demandeEnCours.nomFichier = ".RecetteBalades_"
+            +(QString::number(demandeEnCours.annee));
+        demandeEnCours.listeFactures = QStringList();
     }
     //Factures payées par les pilotes à rembourser
     else if (listeDesRemboursementsFactures.size() > 0)
@@ -350,7 +394,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         view->setHtml( templateCeTmp,
                        ressourcesHtml);
-        recopierFacture(demandeRembousement.nomFacture);
+        //recopierFacture(demandeRembousement.nomFacture);
         listeDesFichiers.append(QString(repertoireDesFactures).append(demandeRembousement.nomFacture));
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
@@ -361,6 +405,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
         demandeEnCours.montant = demandeRembousement.montant;
         demandeEnCours.nomFichier = QString(".DemandeRemboursementFacturePayeeParPilote");
+        demandeEnCours.listeFactures = QStringList(demandeRembousement.nomFacture);
     }
     else
     {
@@ -448,7 +493,8 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         ressourcesHtml);
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
-    demandeEnCours.nomFichier = QString(".Recap_pilote_").append(QString::number(p_annee));
+    demandeEnCours.nomFichier = ".Recap_pilote_"
+        +(QString::number(p_annee));
 }
 
 void PdfRenderer::produireFichierPdfGlobal()

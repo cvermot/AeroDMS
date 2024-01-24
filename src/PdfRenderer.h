@@ -67,6 +67,8 @@ private :
 	void recopierFactures(const QStringList p_listeFactures);
 	QString numeroFichierSur3Digits();
 
+	void mergerPdf();
+
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);
