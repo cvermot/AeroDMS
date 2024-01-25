@@ -113,6 +113,71 @@ int ManageDb::recupererProchainNumeroFacture()
     return query.value(0).toInt() + 1 ;
 }
 
+AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee)
+{
+    AeroDmsTypes::ListeStatsHeuresDeVolParActivite liste;
+
+    QSqlQuery query;
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM stats_heuresDeVolParPiloteEtParActivite WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT * FROM stats_heuresDeVolParPiloteEtParActivite");
+    }   
+    query.exec();
+
+    AeroDmsTypes::StatsHeuresDeVolParActivite item;
+    item.piloteId = "";
+
+    while (query.next())
+    {
+        if (item.piloteId != query.value("pilote").toString())
+        {
+            //Nouveau pilote, on enregistre, si on est pas sur le premier tour
+            if (item.piloteId != "")
+            {
+                liste.append(item);
+            }
+            //On rince les donnéee
+            item.piloteId = query.value("pilote").toString();
+            item.nomPrenomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
+            item.minutesVolAvion = 0;
+            item.minutesVolUlm = 0;
+            item.minutesVolPlaneur = 0;
+            item.minutesVolHelicoptere = 0;
+        }
+
+        //On complete les données
+        if (query.value("activite").toString() == "Avion")
+        {
+            item.minutesVolAvion = item.minutesVolAvion + query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("activite").toString() == "ULM")
+        {
+            item.minutesVolUlm = item.minutesVolUlm + query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("activite").toString() == "Planeur")
+        {
+            item.minutesVolPlaneur = item.minutesVolPlaneur + query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("activite").toString() == "Hélicoptère")
+        {
+            item.minutesVolHelicoptere = item.minutesVolHelicoptere + query.value("tempsDeVol").toInt();
+        }
+    }
+
+    //On ajoute si on a pas eu une requete vide
+    if (item.piloteId != "")
+    {
+        liste.append(item);
+    }
+
+    return liste;
+}
+
 AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( const int p_annee, 
                                                                                 const QString p_piloteId,
                                                                                 const bool p_volsSoumisUniquement)

@@ -151,6 +151,19 @@ INNER JOIN pilote ON vol.pilote = pilote.piloteId
 GROUP BY pilote, annee
 ORDER BY pilote, annee;
 
+-- View: stats_heuresDeVolParPiloteEtParActivite
+CREATE VIEW IF NOT EXISTS stats_heuresDeVolParPiloteEtParActivite AS SELECT 
+vol.pilote,
+pilote.nom,
+pilote.prenom,
+vol.activite,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+GROUP BY activite, pilote, annee
+ORDER BY nom, prenom, annee;
+
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 
 pilote, 

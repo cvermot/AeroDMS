@@ -19,12 +19,12 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignRight);
 
-    AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
-
     switch (p_statistique)
     {
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         {
+            AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             donneesTypeDeVolParPilote->setName("Temps de vol par pilote (cliquez pour le détail par pilote)");
 
@@ -46,9 +46,62 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
         }
         break;
 
+        case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
+        {
+            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee);
+
+            auto donneesTypeDeVolParPilote = new QPieSeries(this);
+            donneesTypeDeVolParPilote->setName("Temps de vol par activité (cliquez pour le détail des heures par pilote dans l'activité)");
+
+            auto detailAvion = new QPieSeries(this);
+            detailAvion->setName("Avion");
+            auto detailUlm = new QPieSeries(this);
+            detailUlm->setName("ULM");
+            auto detailPlaneur = new QPieSeries(this);
+            detailPlaneur->setName("Planeur");
+            auto detailHelicoptere = new QPieSeries(this);
+            detailHelicoptere->setName("Hélicoptère");
+
+            for (int i = 0; i < subventionParActivite.size(); i++)
+            {
+                *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvion, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
+                *detailUlm << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolUlm, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
+                *detailPlaneur << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolPlaneur, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
+                *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolHelicoptere, subventionParActivite.at(i).nomPrenomPilote, detailHelicoptere);
+            }
+            if (detailAvion->sum() != 0)
+            {
+                QObject::connect(detailAvion, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), "Avion", detailAvion);
+            }
+            if (detailUlm->sum() != 0)
+            {
+                QObject::connect(detailUlm, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), "ULM", detailUlm);
+            }
+            if (detailPlaneur->sum() != 0)
+            {
+                QObject::connect(detailPlaneur, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), "Planeur", detailPlaneur);
+            }
+            if (detailHelicoptere->sum() != 0)
+            {
+                QObject::connect(detailHelicoptere, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), "Hélicoptère", detailHelicoptere);
+            }
+            
+
+            QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+
+            chart->changeSeries(donneesTypeDeVolParPilote);
+        }
+        break;
+
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         default:
         {
+            AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             donneesTypeDeVolParPilote->setName("Temps de vol par type de vol (cliquez pour le détail des heures par pilote dans la catégorie)");
 

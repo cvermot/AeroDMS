@@ -413,6 +413,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     listeDeroulanteStatistique->addItem("Statistiques mensuelles", AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
     listeDeroulanteStatistique->addItem("Statistiques par pilote", AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
     listeDeroulanteStatistique->addItem("Statistiques par type de vol", AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->addItem("Statistiques par activité", AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     selectionToolBar->addWidget(listeDeroulanteStatistique);
 
@@ -492,18 +493,34 @@ void AeroDms::peuplerStatistiques()
     {
         case AeroDmsTypes::Statistiques_HEURES_ANNUELLES:
         {
-            m_activeWidget = new StatistiqueHistogrammeEmpile(db, listeDeroulanteAnnee->currentData().toInt(), m_contentArea);
+            m_activeWidget = new StatistiqueHistogrammeEmpile( db, 
+                                                               listeDeroulanteAnnee->currentData().toInt(), 
+                                                               m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, m_contentArea);
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
+                                                                       listeDeroulanteAnnee->currentData().toInt(), 
+                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, 
+                                                                       m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
+                                                                       listeDeroulanteAnnee->currentData().toInt(), 
+                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
+                                                                       m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         default:
         {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db, listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, m_contentArea);
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
+                                                                       listeDeroulanteAnnee->currentData().toInt(), 
+                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, 
+                                                                       m_contentArea);
             break;
         }
     }
@@ -1291,8 +1308,7 @@ void AeroDms::editerVol()
         prixDuVol->setEnabled(false);
     }
 
-    validerLeVol->setText("Modifier le vol");
-    
+    validerLeVol->setText("Modifier le vol");   
 }
 
 void AeroDms::supprimerVol()

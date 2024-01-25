@@ -86,7 +86,8 @@ public:
     enum Statistiques {
         Statistiques_HEURES_ANNUELLES,
         Statistiques_HEURES_PAR_PILOTE,
-        Statistiques_HEURES_PAR_TYPE_DE_VOL
+        Statistiques_HEURES_PAR_TYPE_DE_VOL,
+        Statistiques_HEURES_PAR_ACTIVITE
     };
 
     struct DemandeEnCoursDeTraitement {
@@ -204,6 +205,16 @@ public:
         int minutesBalade;
     };
     typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
+
+    struct StatsHeuresDeVolParActivite {
+        QString piloteId;
+        QString nomPrenomPilote;
+        int minutesVolAvion;
+        int minutesVolUlm;
+        int minutesVolPlaneur;
+        int minutesVolHelicoptere;
+    };
+    typedef QList< StatsHeuresDeVolParActivite> ListeStatsHeuresDeVolParActivite;
 
     struct ParametresMetier {
         float montantSubventionEntrainement;
