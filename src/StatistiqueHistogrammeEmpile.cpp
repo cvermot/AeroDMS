@@ -15,7 +15,6 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const
     : StatistiqueWidget(parent)
 {
     const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
-    qDebug() << "annee" << p_annee;
 
     //![1]
     auto entrainement = new QBarSet("Entrainement");

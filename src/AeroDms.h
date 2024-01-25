@@ -158,6 +158,7 @@ public slots:
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);
     void switchModeDebug();
+    void convertirHeureDecimalesVersHhMm();
     void peuplerStatistiques();
 
 };

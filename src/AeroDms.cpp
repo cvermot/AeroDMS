@@ -441,7 +441,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
 
-    //========================Menu
+    //========================Menu option
+    QMenu* menuOption = menuBar()->addMenu(tr("Options"));
+    QAction *boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
+    boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    menuOption->addAction(boutonConversionHeureDecimalesVersHhMm);
+    connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
+    
+    //========================Menu Aide
     QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
     boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
     helpMenu->addAction(boutonModeDebug);
@@ -1372,6 +1379,23 @@ void AeroDms::switchModeDebug()
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
+    }
+}
+
+void AeroDms::convertirHeureDecimalesVersHhMm()
+{
+    bool ok;
+    double heureDecimale = QInputDialog::getDouble(this, tr("Conversion heure décimale"),
+        tr("Saisir l'heure au format décimal : "), 0, 0, 10, 2, &ok,
+        Qt::WindowFlags(), 1);
+    
+    if (ok)
+    {
+        QTime heureHhmm;
+        int heure = floor(heureDecimale);
+        int minutes = 60 * (heureDecimale - floor(heureDecimale));
+        heureHhmm.setHMS(heure, minutes, 0);
+        dureeDuVol->setTime(heureHhmm);
     }
 }
 

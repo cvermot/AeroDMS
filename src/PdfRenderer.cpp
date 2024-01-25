@@ -226,9 +226,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     const AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
     const AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
 
-    qDebug() << "Nombre cotisations" << listeDesCotisations.size();
-    qDebug() << "Nombre balades/sorties" << listeDesRecettesBaladesSorties.size();
-
     //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)
     {
