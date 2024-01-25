@@ -56,6 +56,9 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     QLabel* aeroclubLabel = new QLabel(tr("Aéroclub : "), this);
     connect(aeroclub, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
+    activitePrincipale = new QComboBox();
+    QLabel* activitePrincipaleLabel = new QLabel(tr("Activité principale : "), this);
+
     estAyantDroit = new QCheckBox(this);
     QLabel* estAyantDroitLabel = new QLabel(tr("Ayant droit : "), this);
 
@@ -70,7 +73,6 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
 
     idPilote = "";
 
-
     QGridLayout* mainLayout = new QGridLayout(this);
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -83,24 +85,34 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     mainLayout->addWidget(aeroclubLabel, 2, 0);
     mainLayout->addWidget(aeroclub, 2, 1);
 
-    mainLayout->addWidget(estAyantDroitLabel, 3, 0);
-    mainLayout->addWidget(estAyantDroit, 3, 1);
+    mainLayout->addWidget(activitePrincipaleLabel, 3, 0);
+    mainLayout->addWidget(activitePrincipale, 3, 1);
 
-    mainLayout->addWidget(mailLabel, 4, 0);
-    mainLayout->addWidget(mail, 4, 1);
+    mainLayout->addWidget(estAyantDroitLabel, 4, 0);
+    mainLayout->addWidget(estAyantDroit, 4, 1);
 
-    mainLayout->addWidget(telephoneLabel, 5, 0);
-    mainLayout->addWidget(telephone, 5, 1);
+    mainLayout->addWidget(mailLabel, 5, 0);
+    mainLayout->addWidget(mail, 5, 1);
 
-    mainLayout->addWidget(remarqueLabel, 6, 0);
-    mainLayout->addWidget(remarque, 6, 1);
+    mainLayout->addWidget(telephoneLabel, 6, 0);
+    mainLayout->addWidget(telephone, 6, 1);
+
+    mainLayout->addWidget(remarqueLabel, 7, 0);
+    mainLayout->addWidget(remarque, 7, 1);
 
 
-    mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
+    mainLayout->addWidget(buttonBox, 8, 0, 1, 2);
 
     setLayout(mainLayout);
 
+    peuplerActivitePrincipale();
+
     setWindowTitle(tr("Ajouter un pilote"));
+}
+
+void DialogueGestionPilote::peuplerActivitePrincipale()
+{
+    activitePrincipale->addItems(database->recupererListeActivites());
 }
 
 AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
@@ -115,6 +127,7 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.mail = mail->text();
     pilote.telephone = telephone->text();
     pilote.remarque = remarque->text();
+    pilote.activitePrincipale = activitePrincipale->currentText();
 
     //On rince l'affichage en vue d'une éventuelle autre saisie
     annulationOuFinSaisie();
@@ -169,6 +182,7 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     mail->clear();
     telephone->clear();
     remarque->clear();
+    activitePrincipale->setCurrentIndex(0);
 
     setWindowTitle(tr("Ajouter un pilote"));
     okButton->setText(tr("&Ajouter"));

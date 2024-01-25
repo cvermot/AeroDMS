@@ -58,7 +58,6 @@ void PdfRenderer::mergerPdf()
     {
         const QString nomFacture = repertoireDesFactures
             + demandeEnCours.listeFactures.at(i);
-        qDebug() << nomFacture;
         PoDoFo::PdfMemDocument facture;
         facture.Load(nomFacture.toStdString());
         document.GetPages().AppendDocumentPages(facture);

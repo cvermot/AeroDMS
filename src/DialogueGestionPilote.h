@@ -36,6 +36,7 @@ private:
     QLineEdit* prenom;
     QLineEdit* aeroclub;
     QCheckBox *estAyantDroit;
+    QComboBox* activitePrincipale;
     QLineEdit* mail;
     QLineEdit* telephone;
     QLineEdit* remarque;
@@ -47,7 +48,8 @@ private:
     QDialogButtonBox* buttonBox;
     QPushButton* cancelButton;
     QPushButton* okButton;
-    //QWidget* extension;
+    
+    void peuplerActivitePrincipale();
 
 private slots:
     void prevaliderDonneesSaisies();

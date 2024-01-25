@@ -78,6 +78,7 @@ private:
     QComboBox* typeDeVol;
     QComboBox* choixPilote;
     QLineEdit* aeroclubPiloteSelectionne;
+    QComboBox* activite;
     QDateTimeEdit* dateDuVol;
     QTimeEdit* dureeDuVol;
     QDoubleSpinBox* prixDuVol;

@@ -49,6 +49,7 @@ public:
                                          const int p_facture,
                                          const int p_idSortie,
                                          const QString& p_remarque,
+                                         const QString& p_activite,
                                          const int p_idVolAEditer);
     bool supprimerUnVol(const int p_volAEditer);
     void enregistrerUneFacture( const QString& p_payeur,
@@ -84,6 +85,7 @@ public:
     AeroDmsTypes::Vol recupererVol(const int p_idVol);
 
     QStringList recupererListeFacturesAssocieeASubvention(const AeroDmsTypes::DemandeRemboursement p_demande);
+    QStringList recupererListeActivites();
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
@@ -95,6 +97,7 @@ public:
     AeroDmsTypes::ListeSortie recupererListeDepensesPouvantAvoirUneFacture();
     QString recupererAeroclub(const QString p_piloteId);
     QString recupererNomPrenomPilote(const QString p_piloteId);
+    QString recupererActivitePrincipale(const QString p_piloteId);
     QString recupererNomFacture(const int p_volId);
 
     int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);

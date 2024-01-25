@@ -50,8 +50,9 @@ public:
         VolTableElement_SUBVENTION = 0x5,
         VolTableElement_SOUMIS_CE = 0x6,
         VolTableElement_REMARQUE = 0x7,
-        VolTableElement_VOL_ID = 0x8,
-        VolTableElement_NB_COLONNES = 0x9,
+        VolTableElement_ACTIVITE = 0x8,
+        VolTableElement_VOL_ID = 0x9,
+        VolTableElement_NB_COLONNES = 0xA,
     };
 
     enum FactureTableElement {
@@ -106,6 +107,7 @@ public:
         QString nom;
         QString prenom;
         QString aeroclub;
+        QString activitePrincipale;
         bool estAyantDroit;
         QString mail;
         QString telephone;
@@ -141,6 +143,7 @@ public:
         QString typeDeVol;
         QString duree;
         QString remarque;
+        QString activite;
         QString estSoumisCe;
         float coutVol;
         float montantRembourse;

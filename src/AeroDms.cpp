@@ -134,6 +134,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem("Subvention"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem("Activité"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem("ID"));
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -197,6 +198,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     aeroclubPiloteSelectionne->setEnabled(false);
     QLabel* aeroclubPiloteSelectionneLabel = new QLabel(tr("Aéroclub : "), this);
 
+    activite = new QComboBox(this);
+    activite->setToolTip("L'activité est fournie à titre statistique uniquement.\n"
+                         "Ce champ est rempli automatiquement à partir de l'activité\n"
+                         "par défaut renseignée pour le pilote sélectionné.\n"
+                         "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités.");
+    activite->addItems(db->recupererListeActivites());
+    QLabel* activiteLabel = new QLabel(tr("Activité : "), this);
+
     dateDuVol = new QDateTimeEdit(this);
     dateDuVol->setDisplayFormat("dd/MM/yyyy");
     dateDuVol->setCalendarPopup(true);
@@ -235,17 +244,19 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosVol->addWidget(choixPilote,                    1, 1);
     infosVol->addWidget(aeroclubPiloteSelectionneLabel, 2, 0);
     infosVol->addWidget(aeroclubPiloteSelectionne,      2, 1);
-    infosVol->addWidget(dateDuVolLabel,                 3, 0);
-    infosVol->addWidget(dateDuVol,                      3, 1);
-    infosVol->addWidget(dureeDuVolLabel,                4, 0);
-    infosVol->addWidget(dureeDuVol,                     4, 1);
-    infosVol->addWidget(prixDuVolLabel,                 5, 0);
-    infosVol->addWidget(prixDuVol,                      5, 1);
-    infosVol->addWidget(choixBaladeLabel,               6, 0);
-    infosVol->addWidget(choixBalade,                    6, 1);
-    infosVol->addWidget(remarqueVolLabel,               7, 0);
-    infosVol->addWidget(remarqueVol,                    7, 1);
-    infosVol->addWidget(validerLeVol,                   8, 0, 2, 0);
+    infosVol->addWidget(activiteLabel,                  3, 0);
+    infosVol->addWidget(activite,                       3, 1);
+    infosVol->addWidget(dateDuVolLabel,                 4, 0);
+    infosVol->addWidget(dateDuVol,                      4, 1);
+    infosVol->addWidget(dureeDuVolLabel,                5, 0);
+    infosVol->addWidget(dureeDuVol,                     5, 1);
+    infosVol->addWidget(prixDuVolLabel,                 6, 0);
+    infosVol->addWidget(prixDuVol,                      6, 1);
+    infosVol->addWidget(choixBaladeLabel,               7, 0);
+    infosVol->addWidget(choixBalade,                    7, 1);
+    infosVol->addWidget(remarqueVolLabel,               8, 0);
+    infosVol->addWidget(remarqueVol,                    8, 1);
+    infosVol->addWidget(validerLeVol,                   9, 0, 2, 0);
 
     //==========Sous onglet facture de l'onglet "Ajout dépense"
     choixPayeur = new QComboBox(this);
@@ -570,6 +581,7 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
     }
     vueVols->resizeColumnsToContents();
@@ -927,21 +939,8 @@ void AeroDms::enregistrerUnVol()
 				}
                 
 
-				/*db->enregistrerUnVolSortieOuBalade(idPilote,
-					typeDeVol->currentText(),
-					dateDuVol->date(),
-					dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute(),
-					prixDuVol->value(),
-					montantSubventionne,
-					factureIdEnBdd,
-                    choixBalade->currentData().toInt(),
-					remarqueVol->text());*/
-
 				subventionRestante = subventionRestante - montantSubventionne;
 			}
-			//Sinon on est balade ou sortie, on enregistre le vol avec la référence de balade/sortie
-			//else
-			//{
 				db->enregistrerUnVol(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
@@ -951,10 +950,8 @@ void AeroDms::enregistrerUnVol()
 					factureIdEnBdd,
 					choixBalade->currentData().toInt(),
 					remarqueVol->text(),
+                    activite->currentText(),
                     volAEditer);
-
-				
-			//}
 
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
@@ -1129,6 +1126,7 @@ void AeroDms::prevaliderDonnnesSaisies()
     }
 
     aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
+    activite->setCurrentIndex(activite->findText(db->recupererActivitePrincipale(choixPilote->currentData().toString())));
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()
@@ -1258,7 +1256,6 @@ void AeroDms::editerVol()
     //On récupère le nom de la facture associée et on la charge
     const QString cheminComplet = cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer);
     chargerUneFacture(cheminComplet);
-    qDebug() << cheminComplet;
 
     //On indique que c'est une facture déjà en BDD
 
@@ -1280,6 +1277,8 @@ void AeroDms::editerVol()
 
     choixBalade->setCurrentIndex(choixBalade->findData(vol.baladeId));
     choixBalade->setEnabled(false);
+
+    activite->setCurrentIndex(activite->findText(vol.activite));
 
     remarqueVol->setText(vol.remarque);
 
