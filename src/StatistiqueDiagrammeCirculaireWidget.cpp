@@ -64,10 +64,30 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
 
             for (int i = 0; i < subventionParActivite.size(); i++)
             {
-                *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvion, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
-                *detailUlm << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolUlm, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
-                *detailPlaneur << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolPlaneur, subventionParActivite.at(i).nomPrenomPilote, donneesTypeDeVolParPilote);
-                *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolHelicoptere, subventionParActivite.at(i).nomPrenomPilote, detailHelicoptere);
+                if (subventionParActivite.at(i).minutesVolAvion != 0)
+                {
+                    *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvion,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        donneesTypeDeVolParPilote);
+                }
+                if (subventionParActivite.at(i).minutesVolUlm != 0)
+                {
+                    *detailUlm << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolUlm, 
+                        subventionParActivite.at(i).nomPrenomPilote, 
+                        donneesTypeDeVolParPilote);
+                }
+                if (subventionParActivite.at(i).minutesVolPlaneur != 0)
+                {
+                    *detailPlaneur << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolPlaneur, 
+                        subventionParActivite.at(i).nomPrenomPilote, 
+                        donneesTypeDeVolParPilote);
+                }
+                if (subventionParActivite.at(i).minutesVolHelicoptere != 0)
+                {
+                    *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolHelicoptere, 
+                        subventionParActivite.at(i).nomPrenomPilote, 
+                        detailHelicoptere);
+                }
             }
             if (detailAvion->sum() != 0)
             {
@@ -88,8 +108,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
             {
                 QObject::connect(detailHelicoptere, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
                 *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), "Hélicoptère", detailHelicoptere);
-            }
-            
+            }   
 
             QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
 
