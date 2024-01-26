@@ -12,7 +12,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Écriture PDF à partir d’un template HTML via WebEngine (QtWebEngine)
   - Accès à la BDD SQLite (QtSql)
   - Affichage des statistiques (QtCharts)
--Librairie PoDoFo (0.10.3)
+- Librairie PoDoFo (0.10.3)
 
 ## Mise en place de l’environnement de développement
 Le développement est effectué sous Visual Studio 2022 (MSVC). Cette contrainte découle du fait que QtWebEngine n’est pas disponible lorsque Qt est compilé avec MinGw, cela interdit donc la compilation de l’application sous QtCreator sous Windows.
