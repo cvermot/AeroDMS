@@ -41,8 +41,8 @@ Une fois installée, PoDoFo est directement disponible sous MSVC sans manipulati
 
 ## Déploiement
 
-## Utilisation
-TODO
+## Configuration, utilisation
+Voir le [Wiki](https://github.com/cvermot/AeroDMS/wiki).
 
 ## Elements graphiques
 Les images du dossier ressources sont des icones "Material Design" issues du site [Pictogrammers.com](https://pictogrammers.com/).
