@@ -54,6 +54,9 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     annee->addItem(QString::number(anneeCourante));
     annee->addItem(QString::number(anneeCourante + 1));
     annee->setCurrentIndex(1);
+    annee->setItemIcon(0, QIcon("./ressources/numeric-negative-1.svg"));
+    annee->setItemIcon(1, QIcon("./ressources/numeric-0.svg"));
+    annee->setItemIcon(2, QIcon("./ressources/numeric-positive-1.svg"));
 
     montant = new QDoubleSpinBox(this);
     QLabel* montantLabel = new QLabel(tr("Montant : "), this);

@@ -90,6 +90,18 @@ public:
         Statistiques_HEURES_PAR_ACTIVITE
     };
 
+    enum Signature {
+        Signature_SANS,
+        Signature_MANUSCRITE_IMAGE,
+        Signature_NUMERIQUE_LEX_COMMUNITY
+    };
+
+    enum TypeGenerationPdf {
+        TypeGenerationPdf_TOUTES,
+        TypeGenerationPdf_RECETTES_SEULEMENT,
+        TypeGenerationPdf_DEPENSES_SEULEMENT
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande;
         QString idPilote;

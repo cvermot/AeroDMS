@@ -211,6 +211,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     dateDuVol->setCalendarPopup(true);
     dateDuVol->setDate(QDate::currentDate());
     QLabel* dateDuVolLabel = new QLabel(tr("Date du vol : "), this);
+    connect(dateDuVol, &QDateEdit::dateChanged, this, &AeroDms::prevaliderDonnnesSaisies);
 
     dureeDuVol = new QTimeEdit(this);
     QLabel* dureeDuVolLabel = new QLabel(tr("Durée du vol : "), this);
@@ -411,9 +412,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     listeDeroulanteStatistique = new QComboBox(this);
     listeDeroulanteStatistique->addItem("Statistiques mensuelles", AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_ANNUELLES, QIcon("./ressources/chart-bar-stacked.svg"));
     listeDeroulanteStatistique->addItem("Statistiques par pilote", AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, QIcon("./ressources/chart-pie.svg"));
     listeDeroulanteStatistique->addItem("Statistiques par type de vol", AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, QIcon("./ressources/chart-pie.svg"));
     listeDeroulanteStatistique->addItem("Statistiques par activité", AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, QIcon("./ressources/chart-pie.svg"));
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     selectionToolBar->addWidget(listeDeroulanteStatistique);
 
@@ -441,11 +446,71 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
 
-    //========================Menu option
+    //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("Options"));
-    QAction *boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
+    //QAction *boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
+    //boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    //menuOption->addAction(boutonConversionHeureDecimalesVersHhMm);
+    //connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
+
+    QMenu* menuSignature = menuOption->addMenu(tr("Signature"));
+    menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
+
+    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature manuelle"), this); 
+    menuSignature->addAction(boutonAucuneSignature);
+
+    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'image d'une signature"), this); 
+    menuSignature->addAction(boutonSignatureManuelle);
+
+    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature numérique avec Lex Community"), this);   
+    menuSignature->addAction(boutonSignatureNumerique);
+
+    connect(boutonAucuneSignature, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
+    connect(boutonSignatureNumerique, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
+    connect(boutonSignatureManuelle, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
+
+    QAction* boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip.svg"), tr("Fusionner les PDF"), this);
+    menuOption->addAction(boutonFusionnerLesPdf);
+
+    QMenu* menuDemandesAGenerer = menuOption->addMenu(tr("Demandes à générer"));
+    menuDemandesAGenerer->setIcon(QIcon("./ressources/file-cog.svg"));
+
+    menuDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("Toutes"), this);
+    menuDemandesAGenerer->addAction(menuDemandesAGenererToutes);
+
+    menuDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("Recettes uniquement"), this);
+    menuDemandesAGenerer->addAction(menuDemandesAGenererRecettes);
+
+    menuDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
+    menuDemandesAGenerer->addAction(menuDemandesAGenererDepenses);
+
+    connect(menuDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+    connect(menuDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+    connect(menuDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+
+    QFont font;
+    font.setWeight(QFont::Bold);
+    menuDemandesAGenererToutes->setFont(font);
+    typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
+    boutonAucuneSignature->setFont(font);
+    signature = AeroDmsTypes::Signature_SANS;
+
+    //========================Menu Outils
+    QMenu* menuOutils = menuBar()->addMenu(tr("Outils"));
+
+    menuOutils->addAction(bouttonAjouterUnVol);
+    menuOutils->addAction(bouttonAjouterCotisation);
+    menuOutils->addAction(bouttonAjouterPilote);
+    menuOutils->addAction(bouttonAjouterSortie);
+    menuOutils->addSeparator();
+    menuOutils->addAction(bouttonGenerePdf);
+    menuOutils->addAction(bouttonGenerePdfRecapHdv);
+
+    menuOutils->addSeparator();
+
+    QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
     boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
-    menuOption->addAction(boutonConversionHeureDecimalesVersHhMm);
+    menuOutils->addAction(boutonConversionHeureDecimalesVersHhMm);
     connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
     
     //========================Menu Aide
@@ -487,6 +552,58 @@ void AeroDms::initialiserOngletGraphiques()
     QWidget* widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
     mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
+}
+
+void AeroDms::changerModeSignature()
+{
+    QFont font;
+    font.setWeight(QFont::Normal);
+    boutonAucuneSignature->setFont(font);
+    boutonSignatureManuelle->setFont(font);
+    boutonSignatureNumerique->setFont(font);
+
+    font.setWeight(QFont::Bold);
+    if (sender() == boutonAucuneSignature)
+    {
+        boutonAucuneSignature->setFont(font);
+        signature = AeroDmsTypes::Signature_SANS;
+    }
+    else if (sender() == boutonSignatureManuelle)
+    {
+        boutonSignatureManuelle->setFont(font);
+        signature = AeroDmsTypes::Signature_MANUSCRITE_IMAGE;
+    }
+    else if (sender() == boutonSignatureNumerique)
+    {
+        boutonSignatureNumerique->setFont(font);
+        signature = AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY;
+    }
+}
+
+void AeroDms::changerDemandesAGenerer()
+{
+    QFont font;
+    font.setWeight(QFont::Normal);
+    menuDemandesAGenererToutes->setFont(font);
+    menuDemandesAGenererRecettes->setFont(font);
+    menuDemandesAGenererDepenses->setFont(font);
+
+    font.setWeight(QFont::Bold);
+    if (sender() == menuDemandesAGenererToutes)
+    {
+        menuDemandesAGenererToutes->setFont(font);
+        typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
+    }
+    else if (sender() == menuDemandesAGenererRecettes)
+    {
+        menuDemandesAGenererRecettes->setFont(font);
+        typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT;
+    }
+    else if (sender() == menuDemandesAGenererDepenses)
+    {
+        menuDemandesAGenererDepenses->setFont(font);
+        typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT;
+    }
 }
 
 void AeroDms::peuplerStatistiques()
@@ -1150,6 +1267,21 @@ void AeroDms::prevaliderDonnnesSaisies()
     }
 
     aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
+    QString cotisation = "(Cotisation payée pour l'année "
+        + QString::number(dateDuVol->date().year())
+        + ")";
+    if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
+    {
+        cotisation = "(Cotisation non payée pour l'année "
+            + QString::number(dateDuVol->date().year())
+            + ")";
+    }
+    statusBar()->showMessage("Subvention restante pour ce pilote, pour l'année " 
+        + QString::number(dateDuVol->date().year()) 
+        + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year())) 
+        + " € "
+        + cotisation 
+        +".");
     activite->setCurrentIndex(activite->findText(db->recupererActivitePrincipale(choixPilote->currentData().toString())));
 }
 

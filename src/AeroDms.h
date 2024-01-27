@@ -60,6 +60,8 @@ private:
 
     ManageDb* db;
     PdfRenderer* pdf;
+    AeroDmsTypes::Signature signature;
+    AeroDmsTypes::TypeGenerationPdf typeGenerationPdf;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
@@ -117,6 +119,14 @@ private:
     QAction* bouttonGenerePdfRecapHdv;
     QAction* boutonModeDebug;
 
+    //Menu options
+    QAction* boutonAucuneSignature;
+    QAction* boutonSignatureManuelle;
+    QAction* boutonSignatureNumerique;
+    QAction* menuDemandesAGenererToutes;
+    QAction* menuDemandesAGenererRecettes;
+    QAction* menuDemandesAGenererDepenses;
+
     //Données internes
     QString piloteAEditer = "";
     int volAEditer = -1;
@@ -160,6 +170,8 @@ public slots:
     void switchModeDebug();
     void convertirHeureDecimalesVersHhMm();
     void peuplerStatistiques();
+    void changerModeSignature();
+    void changerDemandesAGenerer();
 
 };
 #endif // AERODMS_H
