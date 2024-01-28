@@ -176,6 +176,7 @@ public slots:
     void changerModeSignature();
     void changerDemandesAGenerer();
     void changerFusionPdf();
+    void verifierSignatureNumerisee();
 
 };
 #endif // AERODMS_H

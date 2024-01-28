@@ -554,6 +554,16 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
+    verifierSignatureNumerisee();
+}
+
+void AeroDms::verifierSignatureNumerisee()
+{
+    qDebug() << "fichier signature" << QCoreApplication::applicationDirPath() + "/ressources/signature.jpg" << QDir(QCoreApplication::applicationDirPath() + "/ressources/signature.jpg").exists();
+    if (!QFile("./ressources/signature.jpg").exists())
+    {
+        boutonSignatureManuelle->setEnabled(false);
+    }
 }
 
 void AeroDms::initialiserOngletGraphiques()

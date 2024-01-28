@@ -611,7 +611,8 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html)
         case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
         {
             //Le chemin vers le fichier
-            p_html.replace("xxSignature", "<img src=\"./signature.jpg\" width=\"142\" />");
+            QString cheminSignature = QCoreApplication::applicationDirPath() + "/ressources/signature.jpg";
+            p_html.replace("xxSignature", "<img src=\""+ cheminSignature +"\" width=\"142\" />");
         }
         break;
 
