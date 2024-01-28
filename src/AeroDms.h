@@ -113,6 +113,7 @@ private:
 
     //Barre de progression
     QProgressDialog *progressionGenerationPdf;
+    QPushButton *boutonProgressionGenerationPdf;
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
     //Bouttons
@@ -123,9 +124,11 @@ private:
     QAction* boutonAucuneSignature;
     QAction* boutonSignatureManuelle;
     QAction* boutonSignatureNumerique;
-    QAction* menuDemandesAGenererToutes;
-    QAction* menuDemandesAGenererRecettes;
-    QAction* menuDemandesAGenererDepenses;
+    QAction* boutonDemandesAGenererToutes;
+    QAction* boutonDemandesAGenererRecettes;
+    QAction* boutonDemandesAGenererDepenses;
+    QAction* boutonFusionnerLesPdf;
+    QAction* boutonNePasFusionnerLesPdf;
 
     //Données internes
     QString piloteAEditer = "";
@@ -172,6 +175,7 @@ public slots:
     void peuplerStatistiques();
     void changerModeSignature();
     void changerDemandesAGenerer();
+    void changerFusionPdf();
 
 };
 #endif // AERODMS_H

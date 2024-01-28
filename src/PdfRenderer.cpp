@@ -130,7 +130,8 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
 
 void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                          const QString p_cheminSortieFichiersGeneres,
-                                                         const QString p_cheminStockageFactures)
+                                                         const QString p_cheminStockageFactures,
+                                                         const AeroDmsTypes::Signature p_signature)
 {
     nombreFacturesTraitees = 0;
     indiceFichier = 0;
@@ -161,31 +162,48 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     }
 }
 
-int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
-                                                  const QString p_cheminSortieFichiersGeneres,
-                                                  const QString p_cheminStockageFactures)
+void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
+                                                   const QString p_cheminSortieFichiersGeneres,
+                                                   const QString p_cheminStockageFactures,
+                                                   const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf,
+                                                   const AeroDmsTypes::Signature p_signature )
 {
-    AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
-    demandeEnCours.nomTresorier = p_nomTresorier;
     demandeEnCours.listeFactures = QStringList();
-    listeAnnees = db->recupererAnneesAvecVolNonSoumis();
+    demandeEnCours.nomTresorier = p_nomTresorier;
+    demandeEnCours.typeDeGenerationDemandee = p_typeGenerationPdf;
+    demandeEnCours.typeDeSignatureDemandee = p_signature;
+
     nombreFacturesTraitees = 0 ;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
+
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
+
     QDir().mkdir(cheminSortieFichiersGeneres);
     if(QDir(cheminSortieFichiersGeneres).exists())
     { 
         cheminSortieFichiersGeneres.append("/");
         listeDesFichiers.clear();
-        const int nombreFacturesATraiter = db->recupererLesSubventionsAEmettre().size() +
-            db->recupererLesCotisationsAEmettre().size() +
-            db->recupererLesRecettesBaladesEtSortiesAEmettre().size() +
-            db->recupererLesDemandesDeRembousementAEmettre().size()+
-            listeAnnees.size();
+        int nombreElementsATraiter = 0 ;
 
-        emit mettreAJourNombreFacturesATraiter(nombreFacturesATraiter);
+        if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
+             || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
+        {
+            nombreElementsATraiter = db->recupererLesCotisationsAEmettre().size() +
+                                     db->recupererLesRecettesBaladesEtSortiesAEmettre().size();
+        }
+        if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
+             || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT)
+        {
+            listeAnnees = db->recupererAnneesAvecVolNonSoumis();
+            nombreElementsATraiter = nombreElementsATraiter +
+                                     db->recupererLesSubventionsAEmettre().size() +
+                                     db->recupererLesDemandesDeRembousementAEmettre().size() +
+                                     listeAnnees.size();
+        }
+
+        emit mettreAJourNombreFacturesATraiter(nombreElementsATraiter);
         emit mettreAJourNombreFacturesTraitees(0);
 
         imprimerLaProchaineDemandeDeSubvention();
@@ -194,7 +212,6 @@ int PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     {
         qDebug() << "Erreur création repertoire";
     }
-    return listeDesRemboursements.size();
 }
 
 void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
@@ -218,13 +235,6 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     templateCeTmp.replace("xxI", "");
     //Signataire => toujours celui qui exécute le logiciel
     templateCeTmp.replace("xxSignataire", demandeEnCours.nomTresorier);
-    //Signature => Vide (on signe à la main)
-    templateCeTmp.replace("xxSignature", "");
-
-    const AeroDmsTypes::ListeDemandeRemboursement listeDesRemboursements = db->recupererLesSubventionsAEmettre();
-    const AeroDmsTypes::ListeRecette listeDesCotisations = db->recupererLesCotisationsAEmettre();
-    const AeroDmsTypes::ListeRecette listeDesRecettesBaladesSorties = db->recupererLesRecettesBaladesEtSortiesAEmettre();
-    const AeroDmsTypes::ListeDemandeRemboursementFacture listeDesRemboursementsFactures = db->recupererLesDemandesDeRembousementAEmettre();
 
     //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)
@@ -238,9 +248,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
                                            listePilotesDeCetteAnnee, 
                                            totaux);
     }
-    else if (listeDesRemboursements.size() > 0)
+    else if (db->recupererLesSubventionsAEmettre().size() > 0
+              && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
     {    
-        const AeroDmsTypes::DemandeRemboursement demande = listeDesRemboursements.at(0);
+        const AeroDmsTypes::DemandeRemboursement demande = db->recupererLesSubventionsAEmettre().at(0);
         //Depense
         templateCeTmp.replace("xxD", "X");
         //Recette
@@ -248,6 +259,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         //Montant
         remplirLeChampMontant(templateCeTmp, demande.montantARembourser);
+        //Signature
+        remplirLeChampSignature(templateCeTmp);
 
         //Cheque a retirer au CE par le demandeur => a cocher
         templateCeTmp.replace("zzC", "X");
@@ -292,9 +305,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
     }
     //Recettes "Cotisations"
-    else if (listeDesCotisations.size() > 0)
+    else if (db->recupererLesCotisationsAEmettre().size() > 0
+              && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
-        const AeroDmsTypes::Recette recette = listeDesCotisations.at(0);
+        const AeroDmsTypes::Recette recette = db->recupererLesCotisationsAEmettre().at(0);
         //Depense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -305,6 +319,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
+        //Signature
+        remplirLeChampSignature(templateCeTmp);
         //Observation
         templateCeTmp.replace("xxObservation", recette.intitule);
 
@@ -328,9 +344,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.listeFactures = QStringList();
     }
     //Recettes "passagers" des sorties et balades
-    else if (listeDesRecettesBaladesSorties.size() > 0)
+    else if (db->recupererLesRecettesBaladesEtSortiesAEmettre().size() > 0
+              && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
-        const AeroDmsTypes::Recette recette = listeDesRecettesBaladesSorties.at(0);
+        const AeroDmsTypes::Recette recette = db->recupererLesRecettesBaladesEtSortiesAEmettre().at(0);
         //Depense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -342,6 +359,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
+        //Signature
+        remplirLeChampSignature(templateCeTmp);
         //Observation
         templateCeTmp.replace("xxObservation", QString("Participations ").append(recette.intitule));
 
@@ -365,9 +384,10 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         demandeEnCours.listeFactures = QStringList();
     }
     //Factures payées par les pilotes à rembourser
-    else if (listeDesRemboursementsFactures.size() > 0)
+    else if ( db->recupererLesDemandesDeRembousementAEmettre().size() > 0
+              && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT )
     {
-        const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = listeDesRemboursementsFactures.at(0);
+        const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = db->recupererLesDemandesDeRembousementAEmettre().at(0);
         //Depense
         templateCeTmp.replace("xxD", "X");
         //Recette
@@ -379,6 +399,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
         //Montant
         remplirLeChampMontant(templateCeTmp, demandeRembousement.montant);
+        //Signature
+        remplirLeChampSignature(templateCeTmp);
         //Observation
         templateCeTmp.replace("xxObservation", demandeRembousement.intitule);
 
@@ -600,4 +622,34 @@ void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)
     {
         p_html.replace("yyc", "0");
     }
+}
+
+void PdfRenderer::remplirLeChampSignature(QString& p_html)
+{
+    //Signature => 
+    switch (demandeEnCours.typeDeSignatureDemandee)
+    {
+        case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
+        {
+            //Le chemin vers le fichier
+            p_html.replace("xxSignature", "<img src=\"./signature.jpg\" width=\"142\" />");
+        }
+        break;
+
+        case AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY:
+        {
+            //Le tag réservé pour Lex Community
+            p_html.replace("xxSignature", "[SignatureField#1]");
+        }
+        break;
+
+        case AeroDmsTypes::Signature_SANS:
+        default:
+        {
+            //Vide si on signe à la main
+            p_html.replace("xxSignature", "");
+        }
+        break;
+    }
+    
 }

@@ -31,12 +31,15 @@ public:
 		         QString p_cheminTemplatesHtml, 
 		         QWidget* parent = nullptr);
 
-	int imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
-		                                 const QString p_cheminSortieFichiersGeneres,
-		                                 const QString p_cheminStockageFactures);
+	void imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
+		                                  const QString p_cheminSortieFichiersGeneres,
+		                                  const QString p_cheminStockageFactures,
+		                                  const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES,
+		                                  const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS );
 	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 		                                        const QString p_cheminSortieFichiersGeneres,
-		                                        const QString p_cheminStockageFactures);
+		                                        const QString p_cheminStockageFactures,
+		                                        const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS);
 
 private :
 	QWebEnginePage* view;
@@ -57,6 +60,7 @@ private :
 	void imprimerLaProchaineDemandeDeSubvention();
 	void remplirLeChampMontant( QString& p_html, 
 		                        const float p_montant);
+	void remplirLeChampSignature(QString& p_html);
 
 	void imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
 		                                    const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 

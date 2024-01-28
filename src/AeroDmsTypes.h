@@ -112,6 +112,8 @@ public:
         QString nomTresorier;
         QString nomFichier;
         QStringList listeFactures;
+        AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee;
+        AeroDmsTypes::Signature typeDeSignatureDemandee;
         //int idFacture;
     };
 

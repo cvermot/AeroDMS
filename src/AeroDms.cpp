@@ -177,12 +177,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QTabWidget *depenseTabWidget = new QTabWidget(this);
     ajoutVol->addWidget(depenseTabWidget, 1);
-    
 
     //==========Sous onglet vol de l'onglet "Ajout dépense"
     typeDeVol = new QComboBox(this);
     typeDeVol->addItems(db->recupererTypesDesVol());
     typeDeVol->setCurrentIndex(2);
+    typeDeVol->setItemIcon(0, QIcon("./ressources/account-group.svg"));
+    typeDeVol->setItemIcon(1, QIcon("./ressources/bag-checked.svg"));
+    typeDeVol->setItemIcon(2, QIcon("./ressources/airport.svg"));
     QLabel* typeDeVolLabel = new QLabel(tr("Type de vol : "), this);
     connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::changerInfosVolSurSelectionTypeVol);
     connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
@@ -436,7 +438,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
 
     //Dialogue de progression de génération PDF
-    progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "Fermer", 0, 0, this);
+    progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "", 0, 0, this);
+    boutonProgressionGenerationPdf = new QPushButton("Fermer", this);
+    progressionGenerationPdf->setCancelButton(boutonProgressionGenerationPdf);
     progressionGenerationPdf->setAutoClose(false);
     progressionGenerationPdf->setWindowModality(Qt::WindowModal);
     progressionGenerationPdf->close();
@@ -469,31 +473,37 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(boutonSignatureNumerique, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
     connect(boutonSignatureManuelle, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
 
-    QAction* boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip.svg"), tr("Fusionner les PDF"), this);
-    menuOption->addAction(boutonFusionnerLesPdf);
+    QMenu* menuFusionnerLesPdf = menuOption->addMenu(tr("Fusion des PDF"));
+    menuFusionnerLesPdf->setIcon(QIcon("./ressources/paperclip.svg"));
+    boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("Fusionner les PDF"), this);
+    menuFusionnerLesPdf->addAction(boutonFusionnerLesPdf);
+    boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("Ne pas fusionner les PDF"), this);
+    menuFusionnerLesPdf->addAction(boutonNePasFusionnerLesPdf);
+
+    connect(boutonFusionnerLesPdf, SIGNAL(triggered()), this, SLOT(changerFusionPdf()));
+    connect(boutonNePasFusionnerLesPdf, SIGNAL(triggered()), this, SLOT(changerFusionPdf()));
 
     QMenu* menuDemandesAGenerer = menuOption->addMenu(tr("Demandes à générer"));
     menuDemandesAGenerer->setIcon(QIcon("./ressources/file-cog.svg"));
+    boutonDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("Toutes"), this);
+    menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
+    boutonDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("Recettes uniquement"), this);
+    menuDemandesAGenerer->addAction(boutonDemandesAGenererRecettes);
 
-    menuDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("Toutes"), this);
-    menuDemandesAGenerer->addAction(menuDemandesAGenererToutes);
+    boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
+    menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
-    menuDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("Recettes uniquement"), this);
-    menuDemandesAGenerer->addAction(menuDemandesAGenererRecettes);
-
-    menuDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
-    menuDemandesAGenerer->addAction(menuDemandesAGenererDepenses);
-
-    connect(menuDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
-    connect(menuDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
-    connect(menuDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+    connect(boutonDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+    connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+    connect(boutonDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
 
     QFont font;
     font.setWeight(QFont::Bold);
-    menuDemandesAGenererToutes->setFont(font);
+    boutonDemandesAGenererToutes->setFont(font);
     typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     boutonAucuneSignature->setFont(font);
     signature = AeroDmsTypes::Signature_SANS;
+    boutonFusionnerLesPdf->setFont(font);
 
     //========================Menu Outils
     QMenu* menuOutils = menuBar()->addMenu(tr("Outils"));
@@ -540,10 +550,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerTableVols();
     peuplerTableFactures();
     peuplerListeDeroulanteAnnee();
+    peuplerStatistiques();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
-    peuplerStatistiques();
 }
 
 void AeroDms::initialiserOngletGraphiques()
@@ -584,25 +594,43 @@ void AeroDms::changerDemandesAGenerer()
 {
     QFont font;
     font.setWeight(QFont::Normal);
-    menuDemandesAGenererToutes->setFont(font);
-    menuDemandesAGenererRecettes->setFont(font);
-    menuDemandesAGenererDepenses->setFont(font);
+    boutonDemandesAGenererToutes->setFont(font);
+    boutonDemandesAGenererRecettes->setFont(font);
+    boutonDemandesAGenererDepenses->setFont(font);
 
     font.setWeight(QFont::Bold);
-    if (sender() == menuDemandesAGenererToutes)
+    if (sender() == boutonDemandesAGenererToutes)
     {
-        menuDemandesAGenererToutes->setFont(font);
+        boutonDemandesAGenererToutes->setFont(font);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     }
-    else if (sender() == menuDemandesAGenererRecettes)
+    else if (sender() == boutonDemandesAGenererRecettes)
     {
-        menuDemandesAGenererRecettes->setFont(font);
+        boutonDemandesAGenererRecettes->setFont(font);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT;
     }
-    else if (sender() == menuDemandesAGenererDepenses)
+    else if (sender() == boutonDemandesAGenererDepenses)
     {
-        menuDemandesAGenererDepenses->setFont(font);
+        boutonDemandesAGenererDepenses->setFont(font);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT;
+    }
+}
+
+void AeroDms::changerFusionPdf()
+{
+    QFont font;
+    font.setWeight(QFont::Normal);
+    boutonFusionnerLesPdf->setFont(font);
+    boutonNePasFusionnerLesPdf->setFont(font);
+
+    font.setWeight(QFont::Bold);
+    if (sender() == boutonFusionnerLesPdf)
+    {
+        boutonFusionnerLesPdf->setFont(font);
+    }
+    else if (sender() == boutonNePasFusionnerLesPdf)
+    {
+        boutonNePasFusionnerLesPdf->setFont(font);
     }
 }
 
@@ -656,6 +684,7 @@ void AeroDms::peuplerStatistiques()
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
 {
+    boutonProgressionGenerationPdf->setDisabled(true);
     progressionGenerationPdf->setLabelText("Génération PDF en cours");
     progressionGenerationPdf->reset();
     progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
@@ -673,6 +702,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
 
     //On met à jour la fenêtre de progression
     progressionGenerationPdf->setLabelText("Génération PDF terminée");
+    boutonProgressionGenerationPdf->setDisabled(false);
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);
@@ -895,9 +925,100 @@ void AeroDms::chargerUneFacture(QString p_fichier)
 
 void AeroDms::genererPdf()
 {
-    pdf->imprimerLesDemandesDeSubvention( parametresMetiers.nomTresorier,
-                                          cheminSortieFichiersGeneres,
-                                          cheminStockageFacturesTraitees);
+    QString texteSignature = "<b>Signature : </b>";
+    switch (signature)
+    {
+        case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
+        {
+            texteSignature += "Image d'une signature manuscrite";
+        }
+        break;
+        case AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY:
+        {
+            texteSignature += "Signature numérique Lex Community";
+        }
+        break;
+        case AeroDmsTypes::Signature_SANS:
+        default:
+        {
+            texteSignature += "Sans (signature manuscrite)";
+        }
+        break;
+    }
+
+    QString nbSubventions = QString::number(db->recupererLesSubventionsAEmettre().size());
+    QString nbFactures = QString::number(db->recupererLesDemandesDeRembousementAEmettre().size());
+    QString nbCotisations = QString::number(db->recupererLesCotisationsAEmettre().size());
+    QString nbBaladesSorties = QString::number(db->recupererLesRecettesBaladesEtSortiesAEmettre().size());
+
+    QString texteDemande = "<b>Demandes à générer : </b>";
+    switch (typeGenerationPdf)
+    {
+        case AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT:
+        {
+            texteDemande += "Recettes seulement";
+            nbSubventions = "Aucune (recettes seulement)";
+            nbFactures = "Aucune (recettes seulement)";
+        }
+        break;
+        case AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT:
+        {
+            texteDemande += "Dépenses seulement";
+            nbCotisations = "Aucune (dépenses seulement)";
+            nbBaladesSorties = "Aucune (dépenses seulement)";
+        }
+        break;
+        case AeroDmsTypes::TypeGenerationPdf_TOUTES:
+        default:
+        {
+            texteDemande += "Toutes (recettes et dépenses)";
+        }
+        break;
+    }
+
+    QString fusionnerLesPdf = "Oui";
+    if (boutonNePasFusionnerLesPdf->font().bold() == true)
+    {
+        fusionnerLesPdf = "Non";
+    }
+
+    QMessageBox demandeConfirmationGeneration;
+    demandeConfirmationGeneration.setText(QString("Voulez vous générer les PDF de demande de subventions ? <br /><br />")
+        + "La génération sera réalisée avec les options suivantes : <br />"
+        + texteSignature + "<br />"
+        + texteDemande + "<br />"
+        + "<b>Fusion des PDF</b> : " + fusionnerLesPdf + "<br />"
+        + "<br />Nombre de demandes à générer :<br />"
+        + "Subventions heures de vol : " + nbSubventions + "<br />"
+        + "Remboursement factures : " + nbFactures + "<br />"
+        + "Remise chèques cotisations : " + nbCotisations + "<br />"
+        + "Remise chèques balades et sorties : " + nbBaladesSorties + "<br />");
+    demandeConfirmationGeneration.setWindowTitle("Génération des PDF de demande");
+    demandeConfirmationGeneration.setIcon(QMessageBox::Question);
+    demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+    const int ret = demandeConfirmationGeneration.exec();
+
+    switch (ret)
+    {
+        case QMessageBox::Yes:
+        {
+            pdf->imprimerLesDemandesDeSubvention(parametresMetiers.nomTresorier,
+                cheminSortieFichiersGeneres,
+                cheminStockageFacturesTraitees,
+                typeGenerationPdf,
+                signature);
+        }
+        break;
+
+        case QMessageBox::No:
+        default:
+        {
+            //Rien à faire
+        }
+        break;
+    }
+    
 }
 
 void AeroDms::genererPdfRecapHdV()
