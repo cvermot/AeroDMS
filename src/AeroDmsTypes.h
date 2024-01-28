@@ -114,6 +114,7 @@ public:
         QStringList listeFactures;
         AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee;
         AeroDmsTypes::Signature typeDeSignatureDemandee;
+        bool mergerTousLesPdf;
         //int idFacture;
     };
 

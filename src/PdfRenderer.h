@@ -35,7 +35,8 @@ public:
 		                                  const QString p_cheminSortieFichiersGeneres,
 		                                  const QString p_cheminStockageFactures,
 		                                  const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES,
-		                                  const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS );
+		                                  const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS,
+		                                  const bool p_mergerTousLesPdf = true);
 	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 		                                        const QString p_cheminSortieFichiersGeneres,
 		                                        const QString p_cheminStockageFactures,
@@ -67,8 +68,6 @@ private :
 		                                    const AeroDmsTypes::SubventionsParPilote p_totaux);
 	void produireFichierPdfGlobal();
 
-	void recopierFacture(const QString p_nomFacture);
-	void recopierFactures(const QStringList p_listeFactures);
 	QString numeroFichierSur3Digits();
 
 	void mergerPdf();

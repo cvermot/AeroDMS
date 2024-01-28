@@ -166,12 +166,14 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
                                                    const QString p_cheminSortieFichiersGeneres,
                                                    const QString p_cheminStockageFactures,
                                                    const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf,
-                                                   const AeroDmsTypes::Signature p_signature )
+                                                   const AeroDmsTypes::Signature p_signature,
+                                                   const bool p_mergerTousLesPdf)
 {
     demandeEnCours.listeFactures = QStringList();
     demandeEnCours.nomTresorier = p_nomTresorier;
     demandeEnCours.typeDeGenerationDemandee = p_typeGenerationPdf;
     demandeEnCours.typeDeSignatureDemandee = p_signature;
+    demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
 
     nombreFacturesTraitees = 0 ;
     indiceFichier = 0;
@@ -427,29 +429,14 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     }
     else
     {
-        //produireFichierPdfGlobal();
+        if (demandeEnCours.mergerTousLesPdf)
+        {
+            produireFichierPdfGlobal();
+        }
+        
         emit generationTerminee(cheminSortieFichiersGeneres);
     }
     nombreFacturesTraitees++;
-}
-
-//Recopie une facture de nom p_nomFacture de repertoire des factures vers le repertoire ou est sont génerés les autres fichiers
-void PdfRenderer::recopierFacture(const QString p_nomFacture)
-{
-    QFile gestionnaireDeFichier;
-    QString cheminDeLaFactureCourante = QString(repertoireDesFactures).append(p_nomFacture);
-    QString cheminDeDestination = QString(cheminSortieFichiersGeneres).append(numeroFichierSur3Digits()).append(".").append(p_nomFacture);
-    if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminDeDestination))
-    {
-    
-    }
-}
-void PdfRenderer::recopierFactures(const QStringList p_listeFactures)
-{
-    for (int i = 0 ; i < p_listeFactures.size() ; i++)
-    {
-        recopierFacture(p_listeFactures.at(i));
-    }
 }
 
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
@@ -517,39 +504,31 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
 
 void PdfRenderer::produireFichierPdfGlobal()
 {
-    QByteArray pdf;
-    QPrinter printer;
-    QFile *fichierSortie = new QFile("C:/Users/cleme/source/AeroDms/AeroDms/sortie.pdf");
-    fichierSortie->open(QIODevice::WriteOnly);
-    QPdfWriter *pdfWriter = new QPdfWriter(fichierSortie);
-    pdfWriter->setPageSize(QPageSize(QPageSize::A4));
-    pdfWriter->setResolution(300);
-    pdfWriter->setPageOrientation(QPageLayout::Orientation::Portrait);
-    //printer.setOrientation(QPrinter::);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    //printer.setPaperSize(QPrinter::A4);
+    PoDoFo::PdfMemDocument document;
 
-    for (int i = 0; i < listeDesFichiers.size(); i++)
+    const QString nomFichier = cheminSortieFichiersGeneres
+        + numeroFichierSur3Digits()
+        + ".FichiersAssembles.pdf";
+
+    QDir dir(cheminSortieFichiersGeneres);
+    const QStringList fichiers = dir.entryList(QStringList("*.pdf"), QDir::Files);
+   
+    for (int i = 0; i < fichiers.size(); i++)
     {
-        QFile fichier(listeDesFichiers.at(i));
-        fichier.open(QIODevice::ReadOnly);
-        QByteArray donneesFichier = fichier.readAll();
-        QImage image = QImage::fromData(donneesFichier);
-        if (image.isNull())
-        {
-            qDebug() << "Erreur chargement image";
-        }
-        else
-        {
-            pdfWriter->newPage();
-            QPainter painter(pdfWriter);
-            painter.drawImage(QPointF(0, 0), image);
-        }
-        
-        //printer.
+        const QString nomFacture = cheminSortieFichiersGeneres
+            + fichiers.at(i);
+        PoDoFo::PdfMemDocument facture;
+        facture.Load(nomFacture.toStdString());
+        document.GetPages().AppendDocumentPages(facture);
     }
 
-    fichierSortie->close();
+    const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
+    document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
+    document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
+    document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
+    document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
+    qDebug() << "Fin merge";
+    document.Save(nomFichier.toStdString());
 }
 
 void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)
