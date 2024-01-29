@@ -55,7 +55,7 @@ private :
 	AeroDmsTypes::DemandeEnCoursDeTraitement demandeEnCours;
 	QList<int> listeAnnees;
 
-	int nombreFacturesTraitees;
+	int nombreEtapesEffectuees;
 	int indiceFichier;
 
 	void imprimerLaProchaineDemandeDeSubvention();

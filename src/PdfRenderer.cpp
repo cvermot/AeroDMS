@@ -25,7 +25,7 @@ PdfRenderer::PdfRenderer()
 {
     db = new ManageDb();
     view = new QWebEnginePage(this);
-    nombreFacturesTraitees = 0;
+    nombreEtapesEffectuees = 0;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
 }
@@ -36,7 +36,7 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
 {
     db = p_db;
 	view = new QWebEnginePage(this);
-    nombreFacturesTraitees = 0;
+    nombreEtapesEffectuees = 0;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
 
@@ -105,6 +105,8 @@ void PdfRenderer::chargementTermine(bool retour)
 
     view->printToPdf(nomFichier, pageLayout);
     listeDesFichiers.append(demandeEnCours.nomFichier);
+    nombreEtapesEffectuees++;
+    emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
 }
 
 void PdfRenderer::impressionTerminee( const QString& filePath, 
@@ -112,8 +114,10 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
 {
     mergerPdf();
 
+    nombreEtapesEffectuees++;
+    emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+
     db->ajouterDemandeCeEnBdd(demandeEnCours);
-    emit mettreAJourNombreFacturesTraitees(nombreFacturesTraitees);
 
     //Si la demande ne concerne pas un document unique, on fait les demandes suivantes
     if (!laDemandeEstPourUnDocumentUnique)
@@ -133,7 +137,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                          const QString p_cheminStockageFactures,
                                                          const AeroDmsTypes::Signature p_signature)
 {
-    nombreFacturesTraitees = 0;
+    nombreEtapesEffectuees = 0;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = true;
 
@@ -145,7 +149,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         cheminSortieFichiersGeneres.append("/");
         listeDesFichiers.clear();
 
-        emit mettreAJourNombreFacturesATraiter(1);
+        emit mettreAJourNombreFacturesATraiter(3);
         emit mettreAJourNombreFacturesTraitees(0);
 
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
@@ -154,7 +158,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
         imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux);
 
-        nombreFacturesTraitees++;
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
     else
     {
@@ -175,7 +180,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     demandeEnCours.typeDeSignatureDemandee = p_signature;
     demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
 
-    nombreFacturesTraitees = 0 ;
+    nombreEtapesEffectuees = 0 ;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
 
@@ -187,25 +192,25 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     { 
         cheminSortieFichiersGeneres.append("/");
         listeDesFichiers.clear();
-        int nombreElementsATraiter = 0 ;
+        int nombreEtapesAEffectuer = 0 ;
 
         if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
              || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
         {
-            nombreElementsATraiter = db->recupererLesCotisationsAEmettre().size() +
+            nombreEtapesAEffectuer = db->recupererLesCotisationsAEmettre().size() +
                                      db->recupererLesRecettesBaladesEtSortiesAEmettre().size();
         }
         if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
              || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT)
         {
             listeAnnees = db->recupererAnneesAvecVolNonSoumis();
-            nombreElementsATraiter = nombreElementsATraiter +
+            nombreEtapesAEffectuer = nombreEtapesAEffectuer +
                                      db->recupererLesSubventionsAEmettre().size() +
                                      db->recupererLesDemandesDeRembousementAEmettre().size() +
                                      listeAnnees.size();
         }
 
-        emit mettreAJourNombreFacturesATraiter(nombreElementsATraiter);
+        emit mettreAJourNombreFacturesATraiter(3*nombreEtapesAEffectuer);
         emit mettreAJourNombreFacturesTraitees(0);
 
         imprimerLaProchaineDemandeDeSubvention();
@@ -436,7 +441,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         
         emit generationTerminee(cheminSortieFichiersGeneres);
     }
-    nombreFacturesTraitees++;
+    nombreEtapesEffectuees++;
 }
 
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
