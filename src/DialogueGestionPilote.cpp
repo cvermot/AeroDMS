@@ -168,6 +168,7 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     mail->setText(pilote.mail);
     telephone->setText(pilote.telephone);
     remarque->setText(pilote.remarque);
+    activitePrincipale->setCurrentIndex(activitePrincipale->findText(pilote.activitePrincipale));
 
     setWindowTitle(tr("Mettre à jour le pilote"));
     okButton->setText(tr("&Modifier"));

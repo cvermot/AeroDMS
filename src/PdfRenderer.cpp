@@ -494,6 +494,12 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
     templateTable.replace("__TotCouTot__", QString::number(p_totaux.totaux.coutTotal));
     templateTable.replace("__TotSubTot__", QString::number(p_totaux.totaux.montantRembourse));
 
+    if ( demandeEnCours.mergerTousLesPdf
+         && demandeEnCours.typeDeSignatureDemandee == AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY)
+    {
+        templateTable.replace("<!--Signature-->", "<p>[SignatureField#1]</p>");
+    }
+
     view->setHtml(templateTable,
         ressourcesHtml);
 
@@ -612,14 +618,34 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html)
         {
             //Le chemin vers le fichier
             QString cheminSignature = QCoreApplication::applicationDirPath() + "/ressources/signature.jpg";
-            p_html.replace("xxSignature", "<img src=\""+ cheminSignature +"\" width=\"142\" />");
+            p_html.replace("xxSignature", "<img src=\""+ cheminSignature +"\" width=\"140\" />");
         }
         break;
 
         case AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY:
         {
-            //Le tag réservé pour Lex Community
-            p_html.replace("xxSignature", "[SignatureField#1]");
+            if (demandeEnCours.mergerTousLesPdf)
+            {
+                //Si on est sur un PDF mergé, la signature "visible" réalisée par Lex Community
+                //se trouvera sur la première page   
+                if (QFile("./ressources/signature.jpg").exists())
+                {
+                    QString cheminSignature = QCoreApplication::applicationDirPath() + "/ressources/signature.jpg";
+                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + cheminSignature + "\" width=\"140\" />");
+                }
+                else
+                {
+                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font>");
+
+                }
+                
+            }
+            else
+            {
+                //Le tag réservé pour Lex Community
+                p_html.replace("xxSignature", "[SignatureField#1]");
+            }
+            
         }
         break;
 
