@@ -842,6 +842,18 @@ void AeroDms::ajouterUnPiloteEnBdd()
     const AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
     const AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
 
+    //On met à jour les listes de pilotes
+    peuplerListesPilotes();
+    dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
+
+    //Si on est sur une mise à jour, on met à jour les élements d'IMH susceptibles d'être impacté par des changements
+    if (pilote.idPilote != "")
+    {
+        peuplerListeBaladesEtSorties();
+        peuplerTablePilotes();
+        peuplerTableVols();
+    }
+
     switch (resultat)
     {
         case AeroDmsTypes::ResultatCreationPilote_SUCCES:
@@ -868,18 +880,6 @@ void AeroDms::ajouterUnPiloteEnBdd()
             QMessageBox::critical(this, "Echec ajoute pilote", "Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible.");
             break;
         }
-    }
-
-    //On met à jour les listes de pilotes
-    peuplerListesPilotes();
-    dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
-
-    //Si on est sur une mise à jour, on met à jour les élements d'IMH susceptibles d'être impacté par des changements
-    if (pilote.idPilote != "")
-    {
-        peuplerListeBaladesEtSorties();
-        peuplerTablePilotes();
-        peuplerTableVols();
     }
 }
 
@@ -1398,23 +1398,32 @@ void AeroDms::prevaliderDonnnesSaisies()
         validerLaFacture->setEnabled(false);
     }
 
-    aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
-    QString cotisation = "(Cotisation payée pour l'année "
-        + QString::number(dateDuVol->date().year())
-        + ")";
-    if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
+    if (choixPilote->currentIndex() != 0)
     {
-        cotisation = "(Cotisation non payée pour l'année "
+        aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
+        QString cotisation = "(Cotisation payée pour l'année "
             + QString::number(dateDuVol->date().year())
             + ")";
+        if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
+        {
+            cotisation = "(Cotisation non payée pour l'année "
+                + QString::number(dateDuVol->date().year())
+                + ")";
+        }
+        statusBar()->showMessage("Subvention restante pour ce pilote, pour l'année "
+            + QString::number(dateDuVol->date().year())
+            + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year()))
+            + " € "
+            + cotisation
+            + ".");
+        activite->setCurrentIndex(activite->findText(db->recupererActivitePrincipale(choixPilote->currentData().toString())));
     }
-    statusBar()->showMessage("Subvention restante pour ce pilote, pour l'année " 
-        + QString::number(dateDuVol->date().year()) 
-        + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year())) 
-        + " € "
-        + cotisation 
-        +".");
-    activite->setCurrentIndex(activite->findText(db->recupererActivitePrincipale(choixPilote->currentData().toString())));
+    else
+    {
+        aeroclubPiloteSelectionne->setText("");
+        statusBar()->clearMessage();
+    }
+    
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()

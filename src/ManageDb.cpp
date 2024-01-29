@@ -97,6 +97,7 @@ AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
         pilote.mail = query.value("mail").toString();
         pilote.telephone = query.value("telephone").toString();
         pilote.remarque = query.value("remarque").toString();
+        pilote.activitePrincipale = query.value("activitePrincipale").toString();
     }
 
     return pilote;
@@ -1109,7 +1110,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
         query.bindValue(":mail", p_pilote.mail);
         query.bindValue(":telephone", p_pilote.telephone);
         query.bindValue(":remarque", p_pilote.remarque);
-        query.bindValue("activitePrincipale", p_pilote.activitePrincipale);
+        query.bindValue(":activitePrincipale", p_pilote.activitePrincipale);
 
         if (!query.exec())
         {
