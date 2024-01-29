@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 #include "DialogueGestionPilote.h"
+#include "AeroDmsServices.h"
 
 #include <QtWidgets>
 
@@ -106,6 +107,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     setLayout(mainLayout);
 
     peuplerActivitePrincipale();
+    AeroDmsServices::ajouterIconesComboBox(*activitePrincipale);
 
     setWindowTitle(tr("Ajouter un pilote"));
 }

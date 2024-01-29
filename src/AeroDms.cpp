@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 #include "AeroDms.h"
 #include "AeroDmsTypes.h"
+#include "AeroDmsServices.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
@@ -182,9 +183,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     typeDeVol = new QComboBox(this);
     typeDeVol->addItems(db->recupererTypesDesVol());
     typeDeVol->setCurrentIndex(2);
-    typeDeVol->setItemIcon(0, QIcon("./ressources/account-group.svg"));
-    typeDeVol->setItemIcon(1, QIcon("./ressources/bag-checked.svg"));
-    typeDeVol->setItemIcon(2, QIcon("./ressources/airport.svg"));
+    AeroDmsServices::ajouterIconesComboBox(*typeDeVol);
     QLabel* typeDeVolLabel = new QLabel(tr("Type de vol : "), this);
     connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::changerInfosVolSurSelectionTypeVol);
     connect(typeDeVol, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
@@ -206,6 +205,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
                          "par défaut renseignée pour le pilote sélectionné.\n"
                          "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités.");
     activite->addItems(db->recupererListeActivites());
+    AeroDmsServices::ajouterIconesComboBox(*activite);
     QLabel* activiteLabel = new QLabel(tr("Activité : "), this);
 
     dateDuVol = new QDateTimeEdit(this);
@@ -319,8 +319,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     typeDeRecette = new QComboBox(this);
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
+    AeroDmsServices::ajouterIconesComboBox(*typeDeRecette);
     connect(typeDeRecette, &QComboBox::currentIndexChanged, this, &AeroDms::chargerBaladesSorties);
-    //typeDeRecette->setCurrentIndex(2);
     QLabel* typeDeRecetteLabel = new QLabel(tr("Type de vol : "), this);
 
     intituleRecette = new QLineEdit(this);

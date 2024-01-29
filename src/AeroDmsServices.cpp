@@ -30,3 +30,38 @@ const QString AeroDmsServices::convertirMinutesEnHeuresMinutes(const int p_minut
     QString heuresMinutes = QString::number(heures).append("h").append(minutesString);
     return heuresMinutes;
 }
+
+void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
+{
+    for (int i = 0; i < p_activite.count(); i++)
+    {
+        if (p_activite.itemText(i) == "ULM")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/feather.svg"));
+        }
+        else if (p_activite.itemText(i) == "Avion")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/airplane.svg"));
+        }
+        else if (p_activite.itemText(i) == "Planeur")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/airplane-landing.svg"));
+        }
+        else if (p_activite.itemText(i) == "Hélicoptère")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/helicopter.svg"));
+        }
+        else if (p_activite.itemText(i) == "Balade")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/account-group.svg"));
+        }
+        else if (p_activite.itemText(i) == "Sortie")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/bag-checked.svg"));
+        }
+        else if (p_activite.itemText(i) == "Entrainement")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/airport.svg"));
+        }
+    }
+}

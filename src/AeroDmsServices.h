@@ -25,6 +25,7 @@ class AeroDmsServices
 {
 public:
     static const QString convertirMinutesEnHeuresMinutes(const int p_minutes);
+    static void ajouterIconesComboBox(QComboBox &p_activite);
 
 };
 
