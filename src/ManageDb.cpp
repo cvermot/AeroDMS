@@ -1245,3 +1245,27 @@ QStringList ManageDb::recupererListeActivites()
 
     return listeActivite;
 }
+
+QString ManageDb::recupererMailPilotes(const int p_annee)
+{
+    QSqlQuery query;
+    query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
+    query.bindValue(":annee", p_annee);
+    query.exec();
+
+    QString listeMail;
+
+    while (query.next())
+    {
+        listeMail.append(query.value("mail").toString());
+        listeMail.append(";");
+    }
+
+    //On retire le dernier ";" si liste non vide
+    if (listeMail.size() != 0)
+    {
+        listeMail.chop(1);
+    }
+
+    return listeMail;
+}

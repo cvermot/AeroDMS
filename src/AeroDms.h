@@ -129,6 +129,8 @@ private:
     QAction* boutonDemandesAGenererDepenses;
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
+    QAction* mailingPilotesAyantCotiseCetteAnnee;
+    QAction* mailingPilotesDerniereDemandeSubvention;
 
     //Données internes
     QString piloteAEditer = "";
@@ -177,6 +179,7 @@ public slots:
     void changerDemandesAGenerer();
     void changerFusionPdf();
     void verifierSignatureNumerisee();
+    void envoyerMail();
 
 };
 #endif // AERODMS_H

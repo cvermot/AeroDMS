@@ -108,7 +108,8 @@ public:
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
 
-    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1);  
+    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
+    QString recupererMailPilotes(const int p_annee);
 
 public slots:
 

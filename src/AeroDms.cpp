@@ -452,11 +452,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("Options"));
-    //QAction *boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
-    //boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
-    //menuOption->addAction(boutonConversionHeureDecimalesVersHhMm);
-    //connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
-
+    
     QMenu* menuSignature = menuOption->addMenu(tr("Signature"));
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
 
@@ -515,6 +511,18 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     menuOutils->addSeparator();
     menuOutils->addAction(bouttonGenerePdf);
     menuOutils->addAction(bouttonGenerePdfRecapHdv);
+
+    menuOutils->addSeparator();
+
+    QMenu* mailing = menuOutils->addMenu(tr("Mailing"));
+    mailing->setIcon(QIcon("./ressources/email-multiple.svg"));
+    mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
+    mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
+    mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
+    mailingPilotesDerniereDemandeSubvention->setEnabled(false);
+    mailing->addAction(mailingPilotesDerniereDemandeSubvention);
+    connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
 
@@ -768,10 +776,13 @@ void AeroDms::peuplerTableVols()
     vueVols->resizeColumnsToContents();
 
     bouttonGenerePdfRecapHdv->setEnabled(true);
+    mailingPilotesAyantCotiseCetteAnnee->setEnabled(true);
     //On desactive la génération du récap annuel si on est sur la séléction "Toutes les années"
+    //et également le bouton d'envoi des mails aux pilotes de l'année
     if (listeDeroulanteAnnee->currentData().toInt() == -1)
     {
         bouttonGenerePdfRecapHdv->setEnabled(false);
+        mailingPilotesAyantCotiseCetteAnnee->setEnabled(false);
     }
 }
 
@@ -1670,6 +1681,23 @@ void AeroDms::convertirHeureDecimalesVersHhMm()
         heureHhmm.setHMS(heure, minutes, 0);
         dureeDuVol->setTime(heureHhmm);
     }
+}
+
+void AeroDms::envoyerMail()
+{
+    if (sender() == mailingPilotesAyantCotiseCetteAnnee)
+    {
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
+            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+    }
+    else if (sender() == mailingPilotesDerniereDemandeSubvention)
+    {
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
+            + "?subject=[Section aéronautique] Chèques&body=Vos chèques sont disponibles", QUrl::TolerantMode));
+    }
+    
 }
 
 
