@@ -225,6 +225,7 @@ public:
         QString piloteId;
         QString nomPrenomPilote;
         int minutesVolAvion;
+        int minutesVolAvionElectrique;
         int minutesVolUlm;
         int minutesVolPlaneur;
         int minutesVolHelicoptere;

@@ -146,6 +146,7 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
             item.piloteId = query.value("pilote").toString();
             item.nomPrenomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
             item.minutesVolAvion = 0;
+            item.minutesVolAvionElectrique = 0;
             item.minutesVolUlm = 0;
             item.minutesVolPlaneur = 0;
             item.minutesVolHelicoptere = 0;
@@ -155,6 +156,10 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
         if (query.value("activite").toString() == "Avion")
         {
             item.minutesVolAvion = item.minutesVolAvion + query.value("tempsDeVol").toInt();
+        }
+        else if (query.value("activite").toString() == "Avion électrique")
+        {
+            item.minutesVolAvionElectrique = item.minutesVolAvionElectrique + query.value("tempsDeVol").toInt();
         }
         else if (query.value("activite").toString() == "ULM")
         {

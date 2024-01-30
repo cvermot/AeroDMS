@@ -55,6 +55,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
 
             auto detailAvion = new QPieSeries(this);
             detailAvion->setName("Avion");
+            auto detailAvionElectrique = new QPieSeries(this);
+            detailAvionElectrique->setName("Avion électrique");
             auto detailUlm = new QPieSeries(this);
             detailUlm->setName("ULM");
             auto detailPlaneur = new QPieSeries(this);
@@ -67,6 +69,12 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
                 if (subventionParActivite.at(i).minutesVolAvion != 0)
                 {
                     *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvion,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        donneesTypeDeVolParPilote);
+                }
+                if (subventionParActivite.at(i).minutesVolAvionElectrique != 0)
+                {
+                    *detailAvionElectrique << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvionElectrique,
                         subventionParActivite.at(i).nomPrenomPilote,
                         donneesTypeDeVolParPilote);
                 }
@@ -93,6 +101,11 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
             {
                 QObject::connect(detailAvion, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
                 *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), "Avion", detailAvion);
+            }
+            if (detailAvionElectrique->sum() != 0)
+            {
+                QObject::connect(detailAvionElectrique, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), "Avion électrique", detailAvionElectrique);
             }
             if (detailUlm->sum() != 0)
             {

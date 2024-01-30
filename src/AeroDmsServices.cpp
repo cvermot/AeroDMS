@@ -51,6 +51,10 @@ void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
         {
             p_activite.setItemIcon(i, QIcon("./ressources/helicopter.svg"));
         }
+        else if (p_activite.itemText(i) == "Avion électrique")
+        {
+            p_activite.setItemIcon(i, QIcon("./ressources/lightning-bolt.svg"));
+        }
         else if (p_activite.itemText(i) == "Balade")
         {
             p_activite.setItemIcon(i, QIcon("./ressources/account-group.svg"));
