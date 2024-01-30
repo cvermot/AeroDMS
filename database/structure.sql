@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on jeu. janv. 25 17:33:04 2024
+-- File generated with SQLiteStudio v3.4.4 on mar. janv. 30 21:02:11 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS activite (nom TEXT PRIMARY KEY UNIQUE NOT NULL);
 INSERT INTO activite (nom) VALUES ('Avion');
 INSERT INTO activite (nom) VALUES ('ULM');
 INSERT INTO activite (nom) VALUES ('Planeur');
-INSERT INTO activite (nom) VALUES ('Hélicoptère');
+INSERT INTO activite (nom) VALUES ('Helicoptère');
+INSERT INTO activite (nom) VALUES ('Avion électrique');
 
 -- Table: cotisation
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL);

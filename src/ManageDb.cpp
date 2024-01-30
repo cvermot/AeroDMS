@@ -496,9 +496,21 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     //Sinon, un numéro de vol est renseigné : on est en édition
     else
     {
-        query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'activite' = :activite WHERE volId = :volId");
-        if (p_idSortie != -1)
-            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
+        //Dans le cas de l'édition d'un vol déjà soumis au CSE, le montant de la subvention arrivera
+        //ici à 0, on le sort donc de la mise à jour :
+        if (p_montantSubventionne != 0)
+        {
+            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'activite' = :activite WHERE volId = :volId");
+            if (p_idSortie != -1)
+                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
+        }
+        else
+        {
+            //Les mêmes requetes, sans montantRembourse
+            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'activite' = :activite WHERE volId = :volId");
+            if (p_idSortie != -1)
+                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
+        }
         query.bindValue(":volId", p_idVolAEditer);
     }
     
