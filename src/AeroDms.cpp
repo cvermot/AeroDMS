@@ -655,6 +655,12 @@ void AeroDms::changerFusionPdf()
 
 void AeroDms::peuplerStatistiques()
 {
+    //On affiche le widget qui contient la fonction d'ajout de vol
+    if (sender() == listeDeroulanteStatistique)
+    {
+        mainTabWidget->setCurrentIndex(5);
+    }
+
     if (m_activeWidget) {
         m_activeWidget->setVisible(false);
         m_activeWidget->deleteLater();
