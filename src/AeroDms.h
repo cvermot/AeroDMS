@@ -181,6 +181,7 @@ public slots:
     void verifierSignatureNumerisee();
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();
+    void volsSelectionnes();
 
 };
 #endif // AERODMS_H

@@ -136,13 +136,16 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem("Activité"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem("Durée en minutes"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem("ID"));
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
+    vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, true);
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueVols->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
     connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
+    connect(vueVols, &QTableWidget::cellClicked, this, &AeroDms::volsSelectionnes);
 
     //==========Onglet Factures
     vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);;
@@ -778,6 +781,7 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
     }
     vueVols->resizeColumnsToContents();
@@ -1542,6 +1546,78 @@ void AeroDms::editerPilote()
     dialogueGestionPilote->exec();
 }
 
+void AeroDms::volsSelectionnes()
+{
+    int nombreDeColonnes = 0;
+    for (AeroDmsTypes::VolTableElement element = AeroDmsTypes::VolTableElement_PILOTE ; 
+        element < AeroDmsTypes::VolTableElement_NB_COLONNES ; 
+        element = static_cast<AeroDmsTypes::VolTableElement>(element + 1))
+    {
+        if (!vueVols->isColumnHidden(element))
+        {
+            nombreDeColonnes++;
+        }
+    }
+
+    if (vueVols->selectedItems().size() / nombreDeColonnes > 1)
+    {
+        QItemSelectionModel* selection = vueVols->selectionModel();
+
+        QModelIndexList listesLignesSelectionnees = selection->selectedRows();
+
+        double montantTotalSubventionne = 0;
+        double coutTotal = 0;
+        int hdvTotales = 0;
+        
+        while(listesLignesSelectionnees.size())
+        {
+            int numeroLigne = listesLignesSelectionnees.takeFirst().row();
+            
+            QString data = vueVols->item(numeroLigne,AeroDmsTypes::VolTableElement_COUT)->data(0).toString();
+            data.chop(2);
+            coutTotal = coutTotal + data.toDouble();
+
+            data = vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_SUBVENTION)->data(0).toString();
+            data.chop(2);
+            montantTotalSubventionne = montantTotalSubventionne + data.toDouble();
+
+            hdvTotales = hdvTotales + vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
+
+            statusBar()->showMessage("Vols séléctionnés : Coût total : "
+                + QString::number(coutTotal)
+                + " € / Montant subventionné total : "
+                + QString::number(montantTotalSubventionne)
+                + " € / Nombres d'heures de vol totales : "
+                + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
+        }
+
+        /*for (int i = 0; i < vueVols->selectedItems().size() / nombreDeColonnes; i++)
+        {
+            QString data = vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_COUT)->data(0).toString();
+            data.chop(2);
+            coutTotal = coutTotal + data.toDouble();
+
+            data = vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_SUBVENTION)->data(0).toString();
+            data.chop(2);
+            montantTotalSubventionne = montantTotalSubventionne + data.toDouble();
+
+            //hdvTotales = hdvTotales + vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
+
+            statusBar()->showMessage("Vols séléctionnés : Coût total : " 
+                + QString::number(coutTotal) 
+                + " € / Montant subventionné total : " 
+                + QString::number(montantTotalSubventionne)
+                + " € / Nombres d'heures de vol totales : "
+                + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
+        }*/
+    }
+    else
+    {
+        statusBar()->clearMessage();
+    }
+    
+}
+
 void AeroDms::menuContextuelVols(const QPoint& pos)
 {
     if (vueVols->itemAt(pos) != nullptr)
@@ -1658,6 +1734,7 @@ void AeroDms::switchModeDebug()
         boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
         vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, false);
         vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, false);
+        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, false);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, false);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, false);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, false);
@@ -1669,6 +1746,7 @@ void AeroDms::switchModeDebug()
         boutonModeDebug->setIcon(QIcon("./ressources/bug.svg"));
         vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
         vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
+        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);

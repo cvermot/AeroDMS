@@ -360,7 +360,8 @@ AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 
     vol.coutVol = query.value("cout").toFloat();
     vol.date = query.value("date").toDate();
-    vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(query.value("duree").toInt());
+    vol.dureeEnMinutes = query.value("duree").toInt();
+    vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
     vol.estSoumisCe = "Oui";
     if (query.value("demandeRemboursement").isNull())
         vol.estSoumisCe = "Non";
@@ -410,7 +411,8 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
         AeroDmsTypes::Vol vol;
         vol.coutVol = query.value("cout").toFloat();
         vol.date = query.value("date").toDate();
-        vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(query.value("duree").toInt());
+        vol.dureeEnMinutes = query.value("duree").toInt();
+        vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
         vol.estSoumisCe = "Oui";
         if(query.value("demandeRemboursement").isNull())
             vol.estSoumisCe = "Non";

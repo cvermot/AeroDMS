@@ -52,7 +52,8 @@ public:
         VolTableElement_REMARQUE = 0x7,
         VolTableElement_ACTIVITE = 0x8,
         VolTableElement_VOL_ID = 0x9,
-        VolTableElement_NB_COLONNES = 0xA,
+        VolTableElement_DUREE_EN_MINUTES = 0xA,
+        VolTableElement_NB_COLONNES = 0xB,
     };
 
     enum FactureTableElement {
@@ -164,6 +165,7 @@ public:
         float coutVol;
         float montantRembourse;
         int volId;
+        int dureeEnMinutes;
         int baladeId;
     };
     typedef QList<Vol> ListeVols;
