@@ -191,6 +191,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     choixPilote = new QComboBox(this);
     QLabel* choixPiloteLabel = new QLabel(tr("Pilote : "), this);
     connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::prevaliderDonnnesSaisies);
+    connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::mettreAJourInfosSurSelectionPilote);
 
     aeroclubPiloteSelectionne = new QLineEdit(this);
     aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote séléctionné et au nom duquel le\n" 
@@ -1407,8 +1408,11 @@ void AeroDms::prevaliderDonnnesSaisies()
          || pdfDocument->status() != QPdfDocument::Status::Ready )
     {
         validerLaFacture->setEnabled(false);
-    }
+    }    
+}
 
+void AeroDms::mettreAJourInfosSurSelectionPilote()
+{
     if (choixPilote->currentIndex() != 0)
     {
         aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
@@ -1434,7 +1438,6 @@ void AeroDms::prevaliderDonnnesSaisies()
         aeroclubPiloteSelectionne->setText("");
         statusBar()->clearMessage();
     }
-    
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()
@@ -1695,7 +1698,7 @@ void AeroDms::envoyerMail()
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
-            + "?subject=[Section aéronautique] Chèques&body=Vos chèques sont disponibles", QUrl::TolerantMode));
+            + "?subject=[Section aéronautique] Chèques aéro&body=Vos chèques sont disponibles", QUrl::TolerantMode));
     }
     
 }

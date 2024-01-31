@@ -180,6 +180,7 @@ public slots:
     void changerFusionPdf();
     void verifierSignatureNumerisee();
     void envoyerMail();
+    void mettreAJourInfosSurSelectionPilote();
 
 };
 #endif // AERODMS_H
