@@ -1271,3 +1271,33 @@ QString ManageDb::recupererMailPilotes(const int p_annee)
 
     return listeMail;
 }
+
+QString ManageDb::recupererMailDerniereDemandeDeSubvention()
+{
+    QString listeMail;
+
+    QSqlQuery query;
+    query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
+    query.exec();
+    if (query.next())
+    {
+        const QString date = query.value("dateDemande").toString();
+        query.prepare("SELECT mail FROM mailParDateDeDemandeDeSubvention WHERE dateDemande = :dateDemande");
+        query.bindValue(":dateDemande", date);
+        query.exec();
+
+        while (query.next())
+        {
+            listeMail.append(query.value("mail").toString());
+            listeMail.append(";");
+        }
+
+        //On retire le dernier ";" si liste non vide
+        if (listeMail.size() != 0)
+        {
+            listeMail.chop(1);
+        }
+    }
+
+    return listeMail;
+}

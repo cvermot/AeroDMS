@@ -60,7 +60,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     {
         settings.beginGroup("noms");
         settings.setValue("nomTresorier", "Trésorier");
+        settings.endGroup();
     }
+
+    if (settings.value("mailing/texteChequesDisponibles", "") == "")
+    {
+        settings.beginGroup("mailing");
+        settings.setValue("texteChequesDisponibles", "Bonjour,\n\nVos chèques sont disponibles. \n\nCordialement");
+        settings.endGroup();
+    }
+
+    parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
 
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
@@ -523,7 +533,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
-    mailingPilotesDerniereDemandeSubvention->setEnabled(false);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -1781,8 +1790,9 @@ void AeroDms::envoyerMail()
     else if (sender() == mailingPilotesDerniereDemandeSubvention)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
-            + "?subject=[Section aéronautique] Chèques aéro&body=Vos chèques sont disponibles", QUrl::TolerantMode));
+            + db->recupererMailDerniereDemandeDeSubvention()
+            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }
     
 }

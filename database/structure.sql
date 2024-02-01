@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mar. janv. 30 21:02:11 2024
+-- File generated with SQLiteStudio v3.4.4 on jeu. févr. 1 21:41:02 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -101,6 +101,14 @@ INNER JOIN pilote ON facturesSorties.payeur = pilote.piloteId
 INNER JOIN sortie ON facturesSorties.sortie = sortie.sortieId
 INNER JOIN fichiersFacture ON facturesSorties.facture = fichiersFacture.factureId
 WHERE facturesSorties.demandeRemboursement IS NULL;
+
+-- View: mailParDateDeDemandeDeSubvention
+CREATE VIEW IF NOT EXISTS mailParDateDeDemandeDeSubvention AS SELECT dateDemande, mail, pilote
+FROM demandeRemboursementSoumises 
+INNER JOIN vol ON demandeRemboursementSoumises.demandeId = vol.demandeRemboursement
+INNER JOIN pilote on vol.pilote = pilote.piloteId
+GROUP BY mail, dateDemande
+ORDER BY date DESC;
 
 -- View: recettesASoumettreCe
 CREATE VIEW IF NOT EXISTS recettesASoumettreCe AS SELECT recettes.typeDeRecette,

@@ -242,6 +242,7 @@ public:
         float plafondHoraireRemboursementEntrainement;
         QString nomTresorier;
         int delaisDeGardeBdd;
+        QString texteMailDispoCheques;
     };
 
 };
