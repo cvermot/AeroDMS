@@ -145,7 +145,7 @@ strftime('%Y', vol.date) AS annee,
 SUM(vol.duree) as tempsDeVol,
 typeDeVol
 FROM vol
-GROUP BY mois, typeDeVol
+GROUP BY annee, mois, typeDeVol
 ORDER BY annee, mois;
 
 -- View: stats_heuresDeVolParPilote
