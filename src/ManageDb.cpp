@@ -37,15 +37,16 @@ ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd)
 
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(database);
-    if (!db.open())
-    {
-        QMessageBox::warning(this, "Erreur Ouverture", db.lastError().text());
-    }
+    //if (!db.open())
+    //{
+    //    QMessageBox::warning(this, "Erreur Ouverture", db.lastError().text());
+    //}
 
     if (!db.open()) {
         QMessageBox::critical(0, qApp->tr("Impossible d'ouvrir la base de données"),
-            tr("Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : \n"
-                "Cliquez Annuler pour quitter"), QMessageBox::Cancel);
+            "Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : \n"
+                +db.lastError().text()
+                +"\nCliquez Annuler pour quitter", QMessageBox::Cancel);
     }
 }
 
@@ -112,6 +113,60 @@ int ManageDb::recupererProchainNumeroFacture()
     query.exec(sql);
     query.next();
     return query.value(0).toInt() + 1 ;
+}
+
+AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const int p_annee)
+{
+    AeroDmsTypes::ListeRecetteDetail liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM recettesCotisations");
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::RecetteDetail recette;
+        recette.typeDeRecette = "Cotisation";
+        recette.id = query.value("recetteId").toInt();
+        recette.annee = query.value("annee").toInt();
+        recette.intitule = query.value("Intitule").toString();
+        recette.estSoumisCe = true;
+        recette.montant = query.value("montant").toDouble();
+        if (query.value("identifiantFormulaireSoumissionCe").isNull())
+        {
+            recette.estSoumisCe = false;
+        }
+        liste.append(recette);
+    }
+
+    return liste;
+}
+
+AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const int p_annee)
+{
+    AeroDmsTypes::ListeRecetteDetail liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM recettesHorsCotisations");
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::RecetteDetail recette;
+        recette.typeDeRecette = query.value("typeDeRecette").toString();
+        recette.id = query.value("recetteId").toInt();
+        recette.annee = query.value("annee").toInt();
+        recette.intitule = query.value("Intitule").toString();
+        recette.estSoumisCe = true;
+        recette.montant = query.value("montant").toDouble();
+        if (query.value("identifiantFormulaireSoumissionCe").isNull())
+        {
+            recette.estSoumisCe = false;
+        }
+        liste.append(recette);
+    }
+
+    return liste;
 }
 
 AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee)

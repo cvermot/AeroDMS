@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("2.4");
+    QApplication::setApplicationVersion("2.5");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -136,7 +136,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
 
     //==========Onglet Vols
-    vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);;
+    vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem("Pilote"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem("Date"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem("Type"));
@@ -158,7 +158,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(vueVols, &QTableWidget::cellClicked, this, &AeroDms::volsSelectionnes);
 
     //==========Onglet Factures
-    vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);;
+    vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);
     vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
     vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem("Montant"));
     vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem("Payeur"));
@@ -176,6 +176,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     vueFactures->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueFactures->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueFactures, QIcon("./ressources/file-document.svg"), "Factures");
+
+    //==========Onglet Recettes
+    vueRecettes = new QTableWidget(0, AeroDmsTypes::RecetteTableElement_NB_COLONNES, this);
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem("Date"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem("Type"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem("ID"));
+    vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
+    mainTabWidget->addTab(vueRecettes, QIcon("./ressources/cash-multiple.svg"), "Recettes");
 
     //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
@@ -570,6 +581,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     peuplerTablePilotes();
     peuplerTableVols();
     peuplerTableFactures();
+    peuplerTableRecettes();
     peuplerListeDeroulanteAnnee();
     peuplerStatistiques();
     prevaliderDonnnesSaisies();
@@ -670,7 +682,7 @@ void AeroDms::peuplerStatistiques()
     //On affiche le widget qui contient la fonction d'ajout de vol
     if (sender() == listeDeroulanteStatistique)
     {
-        mainTabWidget->setCurrentIndex(5);
+        mainTabWidget->setCurrentIndex(AeroDmsTypes::Onglet_STATISTIQUES);
     }
 
     if (m_activeWidget) {
@@ -830,6 +842,51 @@ void AeroDms::peuplerTableFactures()
     vueFactures->resizeColumnsToContents();
 }
 
+void AeroDms::peuplerTableRecettes()
+{
+    const AeroDmsTypes::ListeRecetteDetail listeRecettesCotisations = db->recupererRecettesCotisations();
+    const AeroDmsTypes::ListeRecetteDetail listeRecettesHorsCotisations = db->recupererRecettesHorsCotisation();
+
+    qDebug() << "recette hors cotisation" << listeRecettesHorsCotisations.size();
+
+    vueRecettes->setRowCount( listeRecettesCotisations.size()
+                              + listeRecettesHorsCotisations.size());
+
+    for (int i = 0; i < listeRecettesCotisations.size(); i++)
+    {
+        AeroDmsTypes::RecetteDetail recette = listeRecettesCotisations.at(i);
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant) + " €"));
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
+        if (recette.estSoumisCe)
+            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Oui"));
+        else
+            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Non"));
+    }
+
+    for (int i = 0; i < listeRecettesHorsCotisations.size(); i++)
+    {
+        AeroDmsTypes::RecetteDetail recette = listeRecettesHorsCotisations.at(i);
+
+        const int position = listeRecettesCotisations.size() + i;
+
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant) + " €"));
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
+        if (recette.estSoumisCe)
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Oui"));
+        else
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Non"));
+    }
+
+    vueRecettes->resizeColumnsToContents();
+    vueRecettes->sortItems(AeroDmsTypes::RecetteTableElement_DATE);
+}
+
 void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
@@ -961,7 +1018,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     choixBalade->setCurrentIndex(0);
     
     //On affiche le widget qui contient la fonction d'ajout de vol
-    mainTabWidget->setCurrentIndex(3);
+    mainTabWidget->setCurrentIndex(AeroDmsTypes::Onglet_AJOUT_DEPENSES);
 }
 
 void AeroDms::genererPdf()
@@ -1747,6 +1804,7 @@ void AeroDms::switchModeDebug()
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, false);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, false);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, false);
+        vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, false);
     }
     //Sinon, le mode est actif, on desactive
     else
@@ -1759,6 +1817,7 @@ void AeroDms::switchModeDebug()
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
         vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
+        vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
     }
 }
 

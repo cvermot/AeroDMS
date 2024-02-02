@@ -70,6 +70,16 @@ public:
         FactureTableElement_NB_COLONNES = 0xA,
     };
 
+    enum RecetteTableElement {
+        RecetteTableElement_DATE = 0x0,
+        RecetteTableElement_TYPE_DE_RECETTE = 0x1,
+        RecetteTableElement_INTITULE = 0x2,
+        RecetteTableElement_MONTANT = 0x3,
+        RecetteTableElement_SOUMIS_CE = 0x4,
+        RecetteTableElement_ID = 0x5,
+        RecetteTableElement_NB_COLONNES = 0x6,
+    };
+
     enum ResultatCreationPilote {
         ResultatCreationPilote_SUCCES = 0x0,
         ResultatCreationPilote_PILOTE_EXISTE = 0x1,
@@ -101,6 +111,16 @@ public:
         TypeGenerationPdf_TOUTES,
         TypeGenerationPdf_RECETTES_SEULEMENT,
         TypeGenerationPdf_DEPENSES_SEULEMENT
+    };
+
+    enum Onglet {
+        Onglet_PILOTES,
+        Onglet_VOLS,
+        Onglet_FACTURES,
+        Onglet_RECETTES,
+        Onglet_AJOUT_DEPENSES,
+        Onglet_AJOUT_RECETTES,
+        Onglet_STATISTIQUES
     };
 
     struct DemandeEnCoursDeTraitement {
@@ -186,6 +206,17 @@ public:
         int annee;
     };
     typedef QList<Recette> ListeRecette;
+
+    struct RecetteDetail {
+        QString intitule;
+        QString typeDeRecette;
+        float montant;
+        QDate date;
+        int annee;
+        bool estSoumisCe;
+        int id;
+    };
+    typedef QList<RecetteDetail> ListeRecetteDetail;
 
     struct Sortie {
         int id;

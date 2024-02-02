@@ -138,6 +138,34 @@ nom
 FROM recettesASoumettreCe
 GROUP BY annee, typeDeRecette, nom;
 
+-- View: recettesCotisations
+CREATE VIEW IF NOT EXISTS recettesCotisations AS SELECT cotisation.pilote,
+       cotisation.annee,
+       cotisation.cotisationId,
+       cotisation.idRecette,
+       pilote.nom,
+       recettes.recetteId,
+       recettes.montant,
+       recettes.Intitule,
+       recettes.identifiantFormulaireSoumissionCe
+FROM cotisation
+     INNER JOIN pilote ON cotisation.pilote = pilote.piloteId
+     INNER JOIN recettes ON recettes.recetteId = cotisation.idRecette
+ORDER BY cotisation.annee;
+
+-- View: recettesHorsCotisations
+CREATE VIEW IF NOT EXISTS recettesHorsCotisations AS SELECT
+    recettes.recetteId, 
+    typeDeRecette, 
+    Intitule, 
+    montant, 
+    strftime('%Y', vol.date) AS annee,
+    vol.date,
+    recettes.identifiantFormulaireSoumissionCe
+FROM recettes
+INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
+INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId;
+
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
 strftime('%m', vol.date) AS mois,
