@@ -276,6 +276,13 @@ public:
         QString texteMailDispoCheques;
     };
 
+    struct TotauxRecettes {
+        double cotisations;
+        double balades;
+        double sorties;
+    };
+    static const TotauxRecettes K_INIT_TOTAUX_RECETTE;
+
 };
 
 #endif // AERODMSTYPES_H

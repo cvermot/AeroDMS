@@ -77,6 +77,7 @@ public:
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1);
     AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = -1);
     AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = -1);
+    AeroDmsTypes::TotauxRecettes recupererTotauxRecettes(const int p_annee);
     AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee = -1, 
                                                                           const QString p_piloteId = "*",
                                                                           const bool p_volsSoumisUniquement = false);

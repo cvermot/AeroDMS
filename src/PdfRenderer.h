@@ -65,7 +65,8 @@ private :
 
 	void imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
 		                                    const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
-		                                    const AeroDmsTypes::SubventionsParPilote p_totaux);
+		                                    const AeroDmsTypes::SubventionsParPilote p_totaux,
+		                                    const bool p_ajouterLesRecettes = false);
 	void produireFichierPdfGlobal();
 
 	QString numeroFichierSur3Digits();

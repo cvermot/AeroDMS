@@ -185,6 +185,39 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const
     return liste;
 }
 
+AeroDmsTypes::TotauxRecettes ManageDb::recupererTotauxRecettes(const int p_annee)
+{
+    AeroDmsTypes::TotauxRecettes totaux = AeroDmsTypes::K_INIT_TOTAUX_RECETTE;
+
+    QSqlQuery query;
+    query.prepare("SELECT SUM(montant) AS totalCotisations FROM recettesCotisations WHERE annee = :annee");
+    query.bindValue(":annee", QString::number(p_annee));
+    query.exec();
+
+    if (query.next())
+    {
+        totaux.cotisations = query.value("totalCotisations").toDouble();
+    }
+
+    query.prepare("SELECT typeDeRecette, SUM(montant) as total FROM recettesHorsCotisations WHERE annee = :annee GROUP BY typeDeRecette");
+    query.bindValue(":annee", QString::number(p_annee));
+    query.exec();
+
+    while (query.next())
+    {
+        if (query.value("typeDeRecette").toString() == "Balade")
+        {
+            totaux.balades = query.value("total").toDouble();
+        }
+        else if (query.value("typeDeRecette").toString() == "Sortie")
+        {
+            totaux.sorties = query.value("total").toDouble();
+        }
+    }
+
+    return totaux;
+}
+
 AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee)
 {
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite liste;

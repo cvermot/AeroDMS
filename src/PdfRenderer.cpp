@@ -156,7 +156,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                                                                                    "*",
                                                                                                                    false);
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
-        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux);
+        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux, true);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -446,18 +446,25 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
                                                      const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
-                                                     const AeroDmsTypes::SubventionsParPilote p_totaux)
+                                                     const AeroDmsTypes::SubventionsParPilote p_totaux,
+                                                     const bool p_ajouterLesRecettes)
 {
     QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
     QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
+    QFile tableRecettes(QString(ressourcesHtml.toLocalFile()).append("TableauRecapRecettes.html"));
     QString templateTable = "";
     QString templateTableItem = "";
-    if (table.open(QFile::ReadOnly | QFile::Text) && tableItem.open(QFile::ReadOnly | QFile::Text))
+    QString templateTableRecettes = "";
+    if (table.open(QFile::ReadOnly | QFile::Text) 
+        && tableItem.open(QFile::ReadOnly | QFile::Text)
+        && tableRecettes.open(QFile::ReadOnly | QFile::Text))
     {
         QTextStream inTable(&table);
         QTextStream inTableItem(&tableItem);
+        QTextStream inTableRecettes(&tableRecettes);
         templateTable = inTable.readAll();
         templateTableItem = inTableItem.readAll();
+        templateTableRecettes = inTableRecettes.readAll();
     }
     else
     {
@@ -498,6 +505,16 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
     templateTable.replace("__TotHdvTot__", p_totaux.totaux.heuresDeVol);
     templateTable.replace("__TotCouTot__", QString::number(p_totaux.totaux.coutTotal));
     templateTable.replace("__TotSubTot__", QString::number(p_totaux.totaux.montantRembourse));
+
+    if (p_ajouterLesRecettes)
+    {
+        templateTable.replace("<!--AccrocheRecette-->", templateTableRecettes);
+
+        const AeroDmsTypes::TotauxRecettes totaux = db->recupererTotauxRecettes(p_annee);
+        templateTable.replace("_RecetteCotisation_", QString::number(totaux.cotisations) + " €");
+        templateTable.replace("_RecetteBalade_", QString::number(totaux.balades) + " €");
+        templateTable.replace("_RecetteSortie_", QString::number(totaux.sorties) + " €");
+    }
 
     if ( demandeEnCours.mergerTousLesPdf
          && demandeEnCours.typeDeSignatureDemandee == AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY)
