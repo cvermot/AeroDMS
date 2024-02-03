@@ -30,6 +30,8 @@ public:
     ManageDb(const QString& database, const int p_delaisDeGardeBdd);
     ManageDb();
 
+    void sauvegarderLaBdd(const QString p_repertoireDeSauvegarde);
+
     QString getLastError();
     AeroDmsTypes::ListePilotes recupererPilotes();
     AeroDmsTypes::Pilote recupererPilote(const QString p_idPilote);

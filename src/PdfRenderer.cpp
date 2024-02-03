@@ -213,6 +213,8 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
         emit mettreAJourNombreFacturesATraiter(3*nombreEtapesAEffectuer);
         emit mettreAJourNombreFacturesTraitees(0);
 
+        db->sauvegarderLaBdd(cheminSortieFichiersGeneres);
+
         imprimerLaProchaineDemandeDeSubvention();
     }
     else

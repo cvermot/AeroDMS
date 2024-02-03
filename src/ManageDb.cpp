@@ -50,6 +50,16 @@ ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd)
     }
 }
 
+void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
+{
+    db.close();
+
+    QFile gestionnaireDeFichier;
+    gestionnaireDeFichier.copy(db.databaseName(), p_repertoireDeSauvegarde + "AeroDms.sqlite");
+
+    db.open();
+}
+
 QString ManageDb::getLastError()
 {
     return db.lastError().text();
