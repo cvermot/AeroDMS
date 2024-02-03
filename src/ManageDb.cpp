@@ -120,7 +120,15 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const in
     AeroDmsTypes::ListeRecetteDetail liste;
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM recettesCotisations");
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM recettesCotisations WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT * FROM recettesCotisations");
+    } 
     query.exec();
 
     while (query.next())
@@ -147,7 +155,15 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const
     AeroDmsTypes::ListeRecetteDetail liste;
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM recettesHorsCotisations");
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM recettesHorsCotisations WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT * FROM recettesHorsCotisations");
+    }
     query.exec();
 
     while (query.next())
@@ -915,7 +931,15 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDeman
     //Récupérationd des demandes de remboursement soumises ou non au CSE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
     QSqlQuery query;
-    query.prepare("SELECT * FROM 'factures'");
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM factures WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT * FROM factures");
+    }
     query.exec();
 
     while (query.next()) {

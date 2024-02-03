@@ -164,7 +164,8 @@ CREATE VIEW IF NOT EXISTS recettesHorsCotisations AS SELECT
     recettes.identifiantFormulaireSoumissionCe
 FROM recettes
 INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
-INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId;
+INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId
+GROUP BY recettes.recetteId;
 
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 

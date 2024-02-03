@@ -429,6 +429,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     listeDeroulanteAnnee = new QComboBox(this);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableFactures);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     selectionToolBar->addWidget(listeDeroulanteAnnee);
 
@@ -592,7 +594,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
 void AeroDms::verifierSignatureNumerisee()
 {
-    qDebug() << "fichier signature" << QCoreApplication::applicationDirPath() + "/ressources/signature.jpg" << QDir(QCoreApplication::applicationDirPath() + "/ressources/signature.jpg").exists();
     if (!QFile("./ressources/signature.jpg").exists())
     {
         boutonSignatureManuelle->setEnabled(false);
@@ -844,10 +845,8 @@ void AeroDms::peuplerTableFactures()
 
 void AeroDms::peuplerTableRecettes()
 {
-    const AeroDmsTypes::ListeRecetteDetail listeRecettesCotisations = db->recupererRecettesCotisations();
-    const AeroDmsTypes::ListeRecetteDetail listeRecettesHorsCotisations = db->recupererRecettesHorsCotisation();
-
-    qDebug() << "recette hors cotisation" << listeRecettesHorsCotisations.size();
+    const AeroDmsTypes::ListeRecetteDetail listeRecettesCotisations = db->recupererRecettesCotisations(listeDeroulanteAnnee->currentData().toInt());
+    const AeroDmsTypes::ListeRecetteDetail listeRecettesHorsCotisations = db->recupererRecettesHorsCotisation(listeDeroulanteAnnee->currentData().toInt());
 
     vueRecettes->setRowCount( listeRecettesCotisations.size()
                               + listeRecettesHorsCotisations.size());
@@ -917,6 +916,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
         //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
         peuplerListeDeroulanteAnnee();
         statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
+
+        peuplerTableRecettes();
     }
 }
 
@@ -1350,7 +1351,7 @@ void AeroDms::enregistrerUnVol()
     //On met à jour la table des pilotes et celle des vols
     peuplerTablePilotes();
     peuplerTableVols();
-    //On met a jour la liste des vols balades/sorties dans l'onglet des recettes
+    //On met a jour la liste des vols balades/sorties dans l'onglet ajout des recettes
     peuplerListeBaladesEtSorties();
 
     //Et l'affichage des statistiques
@@ -1388,6 +1389,7 @@ void AeroDms::enregistrerUneRecette()
     intituleRecette->clear();
     montantRecette->clear();
 
+    peuplerTableRecettes();
 }
 
 float AeroDms::calculerCoutHoraire()
