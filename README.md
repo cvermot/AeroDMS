@@ -1,18 +1,22 @@
 # AeroDMS
+[![GitHub License](https://img.shields.io/github/license/cvermot/AeroDMS)](https://www.gnu.org/licenses/gpl-3.0.fr.html#license-text)
+[![GitHub Release](https://img.shields.io/github/v/release/cvermot/AeroDMS)](https://github.com/cvermot/AeroDMS/releases)
+![GitHub top language](https://img.shields.io/github/languages/top/cvermot/AeroDMS)
+[![GitHub line of code](https://sloc.xyz/github/cvermot/AeroDMS?category=code)]()
 
 Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 
 ## Technologies utilisées
 
 - Développé en C++
-- Base de données SQLite
-- Librairie Qt (6.6.1)
+- Base de données [SQLite](https://www.sqlite.org/)
+- Librairie [Qt](https://www.qt.io/) (6.6.1)
   - GUI (QtGui)
   - Lecture PDF (QtPdf)
   - Écriture PDF à partir d’un template HTML via WebEngine (QtWebEngine)
   - Accès à la BDD SQLite (QtSql)
   - Affichage des statistiques (QtCharts)
-- Librairie PoDoFo (0.10.3)
+- Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
 
 ## Mise en place de l’environnement de développement
 Le développement est effectué sous Visual Studio 2022 (MSVC). Cette contrainte découle du fait que QtWebEngine n’est pas disponible lorsque Qt est compilé avec MinGw, cela interdit donc la compilation de l’application sous QtCreator sous Windows.
@@ -40,6 +44,11 @@ vcpkg integrate install
 Une fois installée, PoDoFo est directement disponible sous MSVC sans manipulations supplémentaires.
 
 ## Déploiement
+Le déploiement est réalisé sous forme d'archives ZIP.
+
+Visual Studio déploie automatiquement les DLL nécéssaires aux librairies utilisées via vcpkg. Pour les DLL Qt, il est nécessaire de passer par [windeployqt](https://doc.qt.io/Qt-5/windows-deployment.html).
+
+:warning: Il existe actuellement un soucis avec la libraire OpenSSL produite par vcpkg et utilisée par PoDoFo. En effet, cette DLL fait appel à une autre DLL qui est referencée par un chemin absolu ([Issue créée sur le GitHub vcpkg](https://github.com/microsoft/vcpkg/issues/36482)). Il est donc pour le moment nécessaire de déployer la DLL `legacy.dll` au chemin exacte ou se trouve celle-ci sur la machine ayant produit la DLL via vcpkg.
 
 ## Configuration, utilisation
 Voir le [Wiki](https://github.com/cvermot/AeroDMS/wiki).
