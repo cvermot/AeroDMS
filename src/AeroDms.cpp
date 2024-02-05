@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("2.5");
+    QApplication::setApplicationVersion("2.6");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -1125,7 +1125,8 @@ void AeroDms::genererPdfRecapHdV()
 {
     pdf->imprimerLeRecapitulatifDesHeuresDeVol( listeDeroulanteAnnee->currentData().toInt(),
                                                 cheminSortieFichiersGeneres,
-                                                cheminStockageFacturesTraitees);
+                                                cheminStockageFacturesTraitees,
+                                                signature);
 }
 
 void AeroDms::enregistrerUneFacture()

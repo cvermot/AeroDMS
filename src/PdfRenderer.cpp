@@ -141,6 +141,9 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = true;
 
+    demandeEnCours.typeDeSignatureDemandee = p_signature;
+    demandeEnCours.mergerTousLesPdf = true;
+
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
     QDir().mkdir(cheminSortieFichiersGeneres);
