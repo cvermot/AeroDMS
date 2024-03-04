@@ -1391,6 +1391,7 @@ void AeroDms::enregistrerUneRecette()
     montantRecette->clear();
 
     peuplerTableRecettes();
+    peuplerListeBaladesEtSorties();
 }
 
 float AeroDms::calculerCoutHoraire()
@@ -1456,12 +1457,18 @@ void AeroDms::peuplerListeBaladesEtSorties()
 {
     listeBaladesEtSorties->clear();
 
-    QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
-    QStringListIterator it(itemLabels);
+    //QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
+    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
+    QListIterator it(itemLabels);
     while (it.hasNext())
     {
-        QListWidgetItem* itemBaladesEtSorties = new QListWidgetItem(it.next(), listeBaladesEtSorties);
+        const AeroDmsTypes::VolSortieOuBalade & vol = it.next();
+        QListWidgetItem* itemBaladesEtSorties = new QListWidgetItem(vol.nomVol, listeBaladesEtSorties);
         itemBaladesEtSorties->setCheckState(Qt::Unchecked);
+        if (!vol.volAAuMoinsUnPaiement)
+        {
+            itemBaladesEtSorties->setForeground(Qt::red);
+        }
         listeBaladesEtSorties->addItem(itemBaladesEtSorties);
     }
 }

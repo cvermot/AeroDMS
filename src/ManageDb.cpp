@@ -1093,15 +1093,28 @@ QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesType
     return liste;
 }
 
-QStringList ManageDb::recupererBaladesEtSorties(const QString p_typeDeVol)
+AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties(const QString p_typeDeVol)
 {
-    QStringList liste;
+    AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
     query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
     query.bindValue(":typeDeVol", p_typeDeVol);
     query.exec();
-    while (query.next()) {
-        liste.append(query.value(2).toString());
+    while (query.next()) 
+    {
+        AeroDmsTypes::VolSortieOuBalade vol;
+        vol.nomVol = query.value("NomVol").toString();
+
+        QSqlQuery paiementAssocie;
+        paiementAssocie.prepare("SELECT COUNT(*) AS nombreVol FROM 'xAssociationRecette-Vol' WHERE volId = :volId");
+        paiementAssocie.bindValue(":volId", query.value("volId").toInt());
+        paiementAssocie.exec();
+        paiementAssocie.next();
+
+        vol.volAAuMoinsUnPaiement = (paiementAssocie.value("nombreVol").toInt() != 0 );
+
+        liste.append(vol);
+
     }
 
     return liste;

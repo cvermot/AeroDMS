@@ -159,6 +159,8 @@ public:
         QString heuresDeVol;
         int tempsDeVolEnMinutes;
     };
+    static const HeureDeVolRemboursement K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
+
     struct SubventionsParPilote {
         QString idPilote;
         int annee;
@@ -170,6 +172,7 @@ public:
         HeureDeVolRemboursement sortie;
         HeureDeVolRemboursement totaux;
     };
+    static const SubventionsParPilote K_INIT_SUBVENTION_PAR_PILOTE;
     typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;
 
     struct Vol {
@@ -253,6 +256,12 @@ public:
         int minutesBalade;
     };
     typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
+
+    struct VolSortieOuBalade {
+        QString nomVol;
+        bool volAAuMoinsUnPaiement;
+    };
+    typedef QList<VolSortieOuBalade> ListeVolSortieOuBalade;
 
     struct StatsHeuresDeVolParActivite {
         QString piloteId;
