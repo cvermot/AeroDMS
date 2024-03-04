@@ -104,7 +104,7 @@ AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
         pilote.nom = query.value("nom").toString();
         pilote.prenom = query.value("prenom").toString();
         pilote.aeroclub = query.value("aeroclub").toString();
-        pilote.estAyantDroit = query.value("esrtAyantDroit").toBool();
+        pilote.estAyantDroit = query.value("estAyantDroit").toBool();
         pilote.mail = query.value("mail").toString();
         pilote.telephone = query.value("telephone").toString();
         pilote.remarque = query.value("remarque").toString();
