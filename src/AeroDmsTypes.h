@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AERODMSTYPES_H
 
 #include <QtWidgets>
+#include "AeroDmsServices.h"
 
 class AeroDmsTypes
 {
@@ -158,6 +159,15 @@ public:
         float coutTotal;
         QString heuresDeVol;
         int tempsDeVolEnMinutes;
+
+        HeureDeVolRemboursement& operator+(const HeureDeVolRemboursement& a)
+        {
+            montantRembourse = montantRembourse + a.montantRembourse;
+            coutTotal = coutTotal + a.coutTotal;
+            tempsDeVolEnMinutes = tempsDeVolEnMinutes + a.tempsDeVolEnMinutes;
+            heuresDeVol = AeroDmsServices::convertirMinutesEnHeuresMinutes(tempsDeVolEnMinutes);
+            return *this;
+        }
     };
     static const HeureDeVolRemboursement K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
 
@@ -171,6 +181,15 @@ public:
         HeureDeVolRemboursement balade;
         HeureDeVolRemboursement sortie;
         HeureDeVolRemboursement totaux;
+
+        SubventionsParPilote& operator+(const SubventionsParPilote& a)
+        {
+            entrainement = entrainement + a.entrainement;
+            balade = balade + a.balade;
+            sortie = sortie + a.sortie;
+            totaux = totaux + a.totaux;
+            return *this;
+        }
     };
     static const SubventionsParPilote K_INIT_SUBVENTION_PAR_PILOTE;
     typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;

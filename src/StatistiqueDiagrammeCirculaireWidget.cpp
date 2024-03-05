@@ -23,7 +23,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
     {
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         {
-            AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+            
+            const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db, 
+                                                                                                              p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             donneesTypeDeVolParPilote->setName("Temps de vol par pilote (cliquez pour le détail par pilote)");
@@ -132,7 +134,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         default:
         {
-            AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+            const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db,
+                                                                                                              p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             donneesTypeDeVolParPilote->setName("Temps de vol par type de vol (cliquez pour le détail des heures par pilote dans la catégorie)");
@@ -166,4 +169,39 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(Manag
     }
     
     createDefaultChartView(chart);
+}
+
+AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::recupererSubventionsPilotes(ManageDb* p_db, const int p_annee)
+{
+    AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+
+    AeroDmsTypes::ListeSubventionsParPilotes subventionParPiloteSansDoublon = QList<AeroDmsTypes::SubventionsParPilote>();
+    while (!subventionParPilote.isEmpty())
+    {
+        AeroDmsTypes::SubventionsParPilote subvention = subventionParPilote.takeFirst();
+        bool estTrouve = false;
+        int pos = 0;
+        while (pos < subventionParPiloteSansDoublon.size() && !estTrouve)
+        {
+            if (subventionParPiloteSansDoublon.at(pos).idPilote == subvention.idPilote)
+            {
+                estTrouve = true;
+            }
+            else
+            {
+                pos++;
+            }
+        }
+        if (!estTrouve)
+        {
+            subventionParPiloteSansDoublon.append(subvention);
+        }
+        else
+        {
+            subvention = subvention + subventionParPiloteSansDoublon.at(pos);
+            subventionParPiloteSansDoublon.replace(pos, subvention);
+        }
+    }
+    
+    return subventionParPiloteSansDoublon;
 }
