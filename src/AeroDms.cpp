@@ -559,6 +559,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     
     //========================Menu Aide
     QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
+    QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("Aide en ligne"), this);
+    aideQtAction->setStatusTip(tr("Ouvrir l'aide en ligne"));
+    helpMenu->addAction(aideQtAction);
+    connect(aideQtAction, SIGNAL(triggered()), this, SLOT(ouvrirAide()));
+    helpMenu->addSeparator();
     boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
@@ -1595,6 +1600,11 @@ void AeroDms::aPropos()
         "<br />< br/>"
         "You should have received a copy of the GNU General Public License"
         " along with this program.  If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.");
+}
+
+void AeroDms::ouvrirAide()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/cvermot/AeroDMS/wiki", QUrl::TolerantMode));
 }
 
 void AeroDms::menuContextuelPilotes(const QPoint& pos)

@@ -169,6 +169,7 @@ public slots:
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
     void aPropos();
+    void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
     void editerPilote();
     void editerVol();
