@@ -210,6 +210,7 @@ public:
         int dureeEnMinutes;
         int baladeId;
     };
+    static const Vol K_INIT_VOL;
     typedef QList<Vol> ListeVols;
 
     struct DemandeRemboursement {

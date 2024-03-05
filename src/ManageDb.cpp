@@ -330,29 +330,13 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
     while (query.next())
     {
         int heuresDeVolEnMinutes = 0;
-        AeroDmsTypes::SubventionsParPilote subvention;
+        AeroDmsTypes::SubventionsParPilote subvention = AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE;
 
         subvention.idPilote = query.value("pilote").toString();
         subvention.annee = query.value("annee").toInt();
         subvention.nom = query.value("nom").toString();
         subvention.prenom = query.value("prenom").toString();
         subvention.aeroclub = query.value("aeroclub").toString();
-        subvention.sortie.heuresDeVol = "0h00";
-        subvention.sortie.tempsDeVolEnMinutes = 0;
-        subvention.sortie.montantRembourse = 0;
-        subvention.sortie.coutTotal = 0;
-        subvention.entrainement.heuresDeVol = "0h00";
-        subvention.entrainement.tempsDeVolEnMinutes = 0;
-        subvention.entrainement.montantRembourse = 0;
-        subvention.entrainement.coutTotal = 0;
-        subvention.balade.heuresDeVol = "0h00";
-        subvention.balade.tempsDeVolEnMinutes = 0;
-        subvention.balade.montantRembourse = 0;
-        subvention.balade.coutTotal = 0;
-        subvention.totaux.heuresDeVol = "0h00";
-        subvention.totaux.tempsDeVolEnMinutes = 0;
-        subvention.totaux.montantRembourse = 0;
-        subvention.totaux.coutTotal = 0;
 
         QSqlQuery queryVolAnneePilote;
         queryVolAnneePilote.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee AND pilote = :piloteId");
@@ -401,24 +385,12 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
 AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_annee,
                                                                     const bool p_volsSoumisUniquement)
 {
-    AeroDmsTypes::SubventionsParPilote totaux;
+    AeroDmsTypes::SubventionsParPilote totaux = AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE;
     totaux.idPilote = "";
     totaux.annee = p_annee;
     totaux.nom = "Totaux";
     totaux.prenom = "";
     totaux.aeroclub = "";
-    totaux.sortie.heuresDeVol = "0h00";
-    totaux.sortie.montantRembourse = 0;
-    totaux.sortie.coutTotal = 0;
-    totaux.entrainement.heuresDeVol = "0h00";
-    totaux.entrainement.montantRembourse = 0;
-    totaux.entrainement.coutTotal = 0;
-    totaux.balade.heuresDeVol = "0h00";
-    totaux.balade.montantRembourse = 0;
-    totaux.balade.coutTotal = 0;
-    totaux.totaux.heuresDeVol = "0h00";
-    totaux.totaux.montantRembourse = 0;
-    totaux.totaux.coutTotal = 0;
 
     int heuresDeVolEnMinutes = 0;
 
@@ -463,7 +435,7 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
 
 AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 {
-    AeroDmsTypes::Vol vol;
+    AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
 
     QSqlQuery query;
     query.prepare("SELECT *  FROM vol WHERE volId = :volId");
@@ -522,7 +494,7 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
 
     while (query.next())
     {
-        AeroDmsTypes::Vol vol;
+        AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
         vol.coutVol = query.value("cout").toFloat();
         vol.date = query.value("date").toDate();
         vol.dureeEnMinutes = query.value("duree").toInt();
