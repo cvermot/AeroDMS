@@ -58,6 +58,8 @@ private:
 
     float calculerCoutHoraire();
 
+    void verifierEtExecuterMaJ(const QString p_chemin);
+
     ManageDb* db;
     PdfRenderer* pdf;
     AeroDmsTypes::Signature signature;
