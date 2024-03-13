@@ -296,7 +296,8 @@ CREATE VIEW IF NOT EXISTS volsBaladesEtSorties AS SELECT
     || pilote.nom || ' ' || pilote.prenom  || ' - ' 
     || strftime('%d/%m/%Y', vol.date) 
     || ' (Durée : ' || CAST(vol.duree/60 AS text) || 'h' || printf("%02d",vol.duree%60) || ') -' 
-    || ifnull(vol.remarque,'Sans remarque') || '-' AS NomVol
+    || ifnull(vol.remarque,'Sans remarque') || '-' AS NomVol,
+    vol.cout
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
 INNER JOIN sortie ON vol.sortie = sortie.sortieId

@@ -95,7 +95,8 @@ public:
 
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
-    AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties(const QString p_typeDeVol);
+    AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties( const QString p_typeDeVol, 
+                                                                    const float p_proportionRemboursement);
     QList<int> recupererAnnees();
     QList<int> recupererAnneesAvecVolNonSoumis();
     AeroDmsTypes::ListeSortie recupererListeSorties();

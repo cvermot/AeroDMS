@@ -1463,7 +1463,7 @@ void AeroDms::peuplerListeBaladesEtSorties()
     listeBaladesEtSorties->clear();
 
     //QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
-    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
+    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText(), parametresMetiers.proportionRemboursementBalade/2);
     QListIterator it(itemLabels);
     while (it.hasNext())
     {
