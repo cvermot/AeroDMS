@@ -44,3 +44,15 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      0,//int dureeEnMinutes;
                                                      0//int baladeId;
 };
+
+const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilote;
+                                                           "", //QString nom;
+                                                           "", //QString prenom;
+                                                           "", //QString aeroclub;
+                                                           "", //QString activitePrincipale;
+                                                           false, //bool estAyantDroit;
+                                                           "", //QString mail;
+                                                           "", //QString telephone;
+                                                           "", //QString remarque;
+                                                           false //bool estActif;
+};

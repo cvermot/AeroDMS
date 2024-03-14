@@ -40,6 +40,7 @@ private:
     QLineEdit* mail;
     QLineEdit* telephone;
     QLineEdit* remarque;
+    QCheckBox* estActif;
 
     QString idPilote;
 

@@ -72,6 +72,10 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     remarque = new QLineEdit(this);
     QLabel* remarqueLabel = new QLabel(tr("Remarque : "), this);
 
+    estActif = new QCheckBox(this);
+    QLabel* estActifLabel = new QLabel(tr("Pilote actif : "), this);
+    estActif->setChecked(Qt::Checked);
+
     idPilote = "";
 
     QGridLayout* mainLayout = new QGridLayout(this);
@@ -101,8 +105,10 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     mainLayout->addWidget(remarqueLabel, 7, 0);
     mainLayout->addWidget(remarque, 7, 1);
 
+    mainLayout->addWidget(estActifLabel, 8, 0);
+    mainLayout->addWidget(estActif, 8, 1);
 
-    mainLayout->addWidget(buttonBox, 8, 0, 1, 2);
+    mainLayout->addWidget(buttonBox, 9, 0, 1, 2);
 
     setLayout(mainLayout);
 
@@ -119,7 +125,7 @@ void DialogueGestionPilote::peuplerActivitePrincipale()
 
 AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
 {
-    AeroDmsTypes::Pilote pilote;
+    AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
 
     pilote.idPilote = idPilote;
     pilote.nom = nom->text().toUpper();
@@ -130,6 +136,7 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.telephone = telephone->text();
     pilote.remarque = remarque->text();
     pilote.activitePrincipale = activitePrincipale->currentText();
+    pilote.estActif = estActif->checkState() == Qt::Checked;
 
     //On rince l'affichage en vue d'une éventuelle autre saisie
     annulationOuFinSaisie();
@@ -158,12 +165,20 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     prenom->setText(pilote.prenom);
     if (pilote.estAyantDroit)
     {
-        estAyantDroit->setChecked(true);
+        estAyantDroit->setChecked(Qt::Checked);
     }
     else
     {
-        estAyantDroit->setChecked(false);
-    }     
+        estAyantDroit->setChecked(Qt::Unchecked);
+    }
+    if (pilote.estActif)
+    {
+        estActif->setChecked(Qt::Checked);
+    }
+    else
+    {
+        estActif->setChecked(Qt::Unchecked);
+    }
     aeroclub->setText(pilote.aeroclub);
     mail->setText(pilote.mail);
     telephone->setText(pilote.telephone);
@@ -186,6 +201,7 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     telephone->clear();
     remarque->clear();
     activitePrincipale->setCurrentIndex(0);
+    estActif->setChecked(Qt::Checked);
 
     setWindowTitle(tr("Ajouter un pilote"));
     okButton->setText(tr("&Ajouter"));

@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS fichiersFacture (factureId INTEGER PRIMARY KEY AUTOIN
 INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePourInit');
 
 -- Table: pilote
-CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL);
+CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC DEFAULT (1) NOT NULL);
 
 -- Table: recettes
 CREATE TABLE IF NOT EXISTS recettes (recetteId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeRecette TEXT NOT NULL REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId), Intitule TEXT NOT NULL, montant REAL NOT NULL, identifiantFormulaireSoumissionCe INTEGER REFERENCES demandeRemboursementSoumises (demandeId));

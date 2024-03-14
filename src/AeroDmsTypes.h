@@ -150,7 +150,9 @@ public:
         QString mail;
         QString telephone;
         QString remarque;
+        bool estActif;
     };
+    static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;
 
     struct HeureDeVolRemboursement

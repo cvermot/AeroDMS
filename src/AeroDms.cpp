@@ -925,6 +925,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
         statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
 
         peuplerTableRecettes();
+        //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
+        peuplerListesPilotes();
     }
 }
 
@@ -1421,8 +1423,11 @@ void AeroDms::peuplerListesPilotes()
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
         listeDeroulantePilote->addItem(nomPrenom, pilote.idPilote);
-        choixPilote->addItem(nomPrenom, pilote.idPilote);
-        choixPayeur->addItem(nomPrenom, pilote.idPilote);
+        if (pilote.estActif)
+        {
+            choixPilote->addItem(nomPrenom, pilote.idPilote);
+            choixPayeur->addItem(nomPrenom, pilote.idPilote);
+        }
     }
 }
 
