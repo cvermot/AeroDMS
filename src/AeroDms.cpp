@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("2.8");
+    QApplication::setApplicationVersion("2.9");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -340,7 +340,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
 
     listeBaladesEtSorties = new QListWidget(this);
-    ajoutRecette->addWidget(listeBaladesEtSorties);
+    ajoutRecette->addWidget(listeBaladesEtSorties,3);
 
     typeDeRecette = new QComboBox(this);
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
@@ -365,7 +365,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
     QGridLayout* infosRecette = new QGridLayout(this);
-    ajoutRecette->addLayout(infosRecette);
+    ajoutRecette->addLayout(infosRecette, 1);
     infosRecette->addWidget(typeDeRecetteLabel, 0, 0);
     infosRecette->addWidget(typeDeRecette, 0, 1);
     infosRecette->addWidget(intituleRecetteLabel, 1, 0);
