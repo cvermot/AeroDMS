@@ -18,7 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDmsTypes.h"
 
 const AeroDmsTypes::TotauxRecettes AeroDmsTypes::K_INIT_TOTAUX_RECETTE = { 0.0, 0.0, 0.0 };
-const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT = { 0.0, 0.0, "", 0 };
+
+const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT = { 0.0, 
+                                                                                                0.0, 
+                                                                                                AeroDmsServices::convertirMinutesEnHeuresMinutes(0), 
+                                                                                                0 };
+
 const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", 
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
@@ -28,7 +33,7 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      QDate() ,//QDate date;
                                                      "",//QString nomPilote;
                                                      "",//QString prenomPilote;
-                                                     "",//QString typeDeVol;
+                                                     AeroDmsServices::convertirMinutesEnHeuresMinutes(0),//QString typeDeVol;
                                                      "",//QString duree;
                                                      "",//QString remarque;
                                                      "",//QString activite;
