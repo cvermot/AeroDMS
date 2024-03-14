@@ -300,6 +300,7 @@ public:
         float proportionRemboursementEntrainement;
         float proportionRemboursementBalade;
         float plafondHoraireRemboursementEntrainement;
+        float proportionParticipationBalade;
         QString nomTresorier;
         int delaisDeGardeBdd;
         QString texteMailDispoCheques;

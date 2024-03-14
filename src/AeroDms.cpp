@@ -83,6 +83,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settingsMetier.setValue("proportionRemboursementEntrainement", "0.5");
         settingsMetier.setValue("plafondHoraireRemboursementEntrainement", "150");
         settingsMetier.setValue("proportionRemboursementBalade", "0.875");
+        settingsMetier.setValue("proportionParticipationBalade", "0.375");
         settingsMetier.endGroup();
     }
 
@@ -102,11 +103,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
 
-    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
-    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "").toFloat();
-    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "").toFloat();
-    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
-    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
+    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
+    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
+    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "0.5").toFloat();
+    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "150").toFloat();
+    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toFloat();
+    parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
@@ -1462,8 +1464,8 @@ void AeroDms::peuplerListeBaladesEtSorties()
 {
     listeBaladesEtSorties->clear();
 
-    //QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
-    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText(), parametresMetiers.proportionRemboursementBalade/2);
+    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties( typeDeRecette->currentText(), 
+                                                                                     parametresMetiers.proportionParticipationBalade);
     QListIterator it(itemLabels);
     while (it.hasNext())
     {
