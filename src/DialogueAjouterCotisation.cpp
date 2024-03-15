@@ -21,15 +21,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 DialogueAjouterCotisation::DialogueAjouterCotisation()
 {
-
+    database = nullptr;
+    montantCotisation = 0;
+    budgetEntrainement = 0;
 }
 
 DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db, 
-                                                      float montantCotisation, 
-                                                      float budgetEntrainement, 
+                                                      const float p_montantCotisation, 
+                                                      const float p_budgetEntrainement, 
                                                       QWidget* parent) : QDialog(parent)
 {
     database = db;
+    montantCotisation = p_montantCotisation;
+    budgetEntrainement = p_budgetEntrainement;
 
     cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
@@ -128,6 +132,11 @@ AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfosCotisa
     infosCotisation.annee = annee->currentText().toInt();
     infosCotisation.montant = montant->value();
     infosCotisation.montantSubvention = montantSubventionAnnuelle->value();
+
+    listePilote->setCurrentIndex(0);
+    annee->setCurrentIndex(1);
+    montant->setValue(montantCotisation);
+    montantSubventionAnnuelle->setValue(budgetEntrainement);
 
     return infosCotisation;
 }

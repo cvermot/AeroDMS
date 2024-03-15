@@ -27,8 +27,8 @@ class DialogueAjouterCotisation : public QDialog
 public:
     DialogueAjouterCotisation();
     DialogueAjouterCotisation( ManageDb* db, 
-                               float montantCotisation, 
-                               float budgetEntrainement, 
+                               const float p_montantCotisation, 
+                               const float p_budgetEntrainement, 
                                QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();
@@ -46,6 +46,9 @@ private:
     QPushButton* cancelButton;
     QPushButton* okButton;
     QWidget* extension;
+
+    float montantCotisation;
+    float budgetEntrainement;
 
     void peuplerListePilote();
 
