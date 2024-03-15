@@ -35,20 +35,19 @@ public:
     AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
 
 private:
-    QComboBox* listePilote;
-    QComboBox* annee;
-    QDoubleSpinBox* montant;
-    QDoubleSpinBox* montantSubventionAnnuelle;
+    QComboBox* listePilote = nullptr;
+    QComboBox* annee = nullptr;
+    QDoubleSpinBox* montant = nullptr;
+    QDoubleSpinBox* montantSubventionAnnuelle = nullptr;
 
-    ManageDb* database;
+    ManageDb* database = nullptr;
 
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
-    QWidget* extension;
+    QDialogButtonBox* buttonBox = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* okButton = nullptr;
 
-    float montantCotisation;
-    float budgetEntrainement;
+    float montantCotisation = 0;
+    float budgetEntrainement = 0;
 
     void peuplerListePilote();
 

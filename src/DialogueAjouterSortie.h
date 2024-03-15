@@ -32,12 +32,12 @@ public:
     AeroDmsTypes::Sortie recupererInfosSortieAAjouter();
 
 private:
-    QLineEdit* nomSortie;
-    QDateEdit* date;
+    QLineEdit* nomSortie = nullptr;
+    QDateEdit* date = nullptr;
 
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
+    QDialogButtonBox* buttonBox = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* okButton = nullptr;
 
 public slots:
     void prevaliderDonneesSaisies();

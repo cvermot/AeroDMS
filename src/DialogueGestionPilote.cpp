@@ -74,7 +74,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
 
     estActif = new QCheckBox(this);
     QLabel* estActifLabel = new QLabel(tr("Pilote actif : "), this);
-    estActif->setChecked(Qt::Checked);
+    estActif->setChecked(true);
 
     idPilote = "";
 
@@ -165,19 +165,19 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     prenom->setText(pilote.prenom);
     if (pilote.estAyantDroit)
     {
-        estAyantDroit->setChecked(Qt::Checked);
+        estAyantDroit->setChecked(true);
     }
     else
     {
-        estAyantDroit->setChecked(Qt::Unchecked);
+        estAyantDroit->setChecked(false);
     }
     if (pilote.estActif)
     {
-        estActif->setChecked(Qt::Checked);
+        estActif->setChecked(true);
     }
     else
     {
-        estActif->setChecked(Qt::Unchecked);
+        estActif->setChecked(true);
     }
     aeroclub->setText(pilote.aeroclub);
     mail->setText(pilote.mail);
@@ -195,13 +195,13 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     idPilote = "";
     nom->clear();
     prenom->clear();
-    estAyantDroit->setChecked(Qt::Unchecked);
+    estAyantDroit->setChecked(false);
     aeroclub->clear();
     mail->clear();
     telephone->clear();
     remarque->clear();
     activitePrincipale->setCurrentIndex(0);
-    estActif->setChecked(Qt::Checked);
+    estActif->setChecked(true);
 
     setWindowTitle(tr("Ajouter un pilote"));
     okButton->setText(tr("&Ajouter"));

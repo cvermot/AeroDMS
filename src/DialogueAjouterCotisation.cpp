@@ -21,9 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 DialogueAjouterCotisation::DialogueAjouterCotisation()
 {
-    database = nullptr;
-    montantCotisation = 0;
-    budgetEntrainement = 0;
 }
 
 DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db, 
@@ -94,8 +91,6 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     mainLayout->addWidget(montantSubventionAnnuelle, 3, 1);
 
     mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
-
-    // mainLayout->setRowStretch(2, 1);
 
     setLayout(mainLayout);
 
