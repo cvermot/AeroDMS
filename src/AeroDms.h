@@ -131,6 +131,7 @@ private:
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* mailingPilotesAyantCotiseCetteAnnee;
+    QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
     QAction* mailingPilotesDerniereDemandeSubvention;
 
     //Données internes

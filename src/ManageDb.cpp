@@ -1371,10 +1371,15 @@ QStringList ManageDb::recupererListeActivites()
     return listeActivite;
 }
 
-QString ManageDb::recupererMailPilotes(const int p_annee)
+QString ManageDb::recupererMailPilotes( const int p_annee, 
+                                        const bool p_pilotesActifsSeulement)
 {
     QSqlQuery query;
     query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
+    if (p_pilotesActifsSeulement)
+    {
+        query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND estActif = 1");
+    }
     query.bindValue(":annee", p_annee);
     query.exec();
 

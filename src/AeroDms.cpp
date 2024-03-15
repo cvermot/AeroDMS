@@ -547,9 +547,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mailing->setIcon(QIcon("./ressources/email-multiple.svg"));
     mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
+    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), this);
+    mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
@@ -1870,7 +1873,13 @@ void AeroDms::envoyerMail()
     if (sender() == mailingPilotesAyantCotiseCetteAnnee)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), false)
+            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+    }
+    else if (sender() == mailingPilotesActifsAyantCotiseCetteAnnee)
+    {
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), true)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesDerniereDemandeSubvention)

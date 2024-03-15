@@ -109,13 +109,14 @@ public:
 
     int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);
     
-    AeroDmsTypes::ResultatCreationPilote creerPilote(const AeroDmsTypes::Pilote p_pilote);
+    AeroDmsTypes::ResultatCreationPilote creerPilote( const AeroDmsTypes::Pilote p_pilote);
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
 
     AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
-    QString recupererMailPilotes(const int p_annee);
+    QString recupererMailPilotes( const int p_annee,
+                                  const bool p_pilotesActifsSeulement);
     QString recupererMailDerniereDemandeDeSubvention();
 
 public slots:
