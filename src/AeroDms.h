@@ -53,8 +53,11 @@ private:
     void peuplerListeSorties();
     void peuplerListeBaladesEtSorties();
     void peuplerListeDeroulanteAnnee();
+    void peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures);
 
     void initialiserOngletGraphiques();
+
+    void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
     float calculerCoutHoraire();
 
@@ -62,6 +65,8 @@ private:
     PdfRenderer* pdf;
     AeroDmsTypes::Signature signature;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf;
+    AeroDmsTypes::ListeDonneesFacture factures;
+    int idFactureDetectee;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
@@ -76,6 +81,7 @@ private:
     QTableWidget* vueVols;
     QTableWidget* vueFactures;
     QTableWidget* vueRecettes;
+    QTableWidget* vueVolsDetectes;
 
     //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;
@@ -88,6 +94,7 @@ private:
     QComboBox* choixBalade;
     QLineEdit* remarqueVol;
     QPushButton* validerLeVol;
+    QPushButton* validerLesVols;
 
     QComboBox* choixPayeur;
     QDateEdit* dateDeFacture;
@@ -186,6 +193,7 @@ public slots:
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();
     void volsSelectionnes();
+    void chargerUnVolDetecte(int row, int column);
 
 };
 #endif // AERODMS_H

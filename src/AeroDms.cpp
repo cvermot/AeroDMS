@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDms.h"
 #include "AeroDmsTypes.h"
 #include "AeroDmsServices.h"
+#include "PdfRenderer.h"
+#include "PdfExtractor.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
@@ -287,6 +289,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosVol->addWidget(remarqueVolLabel,               8, 0);
     infosVol->addWidget(remarqueVol,                    8, 1);
     infosVol->addWidget(validerLeVol,                   9, 0, 2, 0);
+
+    initialiserTableauVolsDetectes(infosVol);
 
     //==========Sous onglet facture de l'onglet "Ajout dépense"
     choixPayeur = new QComboBox(this);
@@ -829,6 +833,24 @@ void AeroDms::peuplerTableVols()
     }
 }
 
+void AeroDms::peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures)
+{
+    vueVolsDetectes->setRowCount(p_factures.size());
+
+    for (int i = 0; i < p_factures.size(); i++)
+    {
+        AeroDmsTypes::DonneesFacture facture = p_factures.at(i);
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol).append(" €")));
+        //Par défaut => vol entrainement
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem(typeDeVol->itemText(2)));
+    }
+
+    vueVolsDetectes->resizeColumnsToContents();
+    
+}
+
 void AeroDms::peuplerTableFactures()
 {
     const AeroDmsTypes::ListeDemandeRemboursementFacture listeFactures = db->recupererToutesLesDemandesDeRemboursement(listeDeroulanteAnnee->currentData().toInt());
@@ -1005,6 +1027,21 @@ void AeroDms::selectionnerUneFacture()
     if (!fichier.isNull())
     {
         chargerUneFacture(fichier);
+        idFactureDetectee = -1;
+
+        factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
+        if (factures.size() != 0)
+        {
+            peuplerTableVolsDetectes(factures);
+            validerLesVols->setHidden(false);
+            vueVolsDetectes->setHidden(false);
+        }
+        else
+        {
+            validerLesVols->setHidden(true);
+            vueVolsDetectes->setHidden(true);
+        }
+        
         //Si on passe ici, on est pas en édition de vol
         volAEditer = -1;
         //On restaure le texte du bouton de validation (qui a changé si on était en édition)
@@ -1355,6 +1392,14 @@ void AeroDms::enregistrerUnVol()
 
             //On sort du mode édition, si on y etait...
             volAEditer = -1;
+
+            //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
+            if (idFactureDetectee != -1)
+            {
+                factures.remove(idFactureDetectee);
+                idFactureDetectee = -1;
+                peuplerTableVolsDetectes(factures);
+            }
         }
         else
         {
@@ -1890,6 +1935,37 @@ void AeroDms::envoyerMail()
             + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }
     
+}
+
+void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
+{
+    vueVolsDetectes = new QTableWidget(0, AeroDmsTypes::VolsDetectesTableElement_NB_COLONNES, this);
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem("Date"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem("Durée"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem("Type"));
+    vueVolsDetectes->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    vueVolsDetectes->resizeColumnsToContents();
+    vueVolsDetectes->setHidden(true);
+
+    p_infosVol->addWidget(vueVolsDetectes, 11, 0, 2, 0);
+
+    validerLesVols = new QPushButton("Valider les vols", this);
+    validerLesVols->setHidden(true);
+    validerLesVols->setEnabled(false);
+    //connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
+    connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
+    p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
+}
+
+void AeroDms::chargerUnVolDetecte(int row, int column)
+{
+    qDebug() << row;
+    idFactureDetectee = row;
+    prixDuVol->setValue(factures.at(idFactureDetectee).coutDuVol);
+    dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
+    dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
 }
 
 
