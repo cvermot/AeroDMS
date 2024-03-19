@@ -526,6 +526,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
 
+    menuOption->addSeparator();
+
+    boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Desactiver le scan automatique des factures"), this);
+    boutonActivationScanAutoFactures->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    menuOption->addAction(boutonActivationScanAutoFactures);
+    connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
+
     QFont font;
     font.setWeight(QFont::Bold);
     boutonDemandesAGenererToutes->setFont(font);
@@ -1029,17 +1036,19 @@ void AeroDms::selectionnerUneFacture()
         chargerUneFacture(fichier);
         idFactureDetectee = -1;
 
-        factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
-        if (factures.size() != 0)
+        //On masque par défaut... on reaffiche si le scan est effectué
+        //et qu'il ne retourne par une liste vide
+        validerLesVols->setHidden(true);
+        vueVolsDetectes->setHidden(true);
+        if (scanAutomatiqueDesFacturesEstActif)
         {
-            peuplerTableVolsDetectes(factures);
-            validerLesVols->setHidden(false);
-            vueVolsDetectes->setHidden(false);
-        }
-        else
-        {
-            validerLesVols->setHidden(true);
-            vueVolsDetectes->setHidden(true);
+            factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
+            if (factures.size() != 0)
+            {
+                peuplerTableVolsDetectes(factures);
+                validerLesVols->setHidden(false);
+                vueVolsDetectes->setHidden(false);
+            }
         }
         
         //Si on passe ici, on est pas en édition de vol
@@ -1895,6 +1904,21 @@ void AeroDms::switchModeDebug()
         vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
     }
 }
+
+void AeroDms::switchScanAutomatiqueDesFactures()
+{
+    scanAutomatiqueDesFacturesEstActif = !scanAutomatiqueDesFacturesEstActif;
+    if (scanAutomatiqueDesFacturesEstActif)
+    {
+        boutonActivationScanAutoFactures->setText(tr("Desactiver le scan automatique des factures"));
+    }
+    else
+    {
+        boutonActivationScanAutoFactures->setText(tr("Activer le scan automatique des factures"));
+    }
+    
+}
+
 
 void AeroDms::convertirHeureDecimalesVersHhMm()
 {

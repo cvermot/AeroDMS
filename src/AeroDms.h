@@ -67,6 +67,7 @@ private:
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf;
     AeroDmsTypes::ListeDonneesFacture factures;
     int idFactureDetectee;
+    bool scanAutomatiqueDesFacturesEstActif = true;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
@@ -140,6 +141,7 @@ private:
     QAction* mailingPilotesAyantCotiseCetteAnnee;
     QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
     QAction* mailingPilotesDerniereDemandeSubvention;
+    QAction* boutonActivationScanAutoFactures;
 
     //Données internes
     QString piloteAEditer = "";
@@ -184,6 +186,7 @@ public slots:
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);
     void switchModeDebug();
+    void switchScanAutomatiqueDesFactures();
     void convertirHeureDecimalesVersHhMm();
     void peuplerStatistiques();
     void changerModeSignature();
