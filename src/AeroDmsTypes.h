@@ -125,7 +125,9 @@ public:
     enum Aeroclub {
         Aeroclub_INCONNU,
         Aeroclub_DACA,
-        Aeroclub_CAPAM
+        Aeroclub_CAPAM,
+        Aeroclub_ACB,
+        Aeroclub_ACAndernos
     };
 
     enum Onglet {
