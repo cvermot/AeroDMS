@@ -1401,15 +1401,6 @@ void AeroDms::enregistrerUnVol()
                 + QString::number(subventionRestante)
                 + "€");
 
-            dureeDuVol->setTime(QTime::QTime(0, 0));
-            prixDuVol->setValue(0);
-            remarqueVol->clear();
-
-            //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
-            typeDeVol->setEnabled(true);
-            dureeDuVol->setEnabled(true);
-            prixDuVol->setEnabled(true);
-
             //On sort du mode édition, si on y etait...
             volAEditer = -1;
 
@@ -1420,6 +1411,17 @@ void AeroDms::enregistrerUnVol()
                 idFactureDetectee = -1;
                 peuplerTableVolsDetectes(factures);
             }
+
+            //On rince les données de vol
+            dureeDuVol->setTime(QTime::QTime(0, 0));
+            prixDuVol->setValue(0);
+            remarqueVol->clear();
+            //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation
+
+            //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
+            typeDeVol->setEnabled(true);
+            dureeDuVol->setEnabled(true);
+            prixDuVol->setEnabled(true);
         }
         else
         {
@@ -1565,6 +1567,7 @@ void AeroDms::prevaliderDonnnesSaisies()
 {
     validerLeVol->setEnabled(true);
     validerLaFacture->setEnabled(true);
+    validerLesVols->setEnabled(true);
 
     if ( prixDuVol->value() == 0
          || dureeDuVol->time() == QTime::QTime(0,0)
@@ -1573,6 +1576,14 @@ void AeroDms::prevaliderDonnnesSaisies()
          || ( typeDeVol->currentText() != "Entrainement" && choixBalade->currentIndex() == 0))
     {
         validerLeVol->setEnabled(false);
+    }
+
+    if ( choixPilote->currentIndex() == 0
+         || pdfDocument->status() != QPdfDocument::Status::Ready
+         || (typeDeVol->currentText() != "Entrainement" )
+         || idFactureDetectee != -1)
+    {
+        validerLesVols->setEnabled(false);
     }
 
     if ( choixBaladeFacture->currentIndex() == 0
@@ -1998,7 +2009,9 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
     validerLesVols->setHidden(true);
     validerLesVols->setEnabled(false);
     validerLesVols->setToolTip(tr("Validation possible si :\n\
-   -pilote sélectionné.\n\
+   -pilote sélectionné,\n\
+   -type de vol sélectionné vaut Entrainement,\n\
+   -Aucun vol sélectionné dans la liste pour modification.\n\
 Note : tous les vols enregistrés via ce bouton seront enregistrés en tant que vol d'entrainement.\n\
 Les vols d'une autre catégorie doivent être saisis via modification manuelle en cliquant sur le vol\n\
 puis en complétant les informations via la fenêtre de saisie."));
