@@ -1549,6 +1549,10 @@ void AeroDms::peuplerListeBaladesEtSorties()
         const AeroDmsTypes::VolSortieOuBalade & vol = it.next();
         QListWidgetItem* itemBaladesEtSorties = new QListWidgetItem(vol.nomVol, listeBaladesEtSorties);
         itemBaladesEtSorties->setCheckState(Qt::Unchecked);
+        if (vol.montantSubventionAttendu != 0)
+        {
+            itemBaladesEtSorties->setToolTip("Montant participation attendu : " + QString::number(vol.montantSubventionAttendu, 'f', 2) + " €)");
+        }  
         if (!vol.volAAuMoinsUnPaiement)
         {
             itemBaladesEtSorties->setForeground(Qt::red);

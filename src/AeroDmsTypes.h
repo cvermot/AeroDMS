@@ -296,8 +296,9 @@ public:
     typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
 
     struct VolSortieOuBalade {
-        QString nomVol;
-        bool volAAuMoinsUnPaiement;
+        QString nomVol = "";
+        float montantSubventionAttendu = 0;
+        bool volAAuMoinsUnPaiement = 0;
     };
     typedef QList<VolSortieOuBalade> ListeVolSortieOuBalade;
 

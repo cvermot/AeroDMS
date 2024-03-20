@@ -1084,7 +1084,7 @@ AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const 
         vol.nomVol = query.value("NomVol").toString();
         if (p_typeDeVol == "Balade")
         {
-            vol.nomVol = vol.nomVol + " (Montant participation attendu : " + QString::number(query.value("cout").toDouble()*p_proportionRemboursement, 'f', 2) + " €)";
+            vol.montantSubventionAttendu = query.value("cout").toDouble() * p_proportionRemboursement;
         }
 
         QSqlQuery paiementAssocie;
