@@ -129,10 +129,17 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesCapam( std::vector<PoD
                 donneesFactures.dureeDuVol = extraireDuree(QString(p_entries.at(index).Text.data()));
             }
 
-            index = index + 2;
-            if (index < p_entries.size())
-            {
-                donneesFactures.coutDuVol = donneesFactures.coutDuVol + QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
+            if (index+2 < p_entries.size())
+            { 
+                if (QString(p_entries.at(index + 2).Text.data()).contains("€"))
+                {
+                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + QString(p_entries.at(index + 2).Text.data()).replace("€", "").replace(",", ".").toFloat();
+                }
+                else if (QString(p_entries.at(index + 1).Text.data()).contains("€"))
+                {
+                    QString montant = QString(p_entries.at(index + 1).Text.data()).split(" ").at(1);
+                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + montant.replace("€", "").replace(",", ".").toFloat();
+                }
             }            
         }
         index++;
