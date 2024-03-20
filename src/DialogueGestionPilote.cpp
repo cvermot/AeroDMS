@@ -177,7 +177,7 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     }
     else
     {
-        estActif->setChecked(true);
+        estActif->setChecked(false);
     }
     aeroclub->setText(pilote.aeroclub);
     mail->setText(pilote.mail);
