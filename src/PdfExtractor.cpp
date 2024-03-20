@@ -32,17 +32,10 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
     auto& pages = doc.GetPages();
     for (unsigned noPage = 0; noPage < pages.GetCount(); noPage++)
     {
-        qDebug() << "debut page" << noPage;
         auto& page = pages.GetPageAt(noPage);
 
         std::vector<PoDoFo::PdfTextEntry> entries;
         page.ExtractTextTo(entries);
-        qDebug() << "fin extract page" << noPage;
-
-        //for (auto& entry : entries)
-        //{
-        //    qDebug() << entry.X << entry.Y << entry.Text.data();
-        //}
 
         AeroDmsTypes::Aeroclub aeroclub = AeroDmsTypes::Aeroclub_INCONNU;
 
@@ -100,8 +93,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
                 break;
         }
     }
-
-    //qDebug() << "taille" << liste.size();
 
     return liste;
 }
@@ -171,14 +162,13 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vecto
             //On ne sais pas pourquoi mais parfois la ligne total TTC ne contient pas le montant et il faut chercher en dessous...
             if (data.contains("€"))
             {
-                donneesFacture.coutDuVol = data.replace("Total TTC", "").replace(" €", "").replace(",", ".").toFloat();
+                donneesFacture.coutDuVol = recupererMontantAca(data);
             }        
             else
             {
                 index++;
-                donneesFacture.coutDuVol = QString(p_entries.at(index).Text.data()).replace(" €", "").replace(",", ".").toFloat();
+                donneesFacture.coutDuVol = recupererMontantAca(QString(p_entries.at(index).Text.data()));
             }
-            //TODO traiter le cas ou on a une chaine de type "Total TTC 10\u0017,\u0013\u0013€"... (comment faire pour que QString interprete les \u...)
         }
         index++;
     }
@@ -221,8 +211,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                 }
 
             }
-            //donneesFactures.dateDuVol = extraireDate(str.at(4));
-            //donneesFactures.dureeDuVol = extraireDuree(str.at(2));
 
             if (donneesFactures.coutDuVol == 0)
             {
@@ -259,7 +247,31 @@ const QTime PdfExtractor::extraireDuree(const QString p_duree)
 {
     const QStringList dureeStr = p_duree.split(":");
     const QTime duree = QTime( dureeStr.at(0).toInt(),
-                                        dureeStr.at(1).toInt(),
-                                        0);
+                               dureeStr.at(1).toInt(),
+                               0);
     return duree;
+}
+
+const float PdfExtractor::recupererMontantAca(QString p_chaine)
+{
+    //On ne sais pas trop pourquoi mais parfois (pas toujours...) les montant sont
+    // encodés en partie avec des \uXXXX
+    // => "Total TTC 10\u0017,\u0013\u0013€" pour 104,00€ par exemple
+
+    //Donc on fait un peu de ménage et on retourne le float...
+    return p_chaine.replace("Total TTC", "")
+        .replace(" ", "")
+        .replace("€", "")
+        .replace(",", ".")
+        .replace('\u0013', "0")
+        .replace('\u0014', "1")
+        .replace('\u0015', "2")
+        .replace('\u0016', "3")
+        .replace('\u0017', "4")
+        .replace('\u0018', "5")
+        .replace('\u0019', "6")
+        .replace('\u0020', "7")
+        .replace('\u0021', "8")
+        .replace('\u0022', "9")
+        .toFloat();
 }

@@ -40,6 +40,7 @@ private:
 
 	static const QDate extraireDate(const QString p_date);
 	static const QTime extraireDuree(const QString p_duree);
+	static const float recupererMontantAca(QString p_chaine);
 };
 
 #endif // PDFEXTRACTOR_H
