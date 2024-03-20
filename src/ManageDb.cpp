@@ -694,6 +694,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.exec();
     query.next();
     const int numeroDeRecetteCree = query.value(0).toInt();
+    qDebug() << numeroDeRecetteCree << query.lastError().text();
 
     //On itère sur la liste des vols pour associer la recette aux vols :
     for (int i = 0 ; i < p_listeVols.size() ; i++)
@@ -701,6 +702,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         //On recupere l'id du vol associé :
         query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE NomVol = :nomVol");
         query.bindValue(":nomVol", p_listeVols.at(i));
+        qDebug() << p_listeVols.at(i);
         query.exec();
         query.next();
         const int numeroDeVol = query.value(0).toInt();

@@ -220,7 +220,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::mettreAJourInfosSurSelectionPilote);
 
     aeroclubPiloteSelectionne = new QLineEdit(this);
-    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote séléctionné et au nom duquel le\n" 
+    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote sélectionné et au nom duquel le\n" 
                                               "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
                                               "l'aéroclub du pilote avant de générer les demandes de subvention."));
     aeroclubPiloteSelectionne->setEnabled(false);
@@ -262,6 +262,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* remarqueVolLabel = new QLabel(tr("Remarque : "), this);
 
     validerLeVol = new QPushButton("Valider le vol", this);
+    validerLeVol->setToolTip(tr("Validation possible si :\n\
+   -pilote sélectionné,\n\
+   -durée de vol saisi,\n\
+   -montant du vol saisi,\n\
+   -si Type de vol est \"Sortie\", sortie sélectionnée."));
     connect(validerLeVol, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
 
     QGridLayout* infosVol = new QGridLayout(this);
@@ -318,7 +323,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* remarqueFactureLabel = new QLabel(tr("Intitulé : "), this);
 
     validerLaFacture = new QPushButton("Valider la facture", this);
-    validerLaFacture->setToolTip("Validation possible si : facture chargée, montant de la facture renseignée, payeur et sortie séléctionnés, intitulé saisi");
+    validerLaFacture->setToolTip("Validation possible si : \n\
+   -montant de la facture renseignée,\n\
+   -payeur et sortie sélectionnés,\n\
+   -intitulé saisi.");
     connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
 
     QGridLayout* infosFacture = new QGridLayout(this);
@@ -366,6 +374,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(montantRecette, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     validerLaRecette = new QPushButton("Valider la recette", this);
+    validerLaRecette->setToolTip(tr("Validation possible si :\n\
+   -montant de recette saisi (non nul),\n\
+   -intitulé saisi,\n\
+   -au moins un vol associé séléctionné."));
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
     QGridLayout* infosRecette = new QGridLayout(this);
@@ -423,8 +435,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     toolBar->addAction(bouttonGenerePdf);
 
     const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
-    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année séléctionnée"), this);
-    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année séléctionnée"));
+    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année sélectionnée"), this);
+    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
 
@@ -1440,7 +1452,11 @@ void AeroDms::enregistrerUneRecette()
 
     if (volsCoches.size() == 0)
     {
-        QMessageBox::critical(this, "Vol non sélectionné", "La dépense doit être associée à au moins un vol. \nSélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\nSaisie non prise en compte.");
+        QMessageBox::critical( this, 
+                               "Vol non sélectionné", 
+                               "La dépense doit être associée à au moins un vol. \n\
+Sélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\n\
+Saisie non prise en compte.");
     }
     else
     {
@@ -1449,10 +1465,10 @@ void AeroDms::enregistrerUneRecette()
                                            intituleRecette->text(),
                                            montantRecette->value());
         statusBar()->showMessage("Recette ajoutee");
-    }
 
-    intituleRecette->clear();
-    montantRecette->clear();
+        intituleRecette->clear();
+        montantRecette->clear();
+    }
 
     peuplerTableRecettes();
     peuplerListeBaladesEtSorties();
@@ -1731,7 +1747,7 @@ void AeroDms::volsSelectionnes()
 
             hdvTotales = hdvTotales + vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
-            statusBar()->showMessage("Vols séléctionnés : Coût total : "
+            statusBar()->showMessage("Vols sélectionnés : Coût total : "
                 + QString::number(coutTotal)
                 + " € / Montant subventionné total : "
                 + QString::number(montantTotalSubventionne)
@@ -1751,7 +1767,7 @@ void AeroDms::volsSelectionnes()
 
             //hdvTotales = hdvTotales + vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
-            statusBar()->showMessage("Vols séléctionnés : Coût total : " 
+            statusBar()->showMessage("Vols sélectionnés : Coût total : " 
                 + QString::number(coutTotal) 
                 + " € / Montant subventionné total : " 
                 + QString::number(montantTotalSubventionne)
@@ -1976,6 +1992,11 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
     validerLesVols = new QPushButton("Valider les vols", this);
     validerLesVols->setHidden(true);
     validerLesVols->setEnabled(false);
+    validerLesVols->setToolTip(tr("Validation possible si :\n\
+   -pilote sélectionné.\n\
+Note : tous les vols enregistrés via ce bouton seront enregistrés en tant que vol d'entrainement.\n\
+Les vols d'une autre catégorie doivent être saisis via modification manuelle en cliquant sur le vol\n\
+puis en complétant les informations via la fenêtre de saisie."));
     //connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
     connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
     p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
