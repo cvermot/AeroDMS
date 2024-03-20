@@ -336,7 +336,9 @@ public:
         QDate dateDuVol;
         QTime dureeDuVol;
         float coutDuVol;
+        int pageDansLeFichierPdf;
     };
+    static const DonneesFacture K_INIT_DONNEES_FACTURE;
     typedef QList<DonneesFacture> ListeDonneesFacture;
 
 };

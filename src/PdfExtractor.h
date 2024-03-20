@@ -34,9 +34,9 @@ public:
 	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf(const QString p_fichier);
 
 private:
-	static AeroDmsTypes::DonneesFacture extraireDonneesCapam(std::vector<PoDoFo::PdfTextEntry> p_entries);
-	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries);
-	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries);
+	static AeroDmsTypes::DonneesFacture extraireDonneesCapam(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 
 	static const QDate extraireDate(const QString p_date);
 	static const QTime extraireDuree(const QString p_duree);

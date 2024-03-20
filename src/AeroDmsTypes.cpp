@@ -45,6 +45,12 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      0//int baladeId;
 };
 
+const AeroDmsTypes::DonneesFacture AeroDmsTypes::K_INIT_DONNEES_FACTURE = { QDate(),
+                                                                            QTime(),
+                                                                            0.0,
+                                                                            0
+};
+
 const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilote;
                                                            "", //QString nom;
                                                            "", //QString prenom;

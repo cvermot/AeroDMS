@@ -30,14 +30,14 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
     PoDoFo::PdfMemDocument doc;
     doc.Load(p_fichier.toStdString());
     auto& pages = doc.GetPages();
-    for (unsigned i = 0; i < pages.GetCount(); i++)
+    for (unsigned noPage = 0; noPage < pages.GetCount(); noPage++)
     {
-        qDebug() << "debut page" << i;
-        auto& page = pages.GetPageAt(i);
+        qDebug() << "debut page" << noPage;
+        auto& page = pages.GetPageAt(noPage);
 
         std::vector<PoDoFo::PdfTextEntry> entries;
         page.ExtractTextTo(entries);
-        qDebug() << "fin extract page" << i;
+        qDebug() << "fin extract page" << noPage;
 
         //for (auto& entry : entries)
         //{
@@ -78,22 +78,22 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
         {
             case AeroDmsTypes::Aeroclub_CAPAM:
             {
-                liste.append(extraireDonneesCapam(entries));
+                liste.append(extraireDonneesCapam(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_DACA:
             {
-                liste.append(extraireDonneesDaca(entries));
+                liste.append(extraireDonneesDaca(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_ACB:
             {
-                liste.append(extraireDonneesCapam(entries));
+                liste.append(extraireDonneesCapam(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_ACAndernos:
             {
-                liste.append(extraireDonneesACAndernos(entries));
+                liste.append(extraireDonneesACAndernos(entries, noPage));
             }
             break;
             default:
@@ -106,10 +106,13 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
     return liste;
 }
 
-AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesCapam(std::vector<PoDoFo::PdfTextEntry> p_entries)
+AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesCapam( std::vector<PoDoFo::PdfTextEntry> p_entries,
+                                                                 const unsigned p_noPage)
 {
     int index = 0;
-    AeroDmsTypes::DonneesFacture donneesFactures;
+    AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+    donneesFactures.pageDansLeFichierPdf = p_noPage;
+
     while ( index < p_entries.size())
     {
         QString data = QString(p_entries.at(index).Text.data()).replace("\xc2\xa0", " ");
@@ -138,10 +141,12 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesCapam(std::vector<PoDo
     return donneesFactures;
 }
 
-AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries)
+AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vector<PoDoFo::PdfTextEntry> p_entries, 
+                                                                      const unsigned p_noPage)
 {
     int index = 0;
-    AeroDmsTypes::DonneesFacture donneesFacture;
+    AeroDmsTypes::DonneesFacture donneesFacture = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+    donneesFacture.pageDansLeFichierPdf = p_noPage;
 
     while (index < p_entries.size())
     {
@@ -175,29 +180,53 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos(std::vector
     return donneesFacture;
 }
 
-AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries)
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector<PoDoFo::PdfTextEntry> p_entries,
+                                                                     const unsigned p_noPage)
 {
     AeroDmsTypes::ListeDonneesFacture liste;
 
     int index = 0;
     while (index < p_entries.size())
     {
+        qDebug() << QString(p_entries.at(index).Text.data());
         if (QString(p_entries.at(index).Text.data()).contains("Vol de"))
         {
-            AeroDmsTypes::DonneesFacture donneesFactures;
+            AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+            donneesFactures.pageDansLeFichierPdf = p_noPage;
 
-            const QStringList str = QString(p_entries.at(index).Text.data()).split(" ");
+            const QStringList str = QString(p_entries.at(index).Text.data()).replace("\xc2\xa0", " ").split(" ");
+            qDebug() << str;
             
-            donneesFactures.dateDuVol = extraireDate(str.at(4));
-            
-            donneesFactures.dureeDuVol = extraireDuree(str.at(2));
-            index = index + 2;
-            //Cas du vol avec FI... ça décalle d'un index
-            if (!QString(p_entries.at(index).Text.data()).contains("€"))
+            for (int i = 0; i < str.size(); i++)
             {
-                index++;
+                if (str.at(i).contains("/"))
+                {
+                    donneesFactures.dateDuVol = extraireDate(str.at(i));
+                }
+                else if(str.at(i).contains(":"))
+                {
+                    donneesFactures.dureeDuVol = extraireDuree(str.at(i));
+                }
+                else if (str.at(i).contains("vol"))
+                {
+                    QString montant = str.at(i);
+                    donneesFactures.coutDuVol = montant.replace("vol", "").replace(",", ".").toFloat();
+                }
+
             }
-            donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
+            //donneesFactures.dateDuVol = extraireDate(str.at(4));
+            //donneesFactures.dureeDuVol = extraireDuree(str.at(2));
+
+            if (donneesFactures.coutDuVol == 0)
+            {
+                index = index + 2;
+                //Cas du vol avec FI... ça décalle d'un index
+                if (!QString(p_entries.at(index).Text.data()).contains("€"))
+                {
+                    index++;
+                }
+                donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
+            }
 
             //qDebug() << donneesFactures.dateDuVol << donneesFactures.dureeDuVol << donneesFactures.coutDuVol;
 

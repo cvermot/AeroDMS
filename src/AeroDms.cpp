@@ -26,9 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 #include <QToolBar>
-#include <QPdfDocument>
-#include <QPdfPageSelector>
-#include <QPdfView>
+#include <QPdfPageNavigator>
 
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
@@ -199,7 +197,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), "Ajout dépense");
 
     pdfDocument = new QPdfDocument(this);
-    QPdfView* pdfView = new QPdfView(this);
+    pdfView = new QPdfView(this);
     pdfView->setDocument(pdfDocument);
     pdfView->setPageMode(QPdfView::PageMode::MultiPage);
     ajoutVol->addWidget(pdfView, 3);
@@ -1985,11 +1983,11 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
 
 void AeroDms::chargerUnVolDetecte(int row, int column)
 {
-    qDebug() << row;
     idFactureDetectee = row;
     prixDuVol->setValue(factures.at(idFactureDetectee).coutDuVol);
     dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
     dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
+    pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
 }
 
 

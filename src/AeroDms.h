@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMainWindow>
 #include <QtWidgets>
 #include <QPdfDocument>
+#include <QPdfView>
 
 #include "ManageDb.h"
 #include "PdfRenderer.h"
@@ -75,6 +76,7 @@ private:
     DialogueAjouterSortie* dialogueAjouterSortie;
 
     QPdfDocument* pdfDocument;
+    QPdfView* pdfView;
 
     QTabWidget* mainTabWidget;
 
