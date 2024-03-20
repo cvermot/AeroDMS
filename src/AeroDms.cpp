@@ -324,6 +324,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     validerLaFacture = new QPushButton("Valider la facture", this);
     validerLaFacture->setToolTip("Validation possible si : \n\
+   -facture chargée,\n\
    -montant de la facture renseignée,\n\
    -payeur et sortie sélectionnés,\n\
    -intitulé saisi.");
