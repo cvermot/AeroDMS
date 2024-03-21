@@ -75,15 +75,17 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
     query.exec(sql);
 
     while (query.next()) {
-        AeroDmsTypes::Pilote pilote;
-        pilote.idPilote = query.value(0).toString();
-        pilote.nom = query.value(1).toString();
-        pilote.prenom = query.value(2).toString();
-        pilote.aeroclub = query.value(3).toString();
-        pilote.estAyantDroit = query.value(4).toBool();
-        pilote.mail = query.value(5).toString();
-        pilote.telephone = query.value(6).toString();
-        pilote.remarque = query.value(7).toString();
+        AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
+        pilote.idPilote = query.value("piloteId").toString();
+        pilote.nom = query.value("nom").toString();
+        pilote.prenom = query.value("prenom").toString();
+        pilote.aeroclub = query.value("aeroclub").toString();
+        pilote.estAyantDroit = query.value("estAyantDroit").toBool();
+        pilote.mail = query.value("mail").toString();
+        pilote.telephone = query.value("telephone").toString();
+        pilote.remarque = query.value("remarque").toString();
+        pilote.activitePrincipale = query.value("activitePrincipale").toString();
+        pilote.estActif = query.value("estActif").toBool();
         listeDesPilotes.append(pilote);
     }
 
@@ -92,7 +94,7 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
 
 AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
 {
-    AeroDmsTypes::Pilote pilote;
+    AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
 
     QSqlQuery query;
     query.prepare("SELECT * FROM pilote WHERE piloteId = :piloteId");
@@ -109,6 +111,7 @@ AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
         pilote.telephone = query.value("telephone").toString();
         pilote.remarque = query.value("remarque").toString();
         pilote.activitePrincipale = query.value("activitePrincipale").toString();
+        pilote.estActif = query.value("estActif").toBool();
     }
 
     return pilote;
@@ -691,6 +694,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.exec();
     query.next();
     const int numeroDeRecetteCree = query.value(0).toInt();
+    qDebug() << numeroDeRecetteCree << query.lastError().text();
 
     //On itère sur la liste des vols pour associer la recette aux vols :
     for (int i = 0 ; i < p_listeVols.size() ; i++)
@@ -698,6 +702,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         //On recupere l'id du vol associé :
         query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE NomVol = :nomVol");
         query.bindValue(":nomVol", p_listeVols.at(i));
+        qDebug() << p_listeVols.at(i);
         query.exec();
         query.next();
         const int numeroDeVol = query.value(0).toInt();
@@ -1065,7 +1070,8 @@ QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesType
     return liste;
 }
 
-AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties(const QString p_typeDeVol)
+AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const QString p_typeDeVol, 
+                                                                          const float p_proportionRemboursement)
 {
     AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
@@ -1076,6 +1082,10 @@ AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties(const Q
     {
         AeroDmsTypes::VolSortieOuBalade vol;
         vol.nomVol = query.value("NomVol").toString();
+        if (p_typeDeVol == "Balade")
+        {
+            vol.montantSubventionAttendu = query.value("cout").toDouble() * p_proportionRemboursement;
+        }
 
         QSqlQuery paiementAssocie;
         paiementAssocie.prepare("SELECT COUNT(*) AS nombreVol FROM 'xAssociationRecette-Vol' WHERE volId = :volId");
@@ -1172,6 +1182,12 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
     query.bindValue(":idRecette", idRecette);
     query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
     query.exec();
+
+    //Un pilote pour lequel on vient d'ajouter une cotistion est toujours un pilote actif
+    query.prepare("UPDATE 'pilote' SET 'estActif' =:estActif WHERE piloteId = :piloteId");
+    query.bindValue(":piloteId", p_infosCotisation.idPilote);
+    query.bindValue(":estActif", true);
+    query.exec();
 }
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
@@ -1207,7 +1223,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
         }
         else
         {
-            query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque','activitePrincipale') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque,:activitePrincipale)");
+            query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque','activitePrincipale','estActif') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque,:activitePrincipale,:estActif)");
             query.bindValue(":piloteId", piloteId);
             query.bindValue(":nom", p_pilote.nom);
             query.bindValue(":prenom", p_pilote.prenom);
@@ -1217,6 +1233,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
             query.bindValue(":telephone", p_pilote.telephone);
             query.bindValue(":remarque", p_pilote.remarque);
             query.bindValue(":activitePrincipale", p_pilote.activitePrincipale);
+            query.bindValue(":estActif", p_pilote.estActif);
 
             if (!query.exec())
             {
@@ -1227,7 +1244,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
     //mise à jour
     else
     {
-        query.prepare("UPDATE 'pilote' SET 'nom' = :nom,'prenom' = :prenom,'aeroclub' = :aeroclub,'estAyantDroit' = :estAyantDroit,'mail' = :mail,'telephone' = :telephone,'remarque' = :remarque, 'activitePrincipale' =:activitePrincipale WHERE piloteId = :piloteId");
+        query.prepare("UPDATE 'pilote' SET 'nom' = :nom,'prenom' = :prenom,'aeroclub' = :aeroclub,'estAyantDroit' = :estAyantDroit,'mail' = :mail,'telephone' = :telephone,'remarque' = :remarque, 'activitePrincipale' =:activitePrincipale, 'estActif' =:estActif WHERE piloteId = :piloteId");
         query.bindValue(":piloteId", p_pilote.idPilote);
         query.bindValue(":nom", p_pilote.nom);
         query.bindValue(":prenom", p_pilote.prenom);
@@ -1237,6 +1254,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
         query.bindValue(":telephone", p_pilote.telephone);
         query.bindValue(":remarque", p_pilote.remarque);
         query.bindValue(":activitePrincipale", p_pilote.activitePrincipale);
+        query.bindValue(":estActif", p_pilote.estActif);
 
         if (!query.exec())
         {
@@ -1355,10 +1373,15 @@ QStringList ManageDb::recupererListeActivites()
     return listeActivite;
 }
 
-QString ManageDb::recupererMailPilotes(const int p_annee)
+QString ManageDb::recupererMailPilotes( const int p_annee, 
+                                        const bool p_pilotesActifsSeulement)
 {
     QSqlQuery query;
     query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
+    if (p_pilotesActifsSeulement)
+    {
+        query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND estActif = 1");
+    }
     query.bindValue(":annee", p_annee);
     query.exec();
 

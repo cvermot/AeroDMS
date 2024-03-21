@@ -27,25 +27,27 @@ class DialogueAjouterCotisation : public QDialog
 public:
     DialogueAjouterCotisation();
     DialogueAjouterCotisation( ManageDb* db, 
-                               float montantCotisation, 
-                               float budgetEntrainement, 
+                               const float p_montantCotisation, 
+                               const float p_budgetEntrainement, 
                                QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();
     AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
 
 private:
-    QComboBox* listePilote;
-    QComboBox* annee;
-    QDoubleSpinBox* montant;
-    QDoubleSpinBox* montantSubventionAnnuelle;
+    QComboBox* listePilote = nullptr;
+    QComboBox* annee = nullptr;
+    QDoubleSpinBox* montant = nullptr;
+    QDoubleSpinBox* montantSubventionAnnuelle = nullptr;
 
-    ManageDb* database;
+    ManageDb* database = nullptr;
 
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
-    QWidget* extension;
+    QDialogButtonBox* buttonBox = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* okButton = nullptr;
+
+    float montantCotisation = 0;
+    float budgetEntrainement = 0;
 
     void peuplerListePilote();
 

@@ -18,20 +18,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDms.h"
 #include "AeroDmsTypes.h"
 #include "AeroDmsServices.h"
+#include "PdfRenderer.h"
+#include "PdfExtractor.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
 
 #include <QtWidgets>
 #include <QToolBar>
-#include <QPdfDocument>
-#include <QPdfPageSelector>
-#include <QPdfView>
+#include <QPdfPageNavigator>
 
 AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("2.8");
+    QApplication::setApplicationVersion("3.3");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -83,6 +83,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settingsMetier.setValue("proportionRemboursementEntrainement", "0.5");
         settingsMetier.setValue("plafondHoraireRemboursementEntrainement", "150");
         settingsMetier.setValue("proportionRemboursementBalade", "0.875");
+        settingsMetier.setValue("proportionParticipationBalade", "0.375");
         settingsMetier.endGroup();
     }
 
@@ -102,11 +103,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
 
-    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "").toFloat();
-    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "").toFloat();
-    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "").toFloat();
-    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "").toFloat();
-    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "").toFloat();
+    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
+    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
+    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "0.5").toFloat();
+    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "150").toFloat();
+    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toFloat();
+    parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
@@ -115,6 +117,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
+
+    installEventFilter(this);
+    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
 
     //==========Onglet Pilotes
     vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
@@ -197,7 +202,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), "Ajout dépense");
 
     pdfDocument = new QPdfDocument(this);
-    QPdfView* pdfView = new QPdfView(this);
+    pdfView = new QPdfView(this);
     pdfView->setDocument(pdfDocument);
     pdfView->setPageMode(QPdfView::PageMode::MultiPage);
     ajoutVol->addWidget(pdfView, 3);
@@ -220,7 +225,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::mettreAJourInfosSurSelectionPilote);
 
     aeroclubPiloteSelectionne = new QLineEdit(this);
-    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote séléctionné et au nom duquel le\n" 
+    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote sélectionné et au nom duquel le\n" 
                                               "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
                                               "l'aéroclub du pilote avant de générer les demandes de subvention."));
     aeroclubPiloteSelectionne->setEnabled(false);
@@ -262,6 +267,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* remarqueVolLabel = new QLabel(tr("Remarque : "), this);
 
     validerLeVol = new QPushButton("Valider le vol", this);
+    validerLeVol->setToolTip(tr("Validation possible si :\n\
+   -pilote sélectionné,\n\
+   -durée de vol saisi,\n\
+   -montant du vol saisi,\n\
+   -si Type de vol est \"Sortie\", sortie sélectionnée."));
     connect(validerLeVol, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
 
     QGridLayout* infosVol = new QGridLayout(this);
@@ -287,6 +297,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     infosVol->addWidget(remarqueVolLabel,               8, 0);
     infosVol->addWidget(remarqueVol,                    8, 1);
     infosVol->addWidget(validerLeVol,                   9, 0, 2, 0);
+
+    initialiserTableauVolsDetectes(infosVol);
 
     //==========Sous onglet facture de l'onglet "Ajout dépense"
     choixPayeur = new QComboBox(this);
@@ -316,7 +328,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QLabel* remarqueFactureLabel = new QLabel(tr("Intitulé : "), this);
 
     validerLaFacture = new QPushButton("Valider la facture", this);
-    validerLaFacture->setToolTip("Validation possible si : facture chargée, montant de la facture renseignée, payeur et sortie séléctionnés, intitulé saisi");
+    validerLaFacture->setToolTip("Validation possible si : \n\
+   -facture chargée,\n\
+   -montant de la facture renseignée,\n\
+   -payeur et sortie sélectionnés,\n\
+   -intitulé saisi.");
     connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
 
     QGridLayout* infosFacture = new QGridLayout(this);
@@ -342,7 +358,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
 
     listeBaladesEtSorties = new QListWidget(this);
-    ajoutRecette->addWidget(listeBaladesEtSorties);
+    ajoutRecette->addWidget(listeBaladesEtSorties,3);
 
     typeDeRecette = new QComboBox(this);
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
@@ -364,10 +380,14 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(montantRecette, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     validerLaRecette = new QPushButton("Valider la recette", this);
+    validerLaRecette->setToolTip(tr("Validation possible si :\n\
+   -montant de recette saisi (non nul),\n\
+   -intitulé saisi,\n\
+   -au moins un vol associé séléctionné."));
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
     QGridLayout* infosRecette = new QGridLayout(this);
-    ajoutRecette->addLayout(infosRecette);
+    ajoutRecette->addLayout(infosRecette, 1);
     infosRecette->addWidget(typeDeRecetteLabel, 0, 0);
     infosRecette->addWidget(typeDeRecette, 0, 1);
     infosRecette->addWidget(intituleRecetteLabel, 1, 0);
@@ -421,8 +441,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     toolBar->addAction(bouttonGenerePdf);
 
     const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
-    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année séléctionnée"), this);
-    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année séléctionnée"));
+    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année sélectionnée"), this);
+    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
 
@@ -522,6 +542,13 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
 
+    menuOption->addSeparator();
+
+    boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Desactiver le scan automatique des factures"), this);
+    boutonActivationScanAutoFactures->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    menuOption->addAction(boutonActivationScanAutoFactures);
+    connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
+
     QFont font;
     font.setWeight(QFont::Bold);
     boutonDemandesAGenererToutes->setFont(font);
@@ -547,9 +574,12 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mailing->setIcon(QIcon("./ressources/email-multiple.svg"));
     mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
+    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), this);
+    mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
@@ -826,6 +856,24 @@ void AeroDms::peuplerTableVols()
     }
 }
 
+void AeroDms::peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures)
+{
+    vueVolsDetectes->setRowCount(p_factures.size());
+
+    for (int i = 0; i < p_factures.size(); i++)
+    {
+        AeroDmsTypes::DonneesFacture facture = p_factures.at(i);
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol).append(" €")));
+        //Par défaut => vol entrainement
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem(typeDeVol->itemText(2)));
+    }
+
+    vueVolsDetectes->resizeColumnsToContents();
+    
+}
+
 void AeroDms::peuplerTableFactures()
 {
     const AeroDmsTypes::ListeDemandeRemboursementFacture listeFactures = db->recupererToutesLesDemandesDeRemboursement(listeDeroulanteAnnee->currentData().toInt());
@@ -925,6 +973,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
         statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
 
         peuplerTableRecettes();
+        //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
+        peuplerListesPilotes();
     }
 }
 
@@ -1000,6 +1050,23 @@ void AeroDms::selectionnerUneFacture()
     if (!fichier.isNull())
     {
         chargerUneFacture(fichier);
+        idFactureDetectee = -1;
+
+        //On masque par défaut... on reaffiche si le scan est effectué
+        //et qu'il ne retourne par une liste vide
+        validerLesVols->setHidden(true);
+        vueVolsDetectes->setHidden(true);
+        if (scanAutomatiqueDesFacturesEstActif)
+        {
+            factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
+            if (factures.size() != 0)
+            {
+                peuplerTableVolsDetectes(factures);
+                validerLesVols->setHidden(false);
+                vueVolsDetectes->setHidden(false);
+            }
+        }
+        
         //Si on passe ici, on est pas en édition de vol
         volAEditer = -1;
         //On restaure le texte du bouton de validation (qui a changé si on était en édition)
@@ -1226,18 +1293,8 @@ void AeroDms::enregistrerUneFacture()
 
 void AeroDms::enregistrerUnVol()
 {
-    bool estEnEchec = false;
-    const int anneeRenseignee = dateDuVol->date().year();
-    const QString idPilote = choixPilote->currentData().toString();
-
-    //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
-    if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
-    {
-        estEnEchec = true;
-        QMessageBox::critical(this, tr("AeroDMS"),
-            tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
-                "Impossible d'enregistrer le vol."), QMessageBox::Cancel);
-    }
+    //Si le pilote n'est pas à jour de sa cotisation => echec immediat
+    bool estEnEchec = !lePiloteEstAJourDeCotisation();
 
     //On effectue d'abord quelques contrôles pour savoir si le vol est enregistrable :
     //1) on a une facture chargée
@@ -1246,6 +1303,9 @@ void AeroDms::enregistrerUnVol()
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec )
     {
+        const int anneeRenseignee = dateDuVol->date().year();
+        const QString idPilote = choixPilote->currentData().toString();
+
         QString nomDeLaFacture = "";
         if (choixPilote->isEnabled())
         {
@@ -1323,6 +1383,12 @@ void AeroDms::enregistrerUnVol()
                     activite->currentText(),
                     volAEditer);
 
+                QString volAjouteModifie = "ajouté";
+                if (volAEditer != -1)
+                {
+                    volAjouteModifie = "modifié";
+                }
+
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
                 + " de "
@@ -1333,23 +1399,35 @@ void AeroDms::enregistrerUnVol()
                 + dureeDuVol->time().toString("hh:mm")
                 + "/"
                 + QString::number(prixDuVol->value())
-                + "€) ajouté. Montant subvention : "
+                + "€) "
+                + volAjouteModifie
+                + ". Montant subvention : "
                 + QString::number(montantSubventionne)
                 + "€ / Subvention entrainement restante : "
                 + QString::number(subventionRestante)
                 + "€");
 
+            //On sort du mode édition, si on y etait...
+            volAEditer = -1;
+
+            //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
+            if (idFactureDetectee != -1)
+            {
+                factures.remove(idFactureDetectee);
+                idFactureDetectee = -1;
+                peuplerTableVolsDetectes(factures);
+            }
+
+            //On rince les données de vol
             dureeDuVol->setTime(QTime::QTime(0, 0));
             prixDuVol->setValue(0);
             remarqueVol->clear();
+            //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation
 
             //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
             typeDeVol->setEnabled(true);
             dureeDuVol->setEnabled(true);
             prixDuVol->setEnabled(true);
-
-            //On sort du mode édition, si on y etait...
-            volAEditer = -1;
         }
         else
         {
@@ -1369,6 +1447,27 @@ void AeroDms::enregistrerUnVol()
     validerLeVol->setText("Valider le vol");
 }
 
+void AeroDms::enregistrerLesVols()
+{
+    //On ne peut enregistrer les vols que si le pilote est à jour de cotisation
+    //Cela sera verifie dans la methode enregistrerUnVol() cependant on le prévérifie
+    //ici pour éviter d'avoir N fois la notification d'echec si le pilote n'est 
+    //pas à jour de sa cotisation
+    if (lePiloteEstAJourDeCotisation())
+    {
+        while (!factures.isEmpty())
+        {
+            //On charge le premier vol de la ligne
+            chargerUnVolDetecte(0, 0);
+
+            //On demande l'enregistrement
+            enregistrerUnVol();
+        }
+        //La liste sera vide => on desactive le bouton d'enregistrement du vol
+        validerLesVols->setEnabled(false);
+    }
+}
+
 void AeroDms::enregistrerUneRecette()
 {
     QStringList volsCoches;
@@ -1383,7 +1482,11 @@ void AeroDms::enregistrerUneRecette()
 
     if (volsCoches.size() == 0)
     {
-        QMessageBox::critical(this, "Vol non sélectionné", "La dépense doit être associée à au moins un vol. \nSélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\nSaisie non prise en compte.");
+        QMessageBox::critical( this, 
+                               "Vol non sélectionné", 
+                               "La dépense doit être associée à au moins un vol. \n\
+Sélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\n\
+Saisie non prise en compte.");
     }
     else
     {
@@ -1392,10 +1495,10 @@ void AeroDms::enregistrerUneRecette()
                                            intituleRecette->text(),
                                            montantRecette->value());
         statusBar()->showMessage("Recette ajoutee");
-    }
 
-    intituleRecette->clear();
-    montantRecette->clear();
+        intituleRecette->clear();
+        montantRecette->clear();
+    }
 
     peuplerTableRecettes();
     peuplerListeBaladesEtSorties();
@@ -1421,8 +1524,11 @@ void AeroDms::peuplerListesPilotes()
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
         listeDeroulantePilote->addItem(nomPrenom, pilote.idPilote);
-        choixPilote->addItem(nomPrenom, pilote.idPilote);
-        choixPayeur->addItem(nomPrenom, pilote.idPilote);
+        if (pilote.estActif)
+        {
+            choixPilote->addItem(nomPrenom, pilote.idPilote);
+            choixPayeur->addItem(nomPrenom, pilote.idPilote);
+        }
     }
 }
 
@@ -1464,14 +1570,18 @@ void AeroDms::peuplerListeBaladesEtSorties()
 {
     listeBaladesEtSorties->clear();
 
-    //QStringList itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
-    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties(typeDeRecette->currentText());
+    AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties( typeDeRecette->currentText(), 
+                                                                                     parametresMetiers.proportionParticipationBalade);
     QListIterator it(itemLabels);
     while (it.hasNext())
     {
         const AeroDmsTypes::VolSortieOuBalade & vol = it.next();
         QListWidgetItem* itemBaladesEtSorties = new QListWidgetItem(vol.nomVol, listeBaladesEtSorties);
         itemBaladesEtSorties->setCheckState(Qt::Unchecked);
+        if (vol.montantSubventionAttendu != 0)
+        {
+            itemBaladesEtSorties->setToolTip("Montant participation attendu : " + QString::number(vol.montantSubventionAttendu, 'f', 2) + " €");
+        }  
         if (!vol.volAAuMoinsUnPaiement)
         {
             itemBaladesEtSorties->setForeground(Qt::red);
@@ -1484,6 +1594,7 @@ void AeroDms::prevaliderDonnnesSaisies()
 {
     validerLeVol->setEnabled(true);
     validerLaFacture->setEnabled(true);
+    validerLesVols->setEnabled(true);
 
     if ( prixDuVol->value() == 0
          || dureeDuVol->time() == QTime::QTime(0,0)
@@ -1492,6 +1603,14 @@ void AeroDms::prevaliderDonnnesSaisies()
          || ( typeDeVol->currentText() != "Entrainement" && choixBalade->currentIndex() == 0))
     {
         validerLeVol->setEnabled(false);
+    }
+
+    if ( choixPilote->currentIndex() == 0
+         || pdfDocument->status() != QPdfDocument::Status::Ready
+         || (typeDeVol->currentText() != "Entrainement" )
+         || idFactureDetectee != -1)
+    {
+        validerLesVols->setEnabled(false);
     }
 
     if ( choixBaladeFacture->currentIndex() == 0
@@ -1671,7 +1790,7 @@ void AeroDms::volsSelectionnes()
 
             hdvTotales = hdvTotales + vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
-            statusBar()->showMessage("Vols séléctionnés : Coût total : "
+            statusBar()->showMessage("Vols sélectionnés : Coût total : "
                 + QString::number(coutTotal)
                 + " € / Montant subventionné total : "
                 + QString::number(montantTotalSubventionne)
@@ -1691,7 +1810,7 @@ void AeroDms::volsSelectionnes()
 
             //hdvTotales = hdvTotales + vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
-            statusBar()->showMessage("Vols séléctionnés : Coût total : " 
+            statusBar()->showMessage("Vols sélectionnés : Coût total : " 
                 + QString::number(coutTotal) 
                 + " € / Montant subventionné total : " 
                 + QString::number(montantTotalSubventionne)
@@ -1772,7 +1891,11 @@ void AeroDms::editerVol()
         prixDuVol->setEnabled(false);
     }
 
-    validerLeVol->setText("Modifier le vol");   
+    validerLeVol->setText("Modifier le vol"); 
+
+    //On masque l'éventuelle table des infos de vol récupéré automatiquement de la facture précédement chargée
+    validerLesVols->setHidden(true);
+    vueVolsDetectes->setHidden(true);
 }
 
 void AeroDms::supprimerVol()
@@ -1843,6 +1966,21 @@ void AeroDms::switchModeDebug()
     }
 }
 
+void AeroDms::switchScanAutomatiqueDesFactures()
+{
+    scanAutomatiqueDesFacturesEstActif = !scanAutomatiqueDesFacturesEstActif;
+    if (scanAutomatiqueDesFacturesEstActif)
+    {
+        boutonActivationScanAutoFactures->setText(tr("Desactiver le scan automatique des factures"));
+    }
+    else
+    {
+        boutonActivationScanAutoFactures->setText(tr("Activer le scan automatique des factures"));
+    }
+    
+}
+
+
 void AeroDms::convertirHeureDecimalesVersHhMm()
 {
     bool ok;
@@ -1865,7 +2003,13 @@ void AeroDms::envoyerMail()
     if (sender() == mailingPilotesAyantCotiseCetteAnnee)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt())
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), false)
+            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+    }
+    else if (sender() == mailingPilotesActifsAyantCotiseCetteAnnee)
+    {
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), true)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesDerniereDemandeSubvention)
@@ -1877,6 +2021,7 @@ void AeroDms::envoyerMail()
     }
     
 }
+
 
 void AeroDms::verifierEtExecuterMaJ(const QString p_chemin)
 {
@@ -1921,7 +2066,88 @@ void AeroDms::verifierEtExecuterMaJ(const QString p_chemin)
         }
     }
 
-    
+void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
+{
+    vueVolsDetectes = new QTableWidget(0, AeroDmsTypes::VolsDetectesTableElement_NB_COLONNES, this);
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem("Date"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem("Durée"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem("Type"));
+    vueVolsDetectes->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    vueVolsDetectes->resizeColumnsToContents();
+    vueVolsDetectes->setHidden(true);
+
+    p_infosVol->addWidget(vueVolsDetectes, 11, 0, 2, 0);
+
+    validerLesVols = new QPushButton("Valider les vols", this);
+    validerLesVols->setHidden(true);
+    validerLesVols->setEnabled(false);
+    validerLesVols->setToolTip(tr("Validation possible si :\n\
+   -pilote sélectionné,\n\
+   -type de vol sélectionné vaut Entrainement,\n\
+   -Aucun vol sélectionné dans la liste pour modification.\n\
+Note : tous les vols enregistrés via ce bouton seront enregistrés en tant que vol d'entrainement.\n\
+Les vols d'une autre catégorie doivent être saisis via modification manuelle en cliquant sur le vol\n\
+puis en complétant les informations via la fenêtre de saisie."));
+    connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerLesVols);
+    connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
+    p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
+}
+
+void AeroDms::chargerUnVolDetecte(int row, int column)
+{
+    idFactureDetectee = row;
+    prixDuVol->setValue(factures.at(idFactureDetectee).coutDuVol);
+    dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
+    dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
+    pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
+}
+
+void AeroDms::deselectionnerVolDetecte()
+{
+    if (idFactureDetectee != -1)
+    {
+        idFactureDetectee = -1;
+        //On rince les données de vol
+        dureeDuVol->setTime(QTime::QTime(0, 0));
+        prixDuVol->setValue(0);
+        remarqueVol->clear();
+        //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation => a faire
+        //imperativement après le rincage de idFactureDetectee car cette donnée ne redeclenche pas ce traitement
+
+        vueVolsDetectes->clearSelection();
+    } 
+}
+
+bool AeroDms::lePiloteEstAJourDeCotisation()
+{
+    const int anneeRenseignee = dateDuVol->date().year();
+    const QString idPilote = choixPilote->currentData().toString();
+
+    //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
+    if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
+    {
+        QMessageBox::critical(this, tr("AeroDMS"),
+            tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
+                "Impossible d'enregistrer le vol."), QMessageBox::Cancel);
+        return false;
+    }
+    return true;
+}
+
+bool AeroDms::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress) 
+    {
+        QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+        if (ke->key() == Qt::Key_Escape)
+        {
+            emit toucheEchapEstAppuyee();
+        }
+    }
+    else
+        return false;
 }
 
 

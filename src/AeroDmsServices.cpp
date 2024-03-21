@@ -31,6 +31,13 @@ const QString AeroDmsServices::convertirMinutesEnHeuresMinutes(const int p_minut
     return heuresMinutes;
 }
 
+const QTime AeroDmsServices::convertirMinutesEnQTime(const int p_minutes)
+{
+    const int heures = p_minutes / 60;
+    const int minutes = p_minutes % 60;
+    return QTime(heures, minutes, 0);
+}
+
 void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
 {
     for (int i = 0; i < p_activite.count(); i++)

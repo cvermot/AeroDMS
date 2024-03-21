@@ -15,19 +15,33 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
+#ifndef PDFEXTRACTOR_H
+#define PDFEXTRACTOR_H
 
-#ifndef AERODMSSERVICES_H
-#define AERODMSSERVICES_H
+#include <QWidget>
+#include <QWebEnginePage>
 
-#include <QtWidgets>
+#include <podofo/podofo.h>
 
-class AeroDmsServices
-{
+#include "AeroDmsTypes.h"
+
+class PdfExtractor : public QWidget {
+	Q_OBJECT
+
 public:
-    static const QString convertirMinutesEnHeuresMinutes(const int p_minutes);
-    static const QTime convertirMinutesEnQTime(const int p_minutes);
-    static void ajouterIconesComboBox(QComboBox &p_activite);
+	PdfExtractor();
 
+	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf(const QString p_fichier);
+
+private:
+	static AeroDmsTypes::DonneesFacture extraireDonneesCapam(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+
+	static const QDate extraireDate(const QString p_date);
+	static const QTime extraireDuree(const QString p_duree);
+	static const float recupererMontantAca(QString p_chaine);
 };
 
-#endif // AERODMSSERVICES_H
+#endif // PDFEXTRACTOR_H
+

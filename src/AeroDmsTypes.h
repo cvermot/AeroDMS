@@ -42,6 +42,14 @@ public:
         PiloteTableElement_NB_COLONNES = 0xC,
     };
 
+    enum VolsDetectesTableElement {
+        VolsDetectesTableElement_DATE = 0x0,
+        VolsDetectesTableElement_DUREE = 0x1,
+        VolsDetectesTableElement_MONTANT = 0x2,
+        VolsDetectesTableElement_TYPE = 0x3,
+        VolsDetectesTableElement_NB_COLONNES = 0x4,
+    };
+
     enum VolTableElement {
         VolTableElement_PILOTE = 0x0,
         VolTableElement_DATE = 0x1,
@@ -114,6 +122,14 @@ public:
         TypeGenerationPdf_DEPENSES_SEULEMENT
     };
 
+    enum Aeroclub {
+        Aeroclub_INCONNU,
+        Aeroclub_DACA,
+        Aeroclub_CAPAM,
+        Aeroclub_ACB,
+        Aeroclub_ACAndernos
+    };
+
     enum Onglet {
         Onglet_PILOTES,
         Onglet_VOLS,
@@ -150,7 +166,9 @@ public:
         QString mail;
         QString telephone;
         QString remarque;
+        bool estActif;
     };
+    static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;
 
     struct HeureDeVolRemboursement
@@ -278,8 +296,9 @@ public:
     typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
 
     struct VolSortieOuBalade {
-        QString nomVol;
-        bool volAAuMoinsUnPaiement;
+        QString nomVol = "";
+        float montantSubventionAttendu = 0;
+        bool volAAuMoinsUnPaiement = 0;
     };
     typedef QList<VolSortieOuBalade> ListeVolSortieOuBalade;
 
@@ -300,6 +319,7 @@ public:
         float proportionRemboursementEntrainement;
         float proportionRemboursementBalade;
         float plafondHoraireRemboursementEntrainement;
+        float proportionParticipationBalade;
         QString nomTresorier;
         int delaisDeGardeBdd;
         QString texteMailDispoCheques;
@@ -311,6 +331,16 @@ public:
         double sorties;
     };
     static const TotauxRecettes K_INIT_TOTAUX_RECETTE;
+
+    struct DonneesFacture
+    {
+        QDate dateDuVol;
+        QTime dureeDuVol;
+        float coutDuVol;
+        int pageDansLeFichierPdf;
+    };
+    static const DonneesFacture K_INIT_DONNEES_FACTURE;
+    typedef QList<DonneesFacture> ListeDonneesFacture;
 
 };
 

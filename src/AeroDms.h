@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMainWindow>
 #include <QtWidgets>
 #include <QPdfDocument>
+#include <QPdfView>
 
 #include "ManageDb.h"
 #include "PdfRenderer.h"
@@ -53,17 +54,28 @@ private:
     void peuplerListeSorties();
     void peuplerListeBaladesEtSorties();
     void peuplerListeDeroulanteAnnee();
+    void peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures);
+
+    bool lePiloteEstAJourDeCotisation();
 
     void initialiserOngletGraphiques();
 
+    void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
+
     float calculerCoutHoraire();
 
+
     void verifierEtExecuterMaJ(const QString p_chemin);
+    bool eventFilter(QObject* object, QEvent* event);
+
 
     ManageDb* db;
     PdfRenderer* pdf;
     AeroDmsTypes::Signature signature;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf;
+    AeroDmsTypes::ListeDonneesFacture factures;
+    int idFactureDetectee;
+    bool scanAutomatiqueDesFacturesEstActif = true;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
@@ -71,6 +83,7 @@ private:
     DialogueAjouterSortie* dialogueAjouterSortie;
 
     QPdfDocument* pdfDocument;
+    QPdfView* pdfView;
 
     QTabWidget* mainTabWidget;
 
@@ -78,6 +91,7 @@ private:
     QTableWidget* vueVols;
     QTableWidget* vueFactures;
     QTableWidget* vueRecettes;
+    QTableWidget* vueVolsDetectes;
 
     //Onglet "Ajouter dépense"
     QComboBox* typeDeVol;
@@ -90,6 +104,7 @@ private:
     QComboBox* choixBalade;
     QLineEdit* remarqueVol;
     QPushButton* validerLeVol;
+    QPushButton* validerLesVols;
 
     QComboBox* choixPayeur;
     QDateEdit* dateDeFacture;
@@ -133,7 +148,9 @@ private:
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* mailingPilotesAyantCotiseCetteAnnee;
+    QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
     QAction* mailingPilotesDerniereDemandeSubvention;
+    QAction* boutonActivationScanAutoFactures;
 
     //Données internes
     QString piloteAEditer = "";
@@ -146,9 +163,13 @@ private:
     QWidget* m_contentArea = nullptr;
     QHBoxLayout* graphiques;
 
+signals:
+    void toucheEchapEstAppuyee();
+
 public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
+    void enregistrerLesVols();
     void enregistrerUneFacture();
     void enregistrerUneRecette();
     void genererPdf();
@@ -178,6 +199,7 @@ public slots:
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);
     void switchModeDebug();
+    void switchScanAutomatiqueDesFactures();
     void convertirHeureDecimalesVersHhMm();
     void peuplerStatistiques();
     void changerModeSignature();
@@ -187,6 +209,8 @@ public slots:
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();
     void volsSelectionnes();
+    void chargerUnVolDetecte(int row, int column);
+    void deselectionnerVolDetecte();
 
 };
 #endif // AERODMS_H
