@@ -112,6 +112,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
+    verifierEtExecuterMaJ(settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
+
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
@@ -2019,6 +2021,50 @@ void AeroDms::envoyerMail()
     }
     
 }
+
+
+void AeroDms::verifierEtExecuterMaJ(const QString p_chemin)
+{
+    const QString fichierAVerifier = p_chemin + "update/AeroDms.exe";
+    if (QFile().exists(fichierAVerifier))
+    {
+        QFile fichierDistant(fichierAVerifier);
+        if (fichierDistant.open(QFile::ReadOnly))
+        {
+            QString hashFichierDistant = "";
+            QCryptographicHash hash(QCryptographicHash::Sha1);
+            if (hash.addData(&fichierDistant))
+            {
+                //QString hashString = QString::fromStdString(hash.result().toStdString());
+                //QMessageBox::critical(this, "Fichier présent", hash.result().toHex());
+                hashFichierDistant = hash.result().toHex();
+            }
+            hash.reset();
+
+            //Calcul de la somme de controle de l'application courante
+            QFile fichierCourant(QCoreApplication::applicationFilePath());
+            //qDebug() << "courant" << QCoreApplication::applicationFilePath();
+            if (fichierCourant.open(QFile::ReadOnly))
+            {
+                QString hashFichierCourant = "";
+                if (hash.addData(&fichierCourant))
+                {
+                    //QString hashString = QString::fromStdString(hash.result().toStdString());
+                    //QMessageBox::critical(this, "Fichier présent", hash.result().toHex() + "\n" + hashFichierDistant);
+                    hashFichierCourant = hash.result().toHex();
+
+                    if (hashFichierDistant != hashFichierCourant)
+                    {
+                        QMessageBox::critical(this, "Une mise à jour est disponible", "Une mise à jour de l'application est disponible et doit être réalisée.");
+                        QFile::copy(fichierAVerifier, QCoreApplication::applicationDirPath()+"/AeroDms_new.exe");
+
+                        QThread::msleep(1000);
+                        QApplication::quit();
+                    }
+                }
+            }
+        }
+    }
 
 void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
 {
