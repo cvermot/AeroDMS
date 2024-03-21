@@ -1291,18 +1291,8 @@ void AeroDms::enregistrerUneFacture()
 
 void AeroDms::enregistrerUnVol()
 {
-    bool estEnEchec = false;
-    const int anneeRenseignee = dateDuVol->date().year();
-    const QString idPilote = choixPilote->currentData().toString();
-
-    //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
-    if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
-    {
-        estEnEchec = true;
-        QMessageBox::critical(this, tr("AeroDMS"),
-            tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
-                "Impossible d'enregistrer le vol."), QMessageBox::Cancel);
-    }
+    //Si le pilote n'est pas à jour de sa cotisation => echec immediat
+    bool estEnEchec = !lePiloteEstAJourDeCotisation();
 
     //On effectue d'abord quelques contrôles pour savoir si le vol est enregistrable :
     //1) on a une facture chargée
@@ -1311,6 +1301,9 @@ void AeroDms::enregistrerUnVol()
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec )
     {
+        const int anneeRenseignee = dateDuVol->date().year();
+        const QString idPilote = choixPilote->currentData().toString();
+
         QString nomDeLaFacture = "";
         if (choixPilote->isEnabled())
         {
@@ -1450,6 +1443,27 @@ void AeroDms::enregistrerUnVol()
 
     //On restaure le texte du bouton de validation (qui a changé si on était en édition)
     validerLeVol->setText("Valider le vol");
+}
+
+void AeroDms::enregistrerLesVols()
+{
+    //On ne peut enregistrer les vols que si le pilote est à jour de cotisation
+    //Cela sera verifie dans la methode enregistrerUnVol() cependant on le prévérifie
+    //ici pour éviter d'avoir N fois la notification d'echec si le pilote n'est 
+    //pas à jour de sa cotisation
+    if (lePiloteEstAJourDeCotisation())
+    {
+        while (!factures.isEmpty())
+        {
+            //On charge le premier vol de la ligne
+            chargerUnVolDetecte(0, 0);
+
+            //On demande l'enregistrement
+            enregistrerUnVol();
+        }
+        //La liste sera vide => on desactive le bouton d'enregistrement du vol
+        validerLesVols->setEnabled(false);
+    }
 }
 
 void AeroDms::enregistrerUneRecette()
@@ -2030,7 +2044,7 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
 Note : tous les vols enregistrés via ce bouton seront enregistrés en tant que vol d'entrainement.\n\
 Les vols d'une autre catégorie doivent être saisis via modification manuelle en cliquant sur le vol\n\
 puis en complétant les informations via la fenêtre de saisie."));
-    //connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
+    connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerLesVols);
     connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
     p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
 }
@@ -2058,6 +2072,22 @@ void AeroDms::deselectionnerVolDetecte()
 
         vueVolsDetectes->clearSelection();
     } 
+}
+
+bool AeroDms::lePiloteEstAJourDeCotisation()
+{
+    const int anneeRenseignee = dateDuVol->date().year();
+    const QString idPilote = choixPilote->currentData().toString();
+
+    //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
+    if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
+    {
+        QMessageBox::critical(this, tr("AeroDMS"),
+            tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
+                "Impossible d'enregistrer le vol."), QMessageBox::Cancel);
+        return false;
+    }
+    return true;
 }
 
 bool AeroDms::eventFilter(QObject* object, QEvent* event)

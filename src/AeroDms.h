@@ -56,6 +56,8 @@ private:
     void peuplerListeDeroulanteAnnee();
     void peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures);
 
+    bool lePiloteEstAJourDeCotisation();
+
     void initialiserOngletGraphiques();
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
@@ -164,6 +166,7 @@ signals:
 public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
+    void enregistrerLesVols();
     void enregistrerUneFacture();
     void enregistrerUneRecette();
     void genererPdf();
