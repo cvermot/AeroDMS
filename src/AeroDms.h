@@ -64,10 +64,8 @@ private:
 
     float calculerCoutHoraire();
 
-
-    void verifierEtExecuterMaJ(const QString p_chemin);
+    bool uneMaJEstDisponible(const QString p_chemin);
     bool eventFilter(QObject* object, QEvent* event);
-
 
     ManageDb* db;
     PdfRenderer* pdf;
@@ -76,6 +74,7 @@ private:
     AeroDmsTypes::ListeDonneesFacture factures;
     int idFactureDetectee;
     bool scanAutomatiqueDesFacturesEstActif = true;
+    bool logicielEnModeLectureSeule = false;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;

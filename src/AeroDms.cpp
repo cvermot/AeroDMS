@@ -112,8 +112,6 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
-    verifierEtExecuterMaJ(settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
-
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
@@ -627,6 +625,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
     verifierSignatureNumerisee();
+
+    if (uneMaJEstDisponible(settings.value("baseDeDonnees/chemin", "").toString() + QString("/")))
+    {
+        bouttonAjouterUnVol->setEnabled(false);
+        bouttonAjouterCotisation->setEnabled(false);
+        bouttonAjouterPilote->setEnabled(false);
+        bouttonAjouterSortie->setEnabled(false);
+        bouttonGenerePdf->setEnabled(false);
+
+        logicielEnModeLectureSeule = true;
+    }
 }
 
 void AeroDms::verifierSignatureNumerisee()
@@ -1617,7 +1626,8 @@ void AeroDms::prevaliderDonnnesSaisies()
          || choixPayeur->currentIndex() == 0
          || montantFacture->value() == 0
          || remarqueFacture->text() == ""
-         || pdfDocument->status() != QPdfDocument::Status::Ready )
+         || pdfDocument->status() != QPdfDocument::Status::Ready
+         || logicielEnModeLectureSeule)
     {
         validerLaFacture->setEnabled(false);
     }    
@@ -1741,6 +1751,10 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         QAction editer(iconeAjouterPilote,"Editer le pilote", this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
         menuClicDroitPilote.addAction(&editer);
+        if (logicielEnModeLectureSeule)
+        {
+            menuClicDroitPilote.setEnabled(false);
+        }
 
         //Afficher le menu sur la vue des pilotes
         menuClicDroitPilote.exec(vuePilotes->mapToParent(QCursor::pos()));
@@ -1845,6 +1859,12 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
         menuClicDroitVol.addAction(&supprimerLeVol);
         supprimerLeVol.setEnabled(leVolEstSupprimable);
+
+        if (logicielEnModeLectureSeule)
+        {
+            editerLeVol.setEnabled(false);
+            supprimerLeVol.setEnabled(false);
+        }
 
         //Afficher le menu sur la vue des vols
         menuClicDroitVol.exec(vueVols->mapToParent(QCursor::pos()));
@@ -2023,7 +2043,7 @@ void AeroDms::envoyerMail()
 }
 
 
-void AeroDms::verifierEtExecuterMaJ(const QString p_chemin)
+bool AeroDms::uneMaJEstDisponible(const QString p_chemin)
 {
     const QString fichierAVerifier = p_chemin + "update/AeroDms.exe";
     if (QFile().exists(fichierAVerifier))
@@ -2055,16 +2075,19 @@ void AeroDms::verifierEtExecuterMaJ(const QString p_chemin)
 
                     if (hashFichierDistant != hashFichierCourant)
                     {
-                        QMessageBox::critical(this, "Une mise à jour est disponible", "Une mise à jour de l'application est disponible et doit être réalisée.");
-                        QFile::copy(fichierAVerifier, QCoreApplication::applicationDirPath()+"/AeroDms_new.exe");
-
-                        QThread::msleep(1000);
-                        QApplication::quit();
+                        QMessageBox::critical(this, "Une mise à jour est disponible", "Une mise à jour de l'application est disponible et doit être réalisée.\n\
+L'application va passer en mode lecture seule.\n\nPour mettre à jour l'application, recopier le fichier\n"
++ fichierAVerifier + "\ndans le repertoire de cette application.");
+                        //QFile::copy(fichierAVerifier, QCoreApplication::applicationDirPath()+"/AeroDms_new.exe");
+                        //QApplication::quit();
+                        return true;
                     }
                 }
             }
         }
     }
+    return false;
+}
 
 void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
 {
