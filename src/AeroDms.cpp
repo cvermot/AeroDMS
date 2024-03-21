@@ -1388,6 +1388,12 @@ void AeroDms::enregistrerUnVol()
                     activite->currentText(),
                     volAEditer);
 
+                QString volAjouteModifie = "ajouté";
+                if (volAEditer != -1)
+                {
+                    volAjouteModifie = "modifié";
+                }
+
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
                 + " de "
@@ -1398,7 +1404,9 @@ void AeroDms::enregistrerUnVol()
                 + dureeDuVol->time().toString("hh:mm")
                 + "/"
                 + QString::number(prixDuVol->value())
-                + "€) ajouté. Montant subvention : "
+                + "€) "
+                + volAjouteModifie
+                + ". Montant subvention : "
                 + QString::number(montantSubventionne)
                 + "€ / Subvention entrainement restante : "
                 + QString::number(subventionRestante)
@@ -1556,7 +1564,7 @@ void AeroDms::peuplerListeBaladesEtSorties()
         itemBaladesEtSorties->setCheckState(Qt::Unchecked);
         if (vol.montantSubventionAttendu != 0)
         {
-            itemBaladesEtSorties->setToolTip("Montant participation attendu : " + QString::number(vol.montantSubventionAttendu, 'f', 2) + " €)");
+            itemBaladesEtSorties->setToolTip("Montant participation attendu : " + QString::number(vol.montantSubventionAttendu, 'f', 2) + " €");
         }  
         if (!vol.volAAuMoinsUnPaiement)
         {
@@ -1867,7 +1875,11 @@ void AeroDms::editerVol()
         prixDuVol->setEnabled(false);
     }
 
-    validerLeVol->setText("Modifier le vol");   
+    validerLeVol->setText("Modifier le vol"); 
+
+    //On masque l'éventuelle table des infos de vol récupéré automatiquement de la facture précédement chargée
+    validerLesVols->setHidden(true);
+    vueVolsDetectes->setHidden(true);
 }
 
 void AeroDms::supprimerVol()
