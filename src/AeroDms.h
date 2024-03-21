@@ -62,6 +62,8 @@ private:
 
     float calculerCoutHoraire();
 
+    bool eventFilter(QObject* object, QEvent* event);
+
     ManageDb* db;
     PdfRenderer* pdf;
     AeroDmsTypes::Signature signature;
@@ -156,6 +158,9 @@ private:
     QWidget* m_contentArea = nullptr;
     QHBoxLayout* graphiques;
 
+signals:
+    void toucheEchapEstAppuyee();
+
 public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
@@ -199,6 +204,7 @@ public slots:
     void mettreAJourInfosSurSelectionPilote();
     void volsSelectionnes();
     void chargerUnVolDetecte(int row, int column);
+    void deselectionnerVolDetecte();
 
 };
 #endif // AERODMS_H

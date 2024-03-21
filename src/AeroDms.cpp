@@ -116,6 +116,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     pdf = new PdfRenderer( db, 
                            ressourcesHtml);
 
+    installEventFilter(this);
+    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
+
     //==========Onglet Pilotes
     vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
@@ -2027,6 +2030,36 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
     dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
+}
+
+void AeroDms::deselectionnerVolDetecte()
+{
+    if (idFactureDetectee != -1)
+    {
+        idFactureDetectee = -1;
+        //On rince les données de vol
+        dureeDuVol->setTime(QTime::QTime(0, 0));
+        prixDuVol->setValue(0);
+        remarqueVol->clear();
+        //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation => a faire
+        //imperativement après le rincage de idFactureDetectee car cette donnée ne redeclenche pas ce traitement
+
+        vueVolsDetectes->clearSelection();
+    } 
+}
+
+bool AeroDms::eventFilter(QObject* object, QEvent* event)
+{
+    if (event->type() == QEvent::KeyPress) 
+    {
+        QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+        if (ke->key() == Qt::Key_Escape)
+        {
+            emit toucheEchapEstAppuyee();
+        }
+    }
+    else
+        return false;
 }
 
 
