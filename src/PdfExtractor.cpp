@@ -23,7 +23,8 @@ PdfExtractor::PdfExtractor()
     
 }
 
-AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const QString p_fichier)
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const QString p_fichier,
+                                                                          const AeroDmsTypes::Aeroclub p_aeroclub)
 {
     AeroDmsTypes::ListeDonneesFacture liste;
 
@@ -37,7 +38,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
         std::vector<PoDoFo::PdfTextEntry> entries;
         page.ExtractTextTo(entries);
 
-        AeroDmsTypes::Aeroclub aeroclub = AeroDmsTypes::Aeroclub_INCONNU;
+        AeroDmsTypes::Aeroclub aeroclub = p_aeroclub;
 
         int index = 0 ;
         while ( index < entries.size() && aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
@@ -70,18 +71,15 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
         switch (aeroclub)
         {
             case AeroDmsTypes::Aeroclub_CAPAM:
+            case AeroDmsTypes::Aeroclub_ACB:
+            case AeroDmsTypes::Aeroclub_Generique_OpenFlyer:
             {
-                liste.append(extraireDonneesCapam(entries, noPage));
+                liste.append(extraireDonneesOpenFlyer(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_DACA:
             {
                 liste.append(extraireDonneesDaca(entries, noPage));
-            }
-            break;
-            case AeroDmsTypes::Aeroclub_ACB:
-            {
-                liste.append(extraireDonneesCapam(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_ACAndernos:
@@ -97,7 +95,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf(const Q
     return liste;
 }
 
-AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesCapam( std::vector<PoDoFo::PdfTextEntry> p_entries,
+AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector<PoDoFo::PdfTextEntry> p_entries,
                                                                  const unsigned p_noPage)
 {
     int index = 0;

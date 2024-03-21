@@ -146,10 +146,15 @@ private:
     QAction* boutonDemandesAGenererDepenses;
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
+    QAction* boutonActivationScanAutoFactures;
+
+    //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
     QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
     QAction* mailingPilotesDerniereDemandeSubvention;
-    QAction* boutonActivationScanAutoFactures;
+    QAction* scanAutoOpenFlyer;
+    QAction* scanAutoAca;
+    QAction* scanAutoDaca;
 
     //Données internes
     QString piloteAEditer = "";
@@ -210,6 +215,7 @@ public slots:
     void volsSelectionnes();
     void chargerUnVolDetecte(int row, int column);
     void deselectionnerVolDetecte();
+    void scannerUneFactureSelonMethodeChoisie();
 
 };
 #endif // AERODMS_H

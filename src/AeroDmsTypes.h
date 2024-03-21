@@ -124,6 +124,7 @@ public:
 
     enum Aeroclub {
         Aeroclub_INCONNU,
+        Aeroclub_Generique_OpenFlyer,
         Aeroclub_DACA,
         Aeroclub_CAPAM,
         Aeroclub_ACB,

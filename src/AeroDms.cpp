@@ -568,6 +568,21 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     menuOutils->addSeparator();
 
+    QMenu* scanFacture = menuOutils->addMenu(tr("Récupération automatique des vols"));
+    scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
+    scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
+    scanAutoOpenFlyer = new QAction(tr("OpenFlyer (CAPAM, ACB)"), this);
+    scanFacture->addAction(scanAutoOpenFlyer);
+    scanAutoAca = new QAction(tr("Aéroclub d'Andernos"), this);
+    scanFacture->addAction(scanAutoAca);
+    scanAutoDaca = new QAction(tr("DACA"), this);
+    scanFacture->addAction(scanAutoDaca);
+    connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+
+    menuOutils->addSeparator();
+
     QMenu* mailing = menuOutils->addMenu(tr("Mailing"));
     mailing->setIcon(QIcon("./ressources/email-multiple.svg"));
     mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
@@ -1080,6 +1095,40 @@ void AeroDms::selectionnerUneFacture()
         volAEditer = -1;
         //On restaure le texte du bouton de validation (qui a changé si on était en édition)
         validerLeVol->setText("Valider le vol");
+    }
+}
+
+void AeroDms::scannerUneFactureSelonMethodeChoisie()
+{
+    AeroDmsTypes::Aeroclub aeroclub = AeroDmsTypes::Aeroclub_INCONNU;
+
+    if (sender() == scanAutoOpenFlyer)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_Generique_OpenFlyer;
+    }
+    else if (sender() == scanAutoAca)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_ACAndernos;
+    }
+    else if (sender() == scanAutoDaca)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_DACA;
+    }
+
+    if (pdfDocument->status() == QPdfDocument::Status::Ready)
+    {
+        factures = PdfExtractor::recupererLesDonneesDuPdf( cheminDeLaFactureCourante,
+                                                           aeroclub);
+        //On masque par défaut... on reaffiche si le scan est effectué
+        //et qu'il ne retourne par une liste vide
+        validerLesVols->setHidden(true);
+        vueVolsDetectes->setHidden(true);
+        if (factures.size() != 0)
+        {
+            peuplerTableVolsDetectes(factures);
+            validerLesVols->setHidden(false);
+            vueVolsDetectes->setHidden(false);
+        }
     }
 }
 

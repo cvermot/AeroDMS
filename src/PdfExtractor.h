@@ -31,10 +31,11 @@ class PdfExtractor : public QWidget {
 public:
 	PdfExtractor();
 
-	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf(const QString p_fichier);
+	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf( const QString p_fichier,
+		                                                                const AeroDmsTypes::Aeroclub p_aeroclub = AeroDmsTypes::Aeroclub_INCONNU);
 
 private:
-	static AeroDmsTypes::DonneesFacture extraireDonneesCapam(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::DonneesFacture extraireDonneesOpenFlyer(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 
