@@ -1431,3 +1431,25 @@ QString ManageDb::recupererMailDerniereDemandeDeSubvention()
 
     return listeMail;
 }
+
+//Un changement de version attendue de la BDD intervient notamment si 
+//   -la structure de la BDD évolue
+//   -on souhaite empecher l'utilisation d'une version du logiciel avec laquelle
+//       un défaut peut avoir un impact sur la BDD (cela imposera de mette à jour
+//       AeroDMS avant de pouvoir utiliser le logiciel en ecriture sur la BDD
+const bool ManageDb::laBddEstALaVersionAttendue()
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM parametres WHERE nom = 'versionBdd'");
+    query.exec();
+
+    if (!query.next())
+    {
+        return false;
+    }     
+    else
+    {
+        //version stockée dans le champ info1
+        return (query.value("info1").toFloat() == versionBddAttendue);
+    }
+}

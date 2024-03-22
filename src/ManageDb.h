@@ -31,6 +31,7 @@ public:
     ManageDb();
 
     void sauvegarderLaBdd(const QString p_repertoireDeSauvegarde);
+    const bool laBddEstALaVersionAttendue();
 
     QString getLastError();
     AeroDmsTypes::ListePilotes recupererPilotes();
@@ -124,7 +125,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-
+    const float versionBddAttendue = 1.0;
 };
 
 #endif

@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QToolBar>
 #include <QPdfPageNavigator>
 
-AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
+AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
     QApplication::setApplicationVersion("3.3");
@@ -37,8 +37,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     setCentralWidget(mainTabWidget);
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope,"AeroDMS", "AeroDMS");
-    
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AeroDMS", "AeroDMS");
+
     if (settings.value("baseDeDonnees/chemin", "") == "")
     {
         settings.beginGroup("baseDeDonnees");
@@ -94,11 +94,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
         settingsMetier.endGroup();
     }
 
-    const QString database = settings.value("baseDeDonnees/chemin", "").toString() + 
-        QString("/") + 
+    const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
+        QString("/") +
         settings.value("baseDeDonnees/nom", "").toString();
-    const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() + 
-        QString("/ressources/HTML") ;
+    const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() +
+        QString("/ressources/HTML");
     cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
@@ -113,8 +113,8 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
 
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
-    pdf = new PdfRenderer( db, 
-                           ressourcesHtml);
+    pdf = new PdfRenderer(db,
+        ressourcesHtml);
 
     installEventFilter(this);
     connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
@@ -205,7 +205,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     pdfView->setPageMode(QPdfView::PageMode::MultiPage);
     ajoutVol->addWidget(pdfView, 3);
 
-    QTabWidget *depenseTabWidget = new QTabWidget(this);
+    QTabWidget* depenseTabWidget = new QTabWidget(this);
     ajoutVol->addWidget(depenseTabWidget, 1);
 
     //==========Sous onglet vol de l'onglet "Ajout dépense"
@@ -223,17 +223,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     connect(choixPilote, &QComboBox::currentIndexChanged, this, &AeroDms::mettreAJourInfosSurSelectionPilote);
 
     aeroclubPiloteSelectionne = new QLineEdit(this);
-    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote sélectionné et au nom duquel le\n" 
-                                              "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
-                                              "l'aéroclub du pilote avant de générer les demandes de subvention."));
+    aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote sélectionné et au nom duquel le\n"
+        "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
+        "l'aéroclub du pilote avant de générer les demandes de subvention."));
     aeroclubPiloteSelectionne->setEnabled(false);
     QLabel* aeroclubPiloteSelectionneLabel = new QLabel(tr("Aéroclub : "), this);
 
     activite = new QComboBox(this);
     activite->setToolTip("L'activité est fournie à titre statistique uniquement.\n"
-                         "Ce champ est rempli automatiquement à partir de l'activité\n"
-                         "par défaut renseignée pour le pilote sélectionné.\n"
-                         "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités.");
+        "Ce champ est rempli automatiquement à partir de l'activité\n"
+        "par défaut renseignée pour le pilote sélectionné.\n"
+        "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités.");
     activite->addItems(db->recupererListeActivites());
     AeroDmsServices::ajouterIconesComboBox(*activite);
     QLabel* activiteLabel = new QLabel(tr("Activité : "), this);
@@ -276,25 +276,25 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     QWidget* widgetDepenseVol = new QWidget(this);
     widgetDepenseVol->setLayout(infosVol);
     depenseTabWidget->addTab(widgetDepenseVol, QIcon("./ressources/airplane-clock.svg"), "Heures de vol");
-    infosVol->addWidget(typeDeVolLabel,                 0, 0);
-    infosVol->addWidget(typeDeVol,                      0, 1);
-    infosVol->addWidget(choixPiloteLabel,               1, 0);
-    infosVol->addWidget(choixPilote,                    1, 1);
+    infosVol->addWidget(typeDeVolLabel, 0, 0);
+    infosVol->addWidget(typeDeVol, 0, 1);
+    infosVol->addWidget(choixPiloteLabel, 1, 0);
+    infosVol->addWidget(choixPilote, 1, 1);
     infosVol->addWidget(aeroclubPiloteSelectionneLabel, 2, 0);
-    infosVol->addWidget(aeroclubPiloteSelectionne,      2, 1);
-    infosVol->addWidget(activiteLabel,                  3, 0);
-    infosVol->addWidget(activite,                       3, 1);
-    infosVol->addWidget(dateDuVolLabel,                 4, 0);
-    infosVol->addWidget(dateDuVol,                      4, 1);
-    infosVol->addWidget(dureeDuVolLabel,                5, 0);
-    infosVol->addWidget(dureeDuVol,                     5, 1);
-    infosVol->addWidget(prixDuVolLabel,                 6, 0);
-    infosVol->addWidget(prixDuVol,                      6, 1);
-    infosVol->addWidget(choixBaladeLabel,               7, 0);
-    infosVol->addWidget(choixBalade,                    7, 1);
-    infosVol->addWidget(remarqueVolLabel,               8, 0);
-    infosVol->addWidget(remarqueVol,                    8, 1);
-    infosVol->addWidget(validerLeVol,                   9, 0, 2, 0);
+    infosVol->addWidget(aeroclubPiloteSelectionne, 2, 1);
+    infosVol->addWidget(activiteLabel, 3, 0);
+    infosVol->addWidget(activite, 3, 1);
+    infosVol->addWidget(dateDuVolLabel, 4, 0);
+    infosVol->addWidget(dateDuVol, 4, 1);
+    infosVol->addWidget(dureeDuVolLabel, 5, 0);
+    infosVol->addWidget(dureeDuVol, 5, 1);
+    infosVol->addWidget(prixDuVolLabel, 6, 0);
+    infosVol->addWidget(prixDuVol, 6, 1);
+    infosVol->addWidget(choixBaladeLabel, 7, 0);
+    infosVol->addWidget(choixBalade, 7, 1);
+    infosVol->addWidget(remarqueVolLabel, 8, 0);
+    infosVol->addWidget(remarqueVol, 8, 1);
+    infosVol->addWidget(validerLeVol, 9, 0, 2, 0);
 
     initialiserTableauVolsDetectes(infosVol);
 
@@ -356,7 +356,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
 
     listeBaladesEtSorties = new QListWidget(this);
-    ajoutRecette->addWidget(listeBaladesEtSorties,3);
+    ajoutRecette->addWidget(listeBaladesEtSorties, 3);
 
     typeDeRecette = new QComboBox(this);
     typeDeRecette->addItems(db->recupererTypesDesVol(true));
@@ -366,7 +366,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     intituleRecette = new QLineEdit(this);
     intituleRecette->setToolTip(tr("Format recommandé : 'NOM EMETTEUR CHEQUE / Banque numéro de chèque'"));
-    QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this); 
+    QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this);
     connect(intituleRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     montantRecette = new QDoubleSpinBox(this);
@@ -407,25 +407,25 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     QToolBar* toolBar = addToolBar(tr(""));
     const QIcon iconeAjouterUnVol = QIcon("./ressources/airplane-plus.svg");
-    QAction* bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter un vol/une dépense"), this);
+    bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter un vol/une dépense"), this);
     bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
     connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(bouttonAjouterUnVol);
 
     const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
-    QAction* bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("&Ajouter un pilote"), this);
+    bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("&Ajouter un pilote"), this);
     bouttonAjouterPilote->setStatusTip(tr("Ajouter un pilote"));
     connect(bouttonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(bouttonAjouterPilote);
 
     const QIcon iconeAjouterCotisation = QIcon("./ressources/ticket.svg");
-    QAction* bouttonAjouterCotisation = new QAction(iconeAjouterCotisation, tr("&Ajouter une cotisation pour un pilote"), this);
+    bouttonAjouterCotisation = new QAction(iconeAjouterCotisation, tr("&Ajouter une cotisation pour un pilote"), this);
     bouttonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
     connect(bouttonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
     toolBar->addAction(bouttonAjouterCotisation);
 
     const QIcon iconeAjouterSortie = QIcon("./ressources/transit-connection-variant.svg");
-    QAction* bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("&Ajouter une sortie"), this);
+    bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("&Ajouter une sortie"), this);
     bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
     connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
@@ -433,7 +433,7 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     toolBar->addSeparator();
 
     const QIcon iconeGenerePdf = QIcon("./ressources/file-cog.svg");
-    QAction* bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
+    bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
     bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
     connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
     toolBar->addAction(bouttonGenerePdf);
@@ -475,10 +475,10 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
 
-    dialogueAjouterCotisation = new DialogueAjouterCotisation( db, 
-                                                               parametresMetiers.montantCotisationPilote, 
-                                                               parametresMetiers.montantSubventionEntrainement, 
-                                                               this);
+    dialogueAjouterCotisation = new DialogueAjouterCotisation(db,
+        parametresMetiers.montantCotisationPilote,
+        parametresMetiers.montantSubventionEntrainement,
+        this);
     connect(dialogueAjouterCotisation, SIGNAL(accepted()), this, SLOT(ajouterUneCotisationEnBdd()));
 
     dialogueAjouterSortie = new DialogueAjouterSortie(this);
@@ -499,17 +499,17 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
 
     //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("Options"));
-    
+
     QMenu* menuSignature = menuOption->addMenu(tr("Signature"));
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
 
-    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature manuelle"), this); 
+    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature manuelle"), this);
     menuSignature->addAction(boutonAucuneSignature);
 
-    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'image d'une signature"), this); 
+    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'image d'une signature"), this);
     menuSignature->addAction(boutonSignatureManuelle);
 
-    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature numérique avec Lex Community"), this);   
+    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature numérique avec Lex Community"), this);
     menuSignature->addAction(boutonSignatureNumerique);
 
     connect(boutonAucuneSignature, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
@@ -601,9 +601,9 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOutils->addAction(boutonConversionHeureDecimalesVersHhMm);
     connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
-    
+
     //========================Menu Aide
-    QMenu *helpMenu = menuBar()->addMenu(tr("Aide"));
+    QMenu* helpMenu = menuBar()->addMenu(tr("Aide"));
     QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("Aide en ligne"), this);
     aideQtAction->setStatusTip(tr("Ouvrir l'aide en ligne"));
     helpMenu->addAction(aideQtAction);
@@ -613,11 +613,11 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
     helpMenu->addSeparator();
-    QAction *aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
+    QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    QAction *aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
+    QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
@@ -641,16 +641,57 @@ AeroDms::AeroDms(QWidget* parent):QMainWindow(parent)
     changerInfosVolSurSelectionTypeVol();
     verifierSignatureNumerisee();
 
-    if (uneMaJEstDisponible(settings.value("baseDeDonnees/chemin", "").toString() + QString("/")))
-    {
-        bouttonAjouterUnVol->setEnabled(false);
-        bouttonAjouterCotisation->setEnabled(false);
-        bouttonAjouterPilote->setEnabled(false);
-        bouttonAjouterSortie->setEnabled(false);
-        bouttonGenerePdf->setEnabled(false);
+    verifierPresenceDeMiseAjour(settings.value("baseDeDonnees/chemin", "").toString());
+}
 
-        logicielEnModeLectureSeule = true;
+void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
+{
+    const QString fichierAVerifier = p_chemin + "/update/AeroDms.exe";
+    if (uneMaJEstDisponible(fichierAVerifier))
+    {
+        if (!db->laBddEstALaVersionAttendue())
+        {
+            passerLeLogicielEnLectureSeule();
+
+            QMessageBox::critical(this, 
+                "Une mise à jour est disponible", 
+                "Une mise à jour de l'application est disponible et doit être réalisée\n\
+car la base de données a évoluée.\n\n\
+L'application va passer en mode lecture seule.\
+\n\nPour mettre à jour l'application, recopier le fichier\n"
++ fichierAVerifier + "\ndans le repertoire de cette application.");
+        }
+        else
+        {
+            QMessageBox::information(this, 
+                "Une mise à jour est disponible", 
+                "Une mise à jour de l'application est disponible.\n\
+Il est fortement recommandé d'effectuer cette mise à jour.\
+\n\nPour mettre à jour l'application, recopier le fichier\n"
++ fichierAVerifier + "\ndans le repertoire de cette application.");
+        }
     }
+    else if (!db->laBddEstALaVersionAttendue())
+    {
+        passerLeLogicielEnLectureSeule();
+
+        QMessageBox::critical(this,
+            "Erreur de version de base de données",
+            "La version de la base de données ne correspond pas à la version attendue.\n\n\
+L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
+Consultez le développeur/responsable de l'application pour plus d'informations.");
+    }
+}
+
+void AeroDms::passerLeLogicielEnLectureSeule()
+{
+    bouttonAjouterUnVol->setEnabled(false);
+    bouttonAjouterCotisation->setEnabled(false);
+    bouttonAjouterPilote->setEnabled(false);
+    bouttonAjouterSortie->setEnabled(false);
+    bouttonGenerePdf->setEnabled(false);
+
+    logicielEnModeLectureSeule = true;
 }
 
 void AeroDms::verifierSignatureNumerisee()
@@ -2091,13 +2132,11 @@ void AeroDms::envoyerMail()
     
 }
 
-
 bool AeroDms::uneMaJEstDisponible(const QString p_chemin)
-{
-    const QString fichierAVerifier = p_chemin + "update/AeroDms.exe";
-    if (QFile().exists(fichierAVerifier))
+{ 
+    if (QFile().exists(p_chemin))
     {
-        QFile fichierDistant(fichierAVerifier);
+        QFile fichierDistant(p_chemin);
         if (fichierDistant.open(QFile::ReadOnly))
         {
             QString hashFichierDistant = "";
@@ -2124,9 +2163,6 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin)
 
                     if (hashFichierDistant != hashFichierCourant)
                     {
-                        QMessageBox::critical(this, "Une mise à jour est disponible", "Une mise à jour de l'application est disponible et doit être réalisée.\n\
-L'application va passer en mode lecture seule.\n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le repertoire de cette application.");
                         //QFile::copy(fichierAVerifier, QCoreApplication::applicationDirPath()+"/AeroDms_new.exe");
                         //QApplication::quit();
                         return true;
@@ -2217,6 +2253,7 @@ bool AeroDms::eventFilter(QObject* object, QEvent* event)
         {
             emit toucheEchapEstAppuyee();
         }
+        return true;
     }
     else
         return false;

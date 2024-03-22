@@ -64,7 +64,9 @@ private:
 
     float calculerCoutHoraire();
 
+    void verifierPresenceDeMiseAjour(const QString p_chemin);
     bool uneMaJEstDisponible(const QString p_chemin);
+    void passerLeLogicielEnLectureSeule();
     bool eventFilter(QObject* object, QEvent* event);
 
     ManageDb* db;
@@ -134,8 +136,14 @@ private:
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
     //Bouttons
+    QAction* bouttonGenerePdf;
     QAction* bouttonGenerePdfRecapHdv;
     QAction* boutonModeDebug;
+    QAction* bouttonAjouterUnVol;
+    QAction* bouttonAjouterCotisation;
+    QAction* bouttonAjouterPilote;
+    QAction* bouttonAjouterSortie;
+
 
     //Menu options
     QAction* boutonAucuneSignature;
