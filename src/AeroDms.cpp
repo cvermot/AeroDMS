@@ -269,7 +269,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
    -pilote sélectionné,\n\
    -durée de vol saisi,\n\
    -montant du vol saisi,\n\
-   -si Type de vol est \"Sortie\", sortie sélectionnée."));
+   -si Type de vol est \"Sortie\", sortie sélectionnée,\n\
+   -facture chargée."));
     connect(validerLeVol, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
 
     QGridLayout* infosVol = new QGridLayout(this);
@@ -568,7 +569,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     menuOutils->addSeparator();
 
-    QMenu* scanFacture = menuOutils->addMenu(tr("Récupération automatique des vols"));
+    QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des factures"));
     scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
     scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
     scanAutoOpenFlyer = new QAction(tr("OpenFlyer (CAPAM, ACB)"), this);
@@ -677,7 +678,7 @@ Il est fortement recommandé d'effectuer cette mise à jour.\
 
         QMessageBox::critical(this,
             "Erreur de version de base de données",
-            "La version de la base de données ne correspond pas à la version attendue.\n\n\
+            "La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
 Consultez le développeur/responsable de l'application pour plus d'informations.");
     }
