@@ -1377,13 +1377,23 @@ QStringList ManageDb::recupererListeActivites()
 }
 
 QString ManageDb::recupererMailPilotes( const int p_annee, 
-                                        const bool p_pilotesActifsSeulement)
+                                        const bool p_pilotesActifsSeulement,
+                                        const bool p_pilotesBrevetes)
 {
     QSqlQuery query;
     query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
     if (p_pilotesActifsSeulement)
     {
         query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND estActif = 1");
+        if (p_pilotesBrevetes)
+        {
+            query.prepare("SELECT piloteId, mail FROM pilote WHERE estActif = 1 AND estBrevete = 1");
+            qDebug() << "ici";
+        }
+    }
+    else if (p_pilotesBrevetes)
+    {
+        query.prepare("SELECT piloteId, mail FROM pilote WHERE estBrevete = 1");
     }
     query.bindValue(":annee", p_annee);
     query.exec();
@@ -1401,6 +1411,8 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
     {
         listeMail.chop(1);
     }
+
+    qDebug() << listeMail << query.size();
 
     return listeMail;
 }

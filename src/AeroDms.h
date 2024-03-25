@@ -159,6 +159,7 @@ private:
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
     QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
+    QAction* mailingPilotesActifsBrevetes;
     QAction* mailingPilotesDerniereDemandeSubvention;
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAca;

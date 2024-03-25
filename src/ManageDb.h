@@ -117,7 +117,8 @@ public:
 
     AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
     QString recupererMailPilotes( const int p_annee,
-                                  const bool p_pilotesActifsSeulement);
+                                  const bool p_pilotesActifsSeulement,
+                                  const bool p_pilotesBrevetes = false);
     QString recupererMailDerniereDemandeDeSubvention();
 
 public slots:
