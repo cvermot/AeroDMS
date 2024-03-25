@@ -47,22 +47,22 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             if (QString(entries.at(index).Text.data()).contains("SIRET : 78194723900013"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_DACA;
-                qDebug() << "Aéroclub trouvé : DACA";
+                //qDebug() << "Aéroclub trouvé : DACA";
             }
             else if (QString(entries.at(index).Text.data()).contains("CAPAM"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_CAPAM;
-                qDebug() << "Aéroclub trouvé : CAPAM";
+                //qDebug() << "Aéroclub trouvé : CAPAM";
             }
             else if (QString(entries.at(index).Text.data()).contains("Aéro-club de Bordeaux"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_ACB;
-                qDebug() << "Aéroclub trouvé : ACB";
+                //qDebug() << "Aéroclub trouvé : ACB";
             }
             else if (QString(entries.at(index).Text.data()).contains("Aéro Club d'Andernos"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_ACAndernos;
-                qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
+                //qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
             }
 
             index++;
@@ -220,7 +220,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                 }
                 donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
             }
-
             //qDebug() << donneesFactures.dateDuVol << donneesFactures.dureeDuVol << donneesFactures.coutDuVol;
 
             liste.append(donneesFactures);

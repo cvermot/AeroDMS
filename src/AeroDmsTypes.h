@@ -168,6 +168,7 @@ public:
         QString telephone;
         QString remarque;
         bool estActif;
+        bool estBrevete;
     };
     static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;

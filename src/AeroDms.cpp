@@ -1902,26 +1902,6 @@ void AeroDms::volsSelectionnes()
                 + " € / Nombres d'heures de vol totales : "
                 + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
         }
-
-        /*for (int i = 0; i < vueVols->selectedItems().size() / nombreDeColonnes; i++)
-        {
-            QString data = vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_COUT)->data(0).toString();
-            data.chop(2);
-            coutTotal = coutTotal + data.toDouble();
-
-            data = vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_SUBVENTION)->data(0).toString();
-            data.chop(2);
-            montantTotalSubventionne = montantTotalSubventionne + data.toDouble();
-
-            //hdvTotales = hdvTotales + vueVols->selectedItems().at(i * nombreDeColonnes + AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
-
-            statusBar()->showMessage("Vols sélectionnés : Coût total : " 
-                + QString::number(coutTotal) 
-                + " € / Montant subventionné total : " 
-                + QString::number(montantTotalSubventionne)
-                + " € / Nombres d'heures de vol totales : "
-                + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
-        }*/
     }
     else
     {

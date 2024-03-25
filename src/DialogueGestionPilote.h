@@ -41,6 +41,7 @@ private:
     QLineEdit* telephone;
     QLineEdit* remarque;
     QCheckBox* estActif;
+    QCheckBox* estBrevete;
 
     QString idPilote;
 

@@ -76,6 +76,10 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     QLabel* estActifLabel = new QLabel(tr("Pilote actif : "), this);
     estActif->setChecked(true);
 
+    estBrevete = new QCheckBox(this);
+    QLabel* estBreveteLabel = new QLabel(tr("Pilote breveté : "), this);
+    estBrevete->setChecked(true);
+
     idPilote = "";
 
     QGridLayout* mainLayout = new QGridLayout(this);
@@ -108,7 +112,10 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     mainLayout->addWidget(estActifLabel, 8, 0);
     mainLayout->addWidget(estActif, 8, 1);
 
-    mainLayout->addWidget(buttonBox, 9, 0, 1, 2);
+    mainLayout->addWidget(estBreveteLabel, 9, 0);
+    mainLayout->addWidget(estBrevete, 9, 1);
+
+    mainLayout->addWidget(buttonBox, 10, 0, 1, 2);
 
     setLayout(mainLayout);
 
@@ -137,6 +144,7 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.remarque = remarque->text();
     pilote.activitePrincipale = activitePrincipale->currentText();
     pilote.estActif = estActif->checkState() == Qt::Checked;
+    pilote.estBrevete = estBrevete->checkState() == Qt::Checked;
 
     //On rince l'affichage en vue d'une éventuelle autre saisie
     annulationOuFinSaisie();
@@ -179,6 +187,14 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     {
         estActif->setChecked(false);
     }
+    if (pilote.estBrevete)
+    {
+        estBrevete->setChecked(true);
+    }
+    else
+    {
+        estBrevete->setChecked(false);
+    }
     aeroclub->setText(pilote.aeroclub);
     mail->setText(pilote.mail);
     telephone->setText(pilote.telephone);
@@ -202,6 +218,7 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     remarque->clear();
     activitePrincipale->setCurrentIndex(0);
     estActif->setChecked(true);
+    estBrevete->setChecked(true);
 
     setWindowTitle(tr("Ajouter un pilote"));
     okButton->setText(tr("&Ajouter"));

@@ -60,5 +60,6 @@ const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilot
                                                            "", //QString mail;
                                                            "", //QString telephone;
                                                            "", //QString remarque;
-                                                           false //bool estActif;
+                                                           false, //bool estActif;
+                                                           false //bool estPiloteBrevete;
 };
