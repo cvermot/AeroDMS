@@ -164,6 +164,7 @@ private:
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAca;
     QAction* scanAutoDaca;
+    QAction* scanAutoGenerique;
 
     //Données internes
     QString piloteAEditer = "";

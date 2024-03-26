@@ -128,7 +128,8 @@ public:
         Aeroclub_DACA,
         Aeroclub_CAPAM,
         Aeroclub_ACB,
-        Aeroclub_ACAndernos
+        Aeroclub_ACAndernos,
+        Aeroclub_GENERIQUE
     };
 
     enum Onglet {

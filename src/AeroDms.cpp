@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtWidgets>
 #include <QToolBar>
 #include <QPdfPageNavigator>
+#include <QtCore>
 
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
@@ -578,9 +579,12 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanFacture->addAction(scanAutoAca);
     scanAutoDaca = new QAction(tr("DACA"), this);
     scanFacture->addAction(scanAutoDaca);
+    scanAutoGenerique = new QAction(tr("Générique"), this);
+    scanFacture->addAction(scanAutoGenerique);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
 
     menuOutils->addSeparator();
 
@@ -1158,6 +1162,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     else if (sender() == scanAutoDaca)
     {
         aeroclub = AeroDmsTypes::Aeroclub_DACA;
+    }
+    else if (sender() == scanAutoGenerique)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_GENERIQUE;
     }
 
     if (pdfDocument->status() == QPdfDocument::Status::Ready)
