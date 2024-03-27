@@ -106,6 +106,7 @@ private:
     QLineEdit* remarqueVol;
     QPushButton* validerLeVol;
     QPushButton* validerLesVols;
+    QPushButton* supprimerLeVolSelectionne;
 
     QComboBox* choixPayeur;
     QDateEdit* dateDeFacture;
@@ -184,6 +185,7 @@ public slots:
     void selectionnerUneFacture();
     void enregistrerUnVol();
     void enregistrerLesVols();
+    void supprimerLeVolDeLaVueVolsDetectes();
     void enregistrerUneFacture();
     void enregistrerUneRecette();
     void genererPdf();

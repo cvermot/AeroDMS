@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("3.6");
+    QApplication::setApplicationVersion("3.7");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -1129,6 +1129,7 @@ void AeroDms::selectionnerUneFacture()
         //et qu'il ne retourne par une liste vide
         validerLesVols->setHidden(true);
         vueVolsDetectes->setHidden(true);
+        supprimerLeVolSelectionne->setHidden(true);
         if (scanAutomatiqueDesFacturesEstActif)
         {
             factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
@@ -1137,6 +1138,7 @@ void AeroDms::selectionnerUneFacture()
                 peuplerTableVolsDetectes(factures);
                 validerLesVols->setHidden(false);
                 vueVolsDetectes->setHidden(false);
+                supprimerLeVolSelectionne->setHidden(false);
             }
         }
         
@@ -1176,11 +1178,13 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
         //et qu'il ne retourne par une liste vide
         validerLesVols->setHidden(true);
         vueVolsDetectes->setHidden(true);
+        supprimerLeVolSelectionne->setHidden(true);
         if (factures.size() != 0)
         {
             peuplerTableVolsDetectes(factures);
             validerLesVols->setHidden(false);
             vueVolsDetectes->setHidden(false);
+            supprimerLeVolSelectionne->setHidden(false);
         }
     }
 }
@@ -1522,12 +1526,7 @@ void AeroDms::enregistrerUnVol()
             volAEditer = -1;
 
             //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
-            if (idFactureDetectee != -1)
-            {
-                factures.remove(idFactureDetectee);
-                idFactureDetectee = -1;
-                peuplerTableVolsDetectes(factures);
-            }
+            supprimerLeVolDeLaVueVolsDetectes();
 
             //On rince les données de vol
             dureeDuVol->setTime(QTime::QTime(0, 0));
@@ -1576,6 +1575,20 @@ void AeroDms::enregistrerLesVols()
         }
         //La liste sera vide => on desactive le bouton d'enregistrement du vol
         validerLesVols->setEnabled(false);
+        supprimerLeVolSelectionne->setEnabled(false);
+    }
+}
+
+void AeroDms::supprimerLeVolDeLaVueVolsDetectes()
+{
+    if (idFactureDetectee != -1)
+    {
+        factures.remove(idFactureDetectee);
+        idFactureDetectee = -1;
+        peuplerTableVolsDetectes(factures);
+
+        vueVolsDetectes->clearSelection();
+        supprimerLeVolSelectionne->setEnabled(false);
     }
 }
 
@@ -1998,6 +2011,7 @@ void AeroDms::editerVol()
     //On masque l'éventuelle table des infos de vol récupéré automatiquement de la facture précédement chargée
     validerLesVols->setHidden(true);
     vueVolsDetectes->setHidden(true);
+    supprimerLeVolSelectionne->setHidden(true);
 }
 
 void AeroDms::supprimerVol()
@@ -2196,9 +2210,14 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
 Note : tous les vols enregistrés via ce bouton seront enregistrés en tant que vol d'entrainement.\n\
 Les vols d'une autre catégorie doivent être saisis via modification manuelle en cliquant sur le vol\n\
 puis en complétant les informations via la fenêtre de saisie."));
+    supprimerLeVolSelectionne = new QPushButton("Supprimer le vol sélectionné", this);
+    supprimerLeVolSelectionne->setHidden(true);
+    supprimerLeVolSelectionne->setEnabled(false);
     connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerLesVols);
+    connect(supprimerLeVolSelectionne, &QPushButton::clicked, this, &AeroDms::supprimerLeVolDeLaVueVolsDetectes);
     connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
     p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
+    p_infosVol->addWidget(supprimerLeVolSelectionne, 14, 0, 2, 0);
 }
 
 void AeroDms::chargerUnVolDetecte(int row, int column)
@@ -2208,6 +2227,8 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
     dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
+
+    supprimerLeVolSelectionne->setEnabled(true);
 }
 
 void AeroDms::deselectionnerVolDetecte()
@@ -2223,6 +2244,7 @@ void AeroDms::deselectionnerVolDetecte()
         //imperativement après le rincage de idFactureDetectee car cette donnée ne redeclenche pas ce traitement
 
         vueVolsDetectes->clearSelection();
+        supprimerLeVolSelectionne->setEnabled(false);
     } 
 }
 
