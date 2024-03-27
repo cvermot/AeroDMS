@@ -252,19 +252,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
     {
         QString str = QString(p_entries.at(index).Text.data())
             .replace("\xc2\xa0", " ")
-            .replace(" ", "")
-            .replace(",", ".")
-            .replace('\u0013', "0")
-            .replace('\u0014', "1")
-            .replace('\u0015', "2")
-            .replace('\u0016', "3")
-            .replace('\u0017', "4")
-            .replace('\u0018', "5")
-            .replace('\u0019', "6")
-            .replace('\u0020', "7")
-            .replace('\u0021', "8")
-            .replace('\u0022', "9");
-
+            .replace(",", ".");
+      
         if (str.contains(date))
         {
             if (donneesFactures.coutDuVol != 0.0 && donneesFactures.dureeDuVol != QTime())
@@ -282,13 +271,18 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
             {
                 donneesFactures.dureeDuVol = extraireDureeRegex(str);
             }
+            str = str.replace(" ", "");
             if (str.contains(euro))
             {
                 QRegularExpressionMatch match = euro.match(str);
-                donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
+                //(certaines factures indiquent un credit nul en dernière ligne)
+                if (match.captured("montant").toFloat() != 0)
+                {
+                    donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                }
             }
         }
-        
         index++;
     }
 

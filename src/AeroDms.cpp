@@ -574,12 +574,17 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
     scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
     scanAutoOpenFlyer = new QAction(tr("OpenFlyer (CAPAM, ACB)"), this);
+    scanAutoOpenFlyer->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoOpenFlyer);
     scanAutoAca = new QAction(tr("Aéroclub d'Andernos"), this);
+    scanAutoAca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoAca);
     scanAutoDaca = new QAction(tr("DACA"), this);
+    scanAutoDaca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoDaca);
+    scanFacture->addSeparator();
     scanAutoGenerique = new QAction(tr("Générique"), this);
+    scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
