@@ -240,10 +240,12 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
 {
     AeroDmsTypes::ListeDonneesFacture liste;
 
-    QRegularExpression date("(?<date>\\d\\d)/(?<month>\\d\\d)/(?<year>\\d\\d\\d\\d)");
+    QRegularExpression dateRe("(?<date>\\d\\d)/(?<month>\\d\\d)/(?<year>\\d\\d\\d\\d)");
+    QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
+    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
+    QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
+
     QRegularExpressionMatch match;
-    QRegularExpression heure("(?<heure>\\d):(?<minutes>\\d\\d)");
-    QRegularExpression euro("(?<montant>\\d+\\.\\d+)€");
 
     int index = 0;
     AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
@@ -254,7 +256,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
             .replace("\xc2\xa0", " ")
             .replace(",", ".");
       
-        if (str.contains(date))
+        if (str.contains(dateRe))
         {
             if (donneesFactures.coutDuVol != 0.0 && donneesFactures.dureeDuVol != QTime())
             {
@@ -267,14 +269,15 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
         //Si on a une date, on cherche les autres champs
         if (donneesFactures.dateDuVol != QDate())
         {
-            if (str.contains(heure))
+            str = str.replace(" ", "");
+            if (str.contains(heureRe)
+                || str.contains(heureHMinRe))
             {
                 donneesFactures.dureeDuVol = extraireDureeRegex(str);
             }
-            str = str.replace(" ", "");
-            if (str.contains(euro))
+            if (str.contains(euroRe))
             {
-                QRegularExpressionMatch match = euro.match(str);
+                QRegularExpressionMatch match = euroRe.match(str);
                 //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
                 //(certaines factures indiquent un credit nul en dernière ligne)
                 if (match.captured("montant").toFloat() != 0)
@@ -311,10 +314,20 @@ const QDate PdfExtractor::extraireDateRegex(const QString p_str)
 const QTime PdfExtractor::extraireDureeRegex(const QString p_str)
 {
     QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
-    QRegularExpressionMatch match = heureRe.match(p_str);
+    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
+    QRegularExpressionMatch match ;
+
+    if (p_str.contains(heureRe))
+    {
+        match = heureRe.match(p_str);
+    }
+    else
+    {
+        match = heureHMinRe.match(p_str);
+    }
    
-    const QTime duree = QTime(match.captured("heure").toInt(),
-        match.captured("minutes").toInt(),
+    const QTime duree = QTime( match.captured("heure").toInt(),
+                               match.captured("minutes").toInt(),
                                0);
     return duree;
 }
