@@ -121,6 +121,8 @@ public:
                                   const bool p_pilotesBrevetes = false);
     QString recupererMailDerniereDemandeDeSubvention();
 
+    const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
+
 public slots:
 
 private:

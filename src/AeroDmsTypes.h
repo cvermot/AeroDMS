@@ -107,7 +107,8 @@ public:
         Statistiques_HEURES_ANNUELLES,
         Statistiques_HEURES_PAR_PILOTE,
         Statistiques_HEURES_PAR_TYPE_DE_VOL,
-        Statistiques_HEURES_PAR_ACTIVITE
+        Statistiques_HEURES_PAR_ACTIVITE,
+        Statistiques_STATUTS_PILOTES
     };
 
     enum Signature {
@@ -344,6 +345,15 @@ public:
     };
     static const DonneesFacture K_INIT_DONNEES_FACTURE;
     typedef QList<DonneesFacture> ListeDonneesFacture;
+
+    struct StatsPilotes
+    {
+        int nbBrevete;
+        int nbNonBrevete;
+        int nbOuvranDroit;
+        int nbAyantDroit;
+    };
+    static const StatsPilotes K_INIT_DONNEES_STATS_PILOTES;
 
 };
 

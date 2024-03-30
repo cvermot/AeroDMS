@@ -63,3 +63,11 @@ const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilot
                                                            false, //bool estActif;
                                                            false //bool estPiloteBrevete;
 };
+
+const AeroDmsTypes::StatsPilotes AeroDmsTypes::K_INIT_DONNEES_STATS_PILOTES =
+{
+    0,
+    0,
+    0,
+    0
+};

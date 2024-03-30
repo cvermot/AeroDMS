@@ -105,6 +105,7 @@
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaireWidget.cpp" />
+    <ClCompile Include="StatistiqueDonuts.cpp" />
     <ClCompile Include="StatistiqueHistogrammeEmpile.cpp" />
     <ClCompile Include="StatistiqueWidget.cpp" />
     <ClCompile Include="DialogueAjouterCotisation.cpp" />
@@ -124,6 +125,7 @@
   <ItemGroup>
     <ClInclude Include="AeroDmsServices.h" />
     <ClInclude Include="AeroDmsTypes.h" />
+    <QtMoc Include="StatistiqueDonuts.h" />
     <QtMoc Include="StatistiqueHistogrammeEmpile.h" />
     <QtMoc Include="StatistiqueWidget.h" />
     <QtMoc Include="StatistiqueDiagrammeCirculaireWidget.h" />

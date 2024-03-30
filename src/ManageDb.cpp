@@ -1468,3 +1468,29 @@ const bool ManageDb::laBddEstALaVersionAttendue()
         return (query.value("info1").toFloat() == versionBddAttendue);
     }
 }
+
+const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
+{
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(estBrevete) AS nbTotal,"
+        "COUNT(*) FILTER (WHERE estBrevete) AS nbBrevete,"
+        "COUNT(*) FILTER (WHERE NOT estBrevete) AS nbNonBrevete,"
+        "COUNT(*) FILTER (WHERE NOT estAyantDroit) AS nbOuvrantDroit,"
+        "COUNT(*) FILTER(WHERE estAyantDroit)  AS nbAyantDroit "
+        "FROM pilote");
+    query.exec();
+
+    AeroDmsTypes::StatsPilotes statsPilotes = AeroDmsTypes::K_INIT_DONNEES_STATS_PILOTES;
+
+    if (query.next())
+    {
+        statsPilotes.nbBrevete = query.value("nbBrevete").toInt() ;
+        statsPilotes.nbNonBrevete = query.value("nbNonBrevete").toInt() ;
+        statsPilotes.nbOuvranDroit = query.value("nbOuvrantDroit").toInt();
+        statsPilotes.nbAyantDroit = query.value("nbAyantDroit").toInt();
+        qDebug() << "passage ici";
+    }
+    qDebug() << "passage la" << query.lastError();
+
+    return statsPilotes;
+}

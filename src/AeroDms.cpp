@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
+#include "StatistiqueDonuts.h"
 
 #include <QtWidgets>
 #include <QToolBar>
@@ -32,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("3.7");
+    QApplication::setApplicationVersion("3.8");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -470,6 +471,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, QIcon("./ressources/chart-pie.svg"));
     listeDeroulanteStatistique->addItem("Statistiques par activité", AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, QIcon("./ressources/chart-pie.svg"));
+    listeDeroulanteStatistique->addItem("Statuts des pilotes", AeroDmsTypes::Statistiques_STATUTS_PILOTES);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_STATUTS_PILOTES, QIcon("./ressources/chart-donut-variant.svg"));
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     selectionToolBar->addWidget(listeDeroulanteStatistique);
 
@@ -829,6 +832,12 @@ void AeroDms::peuplerStatistiques()
                                                                        listeDeroulanteAnnee->currentData().toInt(), 
                                                                        AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
                                                                        m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
+        {
+            m_activeWidget = new StatistiqueDonuts( db,
+                                                    m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
