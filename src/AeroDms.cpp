@@ -1990,7 +1990,7 @@ void AeroDms::editerVol()
 
     //On récupère les infos du vol pour les réintegrer dans l'IHM
     const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer);
-    choixPilote->setCurrentIndex(listeDeroulantePilote->findData(vol.idPilote));
+    choixPilote->setCurrentIndex(choixPilote->findData(vol.idPilote));
     choixPilote->setEnabled(false);
 
     //Type de vol jamais éditable
