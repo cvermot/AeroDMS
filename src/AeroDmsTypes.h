@@ -130,7 +130,8 @@ public:
         Aeroclub_CAPAM,
         Aeroclub_ACB,
         Aeroclub_ACAndernos,
-        Aeroclub_GENERIQUE
+        Aeroclub_GENERIQUE,
+        Aeroclub_GENERIQUE_1_PASSE
     };
 
     enum Onglet {

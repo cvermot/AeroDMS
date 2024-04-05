@@ -586,12 +586,16 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanAutoDaca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoDaca);
     scanFacture->addSeparator();
-    scanAutoGenerique = new QAction(tr("Générique"), this);
+    scanAutoGenerique1Passe = new QAction(tr("Générique (une passe)"), this);
+    scanAutoGenerique1Passe->setIcon(QIcon("./ressources/text-box-search.svg"));
+    scanFacture->addAction(scanAutoGenerique1Passe);
+    scanAutoGenerique = new QAction(tr("Générique (multi-passe)"), this);
     scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
 
     menuOutils->addSeparator();
@@ -1182,6 +1186,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     else if (sender() == scanAutoGenerique)
     {
         aeroclub = AeroDmsTypes::Aeroclub_GENERIQUE;
+    }
+    else if (sender() == scanAutoGenerique1Passe)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_GENERIQUE_1_PASSE;
     }
 
     if (pdfDocument->status() == QPdfDocument::Status::Ready)

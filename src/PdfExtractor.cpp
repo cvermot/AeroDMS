@@ -92,6 +92,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 liste.append(extraireDonneesGenerique(entries, noPage));
             }
             break;
+            case AeroDmsTypes::Aeroclub_GENERIQUE_1_PASSE:
+            {
+                liste.append(extraireDonneesGenerique1Passe(entries, noPage));
+            }
+            break;
             default:
                 break;
         }
@@ -292,6 +297,72 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
     if (donneesFactures.dateDuVol != QDate()
         && donneesFactures.coutDuVol != 0.0
         && donneesFactures.dureeDuVol != QTime())
+    {
+        liste.append(donneesFactures);
+    }
+
+    return liste;
+}
+
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe(std::vector<PoDoFo::PdfTextEntry> p_entries,
+    const unsigned p_noPage)
+{
+    AeroDmsTypes::ListeDonneesFacture liste;
+
+    QRegularExpression dateRe("(?<date>\\d\\d)/(?<month>\\d\\d)/(?<year>\\d\\d\\d\\d)");
+    QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
+    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
+    QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
+
+    QRegularExpressionMatch match;
+
+    int index = 0;
+    AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+
+    while (index < p_entries.size())
+    {
+        QString str = QString(p_entries.at(index).Text.data())
+            .replace("\xc2\xa0", " ")
+            .replace(",", ".");
+
+        if (str.contains(dateRe))
+        {
+            if (donneesFactures.coutDuVol != 0.0 && donneesFactures.dureeDuVol != QTime())
+            {
+                liste.append(donneesFactures);
+                donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+            }
+            donneesFactures.pageDansLeFichierPdf = p_noPage;
+            donneesFactures.dateDuVol = extraireDateRegex(str);
+        }
+        //Si on a une date, on cherche les autres champs
+        if (donneesFactures.dateDuVol != QDate())
+        {
+            str = str.replace(" ", "");
+            if (str.contains(heureRe)
+                || str.contains(heureHMinRe)
+                && donneesFactures.dureeDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.dureeDuVol)
+            {
+                donneesFactures.dureeDuVol = extraireDureeRegex(str);
+            }
+            if (str.contains(euroRe)
+                && donneesFactures.coutDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol)
+            {
+                QRegularExpressionMatch match = euroRe.match(str);
+                //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
+                //(certaines factures indiquent un credit nul en dernière ligne)
+                if (match.captured("montant").toFloat() != 0)
+                {
+                    donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                }
+            }
+        }
+        index++;
+    }
+
+    if (donneesFactures.dateDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dateDuVol
+        && donneesFactures.coutDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol
+        && donneesFactures.dureeDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dureeDuVol)
     {
         liste.append(donneesFactures);
     }
