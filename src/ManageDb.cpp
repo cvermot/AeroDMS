@@ -439,33 +439,14 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
 
 AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 {
-    AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
-
     QSqlQuery query;
-    query.prepare("SELECT *  FROM vol WHERE volId = :volId");
+    query.prepare("SELECT * FROM vol WHERE volId = :volId");
     query.bindValue(":volId", p_idVol);
 
     query.exec();
     query.next();
 
-    vol.coutVol = query.value("cout").toFloat();
-    vol.date = query.value("date").toDate();
-    vol.dureeEnMinutes = query.value("duree").toInt();
-    vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
-    vol.estSoumisCe = "Oui";
-    if (query.value("demandeRemboursement").isNull())
-        vol.estSoumisCe = "Non";
-    vol.idPilote = query.value("pilote").toString();
-    vol.montantRembourse = query.value("montantRembourse").toFloat();
-    vol.remarque = query.value("remarque").toString();
-    vol.typeDeVol = query.value("typeDeVol").toString();
-    vol.volId = query.value("volId").toInt();
-    vol.baladeId = -1;
-    if (!query.value("sortie").isNull())
-        vol.baladeId = query.value("sortie").toInt();
-     vol.activite = query.value("activite").toString();
-
-    return vol;
+    return depilerRequeteVol(query);
 }
 
 AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
@@ -476,19 +457,19 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     QSqlQuery query;
     if (p_annee != -1 && p_piloteId != "*")
     {
-        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId ORDER BY date");
+        query.prepare("SELECT * FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId ORDER BY date");
     }
     else if (p_annee != -1)
     {
-        query.prepare("SELECT *  FROM vols WHERE strftime('%Y', vols.date) = :annee ORDER BY date");
+        query.prepare("SELECT * FROM vols WHERE strftime('%Y', vols.date) = :annee ORDER BY date");
     }
     else if (p_piloteId != "*")
     {
-        query.prepare("SELECT *  FROM vols WHERE pilote = :piloteId ORDER BY date");
+        query.prepare("SELECT * FROM vols WHERE pilote = :piloteId ORDER BY date");
     }
     else
     {
-        query.prepare("SELECT *  FROM vols ORDER BY date");
+        query.prepare("SELECT * FROM vols ORDER BY date");
     }
     query.bindValue(":annee", QString::number(p_annee));
     query.bindValue(":piloteId", p_piloteId);
@@ -498,32 +479,43 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
 
     while (query.next())
     {
-        AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
-        vol.coutVol = query.value("cout").toFloat();
-        vol.date = query.value("date").toDate();
-        vol.dureeEnMinutes = query.value("duree").toInt();
-        vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
-        vol.estSoumisCe = "Oui";
-        if(query.value("demandeRemboursement").isNull())
-            vol.estSoumisCe = "Non";
-        vol.idPilote = query.value("pilote").toString();
-        vol.montantRembourse = query.value("montantRembourse").toFloat();
-        vol.nomPilote = query.value("nom").toString();
-        vol.prenomPilote = query.value("prenom").toString();
-        vol.remarque = query.value("remarque").toString();
-        vol.typeDeVol = query.value("typeDeVol").toString();
-        vol.activite = query.value("activite").toString();
-        vol.volId = query.value("volId").toInt();
-        if (!query.value("sortie").isNull())
-        {
-            vol.baladeId = query.value("sortie").toInt();
-        }
-            
- 
-        liste.append(vol);
+        liste.append(depilerRequeteVol(query));
+    }
+    return liste;
+}
+
+AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
+{
+    AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
+
+    vol.coutVol = p_query.value("cout").toFloat();
+    vol.date = p_query.value("date").toDate();
+    vol.dureeEnMinutes = p_query.value("duree").toInt();
+    vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
+    vol.estSoumisCe = "Oui";
+    if (p_query.value("demandeRemboursement").isNull())
+    {
+        vol.estSoumisCe = "Non";
+    }
+    vol.idPilote = p_query.value("pilote").toString();
+    vol.montantRembourse = p_query.value("montantRembourse").toFloat();
+    if (!p_query.isNull("nom")
+        && !p_query.isNull("prenom"))
+    {
+        vol.nomPilote = p_query.value("nom").toString();
+        vol.prenomPilote = p_query.value("prenom").toString();
+    }
+    vol.remarque = p_query.value("remarque").toString();
+    vol.typeDeVol = p_query.value("typeDeVol").toString();
+    vol.activite = p_query.value("activite").toString();
+    vol.volId = p_query.value("volId").toInt();
+    vol.immat = p_query.value("immatriculation").toString();
+    if (!p_query.value("sortie").isNull())
+    {
+        vol.baladeId = p_query.value("sortie").toInt();
     }
 
-    return liste;
+    return vol;
 }
 
 int ManageDb::ajouterFacture(QString& p_nomFichier)
@@ -573,6 +565,7 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     const int p_facture,
     const int p_idSortie,
     const QString& p_remarque,
+    const QString& p_immat,
     const QString& p_activite,
     const int p_idVolAEditer)
 {
@@ -580,10 +573,10 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     //Si on est sur un ajout
     if (p_idVolAEditer == -1)
     {
-        query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','remarque','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:remarque,:activite)");
+        query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','remarque','immatriculation','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:remarque,:immatriculation,:activite)");
         //Si on est sur une sortie, on la renseigne
         if (p_idSortie != -1)
-            query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','sortie','remarque','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:sortie,:remarque,:activite)");
+            query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','sortie','remarque','immatriculation','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:sortie,:remarque,:immatriculation,:activite)");
     }
     //Sinon, un numéro de vol est renseigné : on est en édition
     else
@@ -592,16 +585,16 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
         //ici à 0, on le sort donc de la mise à jour :
         if (p_montantSubventionne != 0)
         {
-            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'activite' = :activite WHERE volId = :volId");
+            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'activite' = :activite WHERE volId = :volId");
             if (p_idSortie != -1)
-                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
+                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'immatriculation' = :immatriculation,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
         }
         else
         {
             //Les mêmes requetes, sans montantRembourse
-            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'activite' = :activite WHERE volId = :volId");
+            query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'activite' = :activite WHERE volId = :volId");
             if (p_idSortie != -1)
-                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
+                query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
         }
         query.bindValue(":volId", p_idVolAEditer);
     }
@@ -615,6 +608,7 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     query.bindValue(":facture", p_facture);
     query.bindValue(":sortie", p_idSortie);
     query.bindValue(":remarque", p_remarque);
+    query.bindValue(":immatriculation", p_immat);
     query.bindValue(":activite", p_activite);
 
     query.exec();

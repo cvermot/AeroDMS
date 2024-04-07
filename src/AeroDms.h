@@ -104,6 +104,7 @@ private:
     QDoubleSpinBox* prixDuVol;
     QComboBox* choixBalade;
     QLineEdit* remarqueVol;
+    QLineEdit* immat;
     QPushButton* validerLeVol;
     QPushButton* validerLesVols;
     QPushButton* supprimerLeVolSelectionne;
@@ -144,7 +145,6 @@ private:
     QAction* bouttonAjouterCotisation;
     QAction* bouttonAjouterPilote;
     QAction* bouttonAjouterSortie;
-
 
     //Menu options
     QAction* boutonAucuneSignature;

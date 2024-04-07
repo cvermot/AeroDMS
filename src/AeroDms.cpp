@@ -152,6 +152,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem("Subvention"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem("Activité"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem("Durée en minutes"));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem("ID"));
@@ -266,6 +267,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     remarqueVol = new QLineEdit(this);
     QLabel* remarqueVolLabel = new QLabel(tr("Remarque : "), this);
 
+    immat = new QLineEdit(this);
+    immat->setToolTip(tr("Facultatif : à des fins de statistiques uniquement"));
+    QLabel* immatLabel = new QLabel(tr("Immatriculation : "), this);
+
     validerLeVol = new QPushButton("Valider le vol", this);
     validerLeVol->setToolTip(tr("Validation possible si :\n\
    -pilote sélectionné,\n\
@@ -297,7 +302,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     infosVol->addWidget(choixBalade, 7, 1);
     infosVol->addWidget(remarqueVolLabel, 8, 0);
     infosVol->addWidget(remarqueVol, 8, 1);
-    infosVol->addWidget(validerLeVol, 9, 0, 2, 0);
+    infosVol->addWidget(immatLabel, 9, 0);
+    infosVol->addWidget(immat, 9, 1);
+    infosVol->addWidget(validerLeVol, 10, 0, 2, 0);
 
     initialiserTableauVolsDetectes(infosVol);
 
@@ -931,6 +938,7 @@ void AeroDms::peuplerTableVols()
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
+        vueVols->setItem(i, AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(vol.immat));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
         vueVols->setItem(i, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
     }
@@ -957,6 +965,7 @@ void AeroDms::peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy")));
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm")));
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol).append(" €")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT, new QTableWidgetItem(facture.immat));
         //Par défaut => vol entrainement
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem(typeDeVol->itemText(2)));
     }
@@ -1226,6 +1235,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     dureeDuVol->setTime(QTime::QTime(0, 0));
     prixDuVol->setValue(0);
     remarqueVol->clear();
+    immat->clear();
     typeDeVol->setCurrentIndex(2);
     choixBalade->setCurrentIndex(0);
     
@@ -1504,7 +1514,6 @@ void AeroDms::enregistrerUnVol()
 				{
 					montantSubventionne = subventionRestante;
 				}
-                
 
 				subventionRestante = subventionRestante - montantSubventionne;
 			}
@@ -1517,6 +1526,7 @@ void AeroDms::enregistrerUnVol()
 					factureIdEnBdd,
 					choixBalade->currentData().toInt(),
 					remarqueVol->text(),
+                    immat->text(),
                     activite->currentText(),
                     volAEditer);
 
@@ -1554,6 +1564,7 @@ void AeroDms::enregistrerUnVol()
             dureeDuVol->setTime(QTime::QTime(0, 0));
             prixDuVol->setValue(0);
             remarqueVol->clear();
+            immat->clear();
             //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation
 
             //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
@@ -2018,6 +2029,7 @@ void AeroDms::editerVol()
     activite->setCurrentIndex(activite->findText(vol.activite));
 
     remarqueVol->setText(vol.remarque);
+    immat->setText(vol.immat);
 
     //Si le vol est déjà soumis au CE, on ne peut plus modifier les temps de vol et le coût du vol :
     //(modifierait des montants de subventions déjà soumises au CE)
@@ -2214,13 +2226,14 @@ void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
     vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem("Date"));
     vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem("Durée"));
     vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_IMMAT, new QTableWidgetItem("Immat"));
     vueVolsDetectes->setHorizontalHeaderItem(AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem("Type"));
     vueVolsDetectes->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     vueVolsDetectes->resizeColumnsToContents();
     vueVolsDetectes->setHidden(true);
 
-    p_infosVol->addWidget(vueVolsDetectes, 11, 0, 2, 0);
+    p_infosVol->addWidget(vueVolsDetectes, 12, 0, 2, 0);
 
     validerLesVols = new QPushButton("Valider les vols", this);
     validerLesVols->setHidden(true);
@@ -2238,8 +2251,8 @@ puis en complétant les informations via la fenêtre de saisie."));
     connect(validerLesVols, &QPushButton::clicked, this, &AeroDms::enregistrerLesVols);
     connect(supprimerLeVolSelectionne, &QPushButton::clicked, this, &AeroDms::supprimerLeVolDeLaVueVolsDetectes);
     connect(vueVolsDetectes, &QTableWidget::cellClicked, this, &AeroDms::chargerUnVolDetecte);
-    p_infosVol->addWidget(validerLesVols, 13, 0, 2, 0);
-    p_infosVol->addWidget(supprimerLeVolSelectionne, 14, 0, 2, 0);
+    p_infosVol->addWidget(validerLesVols, 14, 0, 2, 0);
+    p_infosVol->addWidget(supprimerLeVolSelectionne, 15, 0, 2, 0);
 }
 
 void AeroDms::chargerUnVolDetecte(int row, int column)
@@ -2248,6 +2261,7 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     prixDuVol->setValue(factures.at(idFactureDetectee).coutDuVol);
     dureeDuVol->setTime(factures.at(idFactureDetectee).dureeDuVol);
     dateDuVol->setDate(factures.at(idFactureDetectee).dateDuVol);
+    immat->setText(factures.at(idFactureDetectee).immat);
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
 
     supprimerLeVolSelectionne->setEnabled(true);
@@ -2262,6 +2276,7 @@ void AeroDms::deselectionnerVolDetecte()
         dureeDuVol->setTime(QTime::QTime(0, 0));
         prixDuVol->setValue(0);
         remarqueVol->clear();
+        immat->clear();
         //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation => a faire
         //imperativement après le rincage de idFactureDetectee car cette donnée ne redeclenche pas ce traitement
 

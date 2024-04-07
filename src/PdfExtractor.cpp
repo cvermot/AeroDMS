@@ -18,6 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PdfExtractor.h"
 
+QRegularExpression dateRe("(?<jour>\\d\\d)/(?<mois>\\d\\d)/(?<annee>\\d\\d\\d\\d)");
+QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
+QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
+QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
+QRegularExpression immatRe("(?<immat>F-[A-Z]{4})");
+
 PdfExtractor::PdfExtractor()
 {
     
@@ -41,7 +47,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
         AeroDmsTypes::Aeroclub aeroclub = p_aeroclub;
 
         int index = 0 ;
-        while ( index < entries.size() && aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
+        while ( index < entries.size() 
+                && aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
         {
             //qDebug() << entries.at(index).Text.data();
             if (QString(entries.at(index).Text.data()).contains("SIRET : 78194723900013"))
@@ -64,7 +71,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 aeroclub = AeroDmsTypes::Aeroclub_ACAndernos;
                 //qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
             }
-
             index++;
         }
 
@@ -106,7 +112,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
 }
 
 AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector<PoDoFo::PdfTextEntry> p_entries,
-                                                                 const unsigned p_noPage)
+                                                                     const unsigned p_noPage)
 {
     int index = 0;
     AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
@@ -119,6 +125,12 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
         {
             QStringList str = data.replace("Vol du ", "").split(" ");
             donneesFactures.dateDuVol = extraireDate(str.at(0));
+
+            if (QString(p_entries.at(index + 1).Text.data()).contains(immatRe))
+            {
+                QRegularExpressionMatch match = immatRe.match(QString(p_entries.at(index + 1).Text.data()));
+                donneesFactures.immat = match.captured("immat");
+            }
            
             index = index + 2;
             if (index < p_entries.size())
@@ -164,6 +176,12 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vecto
             donneesFacture.dateDuVol = extraireDate(str.at(2));
             QString duree = str.at(4);
             donneesFacture.dureeDuVol = AeroDmsServices::convertirMinutesEnQTime(duree.replace("min", "").toInt());
+
+        if (data.contains(immatRe))
+        {
+            QRegularExpressionMatch match = immatRe.match(data);
+            donneesFacture.immat = match.captured("immat");
+        }
         }
         else if (data.contains("Total TTC"))
         {
@@ -217,7 +235,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                     QString montant = str.at(i);
                     donneesFactures.coutDuVol = montant.replace("vol", "").replace(",", ".").toFloat();
                 }
-
+                else if (str.at(i).contains(immatRe))
+                {
+                    QRegularExpressionMatch match = immatRe.match(str.at(i));
+                    donneesFactures.immat = match.captured("immat");
+                }
             }
 
             if (donneesFactures.coutDuVol == 0)
@@ -244,11 +266,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
                                                                           const unsigned p_noPage)
 {
     AeroDmsTypes::ListeDonneesFacture liste;
-
-    QRegularExpression dateRe("(?<date>\\d\\d)/(?<month>\\d\\d)/(?<year>\\d\\d\\d\\d)");
-    QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
-    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
-    QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
 
     QRegularExpressionMatch match;
 
@@ -290,6 +307,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
                     donneesFactures.coutDuVol = match.captured("montant").toFloat();
                 }
             }
+            if (str.contains(immatRe))
+            {
+                QRegularExpressionMatch match = immatRe.match(str);
+                donneesFactures.immat = match.captured("immat");
+            }
         }
         index++;
     }
@@ -304,15 +326,10 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
     return liste;
 }
 
-AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe(std::vector<PoDoFo::PdfTextEntry> p_entries,
-    const unsigned p_noPage)
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe( std::vector<PoDoFo::PdfTextEntry> p_entries,
+                                                                                const unsigned p_noPage)
 {
     AeroDmsTypes::ListeDonneesFacture liste;
-
-    QRegularExpression dateRe("(?<date>\\d\\d)/(?<month>\\d\\d)/(?<year>\\d\\d\\d\\d)");
-    QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
-    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
-    QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
 
     QRegularExpressionMatch match;
 
@@ -356,6 +373,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe(s
                     donneesFactures.coutDuVol = match.captured("montant").toFloat();
                 }
             }
+            if (str.contains(immatRe))
+            {
+                QRegularExpressionMatch match = immatRe.match(str);
+                donneesFactures.immat = match.captured("immat");
+            }
         }
         index++;
     }
@@ -372,7 +394,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe(s
 
 const QDate PdfExtractor::extraireDateRegex(const QString p_str)
 {
-    QRegularExpression dateRe("(?<jour>\\d\\d)/(?<mois>\\d\\d)/(?<annee>\\d\\d\\d\\d)");
     QRegularExpressionMatch match = dateRe.match(p_str);
 
     const QDate date = QDate(match.captured("annee").toInt(),
@@ -384,8 +405,6 @@ const QDate PdfExtractor::extraireDateRegex(const QString p_str)
 
 const QTime PdfExtractor::extraireDureeRegex(const QString p_str)
 {
-    QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
-    QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
     QRegularExpressionMatch match ;
 
     if (p_str.contains(heureRe))

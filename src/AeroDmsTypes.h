@@ -46,8 +46,9 @@ public:
         VolsDetectesTableElement_DATE = 0x0,
         VolsDetectesTableElement_DUREE = 0x1,
         VolsDetectesTableElement_MONTANT = 0x2,
-        VolsDetectesTableElement_TYPE = 0x3,
-        VolsDetectesTableElement_NB_COLONNES = 0x4,
+        VolsDetectesTableElement_IMMAT = 0x3,
+        VolsDetectesTableElement_TYPE = 0x4,
+        VolsDetectesTableElement_NB_COLONNES = 0x5,
     };
 
     enum VolTableElement {
@@ -59,10 +60,11 @@ public:
         VolTableElement_SUBVENTION = 0x5,
         VolTableElement_SOUMIS_CE = 0x6,
         VolTableElement_REMARQUE = 0x7,
-        VolTableElement_ACTIVITE = 0x8,
-        VolTableElement_VOL_ID = 0x9,
-        VolTableElement_DUREE_EN_MINUTES = 0xA,
-        VolTableElement_NB_COLONNES = 0xB,
+        VolTableElement_IMMAT = 0x8,
+        VolTableElement_ACTIVITE = 0x9,
+        VolTableElement_VOL_ID = 0xA,
+        VolTableElement_DUREE_EN_MINUTES = 0xB,
+        VolTableElement_NB_COLONNES = 0xC,
     };
 
     enum FactureTableElement {
@@ -225,6 +227,7 @@ public:
         QString typeDeVol;
         QString duree;
         QString remarque;
+        QString immat;
         QString activite;
         QString estSoumisCe;
         float coutVol;
@@ -342,6 +345,7 @@ public:
         QDate dateDuVol;
         QTime dureeDuVol;
         float coutDuVol;
+        QString immat;
         int pageDansLeFichierPdf;
     };
     static const DonneesFacture K_INIT_DONNEES_FACTURE;

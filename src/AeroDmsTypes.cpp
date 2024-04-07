@@ -36,18 +36,20 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      AeroDmsServices::convertirMinutesEnHeuresMinutes(0),//QString typeDeVol;
                                                      "",//QString duree;
                                                      "",//QString remarque;
+                                                     "",//QString immat;
                                                      "",//QString activite;
                                                      "",//QString estSoumisCe;
                                                      0.0,//float coutVol;
                                                      0.0,//float montantRembourse;
                                                      0,//int volId;
                                                      0,//int dureeEnMinutes;
-                                                     0//int baladeId;
+                                                     -1//int baladeId;
 };
 
 const AeroDmsTypes::DonneesFacture AeroDmsTypes::K_INIT_DONNEES_FACTURE = { QDate(),
                                                                             QTime(),
                                                                             0.0,
+                                                                            QString(),
                                                                             0
 };
 

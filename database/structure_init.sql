@@ -1,7 +1,7 @@
 --
--- File generated with SQLiteStudio v3.4.4 on lun. mars 25 20:56:35 2024
+-- File generated with SQLiteStudio v3.4.4 on dim. avr. 7 23:41:11 2024
 --
--- Text encoding used: UTF-8
+-- Text encoding used: System
 --
 PRAGMA foreign_keys = off;
 BEGIN TRANSACTION;
@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS activite (nom TEXT PRIMARY KEY UNIQUE NOT NULL);
 INSERT INTO activite (nom) VALUES ('Avion');
 INSERT INTO activite (nom) VALUES ('ULM');
 INSERT INTO activite (nom) VALUES ('Planeur');
-INSERT INTO activite (nom) VALUES ('HelicoptÃ¨re');
-INSERT INTO activite (nom) VALUES ('Avion Ã©lectrique');
+INSERT INTO activite (nom) VALUES ('Helicoptère');
+INSERT INTO activite (nom) VALUES ('Avion électrique');
 
 -- Table: cotisation
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL);
@@ -300,7 +300,7 @@ CREATE VIEW IF NOT EXISTS volsBaladesEtSorties AS SELECT
     sortie.nom || ' - ' 
     || pilote.nom || ' ' || pilote.prenom  || ' - ' 
     || strftime('%d/%m/%Y', vol.date) 
-    || ' (DurÃ©e : ' || CAST(vol.duree/60 AS text) || 'h' || printf("%02d",vol.duree%60) || ') -' 
+    || ' (Durée : ' || CAST(vol.duree/60 AS text) || 'h' || printf("%02d",vol.duree%60) || ') -' 
     || ifnull(vol.remarque,'Sans remarque') || '-' AS NomVol,
     vol.cout
 FROM vol
