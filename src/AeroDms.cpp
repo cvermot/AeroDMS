@@ -1596,6 +1596,7 @@ void AeroDms::enregistrerLesVols()
     //Cela sera verifie dans la methode enregistrerUnVol() cependant on le prévérifie
     //ici pour éviter d'avoir N fois la notification d'echec si le pilote n'est 
     //pas à jour de sa cotisation
+    chargerUnVolDetecte(0, 0);
     if (lePiloteEstAJourDeCotisation())
     {
         while (!factures.isEmpty())
