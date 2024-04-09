@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("3.8");
+    QApplication::setApplicationVersion("3.9");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -1445,7 +1445,7 @@ void AeroDms::enregistrerUnVol()
 
     //On effectue d'abord quelques contrôles pour savoir si le vol est enregistrable :
     //1) on a une facture chargée
-    //2) les données (pilote, date du vol, durée, cout) sont renseignées
+    //2) les données (pilote, date du vol, durée, cout) sont renseignées (OK si le bouton est actif)
     //3) on est pas en echec sur une des étapes précédentes
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec )
@@ -1517,6 +1517,7 @@ void AeroDms::enregistrerUnVol()
 
 				subventionRestante = subventionRestante - montantSubventionne;
 			}
+
 				db->enregistrerUnVol(idPilote,
 					typeDeVol->currentText(),
 					dateDuVol->date(),
@@ -1529,7 +1530,7 @@ void AeroDms::enregistrerUnVol()
                     immat->text(),
                     activite->currentText(),
                     volAEditer);
-
+                
                 QString volAjouteModifie = "ajouté";
                 if (volAEditer != -1)
                 {
