@@ -71,10 +71,10 @@ private:
 
     ManageDb* db;
     PdfRenderer* pdf;
-    AeroDmsTypes::Signature signature;
-    AeroDmsTypes::TypeGenerationPdf typeGenerationPdf;
+    AeroDmsTypes::Signature signature = AeroDmsTypes::Signature_SANS;
+    AeroDmsTypes::TypeGenerationPdf typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     AeroDmsTypes::ListeDonneesFacture factures;
-    int idFactureDetectee;
+    int idFactureDetectee = -1;
     bool scanAutomatiqueDesFacturesEstActif = true;
     bool logicielEnModeLectureSeule = false;
 
