@@ -14,6 +14,15 @@ INSERT INTO activite (nom) VALUES ('Planeur');
 INSERT INTO activite (nom) VALUES ('Helicoptère');
 INSERT INTO activite (nom) VALUES ('Avion électrique');
 
+-- Table: aeronef
+CREATE TABLE IF NOT EXISTS aeronef (
+    immatriculation TEXT PRIMARY KEY
+                         UNIQUE,
+    type            TEXT DEFAULT Inconnu
+                         NOT NULL
+);
+INSERT INTO aeronef (immatriculation, type) VALUES (NULL, 'Inconnu');
+
 -- Table: cotisation
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL);
 
@@ -29,7 +38,7 @@ INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePo
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.2', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.3', NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -51,7 +60,7 @@ INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, est
 INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Fonctionnement', 6, 0, 1, 0);
 
 -- Table: vol
-CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), activite TEXT REFERENCES activite (nom) NOT NULL, sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT, immatriculation TEXT);
+CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), activite TEXT REFERENCES activite (nom) NOT NULL, sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT, immatriculation TEXT REFERENCES aeronef (immatriculation));
 
 -- Table: xAssociationRecette-Vol
 CREATE TABLE IF NOT EXISTS "xAssociationRecette-Vol" (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, recetteId INTEGER REFERENCES recettes (recetteId) NOT NULL, volId INTEGER REFERENCES vol (volId) NOT NULL);

@@ -500,7 +500,7 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
     vol.idPilote = p_query.value("pilote").toString();
     vol.montantRembourse = p_query.value("montantRembourse").toFloat();
     if (!p_query.isNull("nom")
-        && !p_query.isNull("prenom"))
+        && !p_query.isNull("prenom") )
     {
         vol.nomPilote = p_query.value("nom").toString();
         vol.prenomPilote = p_query.value("prenom").toString();
@@ -570,6 +570,24 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     const int p_idVolAEditer)
 {
     QSqlQuery query;
+    //On verifie si l'immat existe en BDD
+    qDebug() << "debut";
+    query.prepare("SELECT * FROM aeronef WHERE immatriculation = :immatriculation");
+    query.bindValue(":immatriculation", p_immat);
+
+    query.exec();
+
+    //Si non trouvé : l'immat n'existe pas. On la créé :
+    qDebug() << "immat size" << query.size() << query.lastError();
+    if (!query.next())
+    {
+        query.prepare("INSERT INTO aeronef (immatriculation) VALUES(:immatriculation)");
+        query.bindValue(":immatriculation", p_immat);
+        //Le type est par défaut à inconnu
+        query.exec();
+        qDebug() << "ddeCreate" << query.lastError();
+    }
+
     //Si on est sur un ajout
     if (p_idVolAEditer == -1)
     {
