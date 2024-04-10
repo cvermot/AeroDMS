@@ -130,7 +130,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.2;
+    const float versionBddAttendue = 1.3;
 };
 
 #endif

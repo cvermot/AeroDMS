@@ -1557,6 +1557,9 @@ void AeroDms::enregistrerUnVol()
 
             //On sort du mode édition, si on y etait...
             volAEditer = -1;
+            //Et on recharge la liste déroulante de séléction des pilotes dans laquelle on avait remis les pilotes
+            //inactifs...
+            peuplerListesPilotes();
 
             //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
             supprimerLeVolDeLaVueVolsDetectes();
@@ -1683,7 +1686,11 @@ void AeroDms::peuplerListesPilotes()
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
         listeDeroulantePilote->addItem(nomPrenom, pilote.idPilote);
-        if (pilote.estActif)
+        //Si le pilote est actif, on le met dans la liste...
+        //Et on met tous les pilotes si on est en mode édition de vol
+        //(permet d'éditer le vol d'un pilote inactif)
+        if (pilote.estActif
+            || volAEditer != -1)
         {
             choixPilote->addItem(nomPrenom, pilote.idPilote);
             choixPayeur->addItem(nomPrenom, pilote.idPilote);
@@ -2011,6 +2018,10 @@ void AeroDms::editerVol()
 
     //On récupère les infos du vol pour les réintegrer dans l'IHM
     const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer);
+
+    //On remet les pilotes inactifs dans la listes des pilotes, pour le cas ou on édite un vol
+    //d'un pilote inactif
+    peuplerListesPilotes();
     choixPilote->setCurrentIndex(choixPilote->findData(vol.idPilote));
     choixPilote->setEnabled(false);
 

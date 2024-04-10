@@ -571,21 +571,18 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
 {
     QSqlQuery query;
     //On verifie si l'immat existe en BDD
-    qDebug() << "debut";
     query.prepare("SELECT * FROM aeronef WHERE immatriculation = :immatriculation");
     query.bindValue(":immatriculation", p_immat);
 
     query.exec();
 
     //Si non trouvé : l'immat n'existe pas. On la créé :
-    qDebug() << "immat size" << query.size() << query.lastError();
     if (!query.next())
     {
         query.prepare("INSERT INTO aeronef (immatriculation) VALUES(:immatriculation)");
         query.bindValue(":immatriculation", p_immat);
         //Le type est par défaut à inconnu
         query.exec();
-        qDebug() << "ddeCreate" << query.lastError();
     }
 
     //Si on est sur un ajout
