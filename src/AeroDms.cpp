@@ -1675,6 +1675,9 @@ void AeroDms::peuplerListesPilotes()
 {
     const AeroDmsTypes::ListePilotes pilotes = db->recupererPilotes();
 
+    //On sauvegarde le pilote séléctionné pour le rester le cas échéant
+    const QString piloteSelectionne = listeDeroulantePilote->currentData().toString();
+
     listeDeroulantePilote->clear();
     choixPilote->clear();
 
@@ -1696,6 +1699,14 @@ void AeroDms::peuplerListesPilotes()
             choixPayeur->addItem(nomPrenom, pilote.idPilote);
         }
     }
+
+    //Si le pilote précédément séléctionné existe toujours, on le restaure
+    const int index = listeDeroulantePilote->findData(piloteSelectionne);
+    if (index != -1)
+    {
+        listeDeroulantePilote->setCurrentIndex(index);
+    }
+    
 }
 
 void AeroDms::peuplerListeSorties()
