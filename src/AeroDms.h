@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueGestionPilote.h"
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
+#include "DialogueGestionAeronefs.h"
 #include "StatistiqueWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -82,6 +83,7 @@ private:
     DialogueGestionPilote* dialogueGestionPilote;
     DialogueAjouterCotisation* dialogueAjouterCotisation;
     DialogueAjouterSortie* dialogueAjouterSortie;
+    DialogueGestionAeronefs* dialogueGestionAeronefs;
 
     QPdfDocument* pdfDocument;
     QPdfView* pdfView;
@@ -201,6 +203,7 @@ public slots:
     void ajouterUneSortieEnBdd();
     void ajouterUneCotisation();
     void ajouterUneCotisationEnBdd();
+    void ouvrirGestionAeronefs();
     void peuplerTablePilotes();
     void peuplerTableVols();
     void peuplerTableFactures();

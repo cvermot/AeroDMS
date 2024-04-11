@@ -91,6 +91,12 @@ public:
         RecetteTableElement_NB_COLONNES = 0x6,
     };
 
+    enum AeronefTableElement {
+        AeronefTableElement_IMMAT = 0x0,
+        AeronefTableElement_TYPE = 0x1,
+        AeronefTableElement_NB_COLONNES = 0x2,
+    };
+
     enum ResultatCreationPilote {
         ResultatCreationPilote_SUCCES = 0x0,
         ResultatCreationPilote_PILOTE_EXISTE = 0x1,
@@ -273,6 +279,12 @@ public:
         QDate date;
     };
     typedef QList<Sortie> ListeSortie;
+
+    struct Aeronef {
+        QString immatriculation;
+        QString type;
+    };
+    typedef QList<Aeronef> ListeAeronefs;
 
     struct CotisationAnnuelle {
         QString idPilote;

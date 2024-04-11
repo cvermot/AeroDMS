@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("3.9");
+    QApplication::setApplicationVersion("4.0");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -496,6 +496,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     dialogueAjouterSortie = new DialogueAjouterSortie(this);
     connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
 
+    dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
+    //connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
+
     //Dialogue de progression de génération PDF
     progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "", 0, 0, this);
     boutonProgressionGenerationPdf = new QPushButton("Fermer", this);
@@ -621,6 +624,12 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsBrevetes, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+
+    menuOutils->addSeparator();
+    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Gérer les aéronefs"), this);
+    boutonGestionAeronefs->setStatusTip(tr(""));
+    menuOutils->addAction(boutonGestionAeronefs);
+    connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
     menuOutils->addSeparator();
 
@@ -1874,6 +1883,12 @@ void AeroDms::ajouterUneSortie()
 void AeroDms::ajouterUneCotisation()
 {
     dialogueAjouterCotisation->exec();
+}
+
+void AeroDms::ouvrirGestionAeronefs()
+{
+    dialogueGestionAeronefs->peuplerListeAeronefs();
+    dialogueGestionAeronefs->exec();
 }
 
 void AeroDms::aPropos()

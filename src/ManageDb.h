@@ -100,6 +100,8 @@ public:
 
     AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties( const QString p_typeDeVol, 
                                                                     const float p_proportionRemboursement);
+
+    AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
     QList<int> recupererAnnees();
     QList<int> recupererAnneesAvecVolNonSoumis();
     AeroDmsTypes::ListeSortie recupererListeSorties();

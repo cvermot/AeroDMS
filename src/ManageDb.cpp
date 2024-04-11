@@ -1004,6 +1004,29 @@ QString ManageDb::recupererAeroclub(const QString p_piloteId)
     return query.value(0).toString();
 }
 
+AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM aeronef");
+
+    query.exec();
+
+    AeroDmsTypes::ListeAeronefs listeAeronefs;
+
+    while (query.next())
+    {
+        AeroDmsTypes::Aeronef aeronef;
+        if (!query.value("immatriculation").isNull())
+        {
+            aeronef.immatriculation = query.value("immatriculation").toString();
+            aeronef.type = query.value("type").toString();
+            listeAeronefs.append(aeronef);
+        }  
+    }
+
+    return listeAeronefs;
+}
+
 QList<int> ManageDb::recupererAnnees()
 {
     QList<int> listeAnnees;
