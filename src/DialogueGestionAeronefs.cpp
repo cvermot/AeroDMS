@@ -39,22 +39,45 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db, QWidget* parent) 
     vueAeronefs = new QTableWidget(0, AeroDmsTypes::AeronefTableElement_NB_COLONNES, this);
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_TYPE, new QTableWidgetItem("Type"));
+    vueAeronefs->setEditTriggers(QAbstractItemView::DoubleClicked);
+
+    connect(vueAeronefs, &QTableWidget::cellChanged, this, &DialogueGestionAeronefs::sauvegarderDonneesSaisies);
 
     mainLayout->addWidget(vueAeronefs, 0, 0);
 }
 
 void DialogueGestionAeronefs::peuplerListeAeronefs()
 {
-    vueAeronefs->clear();
+    vueAeronefs->clearContents();
 
     const AeroDmsTypes::ListeAeronefs listeAeronefs = database->recupererListeAeronefs();
+
+    vueAeronefs->blockSignals(true);
 
     vueAeronefs->setRowCount(listeAeronefs.size());
     for (int i = 0; i < listeAeronefs.size(); i++)
     {
         const AeroDmsTypes::Aeronef aeronef = listeAeronefs.at(i);
-        vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_IMMAT, new QTableWidgetItem(aeronef.immatriculation));
+        QTableWidgetItem* itemImmat = new QTableWidgetItem(aeronef.immatriculation);
+        itemImmat->setFlags(itemImmat->flags() & ~Qt::ItemIsEditable);
+        vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_IMMAT, itemImmat);
         vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_TYPE, new QTableWidgetItem(aeronef.type));
     }
     vueAeronefs->resizeColumnsToContents();
+
+    vueAeronefs->blockSignals(false);
+}
+
+void DialogueGestionAeronefs::sauvegarderDonneesSaisies(int p_ligne, int p_colonne)
+{
+    AeroDmsTypes::AeronefTableElement elementEdite = AeroDmsTypes::AeronefTableElement_TYPE;
+
+    if (p_colonne == AeroDmsTypes::AeronefTableElement_TYPE)
+    {
+        elementEdite = AeroDmsTypes::AeronefTableElement_TYPE;
+    }
+
+    database->mettreAJourDonneesAeronefs( vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_IMMAT)->data(Qt::DisplayRole).toString(),
+                                          vueAeronefs->item(p_ligne, p_colonne)->data(Qt::DisplayRole).toString(),
+                                          elementEdite );
 }

@@ -127,6 +127,10 @@ public:
 
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
 
+    void mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
+                                     const QString p_nouvelleValeur,
+                                     const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour);
+
 public slots:
 
 private:

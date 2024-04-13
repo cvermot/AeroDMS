@@ -1526,3 +1526,32 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
 
     return statsPilotes;
 }
+
+void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
+                                           const QString p_nouvelleValeur,
+                                           const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour )
+{
+    QSqlQuery query;
+    bool requeteAExecuter = true;
+
+    switch (p_donneeAMettreAJour)
+    {
+        case AeroDmsTypes::AeronefTableElement_TYPE:
+        {
+            query.prepare("UPDATE aeronef SET type = :nouvelleValeur WHERE immatriculation = :immat");
+            break;
+        }
+        default:
+        {
+            requeteAExecuter = false;
+            break;
+        }
+    }
+
+    if (requeteAExecuter)
+    {
+        query.bindValue(":nouvelleValeur", p_nouvelleValeur);
+        query.bindValue(":immat", p_immatAeronefAMettreAJour);
+        query.exec();
+    }
+}

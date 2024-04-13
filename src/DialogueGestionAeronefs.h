@@ -60,6 +60,7 @@ private:
     void peuplerActivitePrincipale();*/
 
 private slots:
+    void sauvegarderDonneesSaisies(int p_ligne, int p_colonne);
     /*void prevaliderDonneesSaisies();
     void annulationOuFinSaisie(); */
 };
