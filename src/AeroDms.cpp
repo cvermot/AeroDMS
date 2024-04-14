@@ -626,7 +626,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
-    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Gérer les aéronefs"), this);
+    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aéronefs"), this);
+    boutonGestionAeronefs->setToolTip("");
     boutonGestionAeronefs->setStatusTip(tr(""));
     menuOutils->addAction(boutonGestionAeronefs);
     connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
