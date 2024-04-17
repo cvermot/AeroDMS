@@ -1520,11 +1520,37 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
         statsPilotes.nbNonBrevete = query.value("nbNonBrevete").toInt() ;
         statsPilotes.nbOuvranDroit = query.value("nbOuvrantDroit").toInt();
         statsPilotes.nbAyantDroit = query.value("nbAyantDroit").toInt();
-        qDebug() << "passage ici";
     }
-    qDebug() << "passage la" << query.lastError();
 
     return statsPilotes;
+}
+
+const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee)
+{
+    AeroDmsTypes::StatsAeronefs statsAeronefs;
+
+    QSqlQuery query;
+    query.prepare("SELECT " 
+        "immatriculation,"
+        "type,"
+        "SUM(tempsDeVol) AS tempsDeVol "
+        "FROM stats_aeronefs "
+        "GROUP BY immatriculation "
+        "ORDER BY type, immatriculation");
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::StatsAeronef stats;
+
+        stats.immat = query.value("immatriculation").toString();
+        stats.type = query.value("type").toString();
+        stats.nombreMinutesVol = query.value("tempsDeVol").toInt();
+
+        statsAeronefs.append(stats);
+    }
+
+    return statsAeronefs;
 }
 
 void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,

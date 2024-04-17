@@ -180,6 +180,17 @@ INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = re
 INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId
 GROUP BY recettes.recetteId;
 
+-- View: stats_aeronefs
+CREATE VIEW IF NOT EXISTS stats_aeronefs AS SELECT 
+    vol.immatriculation,
+    aeronef.type,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+GROUP BY vol.immatriculation, annee
+ORDER BY annee, type, vol.immatriculation;
+
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
 strftime('%m', vol.date) AS mois,

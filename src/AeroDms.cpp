@@ -480,6 +480,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, QIcon("./ressources/chart-pie.svg"));
     listeDeroulanteStatistique->addItem("Statuts des pilotes", AeroDmsTypes::Statistiques_STATUTS_PILOTES);
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_STATUTS_PILOTES, QIcon("./ressources/chart-donut-variant.svg"));
+    listeDeroulanteStatistique->addItem("Types d'aéronefs", AeroDmsTypes::Statistiques_AERONEFS);
+    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_AERONEFS, QIcon("./ressources/chart-donut-variant.svg"));
+    
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     selectionToolBar->addWidget(listeDeroulanteStatistique);
 
@@ -858,6 +861,14 @@ void AeroDms::peuplerStatistiques()
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
         {
             m_activeWidget = new StatistiqueDonuts( db,
+                                                    AeroDmsTypes::Statistiques_STATUTS_PILOTES,
+                                                    m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_AERONEFS:
+        {
+            m_activeWidget = new StatistiqueDonuts( db,
+                                                    AeroDmsTypes::Statistiques_AERONEFS,
                                                     m_contentArea);
             break;
         }

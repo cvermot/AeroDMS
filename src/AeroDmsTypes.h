@@ -116,7 +116,8 @@ public:
         Statistiques_HEURES_PAR_PILOTE,
         Statistiques_HEURES_PAR_TYPE_DE_VOL,
         Statistiques_HEURES_PAR_ACTIVITE,
-        Statistiques_STATUTS_PILOTES
+        Statistiques_STATUTS_PILOTES,
+        Statistiques_AERONEFS
     };
 
     enum Signature {
@@ -371,6 +372,15 @@ public:
         int nbAyantDroit;
     };
     static const StatsPilotes K_INIT_DONNEES_STATS_PILOTES;
+
+    struct StatsAeronef
+    {
+        QString immat;
+        QString type;
+        int nombreMinutesVol;
+    };
+    static const StatsAeronef K_INIT_STAT_AERONEF;
+    typedef QList<StatsAeronef> StatsAeronefs;
 
 };
 

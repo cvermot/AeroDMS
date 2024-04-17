@@ -13,13 +13,18 @@ class StatistiqueDonuts : public StatistiqueWidget
 {
     Q_OBJECT
 public:
-    StatistiqueDonuts(ManageDb* p_db, QWidget* parent = nullptr);
+    StatistiqueDonuts( ManageDb* p_db, 
+                       const AeroDmsTypes::Statistiques p_statistique, 
+                       QWidget* parent = nullptr);
 
 public slots:
     void explodeSlice(bool exploded);
 
 private:
     QList<QPieSeries*> m_donuts;
+
+    void afficherStatsPilotes(ManageDb* p_db);
+    void afficherStatsAeronefs(ManageDb* p_db);
 };
 
 #endif

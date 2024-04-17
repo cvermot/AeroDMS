@@ -73,3 +73,10 @@ const AeroDmsTypes::StatsPilotes AeroDmsTypes::K_INIT_DONNEES_STATS_PILOTES =
     0,
     0
 };
+
+const AeroDmsTypes::StatsAeronef AeroDmsTypes::K_INIT_STAT_AERONEF = 
+{
+    "",
+    "",
+    0
+};

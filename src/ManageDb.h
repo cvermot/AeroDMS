@@ -123,6 +123,7 @@ public:
     QString recupererMailPilotes( const int p_annee,
                                   const bool p_pilotesActifsSeulement,
                                   const bool p_pilotesBrevetes = false);
+    const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee);
     QString recupererMailDerniereDemandeDeSubvention();
 
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
