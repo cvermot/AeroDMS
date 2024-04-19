@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.0");
+    QApplication::setApplicationVersion("4.1");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -1556,6 +1556,11 @@ void AeroDms::enregistrerUnVol()
                 if (volAEditer != -1)
                 {
                     volAjouteModifie = "modifié";
+                    //On sort du mode édition
+                    volAEditer = -1;
+                    //Et on recharge la liste déroulante de séléction des pilotes dans laquelle on avait remis les pilotes
+                    //inactifs...
+                    peuplerListesPilotes();
                 }
 
             statusBar()->showMessage(QString("Vol ")
@@ -1575,12 +1580,6 @@ void AeroDms::enregistrerUnVol()
                 + "€ / Subvention entrainement restante : "
                 + QString::number(subventionRestante)
                 + "€");
-
-            //On sort du mode édition, si on y etait...
-            volAEditer = -1;
-            //Et on recharge la liste déroulante de séléction des pilotes dans laquelle on avait remis les pilotes
-            //inactifs...
-            peuplerListesPilotes();
 
             //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
             supprimerLeVolDeLaVueVolsDetectes();
