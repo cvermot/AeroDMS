@@ -15,7 +15,8 @@ class StatistiqueDonuts : public StatistiqueWidget
 public:
     StatistiqueDonuts( ManageDb* p_db, 
                        const AeroDmsTypes::Statistiques p_statistique, 
-                       QWidget* parent = nullptr);
+                       QWidget* parent = nullptr,
+                       int p_annee = -1);
 
 public slots:
     void explodeSlice(bool exploded);
@@ -24,7 +25,7 @@ private:
     QList<QPieSeries*> m_donuts;
 
     void afficherStatsPilotes(ManageDb* p_db);
-    void afficherStatsAeronefs(ManageDb* p_db);
+    void afficherStatsAeronefs(ManageDb* p_db, int p_annee);
 };
 
 #endif

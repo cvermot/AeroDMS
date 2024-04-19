@@ -1530,13 +1530,29 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
     AeroDmsTypes::StatsAeronefs statsAeronefs;
 
     QSqlQuery query;
-    query.prepare("SELECT " 
-        "immatriculation,"
-        "type,"
-        "SUM(tempsDeVol) AS tempsDeVol "
-        "FROM stats_aeronefs "
-        "GROUP BY immatriculation "
-        "ORDER BY type, immatriculation");
+    if (p_annee != -1)
+    {
+        query.prepare("SELECT "
+            "immatriculation,"
+            "type,"
+            "SUM(tempsDeVol) AS tempsDeVol "
+            "FROM stats_aeronefs "
+            "WHERE annee = :annee "
+            "GROUP BY immatriculation "
+            "ORDER BY type, immatriculation");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT "
+            "immatriculation,"
+            "type,"
+            "SUM(tempsDeVol) AS tempsDeVol "
+            "FROM stats_aeronefs "
+            "GROUP BY immatriculation "
+            "ORDER BY type, immatriculation");
+    }
+    
     query.exec();
 
     while (query.next())

@@ -869,7 +869,8 @@ void AeroDms::peuplerStatistiques()
         {
             m_activeWidget = new StatistiqueDonuts( db,
                                                     AeroDmsTypes::Statistiques_AERONEFS,
-                                                    m_contentArea);
+                                                    m_contentArea,
+                                                    listeDeroulanteAnnee->currentData().toInt());
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
