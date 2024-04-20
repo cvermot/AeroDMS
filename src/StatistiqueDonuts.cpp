@@ -37,7 +37,7 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
 void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
 {
     const AeroDmsTypes::StatsPilotes statsPilotes = p_db->recupererStatsPilotes();
-    //! [1]
+
     auto chartView = new QChartView(this);
     chartView->setRenderHint(QPainter::Antialiasing);
     QChart* chart = chartView->chart();
@@ -45,16 +45,11 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     chart->setTitle("Statistiques sur les pilotes");
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->layout()->setContentsMargins(0, 0, 0, 0);
-    //! [1]
-
-    //! [2]
+  
     qreal minSize = 0.5;
     qreal maxSize = 0.9;
     int donutCount = 2;
-    //! [2]
-
-    //! [3]
-    //for (int i = 0; i < donutCount; i++) {
+    
     int niveauDuDonut = 0;
     auto donutBrevete = new QPieSeries;
 
@@ -78,7 +73,6 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     m_donuts.append(donutBrevete);
     chartView->chart()->addSeries(donutBrevete);
 
-
     niveauDuDonut++;
     auto donutAyantDroit = new QPieSeries;
     auto sliceOuvrantDroit = new QPieSlice(QString("Ouvrant droit"), statsPilotes.nbOuvranDroit);
@@ -100,15 +94,10 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     donutAyantDroit->setPieSize(minSize + (niveauDuDonut + 1) * (maxSize - minSize) / donutCount);
     m_donuts.append(donutAyantDroit);
     chartView->chart()->addSeries(donutAyantDroit);
-    //}
-    //! [3]
 
-    // create main layout
-    //! [4]
     auto mainLayout = new QGridLayout;
     mainLayout->addWidget(chartView, 1, 1);
     setLayout(mainLayout);
-    //! [4]
 }
 
 void StatistiqueDonuts::afficherStatsAeronefs(ManageDb* p_db, int p_annee)
@@ -129,9 +118,7 @@ void StatistiqueDonuts::afficherStatsAeronefs(ManageDb* p_db, int p_annee)
     
     int niveauDonutImmat = 0;
     int niveauDonutType = 1;
-    //! [1]
-    //! 
-    //! 
+
     auto donutImmat = new QPieSeries;
     auto donutType = new QPieSeries;
 
@@ -208,4 +195,3 @@ void StatistiqueDonuts::explodeSlice(bool exploded)
     }
     slice->setExploded(exploded);
 }
-//! [7]

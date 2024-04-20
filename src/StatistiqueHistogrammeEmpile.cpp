@@ -16,7 +16,6 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const
 {
     const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
 
-    //![1]
     auto entrainement = new QBarSet("Entrainement");
     auto sortie = new QBarSet("Sortie");
     auto balade = new QBarSet("Balade");
@@ -31,23 +30,16 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const
         mois.append(hdv.mois);
     }
 
-    //![1]
-
-    //![2]
     auto series = new QStackedBarSeries;
     series->append(entrainement);
     series->append(sortie);
     series->append(balade);
-    //![2]
 
-    //![3]
     auto chart = new QChart;
     chart->addSeries(series);
     chart->setTitle("Nombre de minutes de vol par mois");
     chart->setAnimationOptions(QChart::AllAnimations);
-    //![3]
 
-    //![4]
     auto axisX = new QBarCategoryAxis;
     axisX->append(mois);
     chart->addAxis(axisX, Qt::AlignBottom);
@@ -55,14 +47,9 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const
     auto axisY = new QValueAxis;
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
-    //![4]
 
-    //![5]
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
-    //![5]
 
-    //![6]
     createDefaultChartView(chart);
-    //![6]
 }

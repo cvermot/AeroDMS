@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
+#include "StatistiqueDonutCombineWidget.h"
 #include "StatistiqueDonuts.h"
 
 #include <QtWidgets>
@@ -867,10 +868,14 @@ void AeroDms::peuplerStatistiques()
         }
         case AeroDmsTypes::Statistiques_AERONEFS:
         {
-            m_activeWidget = new StatistiqueDonuts( db,
+            /*m_activeWidget = new StatistiqueDonuts(db,
                                                     AeroDmsTypes::Statistiques_AERONEFS,
                                                     m_contentArea,
-                                                    listeDeroulanteAnnee->currentData().toInt());
+                                                    listeDeroulanteAnnee->currentData().toInt());*/
+            m_activeWidget = new StatistiqueDonutCombineWidget( db,
+                                                                AeroDmsTypes::Statistiques_AERONEFS,
+                                                                m_contentArea,
+                                                                listeDeroulanteAnnee->currentData().toInt());
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
