@@ -599,6 +599,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanAutoDaca = new QAction(tr("DACA"), this);
     scanAutoDaca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoDaca);
+    scanAutoSepavia = new QAction(tr("SEPAVIA"), this);
+    scanAutoSepavia->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanFacture->addAction(scanAutoSepavia);
     scanFacture->addSeparator();
     scanAutoGenerique1Passe = new QAction(tr("Générique (une passe)"), this);
     scanAutoGenerique1Passe->setIcon(QIcon("./ressources/text-box-search.svg"));
@@ -609,6 +612,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoSepavia, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
 
@@ -1218,6 +1222,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     else if (sender() == scanAutoDaca)
     {
         aeroclub = AeroDmsTypes::Aeroclub_DACA;
+    }
+    else if (sender() == scanAutoSepavia)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_SEPAVIA;
     }
     else if (sender() == scanAutoGenerique)
     {
@@ -2196,11 +2204,7 @@ void AeroDms::convertirHeureDecimalesVersHhMm()
     
     if (ok)
     {
-        QTime heureHhmm;
-        int heure = floor(heureDecimale);
-        int minutes = 60 * (heureDecimale - floor(heureDecimale));
-        heureHhmm.setHMS(heure, minutes, 0);
-        dureeDuVol->setTime(heureHhmm);
+        dureeDuVol->setTime(AeroDmsServices::convertirHeuresDecimalesEnQTime(heureDecimale));
     }
 }
 

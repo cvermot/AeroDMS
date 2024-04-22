@@ -138,6 +138,7 @@ public:
         Aeroclub_DACA,
         Aeroclub_CAPAM,
         Aeroclub_ACB,
+        Aeroclub_SEPAVIA,
         Aeroclub_ACAndernos,
         Aeroclub_GENERIQUE,
         Aeroclub_GENERIQUE_1_PASSE

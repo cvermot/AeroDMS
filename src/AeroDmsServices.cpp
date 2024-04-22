@@ -38,6 +38,16 @@ const QTime AeroDmsServices::convertirMinutesEnQTime(const int p_minutes)
     return QTime(heures, minutes, 0);
 }
 
+const QTime AeroDmsServices::convertirHeuresDecimalesEnQTime(const double p_heureDecimale)
+{
+    QTime heureHhmm;
+    int heure = floor(p_heureDecimale);
+    int minutes = 60 * (p_heureDecimale - floor(p_heureDecimale));
+    heureHhmm.setHMS(heure, minutes, 0);
+
+    return heureHhmm;
+}
+
 void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
 {
     for (int i = 0; i < p_activite.count(); i++)

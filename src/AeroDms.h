@@ -167,6 +167,7 @@ private:
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAca;
     QAction* scanAutoDaca;
+    QAction* scanAutoSepavia;
     QAction* scanAutoGenerique1Passe;
     QAction* scanAutoGenerique;
 

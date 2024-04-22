@@ -71,6 +71,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 aeroclub = AeroDmsTypes::Aeroclub_ACAndernos;
                 //qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
             }
+            else if (QString(entries.at(index).Text.data()).contains("SEPAVIA"))
+            {
+                aeroclub = AeroDmsTypes::Aeroclub_SEPAVIA;
+                //qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
+            }
             index++;
         }
 
@@ -91,6 +96,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             case AeroDmsTypes::Aeroclub_ACAndernos:
             {
                 liste.append(extraireDonneesACAndernos(entries, noPage));
+            }
+            break;
+            case AeroDmsTypes::Aeroclub_SEPAVIA:
+            {
+                liste.append(extraireDonneesSepavia(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_GENERIQUE:
@@ -256,6 +266,81 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
 
             liste.append(donneesFactures);
         }
+        index++;
+    }
+
+    return liste;
+}
+
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vector<PoDoFo::PdfTextEntry> p_entries,
+                                                                        const unsigned p_noPage)
+{
+    AeroDmsTypes::ListeDonneesFacture liste;
+
+    QRegularExpressionMatch match;
+
+    int index = 0;
+    AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+
+    while (index < p_entries.size())
+    {
+        QString str = QString(p_entries.at(index).Text.data())
+            .replace("\xc2\xa0", " ")
+            .replace(",", ".");
+
+        if (str.contains(dateRe) && str.contains("Vol du"))
+        {
+            if (donneesFactures.coutDuVol != 0.0 && donneesFactures.dureeDuVol != QTime())
+            {
+                liste.append(donneesFactures);
+                donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+            }
+            donneesFactures.pageDansLeFichierPdf = p_noPage;
+            donneesFactures.dateDuVol = extraireDateRegex(str);
+        }
+        //Si on a une date, on cherche les autres champs
+        if (donneesFactures.dateDuVol != QDate())
+        {
+            str = str.replace(" ", "");
+
+            if (str.contains(immatRe))
+            {
+                QRegularExpressionMatch match = immatRe.match(str);
+                donneesFactures.immat = match.captured("immat");
+            }
+
+            if (index + 3 < p_entries.size())
+            {
+                //Duree du vol, index +2
+                index = index + 2;
+                str = p_entries.at(index).Text.data();
+                donneesFactures.dureeDuVol = AeroDmsServices::convertirHeuresDecimalesEnQTime(str.replace(",",".").toDouble());
+
+                //Cout du vol, index +3 par rapport à la date
+                index = index + 1;
+                str = QString(p_entries.at(index).Text.data()).replace(",", ".").replace(" ", "");
+                if (str.contains(euroRe)
+                    && donneesFactures.coutDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol)
+                {
+                    QRegularExpressionMatch match = euroRe.match(str);
+                    //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
+                    //(certaines factures indiquent un credit nul en dernière ligne)
+                    if (match.captured("montant").toFloat() != 0)
+                    {
+                        donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                    }
+                }
+            }
+            
+        }
+        if (donneesFactures.dateDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dateDuVol
+            && donneesFactures.coutDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol
+            && donneesFactures.dureeDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dureeDuVol)
+        {
+            liste.append(donneesFactures);
+            donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+        }
+
         index++;
     }
 
