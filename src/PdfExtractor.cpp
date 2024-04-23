@@ -79,6 +79,12 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             index++;
         }
 
+        //Si on a pas identifié de club, on tente le tout pour le tout avec la méthode générique 1 passe...
+        if (aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
+        {
+            aeroclub = AeroDmsTypes::Aeroclub_GENERIQUE_1_PASSE;
+        }
+
         switch (aeroclub)
         {
             case AeroDmsTypes::Aeroclub_CAPAM:
@@ -134,7 +140,7 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
         if (data.contains("Vol"))
         {
             QStringList str = data.replace("Vol du ", "").split(" ");
-            donneesFactures.dateDuVol = extraireDate(str.at(0));
+            donneesFactures.dateDuVol = extraireDateRegex(str.at(0));
 
             if (QString(p_entries.at(index + 1).Text.data()).contains(immatRe))
             {
@@ -147,7 +153,7 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
             {
                 if (!QString(p_entries.at(index).Text.data()).contains(":") && index+1 < p_entries.size())
                     index++;
-                donneesFactures.dureeDuVol = extraireDuree(QString(p_entries.at(index).Text.data()));
+                donneesFactures.dureeDuVol = extraireDureeRegex(QString(p_entries.at(index).Text.data()));
             }
 
             if (index+2 < p_entries.size())
@@ -183,7 +189,7 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vecto
         {
             QStringList str = data.replace("Vol n°", "").split(" ");
             
-            donneesFacture.dateDuVol = extraireDate(str.at(2));
+            donneesFacture.dateDuVol = extraireDateRegex(str.at(2));
             QString duree = str.at(4);
             donneesFacture.dureeDuVol = AeroDmsServices::convertirMinutesEnQTime(duree.replace("min", "").toInt());
 
@@ -234,11 +240,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
             {
                 if (str.at(i).contains("/"))
                 {
-                    donneesFactures.dateDuVol = extraireDate(str.at(i));
+                    donneesFactures.dateDuVol = extraireDateRegex(str.at(i));
                 }
                 else if(str.at(i).contains(":"))
                 {
-                    donneesFactures.dureeDuVol = extraireDuree(str.at(i));
+                    donneesFactures.dureeDuVol = extraireDureeRegex(str.at(i));
                 }
                 else if (str.at(i).contains("vol"))
                 {
@@ -504,25 +510,6 @@ const QTime PdfExtractor::extraireDureeRegex(const QString p_str)
     const QTime duree = QTime( match.captured("heure").toInt(),
                                match.captured("minutes").toInt(),
                                0);
-    return duree;
-}
-
-const QDate PdfExtractor::extraireDate(const QString p_date)
-{
-    const QStringList dateStr = p_date.split("/");
-    const QDate date = QDate(dateStr.at(2).toInt(),
-        dateStr.at(1).toInt(),
-        dateStr.at(0).toInt());
-
-    return date;
-}
-
-const QTime PdfExtractor::extraireDuree(const QString p_duree)
-{
-    const QStringList dureeStr = p_duree.split(":");
-    const QTime duree = QTime(dureeStr.at(0).toInt(),
-        dureeStr.at(1).toInt(),
-        0);
     return duree;
 }
 
