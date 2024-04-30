@@ -21,7 +21,7 @@ StatistiqueDonutCombine::StatistiqueDonutCombine(QGraphicsItem* parent, Qt::Wind
 
 void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QColor color)
 {
-    QFont font("Arial", 8);
+    QFont font("Arial", 10);
 
     // add breakdown series as a slice to center pie
     auto mainSlice = new StatistiqueDonutCombinePartie(breakdownSeries);
@@ -32,8 +32,8 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     // customize the slice
     mainSlice->setBrush(color);
     mainSlice->setLabelVisible();
-    mainSlice->setLabelColor(Qt::white);
-    mainSlice->setLabelPosition(QPieSlice::LabelInsideHorizontal);
+    mainSlice->setLabelColor(Qt::gray);
+    mainSlice->setLabelPosition(QPieSlice::LabelInsideNormal);
     mainSlice->setLabelFont(font);
 
     // position and customize the breakdown series

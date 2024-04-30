@@ -45,7 +45,7 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
 
     
     donutBreakdown->setAnimationOptions(QChart::AllAnimations);
-    donutBreakdown->setTitle("Statistiques de réparatition des vols par aéronefs et types d'aéronefs");
+    donutBreakdown->setTitle("Statistiques de répartition des vols par aéronefs et types d'aéronefs");
     donutBreakdown->legend()->setAlignment(Qt::AlignRight);
     
     createDefaultChartView(donutBreakdown);
