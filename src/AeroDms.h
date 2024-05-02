@@ -233,6 +233,7 @@ public slots:
     void chargerUnVolDetecte(int row, int column);
     void deselectionnerVolDetecte();
     void scannerUneFactureSelonMethodeChoisie();
+    void ouvrirPdfDemandeSuvbvention();
 
 };
 #endif // AERODMS_H

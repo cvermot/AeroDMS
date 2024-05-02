@@ -516,6 +516,16 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
 
+    //========================Menu Fichier
+    QMenu* menuFichier = menuBar()->addMenu(tr("Fichier"));
+
+    QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de demande de subventions"));
+    menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/printer.svg"));
+
+    QAction *boutonOuvrirDernireDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la dernière demande"), this);
+    menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDernireDemande);
+    connect(boutonOuvrirDernireDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
+    
     //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("Options"));
 
@@ -2194,7 +2204,6 @@ void AeroDms::switchScanAutomatiqueDesFactures()
     
 }
 
-
 void AeroDms::convertirHeureDecimalesVersHhMm()
 {
     bool ok;
@@ -2325,6 +2334,46 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
 
     supprimerLeVolSelectionne->setEnabled(true);
+}
+
+void AeroDms::ouvrirPdfDemandeSuvbvention()
+{
+    //Recherche de la dernière demande
+    QDir fichierSortie(cheminSortieFichiersGeneres);
+    fichierSortie.setSorting(QDir::Name | QDir::Reversed | QDir::DirsFirst);
+    const QStringList fichiers = fichierSortie.entryList();
+    if (fichiers.size() >= 2)
+    {
+        //On recherche un fichier fusionné = un fichier dont le nom contient FichiersAssembles
+        const QStringList filtre = QStringList("*FichiersAssembles.pdf");
+        int i = 0;
+        bool fichierTrouve = false;
+        QString fichier = "";
+        while (i < fichiers.size()-2 && !fichierTrouve)
+        {
+            //Indice n-1 et n-2 contiennent . et ..
+            fichier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
+            const QDir dirCourant(fichier);
+            const QStringList fichierFusionne = dirCourant.entryList(filtre);
+            if (fichierFusionne.size() > 0)
+            {
+                fichier = fichier + fichierFusionne.at(0);
+                fichierTrouve = true;
+            }
+            i++;
+        }
+
+        if (fichierTrouve)
+        {
+            QDesktopServices::openUrl(QUrl(fichier, QUrl::TolerantMode));
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("AeroDMS"),
+                tr("Fichier non trouvé\n"
+                    "Aucun fichier fusionné de demande de subvention trouvé."), QMessageBox::Cancel);
+        }
+    } 
 }
 
 void AeroDms::deselectionnerVolDetecte()
