@@ -463,6 +463,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableFactures);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerListeBaladesEtSorties);
     selectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
@@ -1141,7 +1142,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
     peuplerListesPilotes();
     dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
 
-    //Si on est sur une mise à jour, on met à jour les élements d'IMH susceptibles d'être impacté par des changements
+    //Si on est sur une mise à jour, on met à jour les élements d'IHM susceptibles d'être impacté par des changements
     if (pilote.idPilote != "")
     {
         peuplerListeBaladesEtSorties();
@@ -1800,7 +1801,8 @@ void AeroDms::peuplerListeBaladesEtSorties()
     listeBaladesEtSorties->clear();
 
     AeroDmsTypes::ListeVolSortieOuBalade itemLabels = db->recupererBaladesEtSorties( typeDeRecette->currentText(), 
-                                                                                     parametresMetiers.proportionParticipationBalade);
+                                                                                     parametresMetiers.proportionParticipationBalade,
+                                                                                     listeDeroulanteAnnee->currentData().toInt());
     QListIterator it(itemLabels);
     while (it.hasNext())
     {

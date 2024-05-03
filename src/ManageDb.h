@@ -99,7 +99,8 @@ public:
     QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
     AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties( const QString p_typeDeVol, 
-                                                                    const float p_proportionRemboursement);
+                                                                    const float p_proportionRemboursement,
+                                                                    const int p_annee = -1 );
 
     AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
     QList<int> recupererAnnees();
@@ -137,7 +138,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.3;
+    const float versionBddAttendue = 1.4;
 };
 
 #endif

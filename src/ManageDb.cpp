@@ -1104,11 +1104,21 @@ QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesType
 }
 
 AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const QString p_typeDeVol, 
-                                                                          const float p_proportionRemboursement)
+                                                                          const float p_proportionRemboursement,
+                                                                          const int p_annee )
 {
+    qDebug() << p_annee;
     AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
-    query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
+    if (p_annee == -1)
+    {
+        query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
+    }
+    else
+    {
+        query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol AND annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
     query.bindValue(":typeDeVol", p_typeDeVol);
     query.exec();
     while (query.next()) 
