@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.2");
+    QApplication::setApplicationVersion("4.3");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -522,9 +522,14 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de demande de subventions"));
     menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/printer.svg"));
 
-    QAction *boutonOuvrirDernireDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la dernière demande"), this);
-    menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDernireDemande);
-    connect(boutonOuvrirDernireDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
+    QAction *boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la dernière demande"), this);
+    menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
+    connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
+
+    menuOuvrirAutreDemande = menuOuvrirPdfDemandeSubvention->addMenu(tr("Ouvrir un autre fichier de demande de subventions"));
+    menuOuvrirAutreDemande->setIcon(QIcon("./ressources/printer.svg"));
+
+    peuplerMenuAutreDemande();
     
     //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("Options"));
@@ -932,6 +937,9 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);
+
+    //On repeuple le menu d'ouverture des fichiers générés 
+    peuplerMenuAutreDemande();
 }
 
 AeroDms::~AeroDms()
@@ -2373,6 +2381,59 @@ void AeroDms::ouvrirPdfDemandeSuvbvention()
                 tr("Fichier non trouvé\n"
                     "Aucun fichier fusionné de demande de subvention trouvé."), QMessageBox::Cancel);
         }
+    } 
+}
+
+void AeroDms::peuplerMenuAutreDemande()
+{
+    //On supprime les précédents menus
+    menuOuvrirAutreDemande->clear();
+
+    //On ajoute les 10 dernières dates auxquelles on a généré des fichiers
+    QDir fichierSortie(cheminSortieFichiersGeneres);
+    fichierSortie.setSorting(QDir::Name | QDir::Reversed | QDir::DirsFirst);
+    const QStringList fichiers = fichierSortie.entryList();
+    if (fichiers.size() >= 2)
+    {
+        int i = 0;
+        while (i < fichiers.size() - 2 && i < 10)
+        {
+            QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon("./ressources/folder.svg"), fichiers.at(i));
+            //Indice n-1 et n-2 contiennent . et ..
+            const QString dossier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
+            const QDir dirCourant(dossier);
+            const QStringList listeFichiers = dirCourant.entryList(QStringList("*.pdf"));
+            if (listeFichiers.size() > 0)
+            {
+                QAction* actionDossier = new QAction(QIcon("./ressources/folder-open.svg"), "Ouvrir le dossier", this);
+                actionDossier->setData(dossier);
+                menuFichier->addAction(actionDossier);
+                menuFichier->addSeparator();
+                connect(actionDossier, &QAction::triggered, this, &AeroDms::ouvrirUnFichierDeDemandeDeSubvention);
+
+                //Boucle While pour ajouter l'accès à chaque fichier
+                int idFichier = 0;
+                while (idFichier < listeFichiers.size())
+                {
+                    QAction* action = new QAction(QIcon("./ressources/file.svg"), listeFichiers.at(idFichier), this);
+                    action->setData(dossier+listeFichiers.at(idFichier));
+                    menuFichier->addAction(action);
+                    connect(action, &QAction::triggered, this, &AeroDms::ouvrirUnFichierDeDemandeDeSubvention);
+                    idFichier++;
+                }
+                
+            }
+            i++;
+        }
+    }
+}
+
+void AeroDms::ouvrirUnFichierDeDemandeDeSubvention()
+{
+    if (sender() != nullptr)
+    {
+        QAction* action = qobject_cast<QAction*>(sender());
+        QDesktopServices::openUrl(QUrl(action->data().toString(), QUrl::TolerantMode));
     } 
 }
 

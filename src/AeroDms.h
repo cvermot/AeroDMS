@@ -148,6 +148,9 @@ private:
     QAction* bouttonAjouterPilote;
     QAction* bouttonAjouterSortie;
 
+    //Menu Fichier
+    QMenu* menuOuvrirAutreDemande;
+
     //Menu options
     QAction* boutonAucuneSignature;
     QAction* boutonSignatureManuelle;
@@ -234,6 +237,8 @@ public slots:
     void deselectionnerVolDetecte();
     void scannerUneFactureSelonMethodeChoisie();
     void ouvrirPdfDemandeSuvbvention();
+    void peuplerMenuAutreDemande();
+    void ouvrirUnFichierDeDemandeDeSubvention();
 
 };
 #endif // AERODMS_H

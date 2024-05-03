@@ -16,6 +16,7 @@ StatistiqueDonutCombine::StatistiqueDonutCombine(QGraphicsItem* parent, Qt::Wind
     // create the series for main center pie
     m_mainSeries = new QPieSeries;
     m_mainSeries->setPieSize(0.7);
+    m_mainSeries->setHoleSize(0.25);
     QChart::addSeries(m_mainSeries);
 }
 
@@ -32,7 +33,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     // customize the slice
     mainSlice->setBrush(color);
     mainSlice->setLabelVisible();
-    mainSlice->setLabelColor(Qt::gray);
+    mainSlice->setLabelColor(Qt::black);
     mainSlice->setLabelPosition(QPieSlice::LabelInsideNormal);
     mainSlice->setLabelFont(font);
 
