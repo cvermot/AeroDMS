@@ -1107,7 +1107,6 @@ AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const 
                                                                           const float p_proportionRemboursement,
                                                                           const int p_annee )
 {
-    qDebug() << p_annee;
     AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
     if (p_annee == -1)
