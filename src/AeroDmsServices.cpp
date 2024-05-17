@@ -48,41 +48,172 @@ const QTime AeroDmsServices::convertirHeuresDecimalesEnQTime(const double p_heur
     return heureHhmm;
 }
 
+QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
+{
+        if (p_icone == "ULM")
+        {
+            return QIcon("./ressources/feather.svg");
+        }
+        else if (p_icone == "Avion")
+        {
+            return QIcon("./ressources/airplane.svg");
+        }
+        else if (p_icone == "Planeur")
+        {
+            return QIcon("./ressources/airplane-landing.svg");
+        }
+        else if (p_icone == "Hélicoptère")
+        {
+            return QIcon("./ressources/helicopter.svg");
+        }
+        else if (p_icone == "Avion électrique")
+        {
+            return QIcon("./ressources/lightning-bolt.svg");
+        }
+        else if (p_icone == "Balade")
+        {
+            return QIcon("./ressources/account-group.svg");
+        }
+        else if (p_icone == "Sortie")
+        {
+            return QIcon("./ressources/bag-checked.svg");
+        }
+        else if (p_icone == "Entrainement")
+        {
+            return QIcon("./ressources/airport.svg");
+        }
+        else if (p_icone == "Total")
+        {
+            return QIcon("./ressources/sigma.svg");
+        }
+        else if (p_icone == "Oui")
+        {
+            return QIcon("./ressources/check.svg");
+        }
+        else if (p_icone == "Non")
+        {
+            return QIcon("./ressources/close.svg");
+        }
+        else if (p_icone == "Tous")
+        {
+            return QIcon("./ressources/all-inclusive.svg");
+        }
+
+        
+
+        else if (p_icone == "A" || p_icone == "a")
+        {
+            return QIcon("./ressources/alpha-a.svg");
+        }
+        else if (p_icone == "B" || p_icone == "b")
+        {
+            return QIcon("./ressources/alpha-b.svg");
+        }
+        else if (p_icone == "C" || p_icone == "c")
+        {
+            return QIcon("./ressources/alpha-c.svg");
+        }
+        else if (p_icone == "D" || p_icone == "d")
+        {
+            return QIcon("./ressources/alpha-d.svg");
+        }
+        else if (p_icone == "E" || p_icone == "e")
+        {
+            return QIcon("./ressources/alpha-e.svg");
+        }
+        else if (p_icone == "F" || p_icone == "f")
+        {
+            return QIcon("./ressources/alpha-f.svg");
+        }
+        else if (p_icone == "G" || p_icone == "g")
+        {
+            return QIcon("./ressources/alpha-g.svg");
+        }
+        else if (p_icone == "H" || p_icone == "h")
+        {
+            return QIcon("./ressources/alpha-h.svg");
+        }
+        else if (p_icone == "I" || p_icone == "i")
+        {
+            return QIcon("./ressources/alpha-i.svg");
+        }
+        else if (p_icone == "J" || p_icone == "j")
+        {
+            return QIcon("./ressources/alpha-j.svg");
+        }
+        else if (p_icone == "K" || p_icone == "k")
+        {
+            return QIcon("./ressources/alpha-k.svg");
+        }
+        else if (p_icone == "L" || p_icone == "l")
+        {
+            return QIcon("./ressources/alpha-l.svg");
+        }
+        else if (p_icone == "M" || p_icone == "m")
+        {
+            return QIcon("./ressources/alpha-m.svg");
+        }
+        else if (p_icone == "N" || p_icone == "n")
+        {
+            return QIcon("./ressources/alpha-n.svg");
+        }
+        else if (p_icone == "O" || p_icone == "o")
+        {
+            return QIcon("./ressources/alpha-o.svg");
+        }
+        else if (p_icone == "P" || p_icone == "p")
+        {
+            return QIcon("./ressources/alpha-p.svg");
+        }
+        else if (p_icone == "Q" || p_icone == "q")
+        {
+            return QIcon("./ressources/alpha-q.svg");
+        }
+        else if (p_icone == "R" || p_icone == "r")
+        {
+            return QIcon("./ressources/alpha-r.svg");
+        }
+        else if (p_icone == "S" || p_icone == "s")
+        {
+            return QIcon("./ressources/alpha-s.svg");
+        }
+        else if (p_icone == "T" || p_icone == "t")
+        {
+            return QIcon("./ressources/alpha-t.svg");
+        }
+        else if (p_icone == "U" || p_icone == "u")
+        {
+            return QIcon("./ressources/alpha-u.svg");
+        }
+        else if (p_icone == "V" || p_icone == "v")
+        {
+            return QIcon("./ressources/alpha-v.svg");
+        }
+        else if (p_icone == "W" || p_icone == "w")
+        {
+            return QIcon("./ressources/alpha-w.svg");
+        }
+        else if (p_icone == "X" || p_icone == "x")
+        {
+            return QIcon("./ressources/alpha-x.svg");
+        }
+        else if (p_icone == "Y" || p_icone == "y")
+        {
+            return QIcon("./ressources/alpha-y.svg");
+        }
+        else if (p_icone == "Z" || p_icone == "z")
+        {
+            return QIcon("./ressources/alpha-z.svg");
+        }
+
+        return QIcon("./ressources/help.svg");
+
+}
+
 void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
 {
     for (int i = 0; i < p_activite.count(); i++)
     {
-        if (p_activite.itemText(i) == "ULM")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/feather.svg"));
-        }
-        else if (p_activite.itemText(i) == "Avion")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/airplane.svg"));
-        }
-        else if (p_activite.itemText(i) == "Planeur")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/airplane-landing.svg"));
-        }
-        else if (p_activite.itemText(i) == "Hélicoptère")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/helicopter.svg"));
-        }
-        else if (p_activite.itemText(i) == "Avion électrique")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/lightning-bolt.svg"));
-        }
-        else if (p_activite.itemText(i) == "Balade")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/account-group.svg"));
-        }
-        else if (p_activite.itemText(i) == "Sortie")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/bag-checked.svg"));
-        }
-        else if (p_activite.itemText(i) == "Entrainement")
-        {
-            p_activite.setItemIcon(i, QIcon("./ressources/airport.svg"));
-        }
+        p_activite.setItemIcon(i, recupererIcone(p_activite.itemText(i)));
     }
 }

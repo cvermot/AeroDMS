@@ -27,6 +27,7 @@ public:
     static const QString convertirMinutesEnHeuresMinutes(const int p_minutes);
     static const QTime convertirMinutesEnQTime(const int p_minutes);
     static const QTime convertirHeuresDecimalesEnQTime(const double p_heureDecimale);
+    static QIcon recupererIcone(const QString& p_icone);
     static void ajouterIconesComboBox(QComboBox &p_activite);
 
 };

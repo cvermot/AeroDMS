@@ -127,14 +127,43 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem("Prénom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem("Année"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem("HdV Entrainement"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem("Subvention Entrainement"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem("HdV Balade"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem("Subvention Balade"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem("HdV Sortie"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem("Subvention Sortie"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem("HdV Totales"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem("Subvention Totale"));
+
+    QTableWidgetItem * headerHdVEntrainement = new QTableWidgetItem("HdV");
+    headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
+    headerHdVEntrainement->setToolTip("Heures de vol d'entrainement");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, headerHdVEntrainement);
+    QTableWidgetItem* headerSubventionEntrainement = new QTableWidgetItem("Subvention");
+    headerSubventionEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
+    headerSubventionEntrainement->setToolTip("Montant de la subvention d'entrainement déjà allouée");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, headerSubventionEntrainement);
+    
+    QTableWidgetItem* headerHdVBalade = new QTableWidgetItem("HdV");
+    headerHdVBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
+    headerHdVBalade->setToolTip("Heures de vol de balade");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, headerHdVBalade);
+    QTableWidgetItem* headerSubventionBalade = new QTableWidgetItem("Subvention");
+    headerSubventionBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
+    headerSubventionBalade->setToolTip("Montant de la subvention balade déjà allouée");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, headerSubventionBalade);
+    
+    QTableWidgetItem* headerHdVSortie = new QTableWidgetItem("HdV");
+    headerHdVSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
+    headerHdVSortie->setToolTip("Heures de vol de sortie");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, headerHdVSortie);
+    QTableWidgetItem* headerSubventionSortie = new QTableWidgetItem("Subvention");
+    headerSubventionSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
+    headerSubventionSortie->setToolTip("Montant de la subvention sortie déjà allouée");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, headerSubventionSortie);
+    
+    QTableWidgetItem* headerHdVTotales = new QTableWidgetItem("HdV");
+    headerHdVTotales->setIcon(AeroDmsServices::recupererIcone("Total"));
+    headerHdVTotales->setToolTip("Heures de vol totales");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, headerHdVTotales);
+    QTableWidgetItem* headerSubventionTotale = new QTableWidgetItem("Subvention");
+    headerSubventionTotale->setIcon(AeroDmsServices::recupererIcone("Total"));
+    headerSubventionTotale->setToolTip("Montant total de la subvention déjà allouée");
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, headerSubventionTotale);
+
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem("Pilote Id (masqué)"));
     vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -473,11 +502,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     listeDeroulanteVolSoumis = new QComboBox(this);
     listeDeroulanteVolSoumis->addItem("Tous les vols", AeroDmsTypes::VolSoumis_TOUS_LES_VOLS);
-    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_TOUS_LES_VOLS, QIcon("./ressources/chart-bar-stacked.svg"));
+    listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_TOUS_LES_VOLS, AeroDmsServices::recupererIcone("Tous"));
     listeDeroulanteVolSoumis->addItem("Vols soumis au CSE", AeroDmsTypes::VolSoumis_VOL_SOUMIS);
-    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_SOUMIS, QIcon("./ressources/chart-pie.svg"));
+    listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_SOUMIS, AeroDmsServices::recupererIcone("Oui"));
     listeDeroulanteVolSoumis->addItem("Vols non soumis au CSE", AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS);
-    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS, QIcon("./ressources/chart-pie.svg"));
+    listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS, AeroDmsServices::recupererIcone("Non"));
     
     connect(listeDeroulanteVolSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     selectionToolBar->addWidget(listeDeroulanteVolSoumis);
@@ -1002,7 +1031,9 @@ void AeroDms::peuplerTableVols()
             vueVols->setRowCount(nbItems + 1);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
-            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
+            QTableWidgetItem *twSoumisCe = new QTableWidgetItem(vol.estSoumisCe);
+            twSoumisCe->setIcon(AeroDmsServices::recupererIcone(vol.estSoumisCe));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, twSoumisCe);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol).append(" €")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
@@ -1757,22 +1788,22 @@ void AeroDms::peuplerListesPilotes()
     listeDeroulantePilote->clear();
     choixPilote->clear();
 
-    listeDeroulantePilote->addItem("Tous les pilotes", "*");
+    listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone("Tous"), "Tous les pilotes", "*");
     choixPilote->addItem("", "aucun");
     choixPayeur->addItem("", "aucun");
     for (int i = 0; i < pilotes.size(); i++)
     {
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
-        listeDeroulantePilote->addItem(nomPrenom, pilote.idPilote);
+        listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
         //Si le pilote est actif, on le met dans la liste...
         //Et on met tous les pilotes si on est en mode édition de vol
         //(permet d'éditer le vol d'un pilote inactif)
         if (pilote.estActif
             || volAEditer != -1)
         {
-            choixPilote->addItem(nomPrenom, pilote.idPilote);
-            choixPayeur->addItem(nomPrenom, pilote.idPilote);
+            choixPilote->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
+            choixPayeur->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
         }
     }
 
