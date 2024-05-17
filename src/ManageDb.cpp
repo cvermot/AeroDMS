@@ -493,9 +493,11 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
     vol.dureeEnMinutes = p_query.value("duree").toInt();
     vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
     vol.estSoumisCe = "Oui";
+    vol.estSoumis = true;
     if (p_query.value("demandeRemboursement").isNull())
     {
         vol.estSoumisCe = "Non";
+        vol.estSoumis = false;
     }
     vol.idPilote = p_query.value("pilote").toString();
     vol.montantRembourse = p_query.value("montantRembourse").toFloat();

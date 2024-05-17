@@ -127,6 +127,7 @@ private:
 
     QComboBox* listeDeroulanteAnnee;
     QComboBox* listeDeroulantePilote;
+    QComboBox* listeDeroulanteVolSoumis;
     QComboBox* listeDeroulanteStatistique;
 
     QString cheminStockageFacturesTraitees;
@@ -181,6 +182,7 @@ private:
     int factureIdEnBdd = 0;
 
     //Statistiques
+    QWidget* widgetGraphiques;
     StatistiqueWidget* m_activeWidget = nullptr;
     QWidget* m_contentArea = nullptr;
     QHBoxLayout* graphiques;
@@ -239,6 +241,7 @@ public slots:
     void ouvrirPdfDemandeSuvbvention();
     void peuplerMenuAutreDemande();
     void ouvrirUnFichierDeDemandeDeSubvention();
+    void gererChangementOnglet();
 
 };
 #endif // AERODMS_H

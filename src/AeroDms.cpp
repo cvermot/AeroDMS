@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.3");
+    QApplication::setApplicationVersion("4.4");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -471,6 +471,17 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     selectionToolBar->addWidget(listeDeroulantePilote);
 
+    listeDeroulanteVolSoumis = new QComboBox(this);
+    listeDeroulanteVolSoumis->addItem("Tous les vols", AeroDmsTypes::VolSoumis_TOUS_LES_VOLS);
+    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_TOUS_LES_VOLS, QIcon("./ressources/chart-bar-stacked.svg"));
+    listeDeroulanteVolSoumis->addItem("Vols soumis au CSE", AeroDmsTypes::VolSoumis_VOL_SOUMIS);
+    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_SOUMIS, QIcon("./ressources/chart-pie.svg"));
+    listeDeroulanteVolSoumis->addItem("Vols non soumis au CSE", AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS);
+    //listeDeroulanteVolSoumis->setItemIcon(AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS, QIcon("./ressources/chart-pie.svg"));
+    
+    connect(listeDeroulanteVolSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
+    selectionToolBar->addWidget(listeDeroulanteVolSoumis);
+
     listeDeroulanteStatistique = new QComboBox(this);
     listeDeroulanteStatistique->addItem("Statistiques mensuelles", AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_ANNUELLES, QIcon("./ressources/chart-bar-stacked.svg"));
@@ -703,6 +714,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     verifierSignatureNumerisee();
 
     verifierPresenceDeMiseAjour(settings.value("baseDeDonnees/chemin", "").toString());
+
+    connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
+    gererChangementOnglet();
 }
 
 void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
@@ -766,7 +780,7 @@ void AeroDms::verifierSignatureNumerisee()
 void AeroDms::initialiserOngletGraphiques()
 {
     graphiques = new QHBoxLayout(this);
-    QWidget* widgetGraphiques = new QWidget(this);
+    widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
     mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
 }
@@ -843,11 +857,11 @@ void AeroDms::changerFusionPdf()
 
 void AeroDms::peuplerStatistiques()
 {
-    //On affiche le widget qui contient la fonction d'ajout de vol
-    if (sender() == listeDeroulanteStatistique)
-    {
-        mainTabWidget->setCurrentIndex(AeroDmsTypes::Onglet_STATISTIQUES);
-    }
+    //On affiche le widget qui contient les stats
+    //if (sender() == listeDeroulanteStatistique)
+    //{
+    //    mainTabWidget->setCurrentIndex(AeroDmsTypes::Onglet_STATISTIQUES);
+    //}
 
     if (m_activeWidget) {
         m_activeWidget->setVisible(false);
@@ -975,22 +989,31 @@ void AeroDms::peuplerTableVols()
 {
     AeroDmsTypes::ListeVols listeVols = db->recupererVols( listeDeroulanteAnnee->currentData().toInt(),
                                                            listeDeroulantePilote->currentData().toString());
-    vueVols->setRowCount(listeVols.size());
+    const AeroDmsTypes::VolSoumis volAAfficher = static_cast<AeroDmsTypes::VolSoumis>(listeDeroulanteVolSoumis->currentData().toInt());
+    int nbItems = 0;
+    vueVols->clearContents();
     for (int i = 0; i < listeVols.size(); i++)
     {
         const AeroDmsTypes::Vol vol = listeVols.at(i);
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol).append(" €")));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(vol.immat));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
-        vueVols->setItem(i, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
+        if (vol.estSoumis && volAAfficher == AeroDmsTypes::VolSoumis_VOL_SOUMIS
+            || !vol.estSoumis && volAAfficher == AeroDmsTypes::VolSoumis_VOL_NON_SOUMIS
+            || volAAfficher == AeroDmsTypes::VolSoumis_TOUS_LES_VOLS)
+        {
+            vueVols->setRowCount(nbItems + 1);
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol).append(" €")));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(vol.immat));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
+            nbItems++;
+        }
     }
     vueVols->resizeColumnsToContents();
 
@@ -2471,6 +2494,24 @@ bool AeroDms::lePiloteEstAJourDeCotisation()
         return false;
     }
     return true;
+}
+
+void AeroDms::gererChangementOnglet()
+{
+    listeDeroulanteVolSoumis->setVisible(false);
+    listeDeroulanteVolSoumis->setDisabled(true);
+    listeDeroulanteStatistique->setVisible(false);
+    listeDeroulanteStatistique->setDisabled(true);
+    if (mainTabWidget->currentWidget() == vueVols)
+    {
+        //listeDeroulanteVolSoumis->setVisible(true);
+        listeDeroulanteVolSoumis->setDisabled(false);
+    }
+    else if (mainTabWidget->currentWidget() == widgetGraphiques)
+    {
+        //listeDeroulanteStatistique->setVisible(true);
+        listeDeroulanteStatistique->setDisabled(false);
+    }
 }
 
 bool AeroDms::eventFilter(QObject* object, QEvent* event)

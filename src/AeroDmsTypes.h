@@ -120,6 +120,12 @@ public:
         Statistiques_AERONEFS
     };
 
+    enum VolSoumis {
+        VolSoumis_TOUS_LES_VOLS,
+        VolSoumis_VOL_SOUMIS,
+        VolSoumis_VOL_NON_SOUMIS
+    };
+
     enum Signature {
         Signature_SANS,
         Signature_MANUSCRITE_IMAGE,
@@ -238,6 +244,7 @@ public:
         QString immat;
         QString activite;
         QString estSoumisCe;
+        bool estSoumis;
         float coutVol;
         float montantRembourse;
         int volId;
