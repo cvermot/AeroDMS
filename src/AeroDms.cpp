@@ -684,6 +684,15 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mailing->addAction(mailingPilotesActifsBrevetes);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
+    QMenu* menuMailDemandesSubvention = mailing->addMenu(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par une demande de subvention"));
+    QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
+    for (int i = 0; i < datesDemandes.size(); i++)
+    {
+        QAction *action = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), this);
+        action->setData(datesDemandes.at(i).toString("yyyy-MM-dd"));
+        menuMailDemandesSubvention->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsBrevetes, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -2305,6 +2314,14 @@ void AeroDms::envoyerMail()
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailDerniereDemandeDeSubvention()
+            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
+    }
+    else
+    {
+        QAction* action = qobject_cast<QAction*>(sender());
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailDerniereDemandeDeSubvention(action->data().toString())
             + "?subject=[Section aéronautique] Chèques aéro&body="
             + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }

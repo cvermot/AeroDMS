@@ -125,7 +125,8 @@ public:
                                   const bool p_pilotesActifsSeulement,
                                   const bool p_pilotesBrevetes = false);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee);
-    QString recupererMailDerniereDemandeDeSubvention();
+    QList<QDate> recupererDatesDesDemandesDeSubventions();
+    QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
 
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
 

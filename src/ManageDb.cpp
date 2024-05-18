@@ -1460,16 +1460,47 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
     return listeMail;
 }
 
-QString ManageDb::recupererMailDerniereDemandeDeSubvention()
+QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
+{
+    QList<QDate> listeDemandes;
+
+    QSqlQuery query;
+    query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 5");
+    query.exec();
+
+    while (query.next())
+    {
+        QDate date = QDate::fromString(query.value("dateDemande").toString(), "yyyy-MM-dd");
+        listeDemandes.append(date);
+    }
+
+    return listeDemandes;
+}
+
+QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
 {
     QString listeMail;
 
     QSqlQuery query;
-    query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
-    query.exec();
-    if (query.next())
+    QString date = "";
+
+    if (p_date == "")
     {
-        const QString date = query.value("dateDemande").toString();
+        
+        query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
+        query.exec();
+        if (query.next())
+        {
+            date = query.value("dateDemande").toString();
+        }
+    }
+    else
+    {
+        date = p_date;
+    }
+
+    if (date != "")
+    {
         query.prepare("SELECT mail FROM mailParDateDeDemandeDeSubvention WHERE dateDemande = :dateDemande");
         query.bindValue(":dateDemande", date);
         query.exec();
