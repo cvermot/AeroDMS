@@ -43,7 +43,7 @@
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>C:\Qt\6.6.1\msvc2019_64</QtInstall>
+    <QtInstall>C:\Qt\6.7.1\msvc2019_64</QtInstall>
     <QtModules>core;gui;widgets;printsupport;sql;webenginecore;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>

@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.4");
+    QApplication::setApplicationVersion("4.5");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -556,7 +556,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
-
     //========================Menu Fichier
     QMenu* menuFichier = menuBar()->addMenu(tr("Fichier"));
 
@@ -1011,13 +1010,13 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem(subvention.prenom));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem(QString::number(subvention.annee)));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, new QTableWidgetItem(subvention.entrainement.heuresDeVol));
-        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.entrainement.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.entrainement.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, new QTableWidgetItem(subvention.balade.heuresDeVol));
-        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.balade.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.balade.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, new QTableWidgetItem(subvention.sortie.heuresDeVol));
-        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.sortie.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.sortie.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem(subvention.totaux.heuresDeVol));
-        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse).append(" €")));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
     }
     vuePilotes->resizeColumnsToContents();
@@ -1044,8 +1043,8 @@ void AeroDms::peuplerTableVols()
             twSoumisCe->setIcon(AeroDmsServices::recupererIcone(vol.estSoumisCe));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, twSoumisCe);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
-            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol).append(" €")));
-            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse).append(" €")));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol, 'f', 2).append(" €")));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse, 'f', 2).append(" €")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(vol.typeDeVol));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(vol.remarque));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
@@ -1077,7 +1076,7 @@ void AeroDms::peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p
         AeroDmsTypes::DonneesFacture facture = p_factures.at(i);
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy")));
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm")));
-        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol).append(" €")));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol, 'f', 2).append(" €")));
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT, new QTableWidgetItem(facture.immat));
         //Par défaut => vol entrainement
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem(typeDeVol->itemText(2)));
@@ -1095,7 +1094,7 @@ void AeroDms::peuplerTableFactures()
     {
         const AeroDmsTypes::DemandeRemboursementFacture facture = listeFactures.at(i);
         vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem(facture.intitule));
-        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant).append(" €")));
+        vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant, 'f', 2).append(" €")));
         vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem(facture.payeur));
         vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_NOM_SORTIE, new QTableWidgetItem(facture.nomSortie));
         vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_TYPE_SORTIE, new QTableWidgetItem(facture.typeDeSortie));
@@ -1124,7 +1123,7 @@ void AeroDms::peuplerTableRecettes()
         AeroDmsTypes::RecetteDetail recette = listeRecettesCotisations.at(i);
         vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
         vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
-        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant) + " €"));
+        vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant, 'f', 2) + " €"));
         vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
         vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
         if (recette.estSoumisCe)
@@ -1141,7 +1140,7 @@ void AeroDms::peuplerTableRecettes()
 
         vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
         vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
-        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant) + " €"));
+        vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant, 'f', 2) + " €"));
         vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
         vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
         if (recette.estSoumisCe)
@@ -1540,7 +1539,7 @@ void AeroDms::enregistrerUneFacture()
                 + " du "
                 + dateDeFacture->date().toString("dd/MM/yyyy")
                 + " ("
-                + QString::number(montantFacture->value())
+                + QString::number(montantFacture->value(), 'f', 2)
                 + "€) ajoutée.");
 
             montantFacture->setValue(0);
@@ -1668,13 +1667,13 @@ void AeroDms::enregistrerUnVol()
                 + " (" 
                 + dureeDuVol->time().toString("hh:mm")
                 + "/"
-                + QString::number(prixDuVol->value())
+                + QString::number(prixDuVol->value(), 'f', 2)
                 + "€) "
                 + volAjouteModifie
                 + ". Montant subvention : "
-                + QString::number(montantSubventionne)
+                + QString::number(montantSubventionne, 'f', 2)
                 + "€ / Subvention entrainement restante : "
-                + QString::number(subventionRestante)
+                + QString::number(subventionRestante, 'f', 2)
                 + "€");
 
             //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
@@ -2096,9 +2095,9 @@ void AeroDms::volsSelectionnes()
             hdvTotales = hdvTotales + vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
             statusBar()->showMessage("Vols sélectionnés : Coût total : "
-                + QString::number(coutTotal)
+                + QString::number(coutTotal, 'f', 2)
                 + " € / Montant subventionné total : "
-                + QString::number(montantTotalSubventionne)
+                + QString::number(montantTotalSubventionne, 'f', 2)
                 + " € / Nombres d'heures de vol totales : "
                 + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
         }

@@ -1485,8 +1485,7 @@ QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
     QString date = "";
 
     if (p_date == "")
-    {
-        
+    {   
         query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
         query.exec();
         if (query.next())
@@ -1525,7 +1524,7 @@ QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
 //   -la structure de la BDD évolue
 //   -on souhaite empecher l'utilisation d'une version du logiciel avec laquelle
 //       un défaut peut avoir un impact sur la BDD (cela imposera de mette à jour
-//       AeroDMS avant de pouvoir utiliser le logiciel en ecriture sur la BDD
+//       AeroDMS avant de pouvoir utiliser le logiciel en ecriture sur la BDD)
 const bool ManageDb::laBddEstALaVersionAttendue()
 {
     QSqlQuery query;

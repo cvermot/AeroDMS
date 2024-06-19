@@ -138,6 +138,7 @@ private:
     //Barre de progression
     QProgressDialog *progressionGenerationPdf;
     QPushButton *boutonProgressionGenerationPdf;
+
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
     //Bouttons
