@@ -178,6 +178,8 @@ private:
 
     //Données internes
     QString piloteAEditer = "";
+    float montantSubventionDejaAlloue = 0.0;
+    int anneeAEditer = 0;
     int volAEditer = -1;
     bool volPartiellementEditable = false;
     int factureIdEnBdd = 0;
@@ -222,6 +224,7 @@ public slots:
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
     void editerPilote();
+    void editerCotisation();
     void editerVol();
     void supprimerVol();
     void menuContextuelVols(const QPoint& pos);

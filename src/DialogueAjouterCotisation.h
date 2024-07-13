@@ -34,6 +34,10 @@ public:
     void mettreAJourLeContenuDeLaFenetre();
     AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
 
+    void editerLaCotisation( const QString p_pilote, 
+                             const int p_annee,
+                             const float p_montantSubventionDejaAlloue);
+
 private:
     QComboBox* listePilote = nullptr;
     QComboBox* annee = nullptr;
@@ -49,10 +53,13 @@ private:
     float montantCotisation = 0;
     float budgetEntrainement = 0;
 
+    bool modeEdition = false;
+
     void peuplerListePilote();
 
 public slots:
     void prevaliderDonnnesSaisies();
+    void rincerFenetre();
 };
 
 #endif // DIALOGUEAJOUTERCOTISATION_H

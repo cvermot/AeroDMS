@@ -35,6 +35,8 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(rincerFenetre()));
+    connect(this, SIGNAL(rejected()), this, SLOT(rincerFenetre()));
 
     okButton = new QPushButton(tr("&Ajouter"), this);
     okButton->setDefault(true);
@@ -54,7 +56,6 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     annee->addItem(QString::number(anneeCourante - 1));
     annee->addItem(QString::number(anneeCourante));
     annee->addItem(QString::number(anneeCourante + 1));
-    annee->setCurrentIndex(1);
     annee->setItemIcon(0, QIcon("./ressources/numeric-negative-1.svg"));
     annee->setItemIcon(1, QIcon("./ressources/numeric-0.svg"));
     annee->setItemIcon(2, QIcon("./ressources/numeric-positive-1.svg"));
@@ -94,7 +95,7 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Ajouter une cotisation pilote"));
+    rincerFenetre();
 
     peuplerListePilote();
     prevaliderDonnnesSaisies();
@@ -127,11 +128,9 @@ AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfosCotisa
     infosCotisation.annee = annee->currentText().toInt();
     infosCotisation.montant = montant->value();
     infosCotisation.montantSubvention = montantSubventionAnnuelle->value();
+    infosCotisation.estEnEdition = modeEdition;
 
-    listePilote->setCurrentIndex(0);
-    annee->setCurrentIndex(1);
-    montant->setValue(montantCotisation);
-    montantSubventionAnnuelle->setValue(budgetEntrainement);
+    rincerFenetre();
 
     return infosCotisation;
 }
@@ -143,5 +142,54 @@ void DialogueAjouterCotisation::prevaliderDonnnesSaisies()
     if (listePilote->currentIndex() == 0)
     {
         okButton->setEnabled(false);
+    }
+}
+
+void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
+                                                    const int p_annee, 
+                                                    const float p_montantSubventionDejaAlloue)
+{
+    int index = listePilote->findData(p_pilote);
+    if (index != -1) {
+        listePilote->setCurrentIndex(index);
+    }
+
+    listePilote->setEnabled(false);
+    annee->addItem(QString::number(p_annee));
+    annee->setCurrentIndex(3);
+    annee->setEnabled(false);
+    montant->setEnabled(false);
+    montantSubventionAnnuelle->setMinimum(p_montantSubventionDejaAlloue);
+    montantSubventionAnnuelle->setValue(database->recupererSubventionEntrainement(p_pilote, p_annee));
+
+    setWindowTitle(tr("Modifier une cotisation pilote"));
+    okButton->setText("&Modifier");
+
+    modeEdition = true;
+
+}
+
+void DialogueAjouterCotisation::rincerFenetre()
+{
+    //On remet aux valeur par défaut les champs changées en cas d'édition :
+    listePilote->setEnabled(true);
+    annee->setEnabled(true);
+    montant->setEnabled(true);
+    montantSubventionAnnuelle->setMinimum(0.0);
+    modeEdition = false;
+    okButton->setText("&Ajouter");
+
+    setWindowTitle(tr("Ajouter une cotisation pilote"));
+
+    //On rince les autres valeurs
+    listePilote->setCurrentIndex(0);
+    annee->setCurrentIndex(1);
+    montant->setValue(montantCotisation);
+    montantSubventionAnnuelle->setValue(budgetEntrainement);
+
+    //Si on a 4 item c'est qu'on est en mode édition => on supprime l'item additionnel ajouté par simplicité en mode édition
+    if (annee->count() == 4)
+    {
+        annee->removeItem(3);
     }
 }

@@ -300,6 +300,7 @@ public:
         int annee;
         float montantSubvention;
         float montant;
+        bool estEnEdition;
     };
     
     struct DemandeRemboursementFacture {

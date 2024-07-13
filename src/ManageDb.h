@@ -72,6 +72,8 @@ public:
                                      const int annee);
 
     void ajouterCotisation (const AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
+    float recupererSubventionEntrainement( const QString p_pilote, 
+                                           const int p_annee);
 
     AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();

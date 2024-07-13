@@ -1168,25 +1168,34 @@ void AeroDms::peuplerListeDeroulanteAnnee()
 
 void AeroDms::ajouterUneCotisationEnBdd()
 {
-    //On contrôle que le pilote n'a pas déjà une cotisation pour cette année
-    AeroDmsTypes::CotisationAnnuelle infosCotisation = dialogueAjouterCotisation->recupererInfosCotisationAAjouter();
-    if (db->piloteEstAJourDeCotisation(infosCotisation.idPilote, infosCotisation.annee))
+    const AeroDmsTypes::CotisationAnnuelle infosCotisation = dialogueAjouterCotisation->recupererInfosCotisationAAjouter();
+    if (!infosCotisation.estEnEdition)
     {
-        QMessageBox::critical(this, "Cotisation déja reglée", "Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie.");
+        //On contrôle que le pilote n'a pas déjà une cotisation pour cette année
+        if (db->piloteEstAJourDeCotisation(infosCotisation.idPilote, infosCotisation.annee))
+        {
+            QMessageBox::critical(this, "Cotisation déja reglée", "Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie.");
+        }
+        //Si le pilote n'a pas deja une cotisation pour cette année la, on ajoute la cotisation en BDD
+        else
+        {
+            db->ajouterCotisation(infosCotisation);
+            //On met à jour la table des pilotes
+            peuplerTablePilotes();
+            //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
+            peuplerListeDeroulanteAnnee();
+            
+            peuplerTableRecettes();
+            //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
+            peuplerListesPilotes();
+
+            statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
+        }
     }
-    //Si le pilote n'a pas deja une cotisation pour cette année la, on ajoute la cotisation en BDD
     else
     {
         db->ajouterCotisation(infosCotisation);
-        //On met à jour la table des pilotes
-        peuplerTablePilotes();
-        //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
-        peuplerListeDeroulanteAnnee();
-        statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
-
-        peuplerTableRecettes();
-        //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
-        peuplerListesPilotes();
+        statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " mise à jour pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
     }
 }
 
@@ -1246,9 +1255,10 @@ void AeroDms::ajouterUneSortieEnBdd()
     AeroDmsTypes::Sortie sortie = dialogueAjouterSortie->recupererInfosSortieAAjouter();
 
     db->creerSortie(sortie);
-    statusBar()->showMessage("Sortie " + sortie.nom + " ajoutée");
     peuplerListeBaladesEtSorties();
     peuplerListeSorties();
+
+    statusBar()->showMessage("Sortie " + sortie.nom + " ajoutée");
 }
 
 void AeroDms::selectionnerUneFacture()
@@ -2036,11 +2046,19 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         const int ligneSelectionnee = vuePilotes->itemAt(pos)->row();
         piloteAEditer = vuePilotes->item( ligneSelectionnee, 
                                           AeroDmsTypes::PiloteTableElement_PILOTE_ID)->text();
+        montantSubventionDejaAlloue = vuePilotes->item( ligneSelectionnee,
+                                                         AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE)->text().remove(" €").toFloat();
+        anneeAEditer = vuePilotes->item( ligneSelectionnee,
+                                         AeroDmsTypes::PiloteTableElement_ANNEE)->text().toInt();
 
-        const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
-        QAction editer(iconeAjouterPilote,"Editer le pilote", this);
+        QAction editer(QIcon("./ressources/account-tie-hat.svg"),"Editer le pilote", this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
         menuClicDroitPilote.addAction(&editer);
+
+        QAction editerCotisation(QIcon("./ressources/ticket.svg"), "Modifier la cotisation", this);
+        connect(&editerCotisation, SIGNAL(triggered()), this, SLOT(editerCotisation()));
+        menuClicDroitPilote.addAction(&editerCotisation);
+
         if (logicielEnModeLectureSeule)
         {
             menuClicDroitPilote.setEnabled(false);
@@ -2055,6 +2073,14 @@ void AeroDms::editerPilote()
 {
     dialogueGestionPilote->preparerMiseAJourPilote(piloteAEditer);
     dialogueGestionPilote->exec();
+}
+
+void AeroDms::editerCotisation()
+{
+    dialogueAjouterCotisation->editerLaCotisation( piloteAEditer, 
+                                                   anneeAEditer,
+                                                   montantSubventionDejaAlloue);
+    dialogueAjouterCotisation->exec();
 }
 
 void AeroDms::volsSelectionnes()

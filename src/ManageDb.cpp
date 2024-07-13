@@ -1206,32 +1206,58 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeBalade()
 void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infosCotisation)
 {
     QSqlQuery query;
-    query.prepare("SELECT nom, prenom FROM 'pilote' WHERE piloteId = :piloteId");
-    query.bindValue(":piloteId", p_infosCotisation.idPilote);
-    query.exec();
-    query.next();
-    const QString intitule = QString("Cotisation ").append(query.value(0).toString()).append(" ").append(query.value(1).toString()).append(" ").append(QString::number(p_infosCotisation.annee));
 
-    query.prepare("INSERT INTO 'recettes' ('typeDeRecette','Intitule','montant') VALUES ('Cotisation', :intitule, :montant) RETURNING recetteId");
-    query.bindValue(":intitule", intitule);
-    query.bindValue(":montant", p_infosCotisation.montant);
-    query.exec();
-    query.next();
+    if (!p_infosCotisation.estEnEdition)
+    {
+        query.prepare("SELECT nom, prenom FROM 'pilote' WHERE piloteId = :piloteId");
+        query.bindValue(":piloteId", p_infosCotisation.idPilote);
+        query.exec();
+        query.next();
+        const QString intitule = QString("Cotisation ").append(query.value(0).toString()).append(" ").append(query.value(1).toString()).append(" ").append(QString::number(p_infosCotisation.annee));
 
-    const int idRecette = query.value(0).toInt();
+        query.prepare("INSERT INTO 'recettes' ('typeDeRecette','Intitule','montant') VALUES ('Cotisation', :intitule, :montant) RETURNING recetteId");
+        query.bindValue(":intitule", intitule);
+        query.bindValue(":montant", p_infosCotisation.montant);
+        query.exec();
+        query.next();
 
-    query.prepare("INSERT INTO 'cotisation' ('pilote','annee','idRecette', 'montantSubventionAnnuelleEntrainement') VALUES (:pilote, :annee, :idRecette, :montantSubvention)");
-    query.bindValue(":pilote", p_infosCotisation.idPilote);
-    query.bindValue(":annee", p_infosCotisation.annee);
-    query.bindValue(":idRecette", idRecette);
-    query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
-    query.exec();
+        const int idRecette = query.value(0).toInt();
 
-    //Un pilote pour lequel on vient d'ajouter une cotistion est toujours un pilote actif
+        query.prepare("INSERT INTO 'cotisation' ('pilote','annee','idRecette', 'montantSubventionAnnuelleEntrainement') VALUES (:pilote, :annee, :idRecette, :montantSubvention)");
+        query.bindValue(":pilote", p_infosCotisation.idPilote);
+        query.bindValue(":annee",   p_infosCotisation.annee);
+        query.bindValue(":idRecette", idRecette);
+        query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
+        query.exec();
+    }
+    else
+    {
+        query.prepare("UPDATE 'cotisation' SET 'montantSubventionAnnuelleEntrainement' = :montantSubvention WHERE pilote = :pilote AND annee = :annee");
+        query.bindValue(":pilote", p_infosCotisation.idPilote);
+        query.bindValue(":annee", p_infosCotisation.annee);
+        query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
+        query.exec();
+    }
+
+    //Un pilote pour lequel on vient d'ajouter/editer une cotistion est toujours un pilote actif
     query.prepare("UPDATE 'pilote' SET 'estActif' =:estActif WHERE piloteId = :piloteId");
     query.bindValue(":piloteId", p_infosCotisation.idPilote);
     query.bindValue(":estActif", true);
     query.exec();
+}
+
+float ManageDb::recupererSubventionEntrainement( const QString p_pilote, 
+                                                 const int p_annee)
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT montantSubventionAnnuelleEntrainement FROM 'cotisation' WHERE pilote = :pilote AND annee = :annee");
+    query.bindValue(":pilote", p_pilote);
+    query.bindValue(":annee", p_annee);
+    query.exec();
+    query.next();
+
+    return query.value("montantSubventionAnnuelleEntrainement").toFloat();
 }
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
