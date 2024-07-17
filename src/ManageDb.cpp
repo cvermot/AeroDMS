@@ -1664,3 +1664,39 @@ void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJ
         query.exec();
     }
 }
+
+AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBaladesEtSorties(const int p_annee)
+{
+    AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM detailsBaladesEtSorties WHERE annee = :annee");
+    query.bindValue(":annee", QString::number(p_annee));
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::DetailsBaladesEtSorties details = AeroDmsTypes::K_INIT_DETAILS_BALADES_ET_SORTIES;
+
+        details.volId = query.value("volId").toInt();
+        details.idSortie = query.value("idSortie").toInt();
+        details.nomSortie = query.value("nomSortie").toString();
+
+        details.dateVol = query.value("dateVol").toDate();
+        details.dureeVol = query.value("dureeVol").toInt();
+        details.nomPassagers = query.value("nomPassagers").toString();
+        details.coutVol = query.value("coutVol").toFloat();
+        details.montantRembouse = query.value("montantRembouse").toFloat();
+        
+        if (!query.value("idRecette").isNull())
+        {
+            details.idRecette = query.value("idRecette").toInt();
+            details.intituleRecette = query.value("intituleRecette").toString();
+            details.montantRecette = query.value("intituleRecette").toFloat();
+        }
+        
+        listeDetails.append(details);
+    }
+
+    return listeDetails;
+}

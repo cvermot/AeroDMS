@@ -80,3 +80,18 @@ const AeroDmsTypes::StatsAeronef AeroDmsTypes::K_INIT_STAT_AERONEF =
     "",
     0
 };
+
+const AeroDmsTypes::DetailsBaladesEtSorties AeroDmsTypes::K_INIT_DETAILS_BALADES_ET_SORTIES =
+{
+    -1,
+    -1,
+    -1,
+    QDate(),
+    0,
+    0.0,
+    0.0,
+    "",
+    "",
+    0.0,
+    ""
+};

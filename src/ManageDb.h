@@ -130,6 +130,8 @@ public:
     QList<QDate> recupererDatesDesDemandesDeSubventions();
     QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
 
+    AeroDmsTypes::ListeDetailsBaladesEtSorties recupererListeDetailsBaladesEtSorties(const int p_annee);
+
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
 
     void mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
@@ -141,7 +143,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.4;
+    const float versionBddAttendue = 1.5;
 };
 
 #endif

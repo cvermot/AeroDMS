@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. mai 3 21:15:50 2024
+-- File generated with SQLiteStudio v3.4.4 on mer. juil. 17 21:28:01 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -38,7 +38,7 @@ INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePo
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.4', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.5', NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -79,6 +79,28 @@ FROM cotisation
 WHERE 
       recettes.identifiantFormulaireSoumissionCe IS NULL
 ORDER BY cotisation.annee;
+
+-- View: detailsBaladesEtSorties
+CREATE VIEW IF NOT EXISTS detailsBaladesEtSorties AS SELECT vol.volId AS volId,
+sortie.sortieId AS idSortie,
+recettes.recetteId As idRecette,
+vol.typeDeVol AS typeVol,
+vol.date AS dateVol,
+vol.duree AS dureeVol,
+vol.cout AS coutVol,
+vol.montantRembourse AS montantVolRembourse,
+vol.remarque AS nomPassagers,
+strftime('%Y', vol.date) AS annee,
+recettes.Intitule AS intituleRecette,
+recettes.montant AS montantRecette,
+sortie.nom AS nomSortie
+FROM vol
+LEFT JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".volId = vol.volId
+LEFT JOIN recettes ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
+LEFT JOIN demandeRemboursementSoumises ON recettes.identifiantFormulaireSoumissionCe = demandeRemboursementSoumises.demandeId
+LEFT JOIN sortie ON vol.sortie = sortie.sortieId
+WHERE vol.typeDeVol != "Entrainement"
+ORDER BY idSortie, idRecette, volId;
 
 -- View: factures
 CREATE VIEW IF NOT EXISTS factures AS SELECT 

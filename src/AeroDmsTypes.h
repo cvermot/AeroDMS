@@ -391,6 +391,22 @@ public:
     static const StatsAeronef K_INIT_STAT_AERONEF;
     typedef QList<StatsAeronef> StatsAeronefs;
 
+    struct DetailsBaladesEtSorties
+    {
+        int volId;
+        int idSortie;
+        int idRecette;
+        QDate dateVol;
+        int dureeVol;
+        float coutVol;
+        float montantRembouse;
+        QString nomPassagers;
+        QString intituleRecette;
+        float montantRecette;
+        QString nomSortie;
+    };
+    static const DetailsBaladesEtSorties K_INIT_DETAILS_BALADES_ET_SORTIES;
+    typedef QList<DetailsBaladesEtSorties> ListeDetailsBaladesEtSorties;
 };
 
 #endif // AERODMSTYPES_H

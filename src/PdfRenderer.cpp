@@ -452,7 +452,8 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
                                                      const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
                                                      const AeroDmsTypes::SubventionsParPilote p_totaux,
-                                                     const bool p_ajouterLesRecettes)
+                                                     const bool p_ajouterLesRecettes,
+                                                     const bool p_ajouterLeRecapBaladesEtSorties)
 {
     QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
     QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
@@ -519,6 +520,12 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         templateTable.replace("_RecetteCotisation_", QString::number(totaux.cotisations, 'f', 2) + " €");
         templateTable.replace("_RecetteBalade_", QString::number(totaux.balades, 'f', 2) + " €");
         templateTable.replace("_RecetteSortie_", QString::number(totaux.sorties, 'f', 2) + " €");
+    }
+
+    if (p_ajouterLeRecapBaladesEtSorties)
+    {
+        //TODO const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee);
+        //templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
     if ( demandeEnCours.mergerTousLesPdf
@@ -685,4 +692,57 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html)
         break;
     }
     
+}
+
+QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
+{
+    QString html;
+
+    const AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails = db->recupererListeDetailsBaladesEtSorties(p_annee);
+
+    int nbSortiesRestantesDeMemeTypeQueSortieCourante = 0;
+
+    for (int i = 0; i < listeDetails.size(); i++)
+    {
+        AeroDmsTypes::DetailsBaladesEtSorties details = listeDetails.at(i);
+
+        html = html + "<tr>";
+
+        if (nbSortiesRestantesDeMemeTypeQueSortieCourante == 0)
+        {
+            for (int j = i; j < listeDetails.size(); j++)
+            {
+                if (listeDetails.at(i).idSortie == listeDetails.at(j).idSortie)
+                {
+                    nbSortiesRestantesDeMemeTypeQueSortieCourante++;
+                    qDebug() << "identique" << listeDetails.at(i).idSortie << listeDetails.at(j).idSortie;
+                }
+                else
+                    qDebug() << "différent" << listeDetails.at(i).idSortie << listeDetails.at(j).idSortie;
+                    
+
+            }
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbSortiesRestantesDeMemeTypeQueSortieCourante) + "'>"+details.nomSortie+"</td>";
+        }
+
+
+        html = html + "<td class = 'tg-lboi'>" + "#1 " + "</td >";
+        html = html + "<td class = 'tg-lboi'>" + details.dateVol.toString() + "</td >";
+        html = html + "<td class = 'tg-lboi'>" + details.nomPassagers + "</td>";
+        html = html + "<td class = 'tg-lboi'>" + QString::number(details.dureeVol) + " €</td>";
+        html = html + "<td class = 'tg-lboi'>" + QString::number(details.coutVol) + " €</td>";
+        html = html + "<td class = 'tg-lboi'>" + QString::number(details.montantRembouse) + " €</td>";
+        html = html + "<td class = 'tg-lboi'>" + details.intituleRecette + "</td >";
+        html = html + "<td class = 'tg-lboi'>" + QString::number(details.montantRecette) + " €</td>";
+
+        html = html + "</tr>";
+
+        nbSortiesRestantesDeMemeTypeQueSortieCourante--;
+    }
+
+    qDebug() << "-------------------------------------";
+    qDebug() << html;
+    qDebug() << "-------------------------------------";
+
+    return html;
 }

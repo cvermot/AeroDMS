@@ -156,6 +156,7 @@ void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
 
     listePilote->setEnabled(false);
     annee->addItem(QString::number(p_annee));
+    annee->setItemIcon(3, QIcon("./ressources/pencil.svg"));
     annee->setCurrentIndex(3);
     annee->setEnabled(false);
     montant->setEnabled(false);
