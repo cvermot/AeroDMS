@@ -648,6 +648,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanAutoOpenFlyer = new QAction(tr("OpenFlyer (CAPAM, ACB)"), this);
     scanAutoOpenFlyer->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoOpenFlyer);
+    scanAutoAerogest = new QAction(tr("Aerogest (ACBA)"), this);
+    scanAutoAerogest->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanFacture->addAction(scanAutoAerogest);
     scanAutoAca = new QAction(tr("Aéroclub d'Andernos"), this);
     scanAutoAca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoAca);
@@ -665,6 +668,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoAerogest, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoSepavia, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
@@ -1329,6 +1333,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     if (sender() == scanAutoOpenFlyer)
     {
         aeroclub = AeroDmsTypes::Aeroclub_Generique_OpenFlyer;
+    }
+    if (sender() == scanAutoAerogest)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_Generique_Aerogest;
     }
     else if (sender() == scanAutoAca)
     {

@@ -170,6 +170,7 @@ private:
     QAction* mailingPilotesActifsBrevetes;
     QAction* mailingPilotesDerniereDemandeSubvention;
     QAction* scanAutoOpenFlyer;
+    QAction* scanAutoAerogest;
     QAction* scanAutoAca;
     QAction* scanAutoDaca;
     QAction* scanAutoSepavia;

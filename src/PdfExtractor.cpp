@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 QRegularExpression dateRe("(?<jour>\\d\\d)/(?<mois>\\d\\d)/(?<annee>\\d\\d\\d\\d)");
 QRegularExpression heureRe("(?<heure>\\d):(?<minutes>\\d\\d)");
 QRegularExpression heureHMinRe("(?<heure>\\d)h(?<minutes>\\d\\d)min");
-QRegularExpression euroRe("(?<montant>\\d+\\.\\d+)€");
+QRegularExpression euroRe("(?<montant>\\d+\\[.,]\\d+)€");
 QRegularExpression immatRe("(?<immat>F-[A-Z]{4})");
 
 PdfExtractor::PdfExtractor()
@@ -61,6 +61,16 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 aeroclub = AeroDmsTypes::Aeroclub_CAPAM;
                 //qDebug() << "Aéroclub trouvé : CAPAM";
             }
+            else if ( QString(entries.at(index).Text.data()).contains("Aéroclub Arcachon"))
+            {
+                aeroclub = AeroDmsTypes::Aeroclub_ACBA;
+                //qDebug() << "Aéroclub trouvé : ACBA";
+            }
+            else if ( QString(entries.at(index).Text.data()).contains("Aerogest"))
+            {
+                aeroclub = AeroDmsTypes::Aeroclub_Generique_Aerogest;
+                //qDebug() << "Aéroclub trouvé : Aerogest (générique)";
+            }
             else if (QString(entries.at(index).Text.data()).contains("Aéro-club de Bordeaux"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_ACB;
@@ -92,6 +102,12 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             case AeroDmsTypes::Aeroclub_Generique_OpenFlyer:
             {
                 liste.append(extraireDonneesOpenFlyer(entries, noPage));
+            }
+            break;
+            case AeroDmsTypes::Aeroclub_ACBA:
+            case AeroDmsTypes::Aeroclub_Generique_Aerogest:
+            {
+                liste.append(extraireDonneesAerogest(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_DACA:
@@ -175,6 +191,52 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
     return donneesFactures;
 }
 
+AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesAerogest( std::vector<PoDoFo::PdfTextEntry> p_entries,
+                                                                         const unsigned p_noPage)
+{
+    int index = 0;
+    AeroDmsTypes::DonneesFacture donneesFactures = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+    donneesFactures.pageDansLeFichierPdf = p_noPage;
+
+    while (index < p_entries.size())
+    {
+        QString data = QString(p_entries.at(index).Text.data());
+        qDebug() << data;
+
+        if (data.contains(immatRe))
+        {
+            QRegularExpressionMatch match = immatRe.match(data);
+            donneesFactures.immat = match.captured("immat");
+        }
+
+        if (data.contains(dateRe))
+        {
+            donneesFactures.dateDuVol = extraireDateRegex(data);
+        }
+
+        if (data.contains("€") && data.contains("Tarif standard"))
+        {
+            donneesFactures.coutDuVol = data.remove("Tarif standard : ").remove("€").replace(",",".").toFloat();
+        }
+
+        if (data.contains(euroRe))
+        {
+            QRegularExpressionMatch match = euroRe.match(data);
+            donneesFactures.coutDuVol = match.captured("montant").toFloat();
+            qDebug() << "montant detecté";
+        }
+
+        if (data.contains(" minutes"))
+        {
+            donneesFactures.dureeDuVol = AeroDmsServices::convertirMinutesEnQTime(data.remove(" minutes").toInt());
+        }
+
+        index++;
+    }
+    
+    return donneesFactures;
+}
+
 AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vector<PoDoFo::PdfTextEntry> p_entries, 
                                                                       const unsigned p_noPage)
 {
@@ -234,7 +296,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
             donneesFactures.pageDansLeFichierPdf = p_noPage;
 
             const QStringList str = QString(p_entries.at(index).Text.data()).replace("\xc2\xa0", " ").split(" ");
-            //qDebug() << str;
             
             for (int i = 0; i < str.size(); i++)
             {

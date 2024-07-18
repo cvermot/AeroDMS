@@ -36,6 +36,7 @@ public:
 
 private:
 	static AeroDmsTypes::DonneesFacture extraireDonneesOpenFlyer(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::DonneesFacture extraireDonneesAerogest(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesSepavia(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);

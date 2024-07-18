@@ -141,9 +141,11 @@ public:
     enum Aeroclub {
         Aeroclub_INCONNU,
         Aeroclub_Generique_OpenFlyer,
+        Aeroclub_Generique_Aerogest,
         Aeroclub_DACA,
         Aeroclub_CAPAM,
         Aeroclub_ACB,
+        Aeroclub_ACBA,
         Aeroclub_SEPAVIA,
         Aeroclub_ACAndernos,
         Aeroclub_GENERIQUE,
