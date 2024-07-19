@@ -163,6 +163,7 @@ private:
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* boutonActivationScanAutoFactures;
+    QAction* boutonOuvrirAutomatiquementLesPdfGeneres;
 
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
@@ -245,6 +246,7 @@ public slots:
     void scannerUneFactureSelonMethodeChoisie();
     void ouvrirPdfDemandeSuvbvention();
     void peuplerMenuAutreDemande();
+    void ouvrirPdfGenere();
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
 

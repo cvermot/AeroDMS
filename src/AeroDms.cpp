@@ -66,6 +66,13 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
         settings.endGroup();
     }
 
+    if (settings.value("options/ouvertureAutomatiqueApresGeneration", "") == "")
+    {
+        settings.beginGroup("options");
+        settings.setValue("ouvertureAutomatiqueApresGeneration", "1");
+        settings.endGroup();
+    }
+
     if (settings.value("mailing/texteChequesDisponibles", "") == "")
     {
         settings.beginGroup("mailing");
@@ -114,6 +121,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
+    parametresMetiers.ouvertureAutomatiqueApresGeneration = settings.value("options/ouvertureAutomatiqueApresGeneration").toBool();
 
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer(db,
@@ -547,6 +555,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     //Dialogue de progression de génération PDF
     progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "", 0, 0, this);
     boutonProgressionGenerationPdf = new QPushButton("Fermer", this);
+    connect(boutonProgressionGenerationPdf, SIGNAL(clicked()), this, SLOT(ouvrirPdfGenere()));
     progressionGenerationPdf->setCancelButton(boutonProgressionGenerationPdf);
     progressionGenerationPdf->setAutoClose(false);
     progressionGenerationPdf->setWindowModality(Qt::WindowModal);
@@ -609,6 +618,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
+
+    boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les PDF à la fin de la génération", this);
+    boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
+    boutonOuvrirAutomatiquementLesPdfGeneres->setChecked(parametresMetiers.ouvertureAutomatiqueApresGeneration);
+    menuOption->addAction(boutonOuvrirAutomatiquementLesPdfGeneres);
 
     connect(boutonDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
@@ -987,15 +1001,15 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     //On met à jour la table des vols (champ Soumis CE)
     peuplerTableVols();
 
+    //On repeuple le menu d'ouverture des fichiers générés 
+    peuplerMenuAutreDemande();
+
     //On met à jour la fenêtre de progression
     progressionGenerationPdf->setLabelText("Génération PDF terminée");
     boutonProgressionGenerationPdf->setDisabled(false);
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);
-
-    //On repeuple le menu d'ouverture des fichiers générés 
-    peuplerMenuAutreDemande();
 }
 
 AeroDms::~AeroDms()
@@ -2526,10 +2540,10 @@ void AeroDms::peuplerMenuAutreDemande()
     if (fichiers.size() >= 2)
     {
         int i = 0;
+        //les 2 dernières cases ontiennent . et ..
         while (i < fichiers.size() - 2 && i < 10)
         {
             QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon("./ressources/folder.svg"), fichiers.at(i));
-            //Indice n-1 et n-2 contiennent . et ..
             const QString dossier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
             const QDir dirCourant(dossier);
             const QStringList listeFichiers = dirCourant.entryList(QStringList("*.pdf"));
@@ -2565,6 +2579,15 @@ void AeroDms::ouvrirUnFichierDeDemandeDeSubvention()
         QAction* action = qobject_cast<QAction*>(sender());
         QDesktopServices::openUrl(QUrl(action->data().toString(), QUrl::TolerantMode));
     } 
+}
+
+void AeroDms::ouvrirPdfGenere()
+{
+    if (boutonOuvrirAutomatiquementLesPdfGeneres->isChecked())
+    {
+        const int nombreElements = menuOuvrirAutreDemande->actions().at(0)->menu()->actions().size();  
+        QDesktopServices::openUrl(QUrl(menuOuvrirAutreDemande->actions().at(0)->menu()->actions().at(nombreElements - 1)->data().toString(), QUrl::TolerantMode));
+    }
 }
 
 void AeroDms::deselectionnerVolDetecte()

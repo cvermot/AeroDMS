@@ -355,6 +355,7 @@ public:
         QString nomTresorier;
         int delaisDeGardeBdd;
         QString texteMailDispoCheques;
+        bool ouvertureAutomatiqueApresGeneration;
     };
 
     struct TotauxRecettes {
