@@ -1686,13 +1686,13 @@ AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBalade
         details.dureeVol = query.value("dureeVol").toInt();
         details.nomPassagers = query.value("nomPassagers").toString();
         details.coutVol = query.value("coutVol").toFloat();
-        details.montantRembouse = query.value("montantRembouse").toFloat();
+        details.montantRembouse = query.value("montantVolRembourse").toFloat();
         
         if (!query.value("idRecette").isNull())
         {
             details.idRecette = query.value("idRecette").toInt();
             details.intituleRecette = query.value("intituleRecette").toString();
-            details.montantRecette = query.value("intituleRecette").toFloat();
+            details.montantRecette = query.value("montantRecette").toFloat();
         }
         
         listeDetails.append(details);

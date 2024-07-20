@@ -524,8 +524,8 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
 
     if (p_ajouterLeRecapBaladesEtSorties)
     {
-        //TODO const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee);
-        //templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
+        const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee);
+        templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
     if ( demandeEnCours.mergerTousLesPdf
@@ -696,11 +696,29 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html)
 
 QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
 {
-    QString html;
+    QString html = "";
 
     const AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails = db->recupererListeDetailsBaladesEtSorties(p_annee);
 
     int nbSortiesRestantesDeMemeTypeQueSortieCourante = 0;
+    int nbRecettesCommunesAVolRestantes = 0;
+    int nbVolsCommunsARecetteRestants = 0;
+    int nbItem = 0;
+    int compteurLignesDansGroupe = 0;
+
+    bool recetteCommuneATraiter = false;
+    bool volCommunATraiter = false;
+
+    QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
+    if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream inTableBaladesSorties(&tableBaladesSorties);
+        html = inTableBaladesSorties.readAll();
+    }
+    else
+    {
+        qDebug() << "Erreur ouverture fichier";
+    }
 
     for (int i = 0; i < listeDetails.size(); i++)
     {
@@ -725,20 +743,91 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
             html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbSortiesRestantesDeMemeTypeQueSortieCourante) + "'>"+details.nomSortie+"</td>";
         }
 
+        if (nbRecettesCommunesAVolRestantes == 0)
+        {
+            int j = i;
+            bool sortieBoucle = false;
+            recetteCommuneATraiter = true;
+            while (j < listeDetails.size() && !sortieBoucle)
+            {
+                if (listeDetails.at(i).idRecette == listeDetails.at(j).idRecette)
+                {
+                    nbRecettesCommunesAVolRestantes++;
+                }
+                else
+                {
+                    sortieBoucle = true;
+                }
+                j++;
+            }
+        }
 
-        html = html + "<td class = 'tg-lboi'>" + "#1 " + "</td >";
-        html = html + "<td class = 'tg-lboi'>" + details.dateVol.toString() + "</td >";
-        html = html + "<td class = 'tg-lboi'>" + details.nomPassagers + "</td>";
-        html = html + "<td class = 'tg-lboi'>" + QString::number(details.dureeVol) + " €</td>";
-        html = html + "<td class = 'tg-lboi'>" + QString::number(details.coutVol) + " €</td>";
-        html = html + "<td class = 'tg-lboi'>" + QString::number(details.montantRembouse) + " €</td>";
-        html = html + "<td class = 'tg-lboi'>" + details.intituleRecette + "</td >";
-        html = html + "<td class = 'tg-lboi'>" + QString::number(details.montantRecette) + " €</td>";
+        if (nbVolsCommunsARecetteRestants == 0)
+        {
+            int j = i;
+            bool sortieBoucle = false;
+            volCommunATraiter = true;
+            while (j < listeDetails.size() && !sortieBoucle)
+            {
+                if (listeDetails.at(i).volId == listeDetails.at(j).volId)
+                {
+                    nbVolsCommunsARecetteRestants++;
+                }
+                else
+                {
+                    sortieBoucle = true;
+                }
+                j++;
+            }
+        }
+
+
+        if ( compteurLignesDansGroupe == 0)
+        {
+            nbItem++;
+            if (recetteCommuneATraiter && nbRecettesCommunesAVolRestantes > 1)
+            {
+                compteurLignesDansGroupe = nbRecettesCommunesAVolRestantes;
+            }
+            else  if (volCommunATraiter && nbVolsCommunsARecetteRestants > 1)
+            {
+                compteurLignesDansGroupe = nbVolsCommunsARecetteRestants;
+            }
+            else
+            {
+                compteurLignesDansGroupe = 1;
+            }
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesDansGroupe) + "'>" + "#" + QString::number(nbItem) + " " + "</td >";
+        }
+
+        if (volCommunATraiter)
+        {
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + details.dateVol.toString() + "</td >";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + details.nomPassagers + "</td>";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(details.dureeVol) + "</td>";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + QString::number(details.coutVol) + " €</td>";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + QString::number(details.montantRembouse) + " €</td>";
+        }    
+        if (recetteCommuneATraiter)
+        {
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbRecettesCommunesAVolRestantes) + "'>" + details.intituleRecette + "</td >";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbRecettesCommunesAVolRestantes) + "'>" + QString::number(details.montantRecette) + " €</td>";
+        }
 
         html = html + "</tr>";
 
+        recetteCommuneATraiter = false;
+        nbRecettesCommunesAVolRestantes--;
+
+        volCommunATraiter = false;
+        nbVolsCommunsARecetteRestants--;
+
+        compteurLignesDansGroupe--;
+
         nbSortiesRestantesDeMemeTypeQueSortieCourante--;
     }
+
+    html = html + "</tbody></table>";
 
     qDebug() << "-------------------------------------";
     qDebug() << html;
