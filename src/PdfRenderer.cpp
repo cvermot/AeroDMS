@@ -701,17 +701,20 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
     const AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails = db->recupererListeDetailsBaladesEtSorties(p_annee);
 
     int nbSortiesRestantesDeMemeTypeQueSortieCourante = 0;
-    int nbRecettesCommunesAVolRestantes = 0;
-    int nbVolsCommunsARecetteRestants = 0;
-    int nbLignesItem = 0;
     int nbItem = 0;
     int compteurLignesDansGroupe = 0;
+    int identifiantFinBoucle = 0;
     QVector<int> listeVolId;
     listeVolId.clear();
 
-    bool recetteCommuneATraiter = false;
-    bool volCommunATraiter = false;
-    bool nVolsSontAssociesANRecettes = false;
+    QVector<int> idsVolsEnCours;
+    QVector<int> idsRecettesEnCours;
+
+    QVector<int> idsVolsDejaAjoute;
+    QVector<int> idsRecettesDejaAjoute;
+
+    QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
+    QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettessUniques;
 
     QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
     if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
@@ -737,127 +740,150 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
                 if (listeDetails.at(i).idSortie == listeDetails.at(j).idSortie)
                 {
                     nbSortiesRestantesDeMemeTypeQueSortieCourante++;
-                    qDebug() << "identique" << listeDetails.at(i).idSortie << listeDetails.at(j).idSortie;
                 }
-                else
-                    qDebug() << "différent" << listeDetails.at(i).idSortie << listeDetails.at(j).idSortie;
-                    
-
             }
             html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbSortiesRestantesDeMemeTypeQueSortieCourante) + "'>"+details.nomSortie+"</td>";
         }
 
-        if (nbRecettesCommunesAVolRestantes == 0)
+        if (compteurLignesDansGroupe == 0)
         {
-            int j = i;
-            bool sortieBoucle = false;
-            recetteCommuneATraiter = true;
-            nVolsSontAssociesANRecettes = false;
-            listeVolId.clear();
-            listeVolId.append(listeDetails.at(j).volId);
+            nbItem++;
 
+            idsVolsDejaAjoute.clear();
+            idsRecettesDejaAjoute.clear();
+
+            idsVolsEnCours.clear();
+            idsRecettesEnCours.clear();
+            idsVolsEnCours.append(listeDetails.at(i).volId);
+            idsRecettesEnCours.append(listeDetails.at(i).idRecette);
+
+            volsUniques.clear();
+            recettessUniques.clear();
+            volsUniques.append(listeDetails.at(i));
+            recettessUniques.append(listeDetails.at(i));
+
+            int j = i + 1;
+            bool sortieBoucle = false;
             while (j < listeDetails.size() && !sortieBoucle)
             {
-                if (listeDetails.at(i).idRecette == listeDetails.at(j).idRecette)
+                if (idsVolsEnCours.contains(listeDetails.at(j).volId)
+                    || idsRecettesEnCours.contains(listeDetails.at(j).idRecette))
                 {
-                    nbRecettesCommunesAVolRestantes++;
-                    nbLignesItem++;
-
-                    if (!listeVolId.contains(listeDetails.at(j).volId))
+                    //Sî l'une des 2 listes contient déjà l'identifiant associé, alors on ajoute l'identifiant à l'autre liste, s'il ne s'y trouve pas déjà
+                    if (!idsVolsEnCours.contains(listeDetails.at(j).volId))
                     {
-                        listeVolId.append(listeDetails.at(j).volId);
+                        idsVolsEnCours.append(listeDetails.at(j).volId);
+                        volsUniques.append(listeDetails.at(j));
                     }
+                    if (!idsRecettesEnCours.contains(listeDetails.at(j).idRecette))
+                    {
+                        idsRecettesEnCours.append(listeDetails.at(j).idRecette);
+                        recettessUniques.append(listeDetails.at(j));
+                    }
+                    identifiantFinBoucle = j;
                 }
                 else
                 {
-                    //On recheche parmi les lignes suivantes si des fois les recettes trouvées ne couvriraient pas d'autres vols...
-                    //Ces vols sont forcément situés juste derrière les premiers => on arrête la recherche dès que les volId de la 
-                    //listes ne se trouvent plus dans la liste
-                    if (listeVolId.contains(listeDetails.at(j).volId))
-                    {
-                        nbLignesItem++;
-                        nVolsSontAssociesANRecettes = true;
-                    }
-                    else
-                    {
-                        sortieBoucle = true;
-                    }
-                    
-                }
-                j++;
-            }
-        }
-
-        if (nbVolsCommunsARecetteRestants == 0)
-        {
-            int j = i;
-            bool sortieBoucle = false;
-            volCommunATraiter = true;
-            while (j < listeDetails.size() && !sortieBoucle)
-            {
-                if (listeDetails.at(i).volId == listeDetails.at(j).volId)
-                {
-                    nbVolsCommunsARecetteRestants++;
-                }
-                else
-                {
+                    //Sinon, aucun des 2 identifiant ne se trouve déjà dans la liste => on est sur une nouvelle série de vols/recettes, on sort
                     sortieBoucle = true;
                 }
                 j++;
             }
         }
 
-
         if ( compteurLignesDansGroupe == 0)
         {
-            nbItem++;
-            if (recetteCommuneATraiter && nbRecettesCommunesAVolRestantes > 1)
-            {
-                compteurLignesDansGroupe = nbLignesItem;
-            }
-            else  if (volCommunATraiter && nbVolsCommunsARecetteRestants > 1)
-            {
-                compteurLignesDansGroupe = nbVolsCommunsARecetteRestants;
-            }
-            else
-            {
-                compteurLignesDansGroupe = 1;
-            }
+            compteurLignesDansGroupe = std::max(idsVolsEnCours.size(), idsRecettesEnCours.size());
             html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesDansGroupe) + "'>" + "#" + QString::number(nbItem) + " " + "</td >";
         }
 
-        if (volCommunATraiter)
+        if (idsVolsEnCours.size() == 1)
         {
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + details.dateVol.toString() + "</td >";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + details.nomPassagers + "</td>";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(details.dureeVol) + "</td>";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + QString::number(details.coutVol) + " €</td>";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbVolsCommunsARecetteRestants) + "'>" + QString::number(details.montantRembouse) + " €</td>";
-        }    
-        if (recetteCommuneATraiter)
+            if (idsVolsDejaAjoute.size() == 0)
+            {
+                idsVolsDejaAjoute.append(details.volId);
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + details.dateVol.toString("dd/MM/yyyy") + "</td >";
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + details.nomPassagers + "</td>";
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(details.dureeVol) + "</td>";
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + QString::number(details.coutVol) + " €</td>";
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + QString::number(details.montantRembouse) + " €</td>";
+            }
+        }
+        else
         {
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbRecettesCommunesAVolRestantes) + "'>" + details.intituleRecette + "</td >";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbRecettesCommunesAVolRestantes) + "'>" + QString::number(details.montantRecette) + " €</td>";
+            if (volsUniques.size() > 0)
+            {
+                const AeroDmsTypes::DetailsBaladesEtSorties element = volsUniques.first();
+                volsUniques.pop_front();
+                html = html + "<td class = 'tg-lboi'>" + element.dateVol.toString("dd/MM/yyyy") + "</td >";
+                html = html + "<td class = 'tg-lboi'>" + element.nomPassagers + "</td>";
+                html = html + "<td class = 'tg-lboi'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(element.dureeVol) + "</td>";
+                html = html + "<td class = 'tg-lboi'>" + QString::number(element.coutVol) + " €</td>";
+                html = html + "<td class = 'tg-lboi'>" + QString::number(element.montantRembouse) + " €</td>";
+            }
+            else
+            {
+                //On ajoute une ligne vide
+                html = html + "<td class = 'tg-lboi'>" + "</td >";
+                html = html + "<td class = 'tg-lboi'>" + "</td>";
+                html = html + "<td class = 'tg-lboi'>" + "</td>";
+                html = html + "<td class = 'tg-lboi'>" + "</td>";
+                html = html + "<td class = 'tg-lboi'>" + "</td>";
+            }
         }
 
+        if (idsRecettesEnCours.size() == 1)
+        {
+            if (idsRecettesDejaAjoute.size() == 0)
+            {
+                idsRecettesDejaAjoute.append(details.idRecette);
+                if (details.montantRecette != 0.0)
+                {
+                    html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>" + details.intituleRecette + "</td >";
+                    html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>" + QString::number(details.montantRecette) + " €</td>";
+                }
+                else
+                {
+                    html = html + "<td class = 'tg-1zu3' colspan='2' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>Paiement non encore reçu</td >";
+                }
+            }
+        }
+        else
+        {
+            if (recettessUniques.size() > 0)
+            {
+                const AeroDmsTypes::DetailsBaladesEtSorties element = recettessUniques.first();
+                recettessUniques.pop_front();
+                if (element.montantRecette != 0.0)
+                {
+                    html = html + "<td class = 'tg-lboi'>" + element.intituleRecette + "</td >";
+                    html = html + "<td class = 'tg-lboi'>" + QString::number(element.montantRecette) + " €</td>";
+                }
+                else
+                {
+                    html = html + "<td class = 'tg-1zu3' colspan='2'>Paiement non encore reçu</td >";
+                }
+            }
+            else
+            {
+                //On ajoute une ligne vide
+                html = html + "<td class = 'tg-lboi'>" + "</td >";
+                html = html + "<td class = 'tg-lboi'>" + "</td>";
+            }
+        }
         html = html + "</tr>";
-
-        recetteCommuneATraiter = false;
-        nbRecettesCommunesAVolRestantes--;
-
-        volCommunATraiter = false;
-        nbVolsCommunsARecetteRestants--;
-
         compteurLignesDansGroupe--;
-
         nbSortiesRestantesDeMemeTypeQueSortieCourante--;
+
+        if ( volsUniques.isEmpty()
+             && recettessUniques.isEmpty())
+        {
+            i = identifiantFinBoucle;
+        }
+            
     }
 
     html = html + "</tbody></table>";
-
-    qDebug() << "-------------------------------------";
-    qDebug() << html;
-    qDebug() << "-------------------------------------";
 
     return html;
 }
