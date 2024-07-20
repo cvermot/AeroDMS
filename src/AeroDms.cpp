@@ -487,7 +487,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     toolBar->addAction(bouttonGenerePdf);
 
     const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
-    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de recap HdV de l'année sélectionnée"), this);
+    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de récapitulatif HdV de l'année sélectionnée"), this);
     bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
@@ -615,9 +615,16 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
     boutonDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("Recettes uniquement"), this);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererRecettes);
-
     boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
+
+    QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"),tr("Options du récapitulatif annuel"));
+    boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), tr("Récapitulatif des recettes"), this);
+    menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
+    boutonOptionRecapAnnuelRecettes->setCheckable(true);
+    boutonOptionRecapAnnuelBaladesSorties = new QAction(QIcon("./ressources/airplane-search.svg"), tr("Récapitulatif des balades et sorties"), this);
+    menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
+    boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
 
     boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les PDF à la fin de la génération", this);
     boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
@@ -1474,12 +1481,28 @@ void AeroDms::genererPdf()
         fusionnerLesPdf = "Non";
     }
 
+    QString recapHdv = "Heures annuelles<br />seulement";
+    if (boutonOptionRecapAnnuelRecettes->isChecked()
+        && boutonOptionRecapAnnuelBaladesSorties->isChecked())
+    {
+        recapHdv = "Heures annuelles,<br />recettes, balades et sorties";
+    }
+    else if (boutonOptionRecapAnnuelRecettes->isChecked())
+    {
+        recapHdv = "Heures annuelles,<br />recettes";
+    }
+    else if (boutonOptionRecapAnnuelBaladesSorties->isChecked())
+    {
+        recapHdv = "Heures annuelles,<br />balades et sorties";
+    }
+
     QMessageBox demandeConfirmationGeneration;
     demandeConfirmationGeneration.setText(QString("Voulez vous générer les PDF de demande de subventions ? <br /><br />")
         + "La génération sera réalisée avec les options suivantes : <br />"
         + texteSignature + "<br />"
         + texteDemande + "<br />"
         + "<b>Fusion des PDF</b> : " + fusionnerLesPdf + "<br />"
+        + "<b>Récapitulatif annuel des heures de vol</b> : " + recapHdv + "<br />"
         + "<br />Nombre de demandes à générer :<br />"
         + "Subventions heures de vol : " + nbSubventions + "<br />"
         + "Remboursement factures : " + nbFactures + "<br />"
@@ -1500,7 +1523,9 @@ void AeroDms::genererPdf()
                 cheminStockageFacturesTraitees,
                 typeGenerationPdf,
                 signature,
-                boutonFusionnerLesPdf->font().bold());
+                boutonFusionnerLesPdf->font().bold(),
+                boutonOptionRecapAnnuelRecettes->isChecked(),
+                boutonOptionRecapAnnuelBaladesSorties->isChecked());
         }
         break;
 

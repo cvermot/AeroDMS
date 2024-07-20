@@ -144,6 +144,9 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     demandeEnCours.typeDeSignatureDemandee = p_signature;
     demandeEnCours.mergerTousLesPdf = true;
 
+    demandeEnCours.recapHdVAvecBaladesEtSorties = true;
+    demandeEnCours.recapHdVAvecRecettes = true;
+
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
     QDir().mkdir(cheminSortieFichiersGeneres);
@@ -159,7 +162,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                                                                                    "*",
                                                                                                                    false);
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
-        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux, true);
+        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux, true, true);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -175,13 +178,17 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
                                                    const QString p_cheminStockageFactures,
                                                    const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf,
                                                    const AeroDmsTypes::Signature p_signature,
-                                                   const bool p_mergerTousLesPdf)
+                                                   const bool p_mergerTousLesPdf,
+                                                   const bool p_recapHdVAvecRecettes,
+                                                   const bool p_recapHdvAvecBaladesEtSorties)
 {
     demandeEnCours.listeFactures = QStringList();
     demandeEnCours.nomTresorier = p_nomTresorier;
     demandeEnCours.typeDeGenerationDemandee = p_typeGenerationPdf;
     demandeEnCours.typeDeSignatureDemandee = p_signature;
     demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
+    demandeEnCours.recapHdVAvecBaladesEtSorties = p_recapHdvAvecBaladesEtSorties;
+    demandeEnCours.recapHdVAvecRecettes = p_recapHdVAvecRecettes;
 
     nombreEtapesEffectuees = 0 ;
     indiceFichier = 0;
@@ -258,7 +265,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
                                                                                      true );
         imprimerLeFichierPdfDeRecapAnnuel( annee, 
                                            listePilotesDeCetteAnnee, 
-                                           totaux);
+                                           totaux,
+                                           demandeEnCours.recapHdVAvecRecettes,
+                                           demandeEnCours.recapHdVAvecBaladesEtSorties);
     }
     else if (db->recupererLesSubventionsAEmettre().size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
@@ -714,7 +723,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
     QVector<int> idsRecettesDejaAjoute;
 
     QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
-    QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettessUniques;
+    QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettesUniques;
 
     QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
     if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
@@ -758,9 +767,9 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
             idsRecettesEnCours.append(listeDetails.at(i).idRecette);
 
             volsUniques.clear();
-            recettessUniques.clear();
+            recettesUniques.clear();
             volsUniques.append(listeDetails.at(i));
-            recettessUniques.append(listeDetails.at(i));
+            recettesUniques.append(listeDetails.at(i));
 
             int j = i + 1;
             bool sortieBoucle = false;
@@ -778,7 +787,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
                     if (!idsRecettesEnCours.contains(listeDetails.at(j).idRecette))
                     {
                         idsRecettesEnCours.append(listeDetails.at(j).idRecette);
-                        recettessUniques.append(listeDetails.at(j));
+                        recettesUniques.append(listeDetails.at(j));
                     }
                     identifiantFinBoucle = j;
                 }
@@ -850,10 +859,10 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
         }
         else
         {
-            if (recettessUniques.size() > 0)
+            if (recettesUniques.size() > 0)
             {
-                const AeroDmsTypes::DetailsBaladesEtSorties element = recettessUniques.first();
-                recettessUniques.pop_front();
+                const AeroDmsTypes::DetailsBaladesEtSorties element = recettesUniques.first();
+                recettesUniques.pop_front();
                 if (element.montantRecette != 0.0)
                 {
                     html = html + "<td class = 'tg-lboi'>" + element.intituleRecette + "</td >";
@@ -876,7 +885,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
         nbSortiesRestantesDeMemeTypeQueSortieCourante--;
 
         if ( volsUniques.isEmpty()
-             && recettessUniques.isEmpty())
+             && recettesUniques.isEmpty())
         {
             i = identifiantFinBoucle;
         }

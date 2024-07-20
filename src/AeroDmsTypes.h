@@ -175,6 +175,8 @@ public:
         AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee;
         AeroDmsTypes::Signature typeDeSignatureDemandee;
         bool mergerTousLesPdf;
+        bool recapHdVAvecRecettes;
+        bool recapHdVAvecBaladesEtSorties;
         //int idFacture;
     };
 

@@ -36,7 +36,9 @@ public:
 		                                  const QString p_cheminStockageFactures,
 		                                  const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES,
 		                                  const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS,
-		                                  const bool p_mergerTousLesPdf = true);
+		                                  const bool p_mergerTousLesPdf = true,
+										  const bool p_recapHdVAvecRecettes = false,
+										  const bool p_recapHdvAvecBaladesEtSorties = false);
 	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 		                                        const QString p_cheminSortieFichiersGeneres,
 		                                        const QString p_cheminStockageFactures,

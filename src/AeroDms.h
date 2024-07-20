@@ -163,6 +163,8 @@ private:
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* boutonActivationScanAutoFactures;
+    QAction* boutonOptionRecapAnnuelRecettes;
+    QAction* boutonOptionRecapAnnuelBaladesSorties;
     QAction* boutonOuvrirAutomatiquementLesPdfGeneres;
 
     //Menu outils
