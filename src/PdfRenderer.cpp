@@ -703,11 +703,15 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
     int nbSortiesRestantesDeMemeTypeQueSortieCourante = 0;
     int nbRecettesCommunesAVolRestantes = 0;
     int nbVolsCommunsARecetteRestants = 0;
+    int nbLignesItem = 0;
     int nbItem = 0;
     int compteurLignesDansGroupe = 0;
+    QVector<int> listeVolId;
+    listeVolId.clear();
 
     bool recetteCommuneATraiter = false;
     bool volCommunATraiter = false;
+    bool nVolsSontAssociesANRecettes = false;
 
     QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
     if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
@@ -748,15 +752,37 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
             int j = i;
             bool sortieBoucle = false;
             recetteCommuneATraiter = true;
+            nVolsSontAssociesANRecettes = false;
+            listeVolId.clear();
+            listeVolId.append(listeDetails.at(j).volId);
+
             while (j < listeDetails.size() && !sortieBoucle)
             {
                 if (listeDetails.at(i).idRecette == listeDetails.at(j).idRecette)
                 {
                     nbRecettesCommunesAVolRestantes++;
+                    nbLignesItem++;
+
+                    if (!listeVolId.contains(listeDetails.at(j).volId))
+                    {
+                        listeVolId.append(listeDetails.at(j).volId);
+                    }
                 }
                 else
                 {
-                    sortieBoucle = true;
+                    //On recheche parmi les lignes suivantes si des fois les recettes trouvées ne couvriraient pas d'autres vols...
+                    //Ces vols sont forcément situés juste derrière les premiers => on arrête la recherche dès que les volId de la 
+                    //listes ne se trouvent plus dans la liste
+                    if (listeVolId.contains(listeDetails.at(j).volId))
+                    {
+                        nbLignesItem++;
+                        nVolsSontAssociesANRecettes = true;
+                    }
+                    else
+                    {
+                        sortieBoucle = true;
+                    }
+                    
                 }
                 j++;
             }
@@ -787,7 +813,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
             nbItem++;
             if (recetteCommuneATraiter && nbRecettesCommunesAVolRestantes > 1)
             {
-                compteurLignesDansGroupe = nbRecettesCommunesAVolRestantes;
+                compteurLignesDansGroupe = nbLignesItem;
             }
             else  if (volCommunATraiter && nbVolsCommunsARecetteRestants > 1)
             {
