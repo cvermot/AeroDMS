@@ -709,190 +709,178 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
 
     const AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails = db->recupererListeDetailsBaladesEtSorties(p_annee);
 
-    int nbSortiesRestantesDeMemeTypeQueSortieCourante = 0;
-    int nbItem = 0;
-    int compteurLignesDansGroupe = 0;
-    int identifiantFinBoucle = 0;
-    QVector<int> listeVolId;
-    listeVolId.clear();
 
-    QVector<int> idsVolsEnCours;
-    QVector<int> idsRecettesEnCours;
+    AeroDmsTypes::ListeBaladesEtSortiesParIdSortie listesParIdSortie;
 
-    QVector<int> idsVolsDejaAjoute;
-    QVector<int> idsRecettesDejaAjoute;
-
-    QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
-    QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettesUniques;
-
-    QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
-    if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
+    //On ajoute le premier item, si la liste retournée par la requete n'est pas vide...
+    if (listeDetails.size() > 0)
     {
-        QTextStream inTableBaladesSorties(&tableBaladesSorties);
-        html = inTableBaladesSorties.readAll();
-    }
-    else
-    {
-        qDebug() << "Erreur ouverture fichier";
-    }
+        AeroDmsTypes::BaladesEtSortiesParId baladeParId;
+        baladeParId.nombreDeLignes = 0;
+        baladeParId.idSortie = listeDetails.at(0).idSortie;
+        AeroDmsTypes::GroupeBaladesEtSortiesAssociees baladesEtSortiesAssociees;
+        baladesEtSortiesAssociees.recettesUniques.append(listeDetails.at(0));
+        baladesEtSortiesAssociees.volsUniques.append(listeDetails.at(0));
+        baladeParId.baladesEtSortiesAssociees.append(baladesEtSortiesAssociees);
+        listesParIdSortie.push_back(baladeParId);
 
-    for (int i = 0; i < listeDetails.size(); i++)
-    {
-        AeroDmsTypes::DetailsBaladesEtSorties details = listeDetails.at(i);
 
-        html = html + "<tr>";
+        QVector<int> idsVolsDejaAjoute;
+        QVector<int> idsRecettesDejaAjoute;
+        idsVolsDejaAjoute.clear();
+        idsRecettesDejaAjoute.clear();
+        idsVolsDejaAjoute.append(listeDetails.at(0).volId);
+        idsRecettesDejaAjoute.append(listeDetails.at(0).idRecette);
 
-        if (nbSortiesRestantesDeMemeTypeQueSortieCourante == 0)
+        //1) on parcours la liste des listeDetails pour élaborer listesParIdSortie
+        for (int i = 0; i < listeDetails.size(); i++)
         {
-            for (int j = i; j < listeDetails.size(); j++)
+            AeroDmsTypes::DetailsBaladesEtSorties details = listeDetails.at(i);
+
+            //Si le nouvel idSortie est différent de celui en cours de traitement, on ajoute un nouvel item dans listesParIdSortie
+            if (details.idSortie != listesParIdSortie.last().idSortie)
             {
-                if (listeDetails.at(i).idSortie == listeDetails.at(j).idSortie)
-                {
-                    nbSortiesRestantesDeMemeTypeQueSortieCourante++;
-                }
-            }
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nbSortiesRestantesDeMemeTypeQueSortieCourante) + "'>"+details.nomSortie+"</td>";
-        }
+                //On finalise le groupe N-1
+                const int nombreItemVol = listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.size();
+                const int nombreItemRecette = std::max(int(listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.size()), 1);
+                listesParIdSortie.last().nombreDeLignes = listesParIdSortie.last().nombreDeLignes + nombreItemVol * nombreItemRecette;
 
-        if (compteurLignesDansGroupe == 0)
-        {
-            nbItem++;
+                AeroDmsTypes::BaladesEtSortiesParId balade;
+                AeroDmsTypes::GroupeBaladesEtSortiesAssociees baladesEtSortiesAssociees;
+                baladesEtSortiesAssociees.recettesUniques.append(details);
+                baladesEtSortiesAssociees.volsUniques.append(details);
+                balade.idSortie = details.idSortie;
+                balade.nombreDeLignes = 0;
+                balade.baladesEtSortiesAssociees.append(baladesEtSortiesAssociees);
+                listesParIdSortie.push_back(balade);
 
-            idsVolsDejaAjoute.clear();
-            idsRecettesDejaAjoute.clear();
+                idsVolsDejaAjoute.clear();
+                idsRecettesDejaAjoute.clear();
 
-            idsVolsEnCours.clear();
-            idsRecettesEnCours.clear();
-            idsVolsEnCours.append(listeDetails.at(i).volId);
-            idsRecettesEnCours.append(listeDetails.at(i).idRecette);
-
-            volsUniques.clear();
-            recettesUniques.clear();
-            volsUniques.append(listeDetails.at(i));
-            recettesUniques.append(listeDetails.at(i));
-
-            int j = i + 1;
-            bool sortieBoucle = false;
-            while (j < listeDetails.size() && !sortieBoucle)
-            {
-                if (idsVolsEnCours.contains(listeDetails.at(j).volId)
-                    || idsRecettesEnCours.contains(listeDetails.at(j).idRecette))
-                {
-                    //Sî l'une des 2 listes contient déjà l'identifiant associé, alors on ajoute l'identifiant à l'autre liste, s'il ne s'y trouve pas déjà
-                    if (!idsVolsEnCours.contains(listeDetails.at(j).volId))
-                    {
-                        idsVolsEnCours.append(listeDetails.at(j).volId);
-                        volsUniques.append(listeDetails.at(j));
-                    }
-                    if (!idsRecettesEnCours.contains(listeDetails.at(j).idRecette))
-                    {
-                        idsRecettesEnCours.append(listeDetails.at(j).idRecette);
-                        recettesUniques.append(listeDetails.at(j));
-                    }
-                    identifiantFinBoucle = j;
-                }
-                else
-                {
-                    //Sinon, aucun des 2 identifiant ne se trouve déjà dans la liste => on est sur une nouvelle série de vols/recettes, on sort
-                    sortieBoucle = true;
-                }
-                j++;
-            }
-        }
-
-        if ( compteurLignesDansGroupe == 0)
-        {
-            compteurLignesDansGroupe = std::max(idsVolsEnCours.size(), idsRecettesEnCours.size());
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesDansGroupe) + "'>" + "#" + QString::number(nbItem) + " " + "</td >";
-        }
-
-        if (idsVolsEnCours.size() == 1)
-        {
-            if (idsVolsDejaAjoute.size() == 0)
-            {
                 idsVolsDejaAjoute.append(details.volId);
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + details.dateVol.toString("dd/MM/yyyy") + "</td >";
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + details.nomPassagers + "</td>";
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(details.dureeVol) + "</td>";
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + QString::number(details.coutVol) + " €</td>";
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsRecettesEnCours.size()) + "'>" + QString::number(details.montantRembouse) + " €</td>";
-            }
-        }
-        else
-        {
-            if (volsUniques.size() > 0)
-            {
-                const AeroDmsTypes::DetailsBaladesEtSorties element = volsUniques.first();
-                volsUniques.pop_front();
-                html = html + "<td class = 'tg-lboi'>" + element.dateVol.toString("dd/MM/yyyy") + "</td >";
-                html = html + "<td class = 'tg-lboi'>" + element.nomPassagers + "</td>";
-                html = html + "<td class = 'tg-lboi'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(element.dureeVol) + "</td>";
-                html = html + "<td class = 'tg-lboi'>" + QString::number(element.coutVol) + " €</td>";
-                html = html + "<td class = 'tg-lboi'>" + QString::number(element.montantRembouse) + " €</td>";
-            }
-            else
-            {
-                //On ajoute une ligne vide
-                html = html + "<td class = 'tg-lboi'>" + "</td >";
-                html = html + "<td class = 'tg-lboi'>" + "</td>";
-                html = html + "<td class = 'tg-lboi'>" + "</td>";
-                html = html + "<td class = 'tg-lboi'>" + "</td>";
-                html = html + "<td class = 'tg-lboi'>" + "</td>";
-            }
-        }
-
-        if (idsRecettesEnCours.size() == 1)
-        {
-            if (idsRecettesDejaAjoute.size() == 0)
-            {
                 idsRecettesDejaAjoute.append(details.idRecette);
-                if (details.montantRecette != 0.0)
-                {
-                    html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>" + details.intituleRecette + "</td >";
-                    html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>" + QString::number(details.montantRecette) + " €</td>";
-                }
-                else
-                {
-                    html = html + "<td class = 'tg-1zu3' colspan='2' rowspan = '" + QString::number(idsVolsEnCours.size()) + "'>Paiement non encore reçu</td >";
-                }
             }
-        }
-        else
-        {
-            if (recettesUniques.size() > 0)
+
+            //Dans tous les cas on effectue les traitements
+            if (idsVolsDejaAjoute.contains(details.volId)
+                || idsRecettesDejaAjoute.contains(details.idRecette))
             {
-                const AeroDmsTypes::DetailsBaladesEtSorties element = recettesUniques.first();
-                recettesUniques.pop_front();
-                if (element.montantRecette != 0.0)
+                //Sî l'une des 2 listes contient déjà l'identifiant associé, alors on ajoute l'identifiant à l'autre liste, s'il ne s'y trouve pas déjà
+                if (!idsVolsDejaAjoute.contains(details.volId))
                 {
-                    html = html + "<td class = 'tg-lboi'>" + element.intituleRecette + "</td >";
-                    html = html + "<td class = 'tg-lboi'>" + QString::number(element.montantRecette) + " €</td>";
+                    idsVolsDejaAjoute.append(details.volId);
+                    listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.append(details);
                 }
-                else
+                if (!idsRecettesDejaAjoute.contains(details.idRecette))
                 {
-                    html = html + "<td class = 'tg-1zu3' colspan='2'>Paiement non encore reçu</td >";
+                    idsRecettesDejaAjoute.append(details.idRecette);
+                    listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.append(details);
                 }
             }
             else
             {
-                //On ajoute une ligne vide
-                html = html + "<td class = 'tg-lboi'>" + "</td >";
-                html = html + "<td class = 'tg-lboi'>" + "</td>";
+                const int nombreItemVol = listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.size();
+                const int nombreItemRecette = std::max(int(listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.size()), 1);
+                listesParIdSortie.last().nombreDeLignes = listesParIdSortie.last().nombreDeLignes + nombreItemVol * nombreItemRecette;
+
+                AeroDmsTypes::GroupeBaladesEtSortiesAssociees baladesEtSortiesAssociees;
+                listesParIdSortie.last().baladesEtSortiesAssociees.append(baladesEtSortiesAssociees);
+
+                idsVolsDejaAjoute.clear();
+                idsRecettesDejaAjoute.clear();
+
+                idsVolsDejaAjoute.append(details.volId);
+                idsRecettesDejaAjoute.append(details.idRecette);
+                listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.append(details);
+                listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.append(details);
+            }
+
+        }
+
+        //On finalise le groupe N-1
+        const int nombreItemVol = listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.size();
+        const int nombreItemRecette = std::max(int(listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.size()), 1);
+        listesParIdSortie.last().nombreDeLignes = listesParIdSortie.last().nombreDeLignes + nombreItemVol * nombreItemRecette;
+
+
+        //Phase de génération HTML
+
+        QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
+        if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
+        {
+            QTextStream inTableBaladesSorties(&tableBaladesSorties);
+            html = inTableBaladesSorties.readAll();
+        }
+        else
+        {
+            qDebug() << "Erreur ouverture fichier";
+        }
+
+        int nbItem = 0;
+
+        for (int i = 0; i < listesParIdSortie.size(); i++)
+        {
+            html = html + "<tr>";
+            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(listesParIdSortie.at(i).nombreDeLignes) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(0).volsUniques.at(0).nomSortie + "</td>";
+
+            for (int j = 0; j < listesParIdSortie.at(i).baladesEtSortiesAssociees.size(); j++)
+            {
+                nbItem++;
+                const int nombreLignes = listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.size() * std::max(1, int(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.size()));
+
+                if (j != 0)
+                    html = html + "<tr>";
+                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nombreLignes) + "'>" + "#" + QString::number(nbItem) + " " + "</td >";
+
+                int compteurLignesPourVol = 0;
+                int compteurLignesPourRecette = 0;
+
+                int compteurVol = 0;
+                int compteurRecettes = 0;
+
+                for (int k = 0; k < nombreLignes; k++)
+                {
+
+                    if (k != 0)
+                        html = html + "<tr>";
+                    if (compteurLignesPourVol == 0)
+                    {
+                        compteurLignesPourVol = std::max(1, int(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.size()));
+
+                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dateVol.toString("dd/MM/yyyy") + "</td >";
+                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).nomPassagers + "</td>";
+                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dureeVol) + "</td>";
+                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).coutVol) + " €</td>";
+                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).montantRembouse) + " €</td>";
+                        compteurVol++;
+                    }
+                    if (compteurLignesPourRecette == 0)
+                    {
+                        compteurLignesPourRecette = std::max(1, int(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.size()));
+
+                        if (listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette != 0)
+                        {
+                            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).intituleRecette + "</td >";
+                            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette) + " €</td>";
+                        }
+                        else
+                        {
+                            html = html + "<td class = 'tg-1zu3' colspan='2' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>Paiement non encore reçu</td >";
+                        }
+
+                        compteurRecettes++;
+                    }
+
+                    html = html + "</tr>";
+
+                    compteurLignesPourVol--;
+                    compteurLignesPourRecette--;
+                }
+
+                listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j);
             }
         }
-        html = html + "</tr>";
-        compteurLignesDansGroupe--;
-        nbSortiesRestantesDeMemeTypeQueSortieCourante--;
-
-        if ( volsUniques.isEmpty()
-             && recettesUniques.isEmpty())
-        {
-            i = identifiantFinBoucle;
-        }
-            
     }
-
-    html = html + "</tbody></table>";
-
     return html;
 }
+

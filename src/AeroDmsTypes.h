@@ -412,6 +412,20 @@ public:
     };
     static const DetailsBaladesEtSorties K_INIT_DETAILS_BALADES_ET_SORTIES;
     typedef QList<DetailsBaladesEtSorties> ListeDetailsBaladesEtSorties;
+
+    struct GroupeBaladesEtSortiesAssociees
+    {
+        QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
+        QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettesUniques;
+    };
+
+    struct BaladesEtSortiesParId
+    {
+        int idSortie;
+        int nombreDeLignes;
+        QVector<GroupeBaladesEtSortiesAssociees> baladesEtSortiesAssociees;
+    };
+    typedef QVector<BaladesEtSortiesParId> ListeBaladesEtSortiesParIdSortie;
 };
 
 #endif // AERODMSTYPES_H

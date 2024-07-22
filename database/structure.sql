@@ -100,7 +100,7 @@ LEFT JOIN recettes ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
 LEFT JOIN demandeRemboursementSoumises ON recettes.identifiantFormulaireSoumissionCe = demandeRemboursementSoumises.demandeId
 LEFT JOIN sortie ON vol.sortie = sortie.sortieId
 WHERE vol.typeDeVol != "Entrainement"
-ORDER BY idSortie, idRecette, volId;
+ORDER BY idSortie, volId, idRecette;
 
 -- View: factures
 CREATE VIEW IF NOT EXISTS factures AS SELECT 
