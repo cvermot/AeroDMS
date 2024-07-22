@@ -881,6 +881,11 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
             }
         }
     }
+    else
+    {
+        html = "<p>Pas de balades ou sorties saisie pour l'exercice en cours (pour le moment...).</p>";
+    }
+
     return html;
 }
 
