@@ -1054,6 +1054,7 @@ void AeroDms::peuplerTableVols()
     const AeroDmsTypes::VolSoumis volAAfficher = static_cast<AeroDmsTypes::VolSoumis>(listeDeroulanteVolSoumis->currentData().toInt());
     int nbItems = 0;
     vueVols->clearContents();
+    vueVols->setRowCount(0);
     for (int i = 0; i < listeVols.size(); i++)
     {
         const AeroDmsTypes::Vol vol = listeVols.at(i);
