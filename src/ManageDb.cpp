@@ -801,7 +801,7 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
 
     if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_HEURE_DE_VOL)
     {
-        query.prepare("UPDATE vol SET demandeRemboursement = :idDemandeRemboursement WHERE strftime('%Y', vol.date) = :annee AND vol.pilote = :pilote AND vol.typeDeVol = :typeDeVol");
+        query.prepare("UPDATE vol SET demandeRemboursement = :idDemandeRemboursement WHERE strftime('%Y', vol.date) = :annee AND vol.pilote = :pilote AND vol.typeDeVol = :typeDeVol AND vol.demandeRemboursement IS NULL");
         query.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
         query.bindValue(":annee", QString::number(p_demande.annee));
         query.bindValue(":pilote", p_demande.idPilote);
