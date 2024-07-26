@@ -10,7 +10,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 
 - Développé en C++
 - Base de données [SQLite](https://www.sqlite.org/)
-- Librairie [Qt](https://www.qt.io/) (6.6.1)
+- Librairie [Qt](https://www.qt.io/) (6.7.1)
   - GUI (QtGui)
   - Lecture PDF (QtPdf)
   - Écriture PDF à partir d’un template HTML via WebEngine (QtWebEngine)
