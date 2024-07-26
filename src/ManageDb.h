@@ -94,6 +94,8 @@ public:
                                            const QString p_piloteId = "*");
     AeroDmsTypes::Vol recupererVol(const int p_idVol);
     AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query);
+    AeroDmsTypes::ListeDemandesRemboursementSoumises recupererDemandesRemboursementSoumises( const int p_annee,
+                                                                                             const QString p_piloteId);
 
     QStringList recupererListeFacturesAssocieeASubvention(const AeroDmsTypes::DemandeRemboursement p_demande);
     QStringList recupererListeActivites();
@@ -143,7 +145,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.5;
+    const float versionBddAttendue = 1.6;
 };
 
 #endif

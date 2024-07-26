@@ -60,6 +60,7 @@ private:
     bool lePiloteEstAJourDeCotisation();
 
     void initialiserOngletGraphiques();
+    void initialiserOngletSubventionsDemandees();
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
@@ -94,6 +95,7 @@ private:
     QTableWidget* vueVols;
     QTableWidget* vueFactures;
     QTableWidget* vueRecettes;
+    QTableWidget* vueSubventions;
     QTableWidget* vueVolsDetectes;
 
     //Onglet "Ajouter dépense"
@@ -221,6 +223,7 @@ public slots:
     void peuplerTableVols();
     void peuplerTableFactures();
     void peuplerTableRecettes();
+    void peuplerTableSubventionsDemandees();
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);

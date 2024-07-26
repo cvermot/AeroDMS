@@ -81,6 +81,17 @@ public:
         FactureTableElement_NB_COLONNES = 0xA,
     };
 
+    enum SubventionDemandeeTableElement {
+        SubventionDemandeeTableElement_DATE = 0x0,
+        SubventionDemandeeTableElement_PILOTE = 0x1,
+        SubventionDemandeeTableElement_BENEFICIAIRE = 0x2,
+        SubventionDemandeeTableElement_TYPE_DEMANDE = 0x3,
+        SubventionDemandeeTableElement_MONTANT = 0x4,
+        SubventionDemandeeTableElement_MONTANT_VOL = 0x5,
+        SubventionDemandeeTableElement_ID_DEMANDE = 0x6,
+        SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x7,
+    };
+
     enum RecetteTableElement {
         RecetteTableElement_DATE = 0x0,
         RecetteTableElement_TYPE_DE_RECETTE = 0x1,
@@ -285,6 +296,19 @@ public:
         int id;
     };
     typedef QList<RecetteDetail> ListeRecetteDetail;
+
+    struct DemandeRemboursementSoumise {
+        int id;
+        QDate dateDemande;
+        QString nomBeneficiaire;
+        QString nomPilote;
+        QString piloteId;
+        QString typeDeVol;
+        float montant;
+        float coutTotalVolAssocies;
+        int anneeVol;     
+    };
+    typedef QList<DemandeRemboursementSoumise> ListeDemandesRemboursementSoumises;
 
     struct Sortie {
         int id;

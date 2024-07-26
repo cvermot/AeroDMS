@@ -520,6 +520,51 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
     return vol;
 }
 
+AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemandesRemboursementSoumises( const int p_annee,
+                                                                                                   const QString p_piloteId)
+{
+    AeroDmsTypes::ListeDemandesRemboursementSoumises liste;
+
+    QSqlQuery query;
+    if (p_annee != -1 && p_piloteId != "*")
+    {
+        query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE anneeVol = :annee AND pilote = :piloteId ORDER BY dateDemande");
+    }
+    else if (p_annee != -1)
+    {
+        query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE anneeVol = :annee ORDER BY dateDemande");
+    }
+    else if (p_piloteId != "*")
+    {
+        query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE pilote = :piloteId ORDER BY dateDemande");
+    }
+    else
+    {
+        query.prepare("SELECT * FROM demandesRembousementVolsSoumises ORDER BY dateDemande");
+    }
+    query.bindValue(":annee", QString::number(p_annee));
+    query.bindValue(":piloteId", p_piloteId);
+
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::DemandeRemboursementSoumise demande;
+        demande.id = query.value("demandeId").toInt();
+        demande.dateDemande = query.value("dateDemande").toDate();
+        demande.nomBeneficiaire = query.value("nomBeneficiaire").toString();
+        demande.montant = query.value("montant").toDouble();
+        demande.typeDeVol = query.value("typeDeDemande").toString();
+        demande.anneeVol = query.value("anneeVol").toInt();
+        demande.coutTotalVolAssocies = query.value("totalCoutVol").toFloat();
+        demande.piloteId = query.value("vol.pilote").toString();
+        demande.nomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
+
+        liste.append(demande);
+    }
+    return liste;
+}
+
 int ManageDb::ajouterFacture(QString& p_nomFichier)
 {
     QString sql = "INSERT INTO 'fichiersFacture' ('nomFichier') VALUES('";

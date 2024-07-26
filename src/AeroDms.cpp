@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.6.2");
+    QApplication::setApplicationVersion("4.7");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -442,6 +442,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     infosRecette->addWidget(montantRecette, 2, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 
+    //=============Onglet Subventions demandées
+    initialiserOngletSubventionsDemandees();
+
     //=============Onglet graphiques
     initialiserOngletGraphiques();
 
@@ -501,11 +504,13 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableFactures);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerListeBaladesEtSorties);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableSubventionsDemandees);
     selectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
+    connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableSubventionsDemandees);
     selectionToolBar->addWidget(listeDeroulantePilote);
 
     listeDeroulanteVolSoumis = new QComboBox(this);
@@ -761,6 +766,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     volAEditer = -1;
     factureIdEnBdd = 0;
 
+    peuplerListeDeroulanteAnnee();
     peuplerListesPilotes();
     peuplerListeSorties();
     peuplerListeBaladesEtSorties();
@@ -768,7 +774,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     peuplerTableVols();
     peuplerTableFactures();
     peuplerTableRecettes();
-    peuplerListeDeroulanteAnnee();
+    peuplerTableSubventionsDemandees();
     peuplerStatistiques();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
@@ -845,6 +851,23 @@ void AeroDms::initialiserOngletGraphiques()
     widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
     mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
+}
+
+void AeroDms::initialiserOngletSubventionsDemandees()
+{
+    vueSubventions = new QTableWidget(0, AeroDmsTypes::SubventionDemandeeTableElementTableElement_NB_COLONNES, this);
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem("Date"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem("Pilote"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem("Nom bénéficiaire"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem("Type de demande"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem("Montant vol"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem("ID demande"));
+    vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
+    vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);
+    mainTabWidget->addTab(vueSubventions, QIcon("./ressources/checkbook.svg"), "Subventions demandées");
 }
 
 void AeroDms::changerModeSignature()
@@ -1142,6 +1165,38 @@ void AeroDms::peuplerTableFactures()
         vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem(QString::number(facture.id)));
     }
     vueFactures->resizeColumnsToContents();
+}
+
+void AeroDms::peuplerTableSubventionsDemandees()
+{
+    const AeroDmsTypes::ListeDemandesRemboursementSoumises listeFactures = db->recupererDemandesRemboursementSoumises( listeDeroulanteAnnee->currentData().toInt(),
+                                                                                                                       listeDeroulantePilote->currentData().toString());
+    vueSubventions->setRowCount(listeFactures.size());
+    for (int i = 0; i < listeFactures.size(); i++)
+    {
+        const AeroDmsTypes::DemandeRemboursementSoumise facture = listeFactures.at(i);
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem(facture.dateDemande.toString("dd/MM/yyyy")));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem(facture.nomPilote));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem(facture.nomBeneficiaire));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem(facture.typeDeVol));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant, 'f', 2).append(" €")));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem(QString::number(facture.coutTotalVolAssocies, 'f', 2).append(" €")));
+        vueSubventions->setItem(i, AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem(QString::number(facture.id)));
+    }
+    vueSubventions->resizeColumnsToContents();
+
+    /*
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Date"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Pilote"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Nom bénéficiaire"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Type de demande"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Montant"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("Montant vol"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::, new QTableWidgetItem("ID demande"));
+    vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
+    vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);*/
 }
 
 void AeroDms::peuplerTableRecettes()
@@ -2332,32 +2387,31 @@ void AeroDms::supprimerVol()
 
 void AeroDms::switchModeDebug()
 {
+    bool masquageEstDemande = false;
+
     //Si le mode debug n'est pas actif
     if (boutonModeDebug->text() == "Activer le mode &debug")
     {
         boutonModeDebug->setText("Désactiver le mode &debug");
         boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
-        vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, false);
-        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, false);
-        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, false);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, false);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, false);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, false);
-        vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, false);
+        masquageEstDemande = false;
     }
     //Sinon, le mode est actif, on desactive
     else
     {
         boutonModeDebug->setText("Activer le mode &debug");
         boutonModeDebug->setIcon(QIcon("./ressources/bug.svg"));
-        vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
-        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
-        vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, true);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
-        vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
-        vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
+        masquageEstDemande = true;
     }
+
+    vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, masquageEstDemande);
+    vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, masquageEstDemande);
+    vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, masquageEstDemande);
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, masquageEstDemande);
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, masquageEstDemande);
+    vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, masquageEstDemande);
+    vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, masquageEstDemande);
+    vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, masquageEstDemande);
 }
 
 void AeroDms::switchScanAutomatiqueDesFactures()
