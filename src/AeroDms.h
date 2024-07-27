@@ -257,6 +257,7 @@ public slots:
     void deselectionnerVolDetecte();
     void scannerUneFactureSelonMethodeChoisie();
     void ouvrirPdfDemandeSuvbvention();
+    void ouvrirDossierDemandesSubventions();
     void peuplerMenuAutreDemande();
     void ouvrirPdfGenere();
     void ouvrirUnFichierDeDemandeDeSubvention();

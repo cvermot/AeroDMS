@@ -575,6 +575,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     //========================Menu Fichier
     QMenu* menuFichier = menuBar()->addMenu(tr("Fichier"));
 
+    QAction* boutonOuvrirDossierDemandes = new QAction(QIcon("./ressources/folder-open.svg"), tr("Ouvrir le dossier contenant les demandes de subventions"), this);
+    menuFichier->addAction(boutonOuvrirDossierDemandes);
+    connect(boutonOuvrirDossierDemandes, SIGNAL(triggered()), this, SLOT(ouvrirDossierDemandesSubventions()));
+
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de demande de subventions"));
     menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/printer.svg"));
 
@@ -2582,6 +2586,11 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
 
     supprimerLeVolSelectionne->setEnabled(true);
+}
+
+void AeroDms::ouvrirDossierDemandesSubventions()
+{
+    QDesktopServices::openUrl(QUrl(cheminSortieFichiersGeneres, QUrl::TolerantMode));
 }
 
 void AeroDms::ouvrirPdfDemandeSuvbvention()
