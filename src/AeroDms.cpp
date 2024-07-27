@@ -1954,19 +1954,21 @@ void AeroDms::peuplerListesPilotes()
     {
         const AeroDmsTypes::Pilote pilote = pilotes.at(i);
         const QString nomPrenom = QString(pilote.prenom).append(" ").append(pilote.nom);
-        listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
+        QString nomPrenomNorm = nomPrenom;
+        AeroDmsServices::normaliser(nomPrenomNorm);
+        listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone(nomPrenomNorm.at(0)), nomPrenom, pilote.idPilote);
         //Si le pilote est actif, on le met dans la liste...
         //Et on met tous les pilotes si on est en mode édition de vol
         //(permet d'éditer le vol d'un pilote inactif)
         if (pilote.estActif
             || volAEditer != -1)
         {
-            choixPilote->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
-            choixPayeur->addItem(AeroDmsServices::recupererIcone(pilote.prenom.at(0)), nomPrenom, pilote.idPilote);
+            choixPilote->addItem(AeroDmsServices::recupererIcone(nomPrenomNorm.at(0)), nomPrenom, pilote.idPilote);
+            choixPayeur->addItem(AeroDmsServices::recupererIcone(nomPrenomNorm.at(0)), nomPrenom, pilote.idPilote);
         }
     }
 
-    //Si le pilote précédément séléctionné existe toujours, on le restaure
+    //Si le pilote précédément sélectionné existe toujours, on le restaure
     const int index = listeDeroulantePilote->findData(piloteSelectionne);
     if (index != -1)
     {
