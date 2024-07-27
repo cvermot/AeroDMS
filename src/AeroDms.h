@@ -99,6 +99,7 @@ private:
     QTableWidget* vueVolsDetectes;
 
     //Onglet "Ajouter dépense"
+    QWidget* widgetAjoutVol;
     QComboBox* typeDeVol;
     QComboBox* choixPilote;
     QLineEdit* aeroclubPiloteSelectionne;
@@ -121,16 +122,22 @@ private:
     QPushButton* validerLaFacture;
 
     //Onglet "Ajouter recette"
+    QWidget* widgetAjoutRecette;
     QListWidget* listeBaladesEtSorties;
     QComboBox* typeDeRecette;
     QLineEdit* intituleRecette;
     QDoubleSpinBox* montantRecette;
     QPushButton* validerLaRecette;
 
+    //Listes déroulantes de la barre principale
     QComboBox* listeDeroulanteAnnee;
+    QAction* actionListeDeroulanteAnnee;
     QComboBox* listeDeroulantePilote;
-    QComboBox* listeDeroulanteVolSoumis;
+    QAction* actionListeDeroulantePilote;
+    QComboBox* listeDeroulanteElementsSoumis;
+    QAction* actionListeDeroulanteElementsSoumis;
     QComboBox* listeDeroulanteStatistique;
+    QAction* actionListeDeroulanteStatistique;
 
     QString cheminStockageFacturesTraitees;
     QString cheminStockageFacturesATraiter;

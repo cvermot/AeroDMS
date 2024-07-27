@@ -131,10 +131,10 @@ public:
         Statistiques_AERONEFS
     };
 
-    enum VolSoumis {
-        VolSoumis_TOUS_LES_VOLS,
-        VolSoumis_VOL_SOUMIS,
-        VolSoumis_VOL_NON_SOUMIS
+    enum ElementSoumis {
+        ElementSoumis_TOUS_LES_ELEMENTS,
+        ElementSoumis_ELEMENTS_SOUMIS,
+        ElementSoumis_ELEMENTS_NON_SOUMIS
     };
 
     enum Signature {
