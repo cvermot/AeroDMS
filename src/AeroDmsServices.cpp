@@ -217,3 +217,34 @@ void AeroDmsServices::ajouterIconesComboBox(QComboBox& p_activite)
         p_activite.setItemIcon(i, recupererIcone(p_activite.itemText(i)));
     }
 }
+
+void AeroDmsServices::normaliser(QString & p_texte)
+{
+    p_texte.replace(QRegularExpression("[ ']"), "");
+
+    p_texte.replace(QRegularExpression("[éèëê]"), "e");
+    p_texte.replace(QRegularExpression("[ÉÈËÊ]"), "E");
+
+    p_texte.replace(QRegularExpression("[aâä]"), "a");
+    p_texte.replace(QRegularExpression("[AÂÄ]"), "A");
+
+    p_texte.replace(QRegularExpression("[îï]"), "i");
+    p_texte.replace(QRegularExpression("[ÎÏ]"), "I");
+
+    p_texte.replace(QRegularExpression("[ôö]"), "o");
+    p_texte.replace(QRegularExpression("[ÔÖ]"), "O");
+
+    p_texte.replace(QRegularExpression("[ùûü]"), "u");
+    p_texte.replace(QRegularExpression("[ÙÛÜ]"), "U");
+
+    p_texte.replace(QRegularExpression("[ÿ]"), "y");
+    p_texte.replace(QRegularExpression("[Ÿ]"), "Y");
+
+    p_texte.replace(QRegularExpression("[ç]"), "c");
+    p_texte.replace(QRegularExpression("[Ç]"), "C");
+
+    p_texte.replace(QRegularExpression("[æ]"), "ae");
+    p_texte.replace(QRegularExpression("[Æ]"), "AE");
+    p_texte.replace(QRegularExpression("[œ]"), "oe");
+    p_texte.replace(QRegularExpression("[Œ]"), "OE");
+}

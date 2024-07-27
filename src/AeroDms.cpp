@@ -804,7 +804,7 @@ void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
 car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
 \n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le repertoire de cette application.");
++ fichierAVerifier + "\ndans le répertoire de cette application.");
         }
         else
         {
@@ -813,7 +813,7 @@ L'application va passer en mode lecture seule.\
                 "Une mise à jour de l'application est disponible.\n\
 Il est fortement recommandé d'effectuer cette mise à jour.\
 \n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le repertoire de cette application.");
++ fichierAVerifier + "\ndans le répertoire de cette application.");
         }
     }
     else if (!db->laBddEstALaVersionAttendue())

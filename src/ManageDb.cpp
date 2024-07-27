@@ -798,10 +798,10 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
     query.exec(sql);
     while (query.next()) {
         AeroDmsTypes::DemandeRemboursement demande;
-        demande.typeDeVol = query.value(0).toString();
-        demande.piloteId = query.value(1).toString();
-        demande.montantARembourser = query.value(3).toFloat();
-        demande.annee = query.value(2).toInt();
+        demande.typeDeVol = query.value("typeDeVol").toString();
+        demande.piloteId = query.value("pilote").toString();
+        demande.montantARembourser = query.value("montantARembourser").toFloat();
+        demande.annee = query.value("annee").toInt();
         //demande.nomFichierFacture = query.value(5).toString();
         liste.append(demande);
     }
@@ -823,7 +823,7 @@ QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTy
     while (query.next())
     {
         //listeFactures.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(query.value(5).toString()));
-        listeFactures.append(query.value(5).toString());
+        listeFactures.append(query.value("nomFichier").toString());
     }
 
     return listeFactures;
@@ -968,10 +968,10 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
     
     while (query.next()) {
         AeroDmsTypes::Recette recette;
-        recette.typeDeSortie = query.value(0).toString();
-        recette.intitule = query.value(3).toString();
-        recette.annee = query.value(1).toInt();
-        recette.montant = query.value(2).toFloat();
+        recette.typeDeSortie = query.value("typeDeRecette").toString();
+        recette.intitule = query.value("nom").toString();
+        recette.annee = query.value("annee").toInt();
+        recette.montant = query.value("SUM(montant)").toFloat();
         liste.append(recette);
     }
     return liste;
@@ -987,14 +987,14 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeR
 
     while (query.next()) {
         AeroDmsTypes::DemandeRemboursementFacture demandeRemboursement;
-        demandeRemboursement.id = query.value(0).toInt();
-        demandeRemboursement.intitule = query.value(1).toString();
-        demandeRemboursement.montant = query.value(2).toFloat();
-        demandeRemboursement.payeur = query.value(4).toString().append(" ").append(query.value(3).toString());
-        demandeRemboursement.nomSortie = query.value(5).toString();
-        demandeRemboursement.typeDeSortie = query.value(6).toString();
-        demandeRemboursement.annee = query.value(7).toInt();
-        demandeRemboursement.nomFacture = query.value(8).toString();
+        demandeRemboursement.id = query.value("id").toInt();
+        demandeRemboursement.intitule = query.value("intitule").toString();
+        demandeRemboursement.montant = query.value("montant").toFloat();
+        demandeRemboursement.payeur = query.value("prenom").toString().append(" ").append(query.value("nom").toString());
+        demandeRemboursement.nomSortie = query.value("nomSortie").toString();
+        demandeRemboursement.typeDeSortie = query.value("typeDeDepense").toString();
+        demandeRemboursement.annee = query.value("annee").toInt();
+        demandeRemboursement.nomFacture = query.value("nomFacture").toString();
         demandeRemboursement.soumisCe = false;
 
         liste.append(demandeRemboursement);
@@ -1048,7 +1048,7 @@ QString ManageDb::recupererAeroclub(const QString p_piloteId)
 
     query.exec();
     query.next();
-    return query.value(0).toString();
+    return query.value("aeroclub").toString();
 }
 
 AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
@@ -1096,7 +1096,7 @@ QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
 
     query.exec();
     query.next();
-    return query.value(0).toString().append(" ").append(query.value(1).toString());
+    return query.value("prenom").toString().append(" ").append(query.value("nom").toString());
 }
 
 QString ManageDb::recupererActivitePrincipale(const QString p_piloteId)
@@ -1201,9 +1201,9 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeSorties()
 
     while (query.next()) {
         AeroDmsTypes::Sortie sortie;
-        sortie.id = query.value(0).toInt();
-        sortie.nom = query.value(1).toString();
-        sortie.date = query.value(2).toDate();
+        sortie.id = query.value("sortieId").toInt();
+        sortie.nom = query.value("nom").toString();
+        sortie.date = query.value("date").toDate();
         liste.append(sortie);
     }
 
@@ -1220,9 +1220,9 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeDepensesPouvantAvoirUneFacture
 
     while (query.next()) {
         AeroDmsTypes::Sortie sortie;
-        sortie.id = query.value(0).toInt();
-        sortie.nom = query.value(1).toString();
-        sortie.date = query.value(2).toDate();
+        sortie.id = query.value("sortieId").toInt();
+        sortie.nom = query.value("nom").toString();
+        sortie.date = query.value("date").toDate();
         liste.append(sortie);
     }
 
@@ -1239,9 +1239,9 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeBalade()
 
     while (query.next()) {
         AeroDmsTypes::Sortie sortie;
-        sortie.id = query.value(0).toInt();
-        sortie.nom = query.value(1).toString();
-        sortie.date = query.value(2).toDate();
+        sortie.id = query.value("sortieId").toInt();
+        sortie.nom = query.value("nom").toString();
+        sortie.date = query.value("date").toDate();
         liste.append(sortie);
     }
 
@@ -1320,11 +1320,7 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
         piloteId.append(".");
         piloteId.append(p_pilote.nom.toLower());
 
-        piloteId.replace(" ", "");
-        piloteId.replace("é", "e");
-        piloteId.replace("è", "e");
-        piloteId.replace("à", "a");
-        piloteId.replace("â", "a");
+        AeroDmsServices::normaliser(piloteId);
 
         //Verifier si le pilote existe
         
