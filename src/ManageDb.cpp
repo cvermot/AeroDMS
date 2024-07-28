@@ -978,6 +978,25 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
     return liste;
 }
 
+QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p_annee,
+                                                               const QString p_typeRecette)
+{
+    QList<QString> liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT Intitule FROM recettesASoumettreCe WHERE annee = :annee AND typeDeRecette = :typeDeRecette");
+    query.bindValue(":annee", QString::number(p_annee));
+    query.bindValue(":typeDeRecette", p_typeRecette);
+    query.exec();
+
+    while (query.next()) {
+        AeroDmsTypes::Recette recette;
+        liste.append(query.value("Intitule").toString());
+    }
+
+    return liste;
+}
+
 AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre()
 {
     //Récupérationd des demandes de remboursement à soumettre au CE

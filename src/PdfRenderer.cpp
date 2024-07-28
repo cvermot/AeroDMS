@@ -383,7 +383,36 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         //Signature
         remplirLeChampSignature(templateCeTmp);
         //Observation
-        templateCeTmp.replace("xxObservation", QString("Participations ").append(recette.intitule));
+        const QList<QString> listeRecettes = db->recupererListeRecettesNonSoumisesCse(recette.annee, recette.typeDeSortie);
+
+        QString observation = QString("Participations ").append(recette.intitule).append(" <font size='1'>(");
+
+        //55 catactères sur la première ligne
+        int nbCaracteresRestants = 55;
+        for (int i = 0; i < listeRecettes.size(); i++)
+        {
+            if (listeRecettes.at(i).size() > nbCaracteresRestants - 2)
+            {
+                observation.append("<br/>");
+                //Sur les lignes suivantes on autorise 90 caractères
+                nbCaracteresRestants = 90;
+            }
+            //if (listeRecettes.at(i).size() < nbCaracteresRestants-2)
+            {
+                //On ajoute la recette à la ligne
+                observation.append(listeRecettes.at(i));
+                //Si on est pas sur le dernier élément, on ajoute " | "
+                if (i != listeRecettes.size() - 1)
+                {
+                    observation.append(" | ");
+                }
+                nbCaracteresRestants = nbCaracteresRestants - (listeRecettes.at(i).size() + 2);
+            }
+        }
+
+        observation.append(")</font>");
+
+        templateCeTmp.replace("xxObservation", observation);
 
         //Année / Budget
         QString ligneBudget = QString::number(db->recupererLigneCompta(recette.typeDeSortie));

@@ -78,6 +78,8 @@ public:
     AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();
     AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre();
+    QList<QString> recupererListeRecettesNonSoumisesCse( const int p_annee,
+                                                         const QString p_typeRecette);
     AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre();
     AeroDmsTypes::ListeDemandeRemboursementFacture recupererToutesLesDemandesDeRemboursement(const int p_annee = -1);
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1);
