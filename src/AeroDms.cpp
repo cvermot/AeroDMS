@@ -849,6 +849,10 @@ void AeroDms::verifierSignatureNumerisee()
     {
         boutonSignatureManuelle->setEnabled(false);
     }
+    else
+    {
+        boutonSignatureManuelle->activate(QAction::Trigger);
+    }
 }
 
 void AeroDms::initialiserOngletGraphiques()
