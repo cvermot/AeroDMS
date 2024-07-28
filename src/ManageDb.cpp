@@ -341,6 +341,7 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.nom = query.value("nom").toString();
         subvention.prenom = query.value("prenom").toString();
         subvention.aeroclub = query.value("aeroclub").toString();
+        subvention.montantSubventionEntrainement = query.value("montantSubventionAnnuelleEntrainement").toFloat();
 
         QSqlQuery queryVolAnneePilote;
         queryVolAnneePilote.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee AND pilote = :piloteId");

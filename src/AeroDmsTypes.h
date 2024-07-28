@@ -231,6 +231,7 @@ public:
         QString nom;
         QString prenom;
         QString aeroclub;
+        float montantSubventionEntrainement;
         HeureDeVolRemboursement entrainement;
         HeureDeVolRemboursement balade;
         HeureDeVolRemboursement sortie;
@@ -238,6 +239,7 @@ public:
 
         SubventionsParPilote& operator+(const SubventionsParPilote& a)
         {
+            montantSubventionEntrainement = montantSubventionEntrainement + a.montantSubventionEntrainement;
             entrainement = entrainement + a.entrainement;
             balade = balade + a.balade;
             sortie = sortie + a.sortie;

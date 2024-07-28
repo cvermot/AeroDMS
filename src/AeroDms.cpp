@@ -1069,6 +1069,20 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem(subvention.totaux.heuresDeVol));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
+
+        QTableWidgetItem* item = vuePilotes->item(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE);
+        if (subvention.entrainement.montantRembourse < subvention.montantSubventionEntrainement)
+        {
+            item->setBackground(QBrush(QColor(140, 255, 135, 120)));
+            item->setToolTip("Subvention entrainement restante pour ce pilote : " 
+                + QString::number(subvention.montantSubventionEntrainement - subvention.entrainement.montantRembourse) 
+                + " €");
+        }
+        else
+        {
+            item->setBackground(QBrush(QColor(255, 140, 135, 120)));
+            item->setToolTip("Ce pilote a consommé la totalité de sa subvention d'entrainement");   
+        }
     }
     vuePilotes->resizeColumnsToContents();
 }
