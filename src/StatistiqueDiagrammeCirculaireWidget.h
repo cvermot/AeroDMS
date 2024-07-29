@@ -6,6 +6,7 @@
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
+#include <QChart>
 
 class StatistiqueDiagrammeCirculaireWidget : public StatistiqueWidget
 {
@@ -13,7 +14,12 @@ class StatistiqueDiagrammeCirculaireWidget : public StatistiqueWidget
 private:
     AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes(ManageDb* p_db, const int p_annee);
 public:
-    explicit StatistiqueDiagrammeCirculaireWidget(ManageDb* p_db, const int p_annee, const AeroDmsTypes::Statistiques p_statistique, QWidget* parent = nullptr);
+    explicit StatistiqueDiagrammeCirculaireWidget( ManageDb* p_db, 
+                                                   const int p_annee, 
+                                                   const AeroDmsTypes::Statistiques p_statistique, 
+                                                   QWidget* parent = nullptr,
+                                                   const QChart::AnimationOption p_animation = QChart::AllAnimations,
+                                                   const bool p_legende = true) ;
 };
 
 #endif

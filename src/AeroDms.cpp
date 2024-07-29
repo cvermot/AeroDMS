@@ -991,10 +991,6 @@ void AeroDms::peuplerStatistiques()
         }
         case AeroDmsTypes::Statistiques_AERONEFS:
         {
-            /*m_activeWidget = new StatistiqueDonuts(db,
-                                                    AeroDmsTypes::Statistiques_AERONEFS,
-                                                    m_contentArea,
-                                                    listeDeroulanteAnnee->currentData().toInt());*/
             m_activeWidget = new StatistiqueDonutCombineWidget( db,
                                                                 AeroDmsTypes::Statistiques_AERONEFS,
                                                                 m_contentArea,

@@ -4,16 +4,20 @@
 #ifndef DONUTBREAKDOWNWIDGET_H
 #define DONUTBREAKDOWNWIDGET_H
 
+#include <QChart>
+
 #include "StatistiqueWidget.h"
 
 class StatistiqueDonutCombineWidget : public StatistiqueWidget
 {
     Q_OBJECT
 public:
-    explicit StatistiqueDonutCombineWidget(ManageDb* p_db,
-        const AeroDmsTypes::Statistiques p_statistique,
-        QWidget* parent = nullptr,
-        int p_annee = -1);
+    explicit StatistiqueDonutCombineWidget( ManageDb* p_db,
+                                            const AeroDmsTypes::Statistiques p_statistique,
+                                            QWidget* parent = nullptr,
+                                            const int p_annee = -1,
+                                            const QChart::AnimationOption p_animation = QChart::AllAnimations,
+                                            const bool p_legende = true);
 
 private:
     const Qt::GlobalColor recupererNouvelleCouleur();

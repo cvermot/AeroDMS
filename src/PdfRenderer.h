@@ -67,9 +67,9 @@ private :
 
 	void imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
 		                                    const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
-		                                    const AeroDmsTypes::SubventionsParPilote p_totaux,
-		                                    const bool p_ajouterLesRecettes = false,
-		                                    const bool p_ajouterLeRecapBaladesEtSorties = true);
+		                                    const AeroDmsTypes::SubventionsParPilote p_totaux);
+	QString genererImagesStatistiques(const int p_annee);
+
 	void produireFichierPdfGlobal();
 
 	QString genererHtmlRecapBaladesSorties(const int p_annee);

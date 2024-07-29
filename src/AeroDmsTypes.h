@@ -123,12 +123,12 @@ public:
     };
 
     enum Statistiques {
-        Statistiques_HEURES_ANNUELLES,
-        Statistiques_HEURES_PAR_PILOTE,
-        Statistiques_HEURES_PAR_TYPE_DE_VOL,
-        Statistiques_HEURES_PAR_ACTIVITE,
-        Statistiques_STATUTS_PILOTES,
-        Statistiques_AERONEFS
+        Statistiques_HEURES_ANNUELLES = 0x1,
+        Statistiques_HEURES_PAR_PILOTE = 0x2,
+        Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,
+        Statistiques_HEURES_PAR_ACTIVITE = 0x8,
+        Statistiques_STATUTS_PILOTES = 0x10,
+        Statistiques_AERONEFS = 0x20
     };
 
     enum ElementSoumis {

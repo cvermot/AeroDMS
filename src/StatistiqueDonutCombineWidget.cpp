@@ -10,7 +10,9 @@
 StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                               const AeroDmsTypes::Statistiques p_statistique,
                                                               QWidget* parent,
-                                                              int p_annee)
+                                                              const int p_annee,
+                                                              const QChart::AnimationOption p_animation,
+                                                              const bool p_legende)
     : StatistiqueWidget(parent)
 {
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
@@ -44,7 +46,8 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
     donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur());
 
     
-    donutBreakdown->setAnimationOptions(QChart::AllAnimations);
+    donutBreakdown->setAnimationOptions(p_animation);
+    donutBreakdown->legend()->setVisible(p_legende);
     donutBreakdown->setTitle("Statistiques de répartition des vols par aéronefs et types d'aéronefs");
     donutBreakdown->legend()->setAlignment(Qt::AlignRight);
     

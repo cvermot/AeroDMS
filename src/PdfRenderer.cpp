@@ -16,10 +16,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 #include "PdfRenderer.h"
+#include "StatistiqueWidget.h"
+#include "StatistiqueDiagrammeCirculaireWidget.h"
+#include "StatistiqueDonutCombineWidget.h"
+
 #include <podofo/podofo.h>
 
 #include <QFile>
 #include <QPrinter>
+#include <QChart>
 
 PdfRenderer::PdfRenderer()
 {
@@ -161,8 +166,11 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
                                                                                                                    "*",
                                                                                                                    false);
+
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
-        imprimerLeFichierPdfDeRecapAnnuel(p_annee, listePilotesDeCetteAnnee, totaux, true, true);
+        imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
+                                           listePilotesDeCetteAnnee, 
+                                           totaux);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -265,9 +273,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
                                                                                      true );
         imprimerLeFichierPdfDeRecapAnnuel( annee, 
                                            listePilotesDeCetteAnnee, 
-                                           totaux,
-                                           demandeEnCours.recapHdVAvecRecettes,
-                                           demandeEnCours.recapHdVAvecBaladesEtSorties);
+                                           totaux);
     }
     else if (db->recupererLesSubventionsAEmettre().size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
@@ -489,9 +495,7 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 
 void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
                                                      const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
-                                                     const AeroDmsTypes::SubventionsParPilote p_totaux,
-                                                     const bool p_ajouterLesRecettes,
-                                                     const bool p_ajouterLeRecapBaladesEtSorties)
+                                                     const AeroDmsTypes::SubventionsParPilote p_totaux)
 {
     QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
     QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
@@ -550,7 +554,7 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
     templateTable.replace("__TotCouTot__", QString::number(p_totaux.totaux.coutTotal, 'f', 2));
     templateTable.replace("__TotSubTot__", QString::number(p_totaux.totaux.montantRembourse, 'f', 2));
 
-    if (p_ajouterLesRecettes)
+    if (demandeEnCours.recapHdVAvecRecettes)
     {
         templateTable.replace("<!--AccrocheRecette-->", templateTableRecettes);
 
@@ -560,11 +564,15 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         templateTable.replace("_RecetteSortie_", QString::number(totaux.sorties, 'f', 2) + " €");
     }
 
-    if (p_ajouterLeRecapBaladesEtSorties)
+    if (demandeEnCours.recapHdVAvecBaladesEtSorties)
     {
         const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee);
         templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
+
+    //TODO conditionnelle
+    const QString images = genererImagesStatistiques(p_annee);
+    templateTable.replace("<!--AccrocheGraphiques-->", images);
 
     if ( demandeEnCours.mergerTousLesPdf
          && demandeEnCours.typeDeSignatureDemandee == AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY)
@@ -914,6 +922,84 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
     {
         html = "<p>Pas de balades ou sorties saisie pour l'exercice en cours (pour le moment...).</p>";
     }
+
+    return html;
+}
+
+QString PdfRenderer::genererImagesStatistiques(const int p_annee)
+{
+    QString cheminSortie = cheminSortieFichiersGeneres + "img";
+    QDir().mkdir(cheminSortie);
+    cheminSortie = cheminSortie + "/";
+
+    int graphDemandes = 63;
+
+    QString html;
+
+    QWidget* m_contentArea = nullptr;
+
+    qDebug() << "graph" << (graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
+    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
+    {
+        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE,
+            m_contentArea,
+            QChart::NoAnimation,
+            false);
+        const QString urlImage = cheminSortie + "pilote.png";
+        stats->grab().save(urlImage);
+        delete stats;
+
+        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+    }
+
+    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
+    {
+        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL,
+            m_contentArea,
+            QChart::NoAnimation,
+            false);
+        const QString urlImage = cheminSortie + "typeVol.png";
+        stats->grab().save(urlImage);
+        delete stats;
+
+        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+    }
+
+    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
+    {
+        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE,
+            m_contentArea,
+            QChart::NoAnimation,
+            false);
+        const QString urlImage = cheminSortie + "activite.png";
+        stats->grab().save(urlImage);
+        delete stats;
+
+        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+    }
+
+    if ((graphDemandes & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
+    {
+        StatistiqueDonutCombineWidget* stats = new StatistiqueDonutCombineWidget(db,
+            AeroDmsTypes::Statistiques_AERONEFS,
+            m_contentArea,
+            p_annee,
+            QChart::NoAnimation,
+            false);
+        const QString urlImage = cheminSortie + "aeronef.png";
+        stats->grab().save(urlImage);
+        delete stats;
+
+        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+    }
+    
+    delete m_contentArea;
 
     return html;
 }

@@ -10,13 +10,18 @@
 #include <QPieSeries>
 #include <QRandomGenerator>
 
-StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget(ManageDb* p_db, const int p_annee, const AeroDmsTypes::Statistiques p_statistique, QWidget* parent)
+StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( ManageDb* p_db, 
+                                                                            const int p_annee, 
+                                                                            const AeroDmsTypes::Statistiques p_statistique, 
+                                                                            QWidget* parent, 
+                                                                            const QChart::AnimationOption p_animation, 
+                                                                            const bool p_legende)
     : StatistiqueWidget(parent)
 {
     auto* chart = new StatistiqueDiagrammeCirculaire;
     chart->setTheme(QChart::ChartThemeLight);
-    chart->setAnimationOptions(QChart::AllAnimations);
-    chart->legend()->setVisible(true);
+    chart->setAnimationOptions(p_animation);
+    chart->legend()->setVisible(p_legende);
     chart->legend()->setAlignment(Qt::AlignRight);
 
     switch (p_statistique)
