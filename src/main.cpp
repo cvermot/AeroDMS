@@ -37,6 +37,12 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QPixmap pixmap("./ressources/splash.jpg");
+    QSplashScreen splash(pixmap);
+    splash.show();
+    splash.showMessage("Chargement en cours");
+    a.processEvents();
+
     //originalHandler = qInstallMessageHandler(logToFile);
 
     QTranslator* translator = new QTranslator();
@@ -47,5 +53,6 @@ int main(int argc, char *argv[])
 
     AeroDms w;
     w.show();
+    splash.finish(&w);
     return a.exec();
 }

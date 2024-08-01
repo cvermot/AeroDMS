@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("4.7");
+    QApplication::setApplicationVersion("4.8");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -2257,6 +2257,7 @@ void AeroDms::aPropos()
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
         "Ce programme utilise la libraire <a href=\"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
         "Les icones sont issues de <a href=\"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
+        "L'image de démarrage est génerée avec <a href=\"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
         "Ce programme inclu du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>"
         "Mentions légales : <br />"
         " This program is free software: you can redistribute it and/or modify"
