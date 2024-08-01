@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AERODMSTYPES_H
 
 #include <QtWidgets>
+
 #include "AeroDmsServices.h"
 
 class AeroDmsTypes
@@ -123,12 +124,20 @@ public:
     };
 
     enum Statistiques {
-        Statistiques_HEURES_ANNUELLES = 0x1,
-        Statistiques_HEURES_PAR_PILOTE = 0x2,
+        Statistiques_HEURES_ANNUELLES       = 0x1,
+        Statistiques_HEURES_PAR_PILOTE      = 0x2,
         Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,
-        Statistiques_HEURES_PAR_ACTIVITE = 0x8,
-        Statistiques_STATUTS_PILOTES = 0x10,
-        Statistiques_AERONEFS = 0x20
+        Statistiques_HEURES_PAR_ACTIVITE    = 0x8,
+        Statistiques_STATUTS_PILOTES        = 0x10,
+        Statistiques_AERONEFS               = 0x20
+    };
+
+                                     //Encodage vers PdrRenderer : 4 bits pour la résolution puis 12 bits pour la stats
+    enum Resolution {                //               RESO|STATS
+        Resolution_Full_HD = 0x4000, //1920x1080      0100|XXXX XXXX XXXX
+        Resolution_QHD     = 0x8000, //2560x1440      1000|XXXX XXXX XXXX
+        Resolution_4K      = 0xC000, //3840x2160      1100|XXXX XXXX XXXX
+        Resolution_MASQUE  = 0xF000  //               1111|0000 0000 0000
     };
 
     enum ElementSoumis {
@@ -188,6 +197,7 @@ public:
         bool mergerTousLesPdf;
         bool recapHdVAvecRecettes;
         bool recapHdVAvecBaladesEtSorties;
+        int recapHdvGraphAGenerer;
         //int idFacture;
     };
 

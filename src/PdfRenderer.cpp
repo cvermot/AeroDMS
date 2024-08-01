@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueWidget.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
 #include "StatistiqueDonutCombineWidget.h"
+#include "StatistiqueHistogrammeEmpile.h"
 
 #include <podofo/podofo.h>
 
@@ -140,7 +141,8 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
 void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                          const QString p_cheminSortieFichiersGeneres,
                                                          const QString p_cheminStockageFactures,
-                                                         const AeroDmsTypes::Signature p_signature)
+                                                         const AeroDmsTypes::Signature p_signature,
+                                                         const int p_graphAGenerer)
 {
     nombreEtapesEffectuees = 0;
     indiceFichier = 0;
@@ -151,6 +153,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 
     demandeEnCours.recapHdVAvecBaladesEtSorties = true;
     demandeEnCours.recapHdVAvecRecettes = true;
+
+    demandeEnCours.recapHdvGraphAGenerer = p_graphAGenerer;
 
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
@@ -188,7 +192,8 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
                                                    const AeroDmsTypes::Signature p_signature,
                                                    const bool p_mergerTousLesPdf,
                                                    const bool p_recapHdVAvecRecettes,
-                                                   const bool p_recapHdvAvecBaladesEtSorties)
+                                                   const bool p_recapHdvAvecBaladesEtSorties,
+                                                   const int p_valeurGraphAGenerer )
 {
     demandeEnCours.listeFactures = QStringList();
     demandeEnCours.nomTresorier = p_nomTresorier;
@@ -197,6 +202,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
     demandeEnCours.recapHdVAvecBaladesEtSorties = p_recapHdvAvecBaladesEtSorties;
     demandeEnCours.recapHdVAvecRecettes = p_recapHdVAvecRecettes;
+    demandeEnCours.recapHdvGraphAGenerer = p_valeurGraphAGenerer;
 
     nombreEtapesEffectuees = 0 ;
     indiceFichier = 0;
@@ -570,7 +576,6 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
-    //TODO conditionnelle
     const QString images = genererImagesStatistiques(p_annee);
     templateTable.replace("<!--AccrocheGraphiques-->", images);
 
@@ -932,14 +937,27 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     QDir().mkdir(cheminSortie);
     cheminSortie = cheminSortie + "/";
 
-    int graphDemandes = 63;
-
     QString html;
 
     QWidget* m_contentArea = nullptr;
 
-    qDebug() << "graph" << (graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
-    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
+    const QSize tailleImage = convertirResolution(demandeEnCours.recapHdvGraphAGenerer);
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
+    {
+        StatistiqueWidget* stats = new StatistiqueHistogrammeEmpile( db,
+                                                                     p_annee,
+                                                                     m_contentArea,
+                                                                     QChart::NoAnimation);
+        const QString urlImage = cheminSortie + "heuresAnnuelles.png";
+        stats->setMinimumSize(tailleImage);
+        stats->grab().save(urlImage);
+        delete stats;
+
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + "\"></center><br/>";
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
     {
         StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
             p_annee,
@@ -948,13 +966,14 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false);
         const QString urlImage = cheminSortie + "pilote.png";
+        stats->setMinimumSize(tailleImage);
         stats->grab().save(urlImage);
         delete stats;
 
-        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + "\"></center><br/>";
     }
 
-    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
     {
         StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
             p_annee,
@@ -963,13 +982,14 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false);
         const QString urlImage = cheminSortie + "typeVol.png";
+        stats->setMinimumSize(tailleImage);
         stats->grab().save(urlImage);
         delete stats;
 
-        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + "\"></center><br/>";
     }
 
-    if ((graphDemandes & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
     {
         StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
             p_annee,
@@ -978,13 +998,14 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false);
         const QString urlImage = cheminSortie + "activite.png";
+        stats->setMinimumSize(tailleImage);
         stats->grab().save(urlImage);
         delete stats;
 
-        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + "\"></center><br/>";
     }
 
-    if ((graphDemandes & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
     {
         StatistiqueDonutCombineWidget* stats = new StatistiqueDonutCombineWidget(db,
             AeroDmsTypes::Statistiques_AERONEFS,
@@ -993,14 +1014,36 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false);
         const QString urlImage = cheminSortie + "aeronef.png";
+        stats->setMinimumSize(tailleImage);
         stats->grab().save(urlImage);
         delete stats;
 
-        html = html + "<center><img src=\"" + urlImage + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + "\"></center><br/>";
     }
     
     delete m_contentArea;
 
     return html;
+}
+QSize PdfRenderer::convertirResolution(const int p_resolution)
+{
+    QSize size(1920,1080);
+
+    const AeroDmsTypes::Resolution resolution = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE);
+
+    if (resolution == AeroDmsTypes::Resolution_Full_HD)
+    {
+        size = QSize(1920, 1080);
+    }
+    else if (resolution == AeroDmsTypes::Resolution_QHD)
+    {
+        size = QSize(2560, 1440);
+    }
+    else if (resolution == AeroDmsTypes::Resolution_4K)
+    {
+        size = QSize(3840, 2160);
+    }
+
+    return size;
 }
 

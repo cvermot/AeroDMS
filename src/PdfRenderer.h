@@ -38,11 +38,13 @@ public:
 		                                  const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS,
 		                                  const bool p_mergerTousLesPdf = true,
 										  const bool p_recapHdVAvecRecettes = false,
-										  const bool p_recapHdvAvecBaladesEtSorties = false);
+										  const bool p_recapHdvAvecBaladesEtSorties = false,
+		                                  const int p_valeurGraphAGenerer = 0);
 	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 		                                        const QString p_cheminSortieFichiersGeneres,
 		                                        const QString p_cheminStockageFactures,
-		                                        const AeroDmsTypes::Signature p_signature = AeroDmsTypes::Signature_SANS);
+		                                        const AeroDmsTypes::Signature p_signature,
+		                                        const int p_graphAGenerer);
 
 private :
 	QWebEnginePage* view;
@@ -77,6 +79,8 @@ private :
 	QString numeroFichierSur3Digits();
 
 	void mergerPdf();
+
+	static QSize convertirResolution(const int p_resolution);
 
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);

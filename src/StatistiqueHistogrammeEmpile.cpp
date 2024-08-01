@@ -11,7 +11,10 @@
 #include <QStackedBarSeries>
 #include <QValueAxis>
 
-StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const int p_annee, QWidget* parent)
+StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db, 
+                                                            const int p_annee, 
+                                                            QWidget* parent,
+                                                            const QChart::AnimationOption p_animation)
     : StatistiqueWidget(parent)
 {
     const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
@@ -38,7 +41,7 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile(ManageDb* p_db, const
     auto chart = new QChart;
     chart->addSeries(series);
     chart->setTitle("Nombre de minutes de vol par mois");
-    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setAnimationOptions(p_animation);
 
     auto axisX = new QBarCategoryAxis;
     axisX->append(mois);

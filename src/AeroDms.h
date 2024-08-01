@@ -65,6 +65,7 @@ private:
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
     float calculerCoutHoraire();
+    int calculerValeurGraphAGenererPdf();
 
     void verifierPresenceDeMiseAjour(const QString p_chemin);
     bool uneMaJEstDisponible(const QString p_chemin);
@@ -174,6 +175,15 @@ private:
     QAction* boutonActivationScanAutoFactures;
     QAction* boutonOptionRecapAnnuelRecettes;
     QAction* boutonOptionRecapAnnuelBaladesSorties;
+    QAction* boutonGraphRecapAnnuelHeuresAnnuelles;
+    QAction* boutonGraphRecapAnnuelHeuresParPilote;
+    QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol;
+    QAction* boutonGraphRecapAnnuelHeuresParActivite;
+    QAction* boutonGraphRecapAnnuelStatutsDesPilotes;
+    QAction* boutonGraphRecapAnnuelAeronefs;
+    QAction* boutonGraphResolutionFullHd;
+    QAction* boutonGraphResolutionQhd;
+    QAction* boutonGraphResolution4k;
     QAction* boutonOuvrirAutomatiquementLesPdfGeneres;
 
     //Menu outils
@@ -249,6 +259,7 @@ public slots:
     void changerModeSignature();
     void changerDemandesAGenerer();
     void changerFusionPdf();
+    void changerResolutionExportGraphiques();
     void verifierSignatureNumerisee();
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();

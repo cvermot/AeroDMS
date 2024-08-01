@@ -458,25 +458,25 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     QToolBar* toolBar = addToolBar(tr(""));
     const QIcon iconeAjouterUnVol = QIcon("./ressources/airplane-plus.svg");
-    bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("&Ajouter un vol/une dépense"), this);
+    bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("Ajouter un &vol/une dépense"), this);
     bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
     connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(bouttonAjouterUnVol);
 
     const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
-    bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("&Ajouter un pilote"), this);
+    bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("Ajouter un &pilote"), this);
     bouttonAjouterPilote->setStatusTip(tr("Ajouter un pilote"));
     connect(bouttonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(bouttonAjouterPilote);
 
     const QIcon iconeAjouterCotisation = QIcon("./ressources/ticket.svg");
-    bouttonAjouterCotisation = new QAction(iconeAjouterCotisation, tr("&Ajouter une cotisation pour un pilote"), this);
+    bouttonAjouterCotisation = new QAction(iconeAjouterCotisation, tr("Ajouter une &cotisation pour un pilote"), this);
     bouttonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
     connect(bouttonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
     toolBar->addAction(bouttonAjouterCotisation);
 
     const QIcon iconeAjouterSortie = QIcon("./ressources/transit-connection-variant.svg");
-    bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("&Ajouter une sortie"), this);
+    bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("Ajouter une &sortie"), this);
     bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
     connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
@@ -490,7 +490,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     toolBar->addAction(bouttonGenerePdf);
 
     const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
-    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("&Générer les PDF de récapitulatif HdV de l'année sélectionnée"), this);
+    bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("Générer les PDF de récapitulatif &HdV de l'année sélectionnée"), this);
     bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
@@ -573,7 +573,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
     //========================Menu Fichier
-    QMenu* menuFichier = menuBar()->addMenu(tr("Fichier"));
+    QMenu* menuFichier = menuBar()->addMenu(tr("&Fichier"));
 
     QAction* boutonOuvrirDossierDemandes = new QAction(QIcon("./ressources/folder-open.svg"), tr("Ouvrir le dossier contenant les demandes de subventions"), this);
     menuFichier->addAction(boutonOuvrirDossierDemandes);
@@ -592,7 +592,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     peuplerMenuAutreDemande();
     
     //========================Menu Options
-    QMenu* menuOption = menuBar()->addMenu(tr("Options"));
+    QMenu* menuOption = menuBar()->addMenu(tr("&Options"));
 
     QMenu* menuSignature = menuOption->addMenu(tr("Signature"));
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
@@ -636,6 +636,52 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonOptionRecapAnnuelBaladesSorties = new QAction(QIcon("./ressources/airplane-search.svg"), tr("Récapitulatif des balades et sorties"), this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
+    //Génération des graphiques
+    QMenu* graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(QIcon("./ressources/chart-areaspline.svg"),tr("Graphiques"));
+
+    boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(QIcon("./ressources/chart-bar-stacked.svg"), tr("Heures annuelles"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresAnnuelles);
+    boutonGraphRecapAnnuelHeuresAnnuelles->setCheckable(true);
+
+    boutonGraphRecapAnnuelHeuresParPilote = new QAction(QIcon("./ressources/chart-pie.svg"), tr("Heures par pilote"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParPilote);
+    boutonGraphRecapAnnuelHeuresParPilote->setCheckable(true);
+
+    boutonGraphRecapAnnuelHeuresParTypeDeVol = new QAction(QIcon("./ressources/chart-pie.svg"), tr("Heures par type de vol"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParTypeDeVol);
+    boutonGraphRecapAnnuelHeuresParTypeDeVol->setCheckable(true);
+
+    boutonGraphRecapAnnuelHeuresParActivite = new QAction(QIcon("./ressources/chart-pie.svg"), tr("Heures par activite"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParActivite);
+    boutonGraphRecapAnnuelHeuresParActivite->setCheckable(true);
+
+    boutonGraphRecapAnnuelStatutsDesPilotes = new QAction(QIcon("./ressources/chart-donut-variant.svg"), tr("Statuts des pilotes"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelStatutsDesPilotes);
+    boutonGraphRecapAnnuelStatutsDesPilotes->setCheckable(true);
+
+    boutonGraphRecapAnnuelAeronefs = new QAction(QIcon("./ressources/chart-donut-variant.svg"), tr("Aéronefs"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelAeronefs);
+    boutonGraphRecapAnnuelAeronefs->setCheckable(true);
+
+    //Résolutions
+    QMenu* resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(QIcon("./ressources/chart-areaspline.svg"), tr("Résolution des graphiques"));
+
+    boutonGraphResolutionFullHd = new QAction(QIcon("./ressources/high-definition.svg"), tr("Full HD (1920 × 1080)"), this);
+    resolutionGraphiques->addAction(boutonGraphResolutionFullHd);
+    boutonGraphResolutionFullHd->setCheckable(true);
+
+    boutonGraphResolutionQhd = new QAction(QIcon("./ressources/high-definition.svg"), tr("QHD (2560 × 1440)"), this);
+    resolutionGraphiques->addAction(boutonGraphResolutionQhd);
+    boutonGraphResolutionQhd->setCheckable(true);
+
+    boutonGraphResolution4k = new QAction(QIcon("./ressources/ultra-high-definition.svg"), tr("UHD (3840 × 2160)"), this);
+    resolutionGraphiques->addAction(boutonGraphResolution4k);
+    boutonGraphResolution4k->setCheckable(true);
+
+    connect(boutonGraphResolutionFullHd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
+    connect(boutonGraphResolutionQhd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
+    connect(boutonGraphResolution4k, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
+    boutonGraphResolutionFullHd->activate(QAction::Trigger);
 
     boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les PDF à la fin de la génération", this);
     boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
@@ -662,7 +708,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonFusionnerLesPdf->setFont(font);
 
     //========================Menu Outils
-    QMenu* menuOutils = menuBar()->addMenu(tr("Outils"));
+    QMenu* menuOutils = menuBar()->addMenu(tr("Ou&tils"));
 
     menuOutils->addAction(bouttonAjouterUnVol);
     menuOutils->addAction(bouttonAjouterCotisation);
@@ -674,29 +720,29 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     menuOutils->addSeparator();
 
-    QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des factures"));
+    QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des &factures"));
     scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
     scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
-    scanAutoOpenFlyer = new QAction(tr("OpenFlyer (CAPAM, ACB)"), this);
+    scanAutoOpenFlyer = new QAction(tr("&OpenFlyer (CAPAM, ACB)"), this);
     scanAutoOpenFlyer->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoOpenFlyer);
-    scanAutoAerogest = new QAction(tr("Aerogest (ACBA)"), this);
+    scanAutoAerogest = new QAction(tr("&Aerogest (ACBA)"), this);
     scanAutoAerogest->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoAerogest);
-    scanAutoAca = new QAction(tr("Aéroclub d'Andernos"), this);
+    scanAutoAca = new QAction(tr("Aér&oclub d'Andernos"), this);
     scanAutoAca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoAca);
-    scanAutoDaca = new QAction(tr("DACA"), this);
+    scanAutoDaca = new QAction(tr("&DACA"), this);
     scanAutoDaca->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoDaca);
-    scanAutoSepavia = new QAction(tr("SEPAVIA"), this);
+    scanAutoSepavia = new QAction(tr("&SEPAVIA"), this);
     scanAutoSepavia->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoSepavia);
     scanFacture->addSeparator();
-    scanAutoGenerique1Passe = new QAction(tr("Générique (une passe)"), this);
+    scanAutoGenerique1Passe = new QAction(tr("&Générique (une passe)"), this);
     scanAutoGenerique1Passe->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique1Passe);
-    scanAutoGenerique = new QAction(tr("Générique (multi-passe)"), this);
+    scanAutoGenerique = new QAction(tr("Générique (&multi-passe)"), this);
     scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
@@ -709,17 +755,17 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     menuOutils->addSeparator();
 
-    QMenu* mailing = menuOutils->addMenu(tr("Mailing"));
+    QMenu* mailing = menuOutils->addMenu(tr("&Mailing"));
     mailing->setIcon(QIcon("./ressources/email-multiple.svg"));
-    mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année"), this);
+    mailingPilotesAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant &cotisé cette année"), this);
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
-    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), this);
+    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un &mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), this);
     mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
-    mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes actifs brevetés"), this);
+    mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes &actifs brevetés"), this);
     mailing->addAction(mailingPilotesActifsBrevetes);
-    mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière demande de subvention"), this);
+    mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
-    QMenu* menuMailDemandesSubvention = mailing->addMenu(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par une demande de subvention"));
+    QMenu* menuMailDemandesSubvention = mailing->addMenu(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par une demande de &subvention"));
     QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
     for (int i = 0; i < datesDemandes.size(); i++)
     {
@@ -734,7 +780,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
-    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aéronefs"), this);
+    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
     boutonGestionAeronefs->setToolTip("");
     boutonGestionAeronefs->setStatusTip(tr(""));
     menuOutils->addAction(boutonGestionAeronefs);
@@ -742,15 +788,15 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     menuOutils->addSeparator();
 
-    QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir une heure en décimal"), this);
+    QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir &une heure en décimal"), this);
     boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOutils->addAction(boutonConversionHeureDecimalesVersHhMm);
     connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
 
     //========================Menu Aide
-    QMenu* helpMenu = menuBar()->addMenu(tr("Aide"));
-    QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("Aide en ligne"), this);
-    aideQtAction->setStatusTip(tr("Ouvrir l'aide en ligne"));
+    QMenu* helpMenu = menuBar()->addMenu(tr("&Aide"));
+    QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("&Aide en ligne"), this);
+    aideQtAction->setStatusTip(tr("&Ouvrir l'aide en ligne"));
     helpMenu->addAction(aideQtAction);
     connect(aideQtAction, SIGNAL(triggered()), this, SLOT(ouvrirAide()));
     helpMenu->addSeparator();
@@ -759,11 +805,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
     helpMenu->addSeparator();
     QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
-    aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
+    aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de &Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
-    aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
+    aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette &application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
 
@@ -903,6 +949,37 @@ void AeroDms::changerModeSignature()
     {
         boutonSignatureNumerique->setFont(font);
         signature = AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY;
+    }
+}
+
+void AeroDms::changerResolutionExportGraphiques()
+{
+    QFont font;
+    font.setWeight(QFont::Normal);
+    boutonGraphResolutionFullHd->setFont(font);
+    boutonGraphResolutionQhd->setFont(font);
+    boutonGraphResolution4k->setFont(font);
+
+    boutonGraphResolutionFullHd->setChecked(false);
+    boutonGraphResolutionQhd->setChecked(false);
+    boutonGraphResolution4k->setChecked(false);
+
+    font.setWeight(QFont::Bold);
+    
+    if (sender() == boutonGraphResolutionFullHd)
+    {
+        boutonGraphResolutionFullHd->setChecked(true);
+        boutonGraphResolutionFullHd->setFont(font);
+    }
+    else if (sender() == boutonGraphResolutionQhd)
+    {
+        boutonGraphResolutionQhd->setChecked(true);
+        boutonGraphResolutionQhd->setFont(font);
+    }
+    else if (sender() == boutonGraphResolution4k)
+    {
+        boutonGraphResolution4k->setChecked(true);
+        boutonGraphResolution4k->setFont(font);
     }
 }
 
@@ -1613,7 +1690,8 @@ void AeroDms::genererPdf()
                 signature,
                 boutonFusionnerLesPdf->font().bold(),
                 boutonOptionRecapAnnuelRecettes->isChecked(),
-                boutonOptionRecapAnnuelBaladesSorties->isChecked());
+                boutonOptionRecapAnnuelBaladesSorties->isChecked(),
+                calculerValeurGraphAGenererPdf());
         }
         break;
 
@@ -1632,7 +1710,8 @@ void AeroDms::genererPdfRecapHdV()
     pdf->imprimerLeRecapitulatifDesHeuresDeVol( listeDeroulanteAnnee->currentData().toInt(),
                                                 cheminSortieFichiersGeneres,
                                                 cheminStockageFacturesTraitees,
-                                                signature);
+                                                signature,
+                                                calculerValeurGraphAGenererPdf());
 }
 
 void AeroDms::enregistrerUneFacture()
@@ -2770,6 +2849,51 @@ void AeroDms::gererChangementOnglet()
         actionListeDeroulanteStatistique->setVisible(true);
         actionListeDeroulantePilote->setVisible(false);
     }
+}
+
+int AeroDms::calculerValeurGraphAGenererPdf()
+{
+    int valeur = 0;
+
+    if (boutonGraphRecapAnnuelHeuresAnnuelles->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_HEURES_ANNUELLES;
+    }
+    if (boutonGraphRecapAnnuelHeuresParPilote->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE;
+    }
+    if (boutonGraphRecapAnnuelHeuresParTypeDeVol->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL;
+    }
+    if (boutonGraphRecapAnnuelHeuresParActivite->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE;
+    }
+    if (boutonGraphRecapAnnuelStatutsDesPilotes->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_STATUTS_PILOTES;
+    }
+    if (boutonGraphRecapAnnuelAeronefs->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_AERONEFS;
+    }
+
+    if (boutonGraphResolutionFullHd->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Resolution_Full_HD;
+    }
+    else if (boutonGraphResolutionQhd->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Resolution_QHD;
+    }
+    else if (boutonGraphResolution4k->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Resolution_4K;
+    }
+
+    return valeur;
 }
 
 bool AeroDms::eventFilter(QObject* object, QEvent* event)
