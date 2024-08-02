@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QPixmap pixmap("./ressources/splash.jpg");
+    QPixmap pixmap("./ressources/splash.png");
     QSplashScreen splash(pixmap);
     splash.show();
     splash.showMessage("Chargement en cours");
