@@ -126,7 +126,8 @@ private:
     QWidget* widgetAjoutRecette;
     QListWidget* listeBaladesEtSorties;
     QComboBox* typeDeRecette;
-    QLineEdit* intituleRecette;
+    QLineEdit* nomEmetteurChequeRecette;
+    QLineEdit* banqueNumeroChequeRecette;
     QDoubleSpinBox* montantRecette;
     QPushButton* validerLaRecette;
 

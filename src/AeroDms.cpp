@@ -412,10 +412,15 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(typeDeRecette, &QComboBox::currentIndexChanged, this, &AeroDms::chargerBaladesSorties);
     QLabel* typeDeRecetteLabel = new QLabel(tr("Type de vol : "), this);
 
-    intituleRecette = new QLineEdit(this);
-    intituleRecette->setToolTip(tr("Format recommandé : 'NOM EMETTEUR CHEQUE / Banque numéro de chèque'"));
-    QLabel* intituleRecetteLabel = new QLabel(tr("Intitulé : "), this);
-    connect(intituleRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
+    nomEmetteurChequeRecette = new QLineEdit(this);
+    nomEmetteurChequeRecette->setToolTip(tr("Nom du titulaire du compte du chèque"));
+    QLabel* nomEmetteurChequeRecetteLabel = new QLabel(tr("Nom émetteur chèque : "), this);
+    connect(nomEmetteurChequeRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
+
+    banqueNumeroChequeRecette = new QLineEdit(this);
+    banqueNumeroChequeRecette->setToolTip(tr("Initiales du nom de la banque et numéro du chèque"));
+    QLabel* banqueNumeroChequeRecetteLabel = new QLabel(tr("Banque & n° chèque : "), this);
+    connect(banqueNumeroChequeRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
     montantRecette = new QDoubleSpinBox(this);
     montantRecette->setRange(0.0, 2000.0);
@@ -428,7 +433,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     validerLaRecette = new QPushButton("Valider la recette", this);
     validerLaRecette->setToolTip(tr("Validation possible si :\n\
    -montant de recette saisi (non nul),\n\
-   -intitulé saisi,\n\
+   -nom de l'émetteur du chèque saisi,\n\
+   -nom bauque et numéro du chèque saisi,\n\
    -au moins un vol associé séléctionné."));
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
@@ -436,10 +442,12 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     ajoutRecette->addLayout(infosRecette, 1);
     infosRecette->addWidget(typeDeRecetteLabel, 0, 0);
     infosRecette->addWidget(typeDeRecette, 0, 1);
-    infosRecette->addWidget(intituleRecetteLabel, 1, 0);
-    infosRecette->addWidget(intituleRecette, 1, 1);
-    infosRecette->addWidget(montantRecetteLabel, 2, 0);
-    infosRecette->addWidget(montantRecette, 2, 1);
+    infosRecette->addWidget(nomEmetteurChequeRecetteLabel, 1, 0);
+    infosRecette->addWidget(nomEmetteurChequeRecette, 1, 1);
+    infosRecette->addWidget(banqueNumeroChequeRecetteLabel, 2, 0);
+    infosRecette->addWidget(banqueNumeroChequeRecette, 2, 1);
+    infosRecette->addWidget(montantRecetteLabel, 3, 0);
+    infosRecette->addWidget(montantRecette, 3, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 
     //=============Onglet Subventions demandées
@@ -2017,11 +2025,12 @@ Saisie non prise en compte.");
     {
         db->ajouterUneRecetteAssocieeAVol( volsCoches,
                                            typeDeRecette->currentText(),
-                                           intituleRecette->text(),
+                                           nomEmetteurChequeRecette->text() + " / " + banqueNumeroChequeRecette->text(),
                                            montantRecette->value());
         statusBar()->showMessage("Recette ajoutee");
 
-        intituleRecette->clear();
+        nomEmetteurChequeRecette->clear();
+        banqueNumeroChequeRecette->clear();
         montantRecette->clear();
     }
 
@@ -2201,7 +2210,8 @@ void AeroDms::prevaliderDonnneesSaisiesRecette()
     validerLaRecette->setEnabled(true);
 
     if ( montantRecette->value() == 0 
-         || intituleRecette->text() == "")
+         || nomEmetteurChequeRecette->text() == ""
+         || banqueNumeroChequeRecette->text() == "")
     {
         validerLaRecette->setEnabled(false);
     }
