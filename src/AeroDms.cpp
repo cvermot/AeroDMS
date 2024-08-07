@@ -434,8 +434,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     validerLaRecette->setToolTip(tr("Validation possible si :\n\
    -montant de recette saisi (non nul),\n\
    -nom de l'émetteur du chèque saisi,\n\
-   -nom bauque et numéro du chèque saisi,\n\
-   -au moins un vol associé séléctionné."));
+   -nom banque et numéro du chèque saisi,\n\
+   -au moins un vol associé sélectionné."));
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
     QGridLayout* infosRecette = new QGridLayout(this);
@@ -1209,7 +1209,7 @@ void AeroDms::peuplerTableVols()
 
     bouttonGenerePdfRecapHdv->setEnabled(true);
     mailingPilotesAyantCotiseCetteAnnee->setEnabled(true);
-    //On desactive la génération du récap annuel si on est sur la séléction "Toutes les années"
+    //On desactive la génération du récap annuel si on est sur la sélection "Toutes les années"
     //et également le bouton d'envoi des mails aux pilotes de l'année
     if (listeDeroulanteAnnee->currentData().toInt() == -1)
     {
@@ -1909,7 +1909,7 @@ void AeroDms::enregistrerUnVol()
                     volAjouteModifie = "modifié";
                     //On sort du mode édition
                     volAEditer = -1;
-                    //Et on recharge la liste déroulante de séléction des pilotes dans laquelle on avait remis les pilotes
+                    //Et on recharge la liste déroulante de sélection des pilotes dans laquelle on avait remis les pilotes
                     //inactifs...
                     peuplerListesPilotes();
                 }
@@ -2047,7 +2047,7 @@ void AeroDms::peuplerListesPilotes()
 {
     const AeroDmsTypes::ListePilotes pilotes = db->recupererPilotes();
 
-    //On sauvegarde le pilote séléctionné pour le rester le cas échéant
+    //On sauvegarde le pilote sélectionné pour le rester le cas échéant
     const QString piloteSelectionne = listeDeroulantePilote->currentData().toString();
 
     listeDeroulantePilote->clear();
