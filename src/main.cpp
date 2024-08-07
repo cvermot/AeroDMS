@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     QPixmap pixmap("./ressources/splash.png");
     QSplashScreen splash(pixmap);
     splash.show();
-    splash.showMessage("Chargement en cours");
+    splash.showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
     a.processEvents();
 
     //originalHandler = qInstallMessageHandler(logToFile);
