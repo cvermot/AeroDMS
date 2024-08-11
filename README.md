@@ -2,7 +2,7 @@
 [![GitHub License](https://img.shields.io/github/license/cvermot/AeroDMS)](https://www.gnu.org/licenses/gpl-3.0.fr.html#license-text)
 [![GitHub Release](https://img.shields.io/github/v/release/cvermot/AeroDMS)](https://github.com/cvermot/AeroDMS/releases)
 ![GitHub top language](https://img.shields.io/github/languages/top/cvermot/AeroDMS)
-[![GitHub line of code](https://sloc.xyz/github/cvermot/AeroDMS?category=code)]()
+![GitHub line of code](https://sloc.xyz/github/cvermot/AeroDMS?category=code)
 
 Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 
@@ -55,6 +55,10 @@ Voir le [Wiki](https://github.com/cvermot/AeroDMS/wiki).
 
 ## Elements graphiques
 Les images du dossier ressources sont des icones "Material Design" issues du site [Pictogrammers.com](https://pictogrammers.com/).
+
+Le splashscreen est généré via IA avec [Microsoft Designer](https://designer.microsoft.com/).
+
+![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.png)
 
 ## Licence
 Le logiciel est diffusé sur licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
