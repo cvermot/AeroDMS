@@ -776,8 +776,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
     mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes n'ayant pas épuisé leur subvention entrainement"), this);
     mailing->addAction(mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement);
+    mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement->setEnabled(false); //TODO
     mailingPilotesActifs = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes &actifs"), this);
     mailing->addAction(mailingPilotesActifs);
+    mailingPilotesActifs->setEnabled(false); //TODO
     mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes actifs &brevetés"), this);
     mailing->addAction(mailingPilotesActifsBrevetes);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), this);
