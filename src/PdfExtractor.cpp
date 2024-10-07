@@ -597,3 +597,61 @@ const float PdfExtractor::recupererMontantAca(QString p_chaine)
         .replace('\u0022', "9")
         .toFloat();
 }
+
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuCsv(const QString p_fichier)
+{
+    AeroDmsTypes::ListeDonneesFacture liste;
+
+    QFile fichierCsv(p_fichier);
+    if (fichierCsv.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&fichierCsv);
+        //in.setAutoDetectUnicode(true);
+        in.setEncoding(QStringConverter::System);
+        if (!in.readAll().contains("€"))
+        {
+            in.setEncoding(QStringConverter::Utf8);
+        }
+        in.seek(0);
+        while (!in.atEnd())
+        {
+            AeroDmsTypes::DonneesFacture donnesFacture = AeroDmsTypes::K_INIT_DONNEES_FACTURE;
+            QString line = in.readLine();
+            QStringList csvItem = line.split(";");
+            for (int i = 0; i < csvItem.size(); i++)
+            {
+                QString str = csvItem.at(i);
+                str.replace(",", ".").replace(" ", "");
+                qDebug() << str;
+                if (str.contains(heureRe))
+                {
+                    donnesFacture.dureeDuVol = extraireDureeRegex(str);
+                }
+                else if (str.contains(dateRe))
+                {
+                    donnesFacture.dateDuVol = extraireDateRegex(str);
+                }
+                else if (str.contains("€"))
+                {
+                    donnesFacture.coutDuVol = str.replace("€", "").toFloat();
+                }
+                else if (str.contains(immatRe))
+                {
+                    QRegularExpressionMatch match = immatRe.match(str);
+                    donnesFacture.immat = match.captured("immat");
+                }
+            }
+            //On remonte toute donnes pour laquelle on a récupéré au moins un champ...
+            if (donnesFacture.coutDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol
+                || donnesFacture.immat != AeroDmsTypes::K_INIT_DONNEES_FACTURE.immat
+                || donnesFacture.dateDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dateDuVol
+                || donnesFacture.dureeDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dureeDuVol)
+            {
+                liste.append(donnesFacture);
+            }
+        }
+        fichierCsv.close();
+    }
+
+    return liste;
+}

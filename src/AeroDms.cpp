@@ -753,6 +753,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanAutoGenerique = new QAction(tr("Générique (&multi-passe)"), this);
     scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
     scanFacture->addAction(scanAutoGenerique);
+    scanFacture->addSeparator();
+    scanAutoCsv = new QAction(tr("Importer les vols depuis un fichier CSV"), this);
+    scanAutoCsv->setIcon(QIcon("./ressources/file-delimited-outline.svg"));
+    scanFacture->addAction(scanAutoCsv);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAerogest, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
@@ -760,6 +764,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(scanAutoSepavia, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
 
     menuOutils->addSeparator();
 
@@ -769,7 +774,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
     mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un &mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), this);
     mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
-    mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes &actifs brevetés"), this);
+    mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes n'ayant pas épuisé leur subvention entrainement"), this);
+    mailing->addAction(mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement);
+    mailingPilotesActifs = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes &actifs"), this);
+    mailing->addAction(mailingPilotesActifs);
+    mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes actifs &brevetés"), this);
     mailing->addAction(mailingPilotesActifsBrevetes);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
@@ -786,6 +795,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsBrevetes, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesDerniereDemandeSubvention, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    connect(mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    connect(mailingPilotesActifs, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
     QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
@@ -1571,6 +1582,35 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
         }
     }
 }
+
+void AeroDms::recupererVolDepuisCsv()
+{
+    QString fichier = QFileDialog::getOpenFileName(
+        this,
+        "Ouvrir un fichier CSV de récapitulatif de vol",
+        cheminStockageFacturesATraiter,
+        tr("Fichier CSV (*.csv)"));
+
+    if (!fichier.isNull())
+    {
+        //On masque par défaut... on reaffiche si le scan est effectué
+        //et qu'il ne retourne par une liste vide
+        validerLesVols->setHidden(true);
+        vueVolsDetectes->setHidden(true);
+        supprimerLeVolSelectionne->setHidden(true);
+
+        factures = PdfExtractor::recupererLesDonneesDuCsv(fichier);
+        if (factures.size() != 0)
+        {
+            peuplerTableVolsDetectes(factures);
+            validerLesVols->setHidden(false);
+            vueVolsDetectes->setHidden(false);
+            supprimerLeVolSelectionne->setHidden(false);
+        }
+    }
+
+}
+
 
 void AeroDms::chargerUneFacture(QString p_fichier)
 {
@@ -2584,6 +2624,24 @@ void AeroDms::envoyerMail()
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), true, true)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+    }
+    else if (sender() == mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement)
+    {
+        //TODO
+        /*
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailDerniereDemandeDeSubvention()
+            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode)); */
+    }
+    else if (sender() == mailingPilotesActifs)
+    {
+        //TODO
+        /*
+        QDesktopServices::openUrl(QUrl("mailto:"
+            + db->recupererMailDerniereDemandeDeSubvention()
+            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode)); */
     }
     else if (sender() == mailingPilotesDerniereDemandeSubvention)
     {

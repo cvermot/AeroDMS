@@ -33,6 +33,7 @@ public:
 
 	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf( const QString p_fichier,
 		                                                                const AeroDmsTypes::Aeroclub p_aeroclub = AeroDmsTypes::Aeroclub_INCONNU);
+	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuCsv(const QString p_fichier);
 
 private:
 	static AeroDmsTypes::DonneesFacture extraireDonneesOpenFlyer(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);

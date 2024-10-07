@@ -189,9 +189,12 @@ private:
 
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
+    QAction* mailingPilotesActifs;
     QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
     QAction* mailingPilotesActifsBrevetes;
+    QAction* mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement;
     QAction* mailingPilotesDerniereDemandeSubvention;
+    
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAerogest;
     QAction* scanAutoAca;
@@ -199,6 +202,7 @@ private:
     QAction* scanAutoSepavia;
     QAction* scanAutoGenerique1Passe;
     QAction* scanAutoGenerique;
+    QAction* scanAutoCsv;
 
     //Données internes
     QString piloteAEditer = "";
@@ -268,6 +272,7 @@ public slots:
     void chargerUnVolDetecte(int row, int column);
     void deselectionnerVolDetecte();
     void scannerUneFactureSelonMethodeChoisie();
+    void recupererVolDepuisCsv();
     void ouvrirPdfDemandeSuvbvention();
     void ouvrirDossierDemandesSubventions();
     void peuplerMenuAutreDemande();
