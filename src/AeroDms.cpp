@@ -1727,6 +1727,14 @@ void AeroDms::genererPdf()
     demandeConfirmationGeneration.setIcon(QMessageBox::Question);
     demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
+    if ( (db->recupererLesSubventionsAEmettre().size()
+         + db->recupererLesDemandesDeRembousementAEmettre().size()
+         + db->recupererLesCotisationsAEmettre().size()
+         + db->recupererLesRecettesBaladesEtSortiesAEmettre().size()) == 0)
+    {
+        demandeConfirmationGeneration.setStandardButtons( QMessageBox::No);
+    }
+
     const int ret = demandeConfirmationGeneration.exec();
 
     switch (ret)
