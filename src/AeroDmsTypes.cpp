@@ -39,11 +39,13 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      "",//QString immat;
                                                      "",//QString activite;
                                                      "",//QString estSoumisCe;
+                                                     false,//bool estSoumis
                                                      0.0,//float coutVol;
                                                      0.0,//float montantRembourse;
                                                      0,//int volId;
                                                      0,//int dureeEnMinutes;
-                                                     -1//int baladeId;
+                                                     -1,//int baladeId;
+                                                     -1//int facture
 };
 
 const AeroDmsTypes::DonneesFacture AeroDmsTypes::K_INIT_DONNEES_FACTURE = { QDate(),

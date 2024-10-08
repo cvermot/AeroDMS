@@ -513,6 +513,7 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
     vol.activite = p_query.value("activite").toString();
     vol.volId = p_query.value("volId").toInt();
     vol.immat = p_query.value("immatriculation").toString();
+    vol.facture = p_query.value("facture").toInt();
     if (!p_query.value("sortie").isNull())
     {
         vol.baladeId = p_query.value("sortie").toInt();

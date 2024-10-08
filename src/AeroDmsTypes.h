@@ -277,6 +277,7 @@ public:
         int volId;
         int dureeEnMinutes;
         int baladeId;
+        int facture;
     };
     static const Vol K_INIT_VOL;
     typedef QList<Vol> ListeVols;

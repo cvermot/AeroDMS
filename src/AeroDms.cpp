@@ -2504,6 +2504,8 @@ void AeroDms::editerVol()
     remarqueVol->setText(vol.remarque);
     immat->setText(vol.immat);
 
+    factureIdEnBdd = vol.facture;
+
     //Si le vol est déjà soumis au CE, on ne peut plus modifier les temps de vol et le coût du vol :
     //(modifierait des montants de subventions déjà soumises au CE)
     //On va chercher cette infos dans la table des vol
