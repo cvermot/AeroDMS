@@ -27,9 +27,9 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     for (int i = 0; i < heuresDeVol.size() ; i++)
     {
         const AeroDmsTypes::StatsHeuresDeVol hdv = heuresDeVol.at(i);
-        *entrainement << hdv.minutesEntrainement;
-        *sortie << hdv.minutesSortie;
-        *balade << hdv.minutesBalade;
+        *entrainement << hdv.minutesEntrainement/60;
+        *sortie << hdv.minutesSortie/60;
+        *balade << hdv.minutesBalade/60;
         mois.append(hdv.mois);
     }
 
@@ -40,7 +40,7 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
 
     auto chart = new QChart;
     chart->addSeries(series);
-    chart->setTitle("Nombre de minutes de vol par mois");
+    chart->setTitle("Nombre d'heures de vol par mois");
     chart->setAnimationOptions(p_animation);
 
     auto axisX = new QBarCategoryAxis;
