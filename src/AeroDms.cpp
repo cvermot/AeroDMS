@@ -761,6 +761,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     scanFacture->addSeparator();
     scanAutoCsv = new QAction(tr("Importer les vols depuis un fichier CSV"), this);
     scanAutoCsv->setIcon(QIcon("./ressources/file-delimited-outline.svg"));
+    scanAutoCsv->setDisabled(true);
     scanFacture->addAction(scanAutoCsv);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAerogest, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
@@ -1647,6 +1648,7 @@ void AeroDms::chargerUneFacture(QString p_fichier)
     immat->clear();
     typeDeVol->setCurrentIndex(2);
     choixBalade->setCurrentIndex(0);
+    scanAutoCsv->setEnabled(true);
     
     //On affiche le widget qui contient la fonction d'ajout de vol
     mainTabWidget->setCurrentIndex(AeroDmsTypes::Onglet_AJOUT_DEPENSES);
