@@ -691,6 +691,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(boutonGraphResolution4k, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
     boutonGraphResolutionFullHd->activate(QAction::Trigger);
 
+    graphiquesDuRecapAnnuel->addSeparator();
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/chart-donut-variant.svg"), tr("Selectionner tous les graphs"), this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
+    connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
+
     boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les PDF à la fin de la génération", this);
     boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
     boutonOuvrirAutomatiquementLesPdfGeneres->setChecked(parametresMetiers.ouvertureAutomatiqueApresGeneration);
@@ -1002,6 +1007,16 @@ void AeroDms::changerResolutionExportGraphiques()
         boutonGraphResolution4k->setChecked(true);
         boutonGraphResolution4k->setFont(font);
     }
+}
+
+void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
+{
+    boutonGraphRecapAnnuelHeuresAnnuelles->setChecked(true);
+    boutonGraphRecapAnnuelHeuresParPilote->setChecked(true);
+    boutonGraphRecapAnnuelHeuresParTypeDeVol->setChecked(true);
+    boutonGraphRecapAnnuelHeuresParActivite->setChecked(true);
+    boutonGraphRecapAnnuelStatutsDesPilotes->setChecked(true);
+    boutonGraphRecapAnnuelAeronefs->setChecked(true);
 }
 
 void AeroDms::changerDemandesAGenerer()

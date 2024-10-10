@@ -182,6 +182,7 @@ private:
     QAction* boutonGraphRecapAnnuelHeuresParActivite;
     QAction* boutonGraphRecapAnnuelStatutsDesPilotes;
     QAction* boutonGraphRecapAnnuelAeronefs;
+    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs;
     QAction* boutonGraphResolutionFullHd;
     QAction* boutonGraphResolutionQhd;
     QAction* boutonGraphResolution4k;
@@ -265,6 +266,7 @@ public slots:
     void changerDemandesAGenerer();
     void changerFusionPdf();
     void changerResolutionExportGraphiques();
+    void selectionnerTousLesGraphsPourRecapAnnuel();
     void verifierSignatureNumerisee();
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();
