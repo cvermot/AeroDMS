@@ -692,7 +692,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonGraphResolutionFullHd->activate(QAction::Trigger);
 
     graphiquesDuRecapAnnuel->addSeparator();
-    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/check-all.svg"), tr("Selectionner tous les graphs"), this);
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/check-all.svg"), tr("Sélectionner tous les graphs"), this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
