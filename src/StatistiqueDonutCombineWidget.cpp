@@ -12,10 +12,12 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                               QWidget* parent,
                                                               const int p_annee,
                                                               const QChart::AnimationOption p_animation,
-                                                              const bool p_legende)
+                                                              const bool p_legende,
+                                                              const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
+    setMinimumSize(p_parametres.tailleMiniImage);
 
     indiceCouleurEnCours = 0;
 
@@ -29,13 +31,14 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
     {
         if (typeCourant == statsAeronefs.at(i).type)
         {
-            series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
+            QPieSlice* pieSlice = new QPieSlice(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
+            series->append(pieSlice);
         }
         else
         {
             if (typeCourant != "init")
             {
-                donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur());
+                donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
             }
             typeCourant = statsAeronefs.at(i).type;
             series = new QPieSeries;
@@ -43,10 +46,11 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
             series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
         }
     }
-    donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur());
+    donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
 
     
     donutBreakdown->setAnimationOptions(p_animation);
+
     donutBreakdown->legend()->setVisible(p_legende);
     donutBreakdown->setTitle("Statistiques de répartition des vols par aéronefs et types d'aéronefs");
     donutBreakdown->legend()->setAlignment(Qt::AlignRight);

@@ -463,6 +463,13 @@ public:
         QVector<GroupeBaladesEtSortiesAssociees> baladesEtSortiesAssociees;
     };
     typedef QVector<BaladesEtSortiesParId> ListeBaladesEtSortiesParIdSortie;
+
+    struct ResolutionEtParametresStatistiques
+    {
+        QSize tailleMiniImage;
+        int tailleDePolice;
+    };
+    static const ResolutionEtParametresStatistiques K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
 };
 
 #endif // AERODMSTYPES_H

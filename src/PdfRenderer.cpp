@@ -941,16 +941,17 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     QWidget* m_contentArea = nullptr;
 
-    const QSize tailleImage = convertirResolution(demandeEnCours.recapHdvGraphAGenerer);
+    const AeroDmsTypes::ResolutionEtParametresStatistiques tailleImage = convertirResolution(demandeEnCours.recapHdvGraphAGenerer);
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
     {
         StatistiqueWidget* stats = new StatistiqueHistogrammeEmpile( db,
                                                                      p_annee,
                                                                      m_contentArea,
-                                                                     QChart::NoAnimation);
+                                                                     QChart::NoAnimation, 
+                                                                     tailleImage );
         const QString urlImage = cheminSortie + "heuresAnnuelles.png";
-        stats->setMinimumSize(tailleImage);
+        stats->setMinimumSize(tailleImage.tailleMiniImage);
         stats->grab().save(urlImage);
         delete stats;
 
@@ -964,9 +965,10 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE,
             m_contentArea,
             QChart::NoAnimation,
-            false);
+            false, 
+            tailleImage);
         const QString urlImage = cheminSortie + "pilote.png";
-        stats->setMinimumSize(tailleImage);
+        stats->setMinimumSize(tailleImage.tailleMiniImage);
         stats->grab().save(urlImage);
         delete stats;
 
@@ -980,9 +982,10 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL,
             m_contentArea,
             QChart::NoAnimation,
-            false);
+            false, 
+            tailleImage);
         const QString urlImage = cheminSortie + "typeVol.png";
-        stats->setMinimumSize(tailleImage);
+        stats->setMinimumSize(tailleImage.tailleMiniImage);
         stats->grab().save(urlImage);
         delete stats;
 
@@ -996,9 +999,10 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE,
             m_contentArea,
             QChart::NoAnimation,
-            false);
+            false,
+            tailleImage);
         const QString urlImage = cheminSortie + "activite.png";
-        stats->setMinimumSize(tailleImage);
+        stats->setMinimumSize(tailleImage.tailleMiniImage);
         stats->grab().save(urlImage);
         delete stats;
 
@@ -1012,9 +1016,10 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             p_annee,
             QChart::NoAnimation,
-            false);
+            false,
+            tailleImage);
         const QString urlImage = cheminSortie + "aeronef.png";
-        stats->setMinimumSize(tailleImage);
+        //stats->setMinimumSize(tailleImage);
         stats->grab().save(urlImage);
         delete stats;
 
@@ -1025,25 +1030,29 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     return html;
 }
-QSize PdfRenderer::convertirResolution(const int p_resolution)
+AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution)
 {
     QSize size(1920,1080);
+    AeroDmsTypes::ResolutionEtParametresStatistiques resolutionEtParametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
 
     const AeroDmsTypes::Resolution resolution = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE);
 
     if (resolution == AeroDmsTypes::Resolution_Full_HD)
     {
-        size = QSize(1920, 1080);
+        resolutionEtParametres.tailleMiniImage = QSize(1920, 1080);
+        resolutionEtParametres.tailleDePolice = 10;
     }
     else if (resolution == AeroDmsTypes::Resolution_QHD)
     {
-        size = QSize(2560, 1440);
+        resolutionEtParametres.tailleMiniImage = QSize(2560, 1440);
+        resolutionEtParametres.tailleDePolice = 18;
     }
     else if (resolution == AeroDmsTypes::Resolution_4K)
     {
-        size = QSize(3840, 2160);
+        resolutionEtParametres.tailleMiniImage = QSize(3840, 2160);
+        resolutionEtParametres.tailleDePolice = 30;
     }
 
-    return size;
+    return resolutionEtParametres;
 }
 

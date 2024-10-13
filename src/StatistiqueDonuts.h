@@ -16,7 +16,8 @@ public:
     StatistiqueDonuts( ManageDb* p_db, 
                        const AeroDmsTypes::Statistiques p_statistique, 
                        QWidget* parent = nullptr,
-                       int p_annee = -1);
+                       int p_annee = -1,
+                       const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 
 public slots:
     void explodeSlice(bool exploded);
@@ -24,8 +25,8 @@ public slots:
 private:
     QList<QPieSeries*> m_donuts;
 
-    void afficherStatsPilotes(ManageDb* p_db);
-    void afficherStatsAeronefs(ManageDb* p_db, int p_annee);
+    void afficherStatsPilotes(ManageDb* p_db, const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres);
+    void afficherStatsAeronefs(ManageDb* p_db, int p_annee, const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres);
 };
 
 #endif

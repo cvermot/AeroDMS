@@ -80,7 +80,7 @@ private :
 
 	void mergerPdf();
 
-	static QSize convertirResolution(const int p_resolution);
+	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution);
 
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);

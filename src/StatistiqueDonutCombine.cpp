@@ -20,9 +20,12 @@ StatistiqueDonutCombine::StatistiqueDonutCombine(QGraphicsItem* parent, Qt::Wind
     QChart::addSeries(m_mainSeries);
 }
 
-void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QColor color)
+void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QColor color, int tailleDePolice)
 {
-    QFont font("Arial", 8);
+    QSizeF widgetSize = size();
+    QFont font("Arial", tailleDePolice);
+
+    setTitleFont(font);
 
     // add breakdown series as a slice to center pie
     auto mainSlice = new StatistiqueDonutCombinePartie(breakdownSeries);
@@ -59,7 +62,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     recalculateAngles();
 
     // update customize legend markers
-    updateLegendMarkers();
+    updateLegendMarkers(font);
 }
 
 void StatistiqueDonutCombine::recalculateAngles()
@@ -74,7 +77,7 @@ void StatistiqueDonutCombine::recalculateAngles()
     }
 }
 
-void StatistiqueDonutCombine::updateLegendMarkers()
+void StatistiqueDonutCombine::updateLegendMarkers(QFont p_font)
 {
     // go through all markers
     const auto allseries = series();
@@ -91,7 +94,7 @@ void StatistiqueDonutCombine::updateLegendMarkers()
                 pieMarker->setLabel(QString("%1 %2%")
                     .arg(pieMarker->slice()->label())
                     .arg(pieMarker->slice()->percentage() * 100, 0, 'f', 2));
-                pieMarker->setFont(QFont("Arial", 8));
+                pieMarker->setFont(p_font);
             }
         }
     }

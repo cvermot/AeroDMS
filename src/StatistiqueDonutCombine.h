@@ -12,11 +12,11 @@ class StatistiqueDonutCombine : public QChart
 {
 public:
     StatistiqueDonutCombine(QGraphicsItem* parent = nullptr, Qt::WindowFlags wFlags = {});
-    void addBreakdownSeries(QPieSeries* series, QColor color);
+    void addBreakdownSeries(QPieSeries* series, QColor color, int tailleDePolice);
 
 private:
     void recalculateAngles();
-    void updateLegendMarkers();
+    void updateLegendMarkers(QFont p_font);
 
 private:
     QPieSeries* m_mainSeries = nullptr;

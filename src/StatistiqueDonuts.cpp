@@ -15,33 +15,40 @@
 StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db, 
                                       const AeroDmsTypes::Statistiques p_statistique, 
                                       QWidget* parent,
-                                      int p_annee)
+                                      int p_annee,
+                                      const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
+    setMinimumSize(p_parametres.tailleMiniImage);
+
     switch (p_statistique)
     {
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
         {
-            afficherStatsPilotes(p_db);
+            afficherStatsPilotes(p_db, p_parametres);
             break;
         }
         case AeroDmsTypes::Statistiques_AERONEFS:
         default:
         {
-            afficherStatsAeronefs(p_db, p_annee);
+            afficherStatsAeronefs(p_db, p_annee, p_parametres);
             break;
         }
     }
 }
 
-void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
+void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
+                                              const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
 {
+    QFont font("Arial", p_parametres.tailleDePolice);
+
     const AeroDmsTypes::StatsPilotes statsPilotes = p_db->recupererStatsPilotes();
 
     auto chartView = new QChartView(this);
     chartView->setRenderHint(QPainter::Antialiasing);
     QChart* chart = chartView->chart();
     chart->legend()->setVisible(false);
+    chart->legend()->setFont(font);
     chart->setTitle("Statistiques sur les pilotes");
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->layout()->setContentsMargins(0, 0, 0, 0);
@@ -54,6 +61,7 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     auto donutBrevete = new QPieSeries;
 
     auto sliceBrevete = new QPieSlice(QString("Breveté"), statsPilotes.nbBrevete);
+    sliceBrevete->setLabelFont(font);
     sliceBrevete->setLabelVisible(true);
     sliceBrevete->setLabelColor(Qt::white);
     sliceBrevete->setLabelPosition(QPieSlice::LabelInsideTangential);
@@ -63,6 +71,7 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     donutBrevete->setPieSize(minSize + (niveauDuDonut + 1) * (maxSize - minSize) / donutCount);
 
     auto sliceNonBrevete = new QPieSlice(QString("Non Breveté"), statsPilotes.nbNonBrevete);
+    sliceNonBrevete->setLabelFont(font);
     sliceNonBrevete->setLabelVisible(true);
     sliceNonBrevete->setLabelColor(Qt::white);
     sliceNonBrevete->setLabelPosition(QPieSlice::LabelInsideTangential);
@@ -76,6 +85,7 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     niveauDuDonut++;
     auto donutAyantDroit = new QPieSeries;
     auto sliceOuvrantDroit = new QPieSlice(QString("Ouvrant droit"), statsPilotes.nbOuvranDroit);
+    sliceOuvrantDroit->setLabelFont(font);
     sliceOuvrantDroit->setLabelVisible(true);
     sliceOuvrantDroit->setLabelColor(Qt::white);
     sliceOuvrantDroit->setLabelPosition(QPieSlice::LabelInsideTangential);
@@ -85,6 +95,7 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     donutAyantDroit->setPieSize(minSize + (niveauDuDonut + 1) * (maxSize - minSize) / donutCount);
 
     auto sliceAyantDroit = new QPieSlice(QString("Ayant droit"), statsPilotes.nbAyantDroit);
+    sliceAyantDroit->setLabelFont(font);
     sliceAyantDroit->setLabelVisible(true);
     sliceAyantDroit->setLabelColor(Qt::white);
     sliceAyantDroit->setLabelPosition(QPieSlice::LabelInsideTangential);
@@ -100,7 +111,9 @@ void StatistiqueDonuts::afficherStatsPilotes(ManageDb* p_db)
     setLayout(mainLayout);
 }
 
-void StatistiqueDonuts::afficherStatsAeronefs(ManageDb* p_db, int p_annee)
+void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db, 
+                                               int p_annee, 
+                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
 {
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
 

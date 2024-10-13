@@ -19,7 +19,8 @@ public:
                                                    const AeroDmsTypes::Statistiques p_statistique, 
                                                    QWidget* parent = nullptr,
                                                    const QChart::AnimationOption p_animation = QChart::AllAnimations,
-                                                   const bool p_legende = true) ;
+                                                   const bool p_legende = true,
+                                                   const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES) ;
 };
 
 #endif

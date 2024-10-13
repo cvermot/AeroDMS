@@ -97,3 +97,9 @@ const AeroDmsTypes::DetailsBaladesEtSorties AeroDmsTypes::K_INIT_DETAILS_BALADES
     0.0,
     ""
 };
+
+const AeroDmsTypes::ResolutionEtParametresStatistiques AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES =
+{
+    QSize(800,600),
+    10
+};

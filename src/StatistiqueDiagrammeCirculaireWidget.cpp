@@ -15,14 +15,21 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                                                                             const AeroDmsTypes::Statistiques p_statistique, 
                                                                             QWidget* parent, 
                                                                             const QChart::AnimationOption p_animation, 
-                                                                            const bool p_legende)
+                                                                            const bool p_legende,
+                                                                            const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
+    setMinimumSize(p_parametres.tailleMiniImage);
+    QFont font("Arial", p_parametres.tailleDePolice);
+
     auto* chart = new StatistiqueDiagrammeCirculaire;
     chart->setTheme(QChart::ChartThemeLight);
     chart->setAnimationOptions(p_animation);
     chart->legend()->setVisible(p_legende);
     chart->legend()->setAlignment(Qt::AlignRight);
+    chart->legend()->setFont(font);
+    chart->setTitleFont(font);
+    chart->setFont(font);
 
     switch (p_statistique)
     {
@@ -39,12 +46,12 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             {
                 auto detailParPilote = new QPieSeries(this);
                 detailParPilote->setName("Vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
-                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, "Entrainement", donneesTypeDeVolParPilote);
-                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, "Sorties", donneesTypeDeVolParPilote);
-                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.tempsDeVolEnMinutes, "Balades", donneesTypeDeVolParPilote);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, "Entrainement", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, "Sorties", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.tempsDeVolEnMinutes, "Balades", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
 
                 QObject::connect(detailParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailParPilote->sum(), subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, detailParPilote);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailParPilote->sum(), subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, detailParPilote);
 
             }
 
@@ -78,57 +85,62 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                 {
                     *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvion,
                         subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
                         donneesTypeDeVolParPilote);
                 }
                 if (subventionParActivite.at(i).minutesVolAvionElectrique != 0)
                 {
                     *detailAvionElectrique << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolAvionElectrique,
                         subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
                         donneesTypeDeVolParPilote);
                 }
                 if (subventionParActivite.at(i).minutesVolUlm != 0)
                 {
                     *detailUlm << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolUlm, 
                         subventionParActivite.at(i).nomPrenomPilote, 
+                        p_parametres.tailleDePolice,
                         donneesTypeDeVolParPilote);
                 }
                 if (subventionParActivite.at(i).minutesVolPlaneur != 0)
                 {
                     *detailPlaneur << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolPlaneur, 
-                        subventionParActivite.at(i).nomPrenomPilote, 
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
                         donneesTypeDeVolParPilote);
                 }
                 if (subventionParActivite.at(i).minutesVolHelicoptere != 0)
                 {
                     *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolHelicoptere, 
                         subventionParActivite.at(i).nomPrenomPilote, 
+                        p_parametres.tailleDePolice,
                         detailHelicoptere);
                 }
             }
             if (detailAvion->sum() != 0)
             {
                 QObject::connect(detailAvion, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), "Avion", detailAvion);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), "Avion", p_parametres.tailleDePolice, detailAvion);
             }
             if (detailAvionElectrique->sum() != 0)
             {
                 QObject::connect(detailAvionElectrique, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), "Avion électrique", detailAvionElectrique);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), "Avion électrique", p_parametres.tailleDePolice, detailAvionElectrique);
             }
             if (detailUlm->sum() != 0)
             {
                 QObject::connect(detailUlm, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), "ULM", detailUlm);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), "ULM", p_parametres.tailleDePolice, detailUlm);
             }
             if (detailPlaneur->sum() != 0)
             {
                 QObject::connect(detailPlaneur, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), "Planeur", detailPlaneur);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), "Planeur", p_parametres.tailleDePolice, detailPlaneur);
             }
             if (detailHelicoptere->sum() != 0)
             {
                 QObject::connect(detailHelicoptere, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), "Hélicoptère", detailHelicoptere);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), "Hélicoptère", p_parametres.tailleDePolice, detailHelicoptere);
             }   
 
             QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
@@ -155,16 +167,16 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
 
             for (int i = 0; i < subventionParPilote.size(); i++)
             {
-                *detailEntrainement << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, donneesTypeDeVolParPilote);
-                *detailSortie << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, donneesTypeDeVolParPilote);
-                *detailBalade << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, donneesTypeDeVolParPilote);
+                *detailEntrainement << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
+                *detailSortie << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
+                *detailBalade << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.tempsDeVolEnMinutes, subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
             }
             QObject::connect(detailEntrainement, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailEntrainement->sum(), "Vols d'entrainement", detailEntrainement);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailEntrainement->sum(), "Vols d'entrainement", p_parametres.tailleDePolice, detailEntrainement);
             QObject::connect(detailSortie, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailSortie->sum(), "Sortie", detailSortie);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailSortie->sum(), "Sortie", p_parametres.tailleDePolice, detailSortie);
             QObject::connect(detailBalade, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailBalade->sum(), "Balades", detailBalade);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailBalade->sum(), "Balades", p_parametres.tailleDePolice, detailBalade);
 
             QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
 

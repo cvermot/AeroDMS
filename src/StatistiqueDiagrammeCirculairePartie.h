@@ -12,7 +12,7 @@ class StatistiqueDiagrammeCirculairePartie : public QPieSlice
 {
     Q_OBJECT
 public:
-    StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, QAbstractSeries* drilldownSeries);
+    StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries);
     QAbstractSeries* drilldownSeries() const;
 
 public slots:

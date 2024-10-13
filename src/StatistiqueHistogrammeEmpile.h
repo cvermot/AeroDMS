@@ -15,7 +15,8 @@ public:
     explicit StatistiqueHistogrammeEmpile( ManageDb* p_db, 
                                            const int p_annee,
                                            QWidget* parent = nullptr,
-                                           const QChart::AnimationOption p_animation = QChart::AllAnimations);
+                                           const QChart::AnimationOption p_animation = QChart::AllAnimations,
+                                           const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 };
 
 #endif

@@ -17,7 +17,8 @@ public:
                                             QWidget* parent = nullptr,
                                             const int p_annee = -1,
                                             const QChart::AnimationOption p_animation = QChart::AllAnimations,
-                                            const bool p_legende = true);
+                                            const bool p_legende = true,
+                                            const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 
 private:
     const Qt::GlobalColor recupererNouvelleCouleur();

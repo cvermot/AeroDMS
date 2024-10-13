@@ -14,14 +14,19 @@
 StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db, 
                                                             const int p_annee, 
                                                             QWidget* parent,
-                                                            const QChart::AnimationOption p_animation)
+                                                            const QChart::AnimationOption p_animation,
+                                                            const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
+    setMinimumSize(p_parametres.tailleMiniImage);
+    QFont font("Arial", p_parametres.tailleDePolice);
+
     const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
 
     auto entrainement = new QBarSet("Entrainement");
     auto sortie = new QBarSet("Sortie");
     auto balade = new QBarSet("Balade");
+
     QStringList mois;
 
     for (int i = 0; i < heuresDeVol.size() ; i++)
@@ -41,18 +46,22 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     auto chart = new QChart;
     chart->addSeries(series);
     chart->setTitle("Nombre d'heures de vol par mois");
+    chart->setTitleFont(font);
     chart->setAnimationOptions(p_animation);
 
     auto axisX = new QBarCategoryAxis;
+    axisX->setLabelsFont(font);
     axisX->append(mois);
     chart->addAxis(axisX, Qt::AlignBottom);
     series->attachAxis(axisX);
     auto axisY = new QValueAxis;
+    axisY->setLabelsFont(font);
     chart->addAxis(axisY, Qt::AlignLeft);
     series->attachAxis(axisY);
 
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->legend()->setFont(font);
 
     createDefaultChartView(chart);
 }

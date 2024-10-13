@@ -29,4 +29,7 @@ QString StatistiqueDonutCombinePartie::name() const
 void StatistiqueDonutCombinePartie::updateLabel()
 {
     setLabel(QString("%1 %2%").arg(m_name).arg(percentage() * 100, 0, 'f', 2));
+    QFont font;
+    font.setPointSize(30);
+    //setLabelFont(font);
 }
