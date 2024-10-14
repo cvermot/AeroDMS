@@ -2118,6 +2118,7 @@ void AeroDms::peuplerListesPilotes()
 
     listeDeroulantePilote->clear();
     choixPilote->clear();
+    choixPayeur->clear();
 
     listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone("Tous"), "Tous les pilotes", "*");
     choixPilote->addItem("", "aucun");
