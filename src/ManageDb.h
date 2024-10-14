@@ -128,8 +128,7 @@ public:
 
     AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
     QString recupererMailPilotes( const int p_annee,
-                                  const bool p_pilotesActifsSeulement,
-                                  const bool p_pilotesBrevetes = false);
+                                  const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee);
     QList<QDate> recupererDatesDesDemandesDeSubventions();
     QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");

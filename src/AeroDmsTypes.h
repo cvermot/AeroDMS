@@ -182,6 +182,16 @@ public:
         Onglet_STATISTIQUES
     };
 
+    enum MailPilotes
+    {
+        MailPilotes_AYANT_COTISE,
+        MailPilotes_ACTIF_AYANT_COTISE,
+        MailPilotes_ACTIFS,
+        MailPilotes_ACTIFS_ET_BREVETES,
+        MailPilotes_BREVETES,
+        MailPilotes_SUBVENTION_NON_CONSOMMEE
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande;
         QString idPilote;

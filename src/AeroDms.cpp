@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("5.1");
+    QApplication::setApplicationVersion("5.2");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -782,10 +782,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
     mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes n'ayant pas épuisé leur subvention entrainement"), this);
     mailing->addAction(mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement);
-    mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement->setEnabled(false); //TODO
     mailingPilotesActifs = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes &actifs"), this);
     mailing->addAction(mailingPilotesActifs);
-    mailingPilotesActifs->setEnabled(false); //TODO
     mailingPilotesActifsBrevetes = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes actifs &brevetés"), this);
     mailing->addAction(mailingPilotesActifsBrevetes);
     mailingPilotesDerniereDemandeSubvention = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), this);
@@ -2639,38 +2637,33 @@ void AeroDms::envoyerMail()
     if (sender() == mailingPilotesAyantCotiseCetteAnnee)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), false)
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_AYANT_COTISE)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifsAyantCotiseCetteAnnee)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), true)
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIF_AYANT_COTISE)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifsBrevetes)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), true, true)
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIFS_ET_BREVETES)
             + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement)
     {
-        //TODO
-        /*
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailDerniereDemandeDeSubvention()
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE)
             + "?subject=[Section aéronautique] Chèques aéro&body="
-            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode)); */
+            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifs)
     {
-        //TODO
-        /*
         QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailDerniereDemandeDeSubvention()
-            + "?subject=[Section aéronautique] Chèques aéro&body="
-            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode)); */
+            + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIFS)
+            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesDerniereDemandeSubvention)
     {

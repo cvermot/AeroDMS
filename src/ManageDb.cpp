@@ -1508,24 +1508,46 @@ QStringList ManageDb::recupererListeActivites()
 }
 
 QString ManageDb::recupererMailPilotes( const int p_annee, 
-                                        const bool p_pilotesActifsSeulement,
-                                        const bool p_pilotesBrevetes)
+                                        const AeroDmsTypes::MailPilotes p_mailingDemande)
 {
     QSqlQuery query;
-    query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
-    if (p_pilotesActifsSeulement)
+
+    switch(p_mailingDemande)
     {
-        query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND estActif = 1");
-        if (p_pilotesBrevetes)
+        case AeroDmsTypes::MailPilotes_ACTIF_AYANT_COTISE:
+        {
+            query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND estActif = 1");
+        }
+        break;
+        case AeroDmsTypes::MailPilotes_ACTIFS_ET_BREVETES:
         {
             query.prepare("SELECT piloteId, mail FROM pilote WHERE estActif = 1 AND estBrevete = 1");
-            qDebug() << "ici";
         }
+        break;
+        case AeroDmsTypes::MailPilotes_BREVETES:
+        {
+            query.prepare("SELECT piloteId, mail FROM pilote WHERE estBrevete = 1");
+        }
+        break;
+        case AeroDmsTypes::MailPilotes_ACTIFS:
+        {
+            query.prepare("SELECT piloteId, mail FROM pilote WHERE estActif = 1");
+        }
+        break;
+        case AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE:
+        {
+            query.prepare("SELECT piloteId, mail, annee, montantSubventionAnnuelleEntrainement, SUM(vol.montantRembourse) AS montantRembourse, vol.typeDeVol FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId INNER JOIN vol ON pilote.piloteId = vol.pilote WHERE annee = :annee AND strftime('%Y', vol.date) = :anneeStr AND vol.typeDeVol = 'Entrainement' GROUP BY piloteId");
+        }
+        break;
+        case AeroDmsTypes::MailPilotes_AYANT_COTISE:
+        default:
+        {
+            query.prepare("SELECT piloteId, mail, annee FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee");
+        }
+        break;
     }
-    else if (p_pilotesBrevetes)
-    {
-        query.prepare("SELECT piloteId, mail FROM pilote WHERE estBrevete = 1");
-    }
+
+    query.bindValue(":p_anneeStr", QString::number(p_annee));
     query.bindValue(":annee", p_annee);
     query.exec();
 
@@ -1533,8 +1555,14 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
 
     while (query.next())
     {
-        listeMail.append(query.value("mail").toString());
-        listeMail.append(";");
+        if ( p_mailingDemande != AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE
+             || ( p_mailingDemande == AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE
+                  && query.value("montantRembourse").toDouble() < query.value("montantSubventionAnnuelleEntrainement").toDouble() ) )
+        {
+            listeMail.append(query.value("mail").toString());
+            listeMail.append(";");
+        }
+        
     }
 
     //On retire le dernier ";" si liste non vide
@@ -1542,8 +1570,6 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
     {
         listeMail.chop(1);
     }
-
-    qDebug() << listeMail << query.size();
 
     return listeMail;
 }
