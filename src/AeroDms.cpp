@@ -1747,7 +1747,8 @@ void AeroDms::genererPdf()
          + db->recupererLesCotisationsAEmettre().size()
          + db->recupererLesRecettesBaladesEtSortiesAEmettre().size()) == 0)
     {
-        demandeConfirmationGeneration.setStandardButtons( QMessageBox::No);
+        demandeConfirmationGeneration.setInformativeText("Rien à génerer. Génération indisponible.");
+        demandeConfirmationGeneration.setStandardButtons( QMessageBox::Close);
     }
 
     const int ret = demandeConfirmationGeneration.exec();
