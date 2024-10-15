@@ -183,6 +183,7 @@ private:
     QAction* boutonGraphRecapAnnuelStatutsDesPilotes;
     QAction* boutonGraphRecapAnnuelAeronefs;
     QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs;
+    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap;
     QAction* boutonGraphResolutionFullHd;
     QAction* boutonGraphResolutionQhd;
     QAction* boutonGraphResolution4k;

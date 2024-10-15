@@ -696,6 +696,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
+    menuOptionsRecapAnnuel->addSeparator();
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(QIcon("./ressources/check-all.svg"), tr("Sélectionner tous les graphs et tous les récaps"), this);
+    menuOptionsRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap);
+    connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
+
     boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les PDF à la fin de la génération", this);
     boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
     boutonOuvrirAutomatiquementLesPdfGeneres->setChecked(parametresMetiers.ouvertureAutomatiqueApresGeneration);
@@ -1010,6 +1015,12 @@ void AeroDms::changerResolutionExportGraphiques()
 
 void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
 {
+    if (sender() == boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap)
+    {
+        boutonOptionRecapAnnuelRecettes->setChecked(true);
+        boutonOptionRecapAnnuelBaladesSorties->setChecked(true);
+    }
+
     boutonGraphRecapAnnuelHeuresAnnuelles->setChecked(true);
     boutonGraphRecapAnnuelHeuresParPilote->setChecked(true);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setChecked(true);
