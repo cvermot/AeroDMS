@@ -1547,7 +1547,7 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
         break;
     }
 
-    query.bindValue(":p_anneeStr", QString::number(p_annee));
+    query.bindValue(":anneeStr", QString::number(p_annee));
     query.bindValue(":annee", p_annee);
     query.exec();
 

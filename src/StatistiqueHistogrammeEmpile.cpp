@@ -46,7 +46,7 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     auto chart = new QChart;
     chart->addSeries(series);
     chart->setTitle("Nombre d'heures de vol par mois");
-    chart->setTitleFont(font);
+    chart->setTitleFont(QFont("Arial", p_parametres.tailleDePolice*1.5, QFont::Bold));
     chart->setAnimationOptions(p_animation);
 
     auto axisX = new QBarCategoryAxis;

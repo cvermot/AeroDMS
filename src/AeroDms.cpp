@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("5.2");
+    QApplication::setApplicationVersion("5.3");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -689,7 +689,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(boutonGraphResolutionFullHd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
     connect(boutonGraphResolutionQhd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
     connect(boutonGraphResolution4k, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
-    boutonGraphResolutionFullHd->activate(QAction::Trigger);
+    boutonGraphResolution4k->activate(QAction::Trigger);
 
     graphiquesDuRecapAnnuel->addSeparator();
     boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/check-all.svg"), tr("Sélectionner tous les graphs"), this);

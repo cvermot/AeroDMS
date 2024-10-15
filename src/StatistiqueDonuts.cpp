@@ -50,6 +50,7 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     chart->legend()->setVisible(false);
     chart->legend()->setFont(font);
     chart->setTitle("Statistiques sur les pilotes");
+    chart->setTitleFont(QFont("Arial", p_parametres.tailleDePolice * 1.5, QFont::Bold));
     chart->setAnimationOptions(QChart::AllAnimations);
     chart->layout()->setContentsMargins(0, 0, 0, 0);
   

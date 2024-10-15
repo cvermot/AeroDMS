@@ -28,8 +28,11 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
     chart->legend()->setVisible(p_legende);
     chart->legend()->setAlignment(Qt::AlignRight);
     chart->legend()->setFont(font);
-    chart->setTitleFont(font);
     chart->setFont(font);
+
+    font.setBold(true);
+    font.setPointSizeF(p_parametres.tailleDePolice * 1.5);
+    chart->setTitleFont(font);
 
     switch (p_statistique)
     {
@@ -40,12 +43,20 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                                                                                                               p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            donneesTypeDeVolParPilote->setName("Temps de vol par pilote (cliquez pour le détail par pilote)");
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par pilote (cliquez pour le détail par pilote)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par pilote");
+            }
+            
 
             for (int i = 0; i < subventionParPilote.size(); i++)
             {
                 auto detailParPilote = new QPieSeries(this);
-                detailParPilote->setName("Vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
+                detailParPilote->setName("Détails par type de vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, "Entrainement", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, "Sorties", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.tempsDeVolEnMinutes, "Balades", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
@@ -156,7 +167,14 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                                                                                                               p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            donneesTypeDeVolParPilote->setName("Temps de vol par type de vol (cliquez pour le détail des heures par pilote dans la catégorie)");
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par type de vol (cliquez pour le détail des heures par pilote dans la catégorie)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par type de vol");
+            }
 
             auto detailEntrainement = new QPieSeries(this);
             detailEntrainement->setName("Vols d'entrainement");
