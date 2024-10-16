@@ -16,6 +16,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Écriture PDF à partir d’un template HTML via WebEngine (QtWebEngine)
   - Accès à la BDD SQLite (QtSql)
   - Affichage des statistiques (QtCharts)
+  - Export des graphiques en SVG (QtSvg)
 - Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
 
 ## Mise en place de l’environnement de développement
@@ -61,7 +62,7 @@ Le splashscreen est généré via IA avec [Microsoft Designer](https://designer.
 ![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.png)
 
 ## Licence
-Le logiciel est diffusé sur licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
+Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
 
 
 
