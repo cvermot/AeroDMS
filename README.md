@@ -61,7 +61,7 @@ Le splashscreen est généré via IA avec [Microsoft Designer](https://designer.
 ![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.png)
 
 ## Licence
-Le logiciel est diffusé sur licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
+Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
 
 
 
