@@ -251,6 +251,7 @@ public:
         QString nom;
         QString prenom;
         QString aeroclub;
+        QString mail;
         float montantSubventionEntrainement;
         HeureDeVolRemboursement entrainement;
         HeureDeVolRemboursement balade;
@@ -404,6 +405,7 @@ public:
         QString nomTresorier;
         int delaisDeGardeBdd;
         QString texteMailDispoCheques;
+        QString texteMailSubventionRestante;
         bool ouvertureAutomatiqueApresGeneration;
     };
 

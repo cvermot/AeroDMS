@@ -24,7 +24,7 @@ const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_RE
                                                                                                 AeroDmsServices::convertirMinutesEnHeuresMinutes(0), 
                                                                                                 0 };
 
-const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", 0.0, 
+const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", "", 0.0,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,

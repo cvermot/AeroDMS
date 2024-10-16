@@ -76,11 +76,13 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     if (settings.value("mailing/texteChequesDisponibles", "") == "")
     {
         settings.beginGroup("mailing");
-        settings.setValue("texteChequesDisponibles", "Bonjour,\n\nVos chèques sont disponibles. \n\nCordialement");
+        settings.setValue("texteChequesDisponibles", tr("Bonjour,\n\nVos chèques sont disponibles. \n\nCordialement"));
+        settings.setValue("texteSubventionRestante", tr("Bonjour,\n\nSauf erreur de notre part, vous disposez encore d'un budget entrainement non consommé. \n\nCordialement"));
         settings.endGroup();
     }
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
+    parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
 
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
@@ -2670,7 +2672,7 @@ void AeroDms::envoyerMail()
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE)
             + "?subject=[Section aéronautique] Chèques aéro&body="
-            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
+            + parametresMetiers.texteMailSubventionRestante, QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifs)
     {

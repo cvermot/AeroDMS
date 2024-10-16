@@ -341,6 +341,7 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.nom = query.value("nom").toString();
         subvention.prenom = query.value("prenom").toString();
         subvention.aeroclub = query.value("aeroclub").toString();
+        subvention.mail = query.value("mail").toString();
         subvention.montantSubventionEntrainement = query.value("montantSubventionAnnuelleEntrainement").toFloat();
 
         QSqlQuery queryVolAnneePilote;
@@ -1510,6 +1511,7 @@ QStringList ManageDb::recupererListeActivites()
 QString ManageDb::recupererMailPilotes( const int p_annee, 
                                         const AeroDmsTypes::MailPilotes p_mailingDemande)
 {
+    QString listeMail;
     QSqlQuery query;
 
     switch(p_mailingDemande)
@@ -1536,7 +1538,17 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
         break;
         case AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE:
         {
-            query.prepare("SELECT piloteId, mail, annee, montantSubventionAnnuelleEntrainement, SUM(vol.montantRembourse) AS montantRembourse, vol.typeDeVol FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId INNER JOIN vol ON pilote.piloteId = vol.pilote WHERE annee = :annee AND strftime('%Y', vol.date) = :anneeStr AND vol.typeDeVol = 'Entrainement' GROUP BY piloteId");
+            const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = recupererSubventionsPilotes(p_annee, "*");
+            for (int i = 0; i < listeSubventions.size(); i++)
+            {
+                const AeroDmsTypes::SubventionsParPilote subvention = listeSubventions.at(i);
+                if (subvention.entrainement.montantRembourse < subvention.montantSubventionEntrainement)
+                {
+                    listeMail.append(subvention.mail);
+                    listeMail.append(";");
+                }
+            }
+            //query.prepare("SELECT piloteId, mail, annee, montantSubventionAnnuelleEntrainement, SUM(vol.montantRembourse) AS montantRembourse, vol.typeDeVol FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId INNER JOIN vol ON pilote.piloteId = vol.pilote WHERE annee = :annee AND strftime('%Y', vol.date) = :anneeStr AND vol.typeDeVol = 'Entrainement' GROUP BY piloteId");
         }
         break;
         case AeroDmsTypes::MailPilotes_AYANT_COTISE:
@@ -1547,23 +1559,17 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
         break;
     }
 
-    query.bindValue(":anneeStr", QString::number(p_annee));
-    query.bindValue(":annee", p_annee);
-    query.exec();
-
-    QString listeMail;
-
-    while (query.next())
+    if (p_mailingDemande != AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE)
     {
-        if ( p_mailingDemande != AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE
-             || ( p_mailingDemande == AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE
-                  && query.value("montantRembourse").toDouble() < query.value("montantSubventionAnnuelleEntrainement").toDouble() ) )
+        query.bindValue(":annee", p_annee);
+        query.exec();
+
+        while (query.next())
         {
             listeMail.append(query.value("mail").toString());
             listeMail.append(";");
         }
-        
-    }
+    }  
 
     //On retire le dernier ";" si liste non vide
     if (listeMail.size() != 0)
