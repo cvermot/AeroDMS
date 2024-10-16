@@ -32,9 +32,9 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     for (int i = 0; i < heuresDeVol.size() ; i++)
     {
         const AeroDmsTypes::StatsHeuresDeVol hdv = heuresDeVol.at(i);
-        *entrainement << hdv.minutesEntrainement/60;
-        *sortie << hdv.minutesSortie/60;
-        *balade << hdv.minutesBalade/60;
+        *entrainement << hdv.minutesEntrainement/60.0;
+        *sortie << hdv.minutesSortie/60.0;
+        *balade << hdv.minutesBalade/60.0;
         mois.append(hdv.mois);
     }
 

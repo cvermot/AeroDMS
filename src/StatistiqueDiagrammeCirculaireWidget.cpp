@@ -77,7 +77,14 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            donneesTypeDeVolParPilote->setName("Temps de vol par activité (cliquez pour le détail des heures par pilote dans l'activité)");
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par activité (cliquez pour le détail des heures par pilote dans l'activité)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Temps de vol par activité");
+            }        
 
             auto detailAvion = new QPieSeries(this);
             detailAvion->setName("Avion");
