@@ -162,11 +162,11 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     QDir().mkdir(cheminSortieFichiersGeneres);
     if (QDir(cheminSortieFichiersGeneres).exists())
     {
+        emit mettreAJourNombreFacturesATraiter(3+ calculerNbEtapesGenerationRecapHdV(p_graphAGenerer));
+        emit mettreAJourNombreFacturesTraitees(0);
+
         cheminSortieFichiersGeneres.append("/");
         listeDesFichiers.clear();
-
-        emit mettreAJourNombreFacturesATraiter(3);
-        emit mettreAJourNombreFacturesTraitees(0);
 
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
                                                                                                                    "*",
@@ -235,7 +235,9 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
                                      listeAnnees.size();
         }
 
-        emit mettreAJourNombreFacturesATraiter(3*nombreEtapesAEffectuer);
+        nombreEtapesAEffectuer = 3 * nombreEtapesAEffectuer + calculerNbEtapesGenerationRecapHdV(p_valeurGraphAGenerer);
+
+        emit mettreAJourNombreFacturesATraiter(nombreEtapesAEffectuer);
         emit mettreAJourNombreFacturesTraitees(0);
 
         db->sauvegarderLaBdd(cheminSortieFichiersGeneres);
@@ -964,6 +966,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         delete stats;
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
@@ -988,6 +993,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         delete stats;
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
@@ -1012,6 +1020,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         delete stats;
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
@@ -1036,6 +1047,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         delete stats;
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
@@ -1060,6 +1074,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         delete stats;
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
     
     delete m_contentArea;
@@ -1090,5 +1107,34 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
     }
 
     return resolutionEtParametres;
+}
+
+int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
+{
+    int nbGraph =  0;
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
+    {
+        nbGraph++;
+    }
+
+    qDebug() <<"Graphiques" << nbGraph;
+
+    return nbGraph;
 }
 

@@ -76,6 +76,8 @@ private :
 
 	QString genererHtmlRecapBaladesSorties(const int p_annee);
 
+	static int calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer);
+
 	QString numeroFichierSur3Digits();
 
 	void mergerPdf();
