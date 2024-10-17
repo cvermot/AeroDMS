@@ -52,7 +52,7 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
     donutBreakdown->setAnimationOptions(p_animation);
 
     donutBreakdown->legend()->setVisible(p_legende);
-    donutBreakdown->setTitle("Statistiques de répartition des vols par aéronefs et types d'aéronefs");
+    donutBreakdown->setTitle("Répartition des vols par aéronefs et types d'aéronefs");
     donutBreakdown->setTitleFont(QFont("Arial", p_parametres.tailleDePolice * 1.5, QFont::Bold));
     donutBreakdown->legend()->setAlignment(Qt::AlignRight);
     

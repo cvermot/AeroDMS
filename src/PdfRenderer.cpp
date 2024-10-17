@@ -953,17 +953,12 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                                                                      m_contentArea,
                                                                      QChart::NoAnimation, 
                                                                      tailleImage );
+
         const QString urlImage = cheminSortie + "heuresAnnuelles";
-        stats->grab().save(urlImage + ".png");
 
-        QSvgGenerator generator;
-        generator.setFileName(urlImage + ".svg");
-        generator.setSize(stats->size());
-        generator.setViewBox(stats->rect());
-        generator.setTitle(tr("Heures annuelles ") + QString::number(p_annee));
-        stats->render(&generator);
-
-        delete stats;
+        enregistrerImage(stats,
+            urlImage,
+            tr("Heures annuelles ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
 
@@ -981,16 +976,10 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             false, 
             tailleImage);
         const QString urlImage = cheminSortie + "pilote";
-        stats->grab().save(urlImage + ".png");
 
-        QSvgGenerator generator;
-        generator.setFileName(urlImage + ".svg");
-        generator.setSize(stats->size());
-        generator.setViewBox(stats->rect());
-        generator.setTitle(tr("Heures par pilote ") + QString::number(p_annee));
-        stats->render(&generator);
-
-        delete stats;
+        enregistrerImage(stats,
+            urlImage,
+            tr("Heures par pilote ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
 
@@ -1007,17 +996,12 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false, 
             tailleImage);
+
         const QString urlImage = cheminSortie + "typeVol";
-        stats->grab().save(urlImage + ".png");
 
-        QSvgGenerator generator;
-        generator.setFileName(urlImage + ".svg");
-        generator.setSize(stats->size());
-        generator.setViewBox(stats->rect());
-        generator.setTitle(tr("Type de vol ") + QString::number(p_annee));
-        stats->render(&generator);
-
-        delete stats;
+        enregistrerImage(stats,
+            urlImage,
+            tr("Type de vol ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
 
@@ -1034,17 +1018,12 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false,
             tailleImage);
+
         const QString urlImage = cheminSortie + "activite";
-        stats->grab().save(urlImage + ".png");
 
-        QSvgGenerator generator;
-        generator.setFileName(urlImage + ".svg");
-        generator.setSize(stats->size());
-        generator.setViewBox(stats->rect());
-        generator.setTitle(tr("Activités ") + QString::number(p_annee));
-        stats->render(&generator);
-
-        delete stats;
+        enregistrerImage(stats,
+            urlImage,
+            tr("Activités ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
 
@@ -1061,17 +1040,12 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             QChart::NoAnimation,
             false,
             tailleImage);
+
         const QString urlImage = cheminSortie + "aeronef";
-        stats->grab().save(urlImage + ".png");
 
-        QSvgGenerator generator;
-        generator.setFileName(urlImage + ".svg");
-        generator.setSize(stats->size());
-        generator.setViewBox(stats->rect());
-        generator.setTitle(tr("Aéronefs ") + QString::number(p_annee));
-        stats->render(&generator);
-
-        delete stats;
+        enregistrerImage( stats,
+                          urlImage,
+                          tr("Aéronefs ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
 
@@ -1083,6 +1057,24 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     return html;
 }
+
+void PdfRenderer::enregistrerImage( QWidget *p_widget,
+                                    QString p_urlImage,
+                                    QString p_titre)
+{
+    p_widget->grab().save(p_urlImage + ".png");
+
+    QSvgGenerator generator;
+    generator.setFileName(p_urlImage + ".svg");
+    generator.setSize(p_widget->size());
+    generator.setViewBox(p_widget->rect());
+    generator.setTitle(p_titre);
+    generator.setDescription(tr("Image générée avec AeroDms v") + QApplication::applicationVersion());
+    p_widget->render(&generator);
+
+    delete p_widget;
+}
+
 AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution)
 {
     QSize size(1920,1080);

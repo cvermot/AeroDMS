@@ -84,6 +84,10 @@ private :
 
 	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution);
 
+	void enregistrerImage( QWidget* p_widget,
+						   QString p_urlImage,
+						   QString p_titre);
+
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);
