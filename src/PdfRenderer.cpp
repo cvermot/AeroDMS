@@ -1133,8 +1133,6 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
         nbGraph++;
     }
 
-    qDebug() <<"Graphiques" << nbGraph;
-
     return nbGraph;
 }
 

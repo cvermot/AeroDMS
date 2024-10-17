@@ -1223,9 +1223,9 @@ void AeroDms::peuplerTableVols()
     for (int i = 0; i < listeVols.size(); i++)
     {
         const AeroDmsTypes::Vol vol = listeVols.at(i);
-        if (vol.estSoumis && volAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS
-            || !vol.estSoumis && volAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS
-            || volAAfficher == AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS)
+        if ( (vol.estSoumis && volAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS)
+              || (!vol.estSoumis && volAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS)
+              || volAAfficher == AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS)
         {
             vueVols->setRowCount(nbItems + 1);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
@@ -1350,46 +1350,47 @@ void AeroDms::peuplerTableRecettes()
 
     for (int i = 0; i < listeRecettesCotisations.size(); i++)
     {
-        
         AeroDmsTypes::RecetteDetail recette = listeRecettesCotisations.at(i);
 
-        if (recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS
-            || !recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS
+        //qDebug() << "elements a afficher" << i << recette.intitule << recette.annee << recette.estSoumisCe << (!recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
+
+        if ( (recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS )
+            || (!recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS)
             || elementAAfficher == AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS)
         {
+            const int position = vueRecettes->rowCount();
             vueRecettes->setRowCount(vueRecettes->rowCount() + 1);
 
-            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
-            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
-            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant, 'f', 2) + " €"));
-            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
-            vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant, 'f', 2) + " €"));
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(recette.typeDeRecette));
             if (recette.estSoumisCe)
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Oui");
                 twSoumisCe->setIcon(AeroDmsServices::recupererIcone("Oui"));
-                vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
+                vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }
             else
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Non");
                 twSoumisCe->setIcon(AeroDmsServices::recupererIcone("Non"));
-                vueRecettes->setItem(i, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
-            }
-        }
-           
+                vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
+            }   
+        }      
     }
 
     for (int i = 0; i < listeRecettesHorsCotisations.size(); i++)
     {
         AeroDmsTypes::RecetteDetail recette = listeRecettesHorsCotisations.at(i); 
 
-        if (recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS
-            || !recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS
+        if ((recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS)
+            || (!recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS)
             || elementAAfficher == AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS)
         {
+            const int position = vueRecettes->rowCount();
             vueRecettes->setRowCount(vueRecettes->rowCount() + 1);
-            const int position = listeRecettesCotisations.size() + i;
 
             vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
             vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(recette.id));
@@ -1408,7 +1409,7 @@ void AeroDms::peuplerTableRecettes()
                 twSoumisCe->setIcon(AeroDmsServices::recupererIcone("Non"));
                 vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }
-        }    
+        }   
     }
 
     vueRecettes->resizeColumnsToContents();
