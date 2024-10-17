@@ -76,17 +76,17 @@ private :
 
 	QString genererHtmlRecapBaladesSorties(const int p_annee);
 
-	static int calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer);
+	void mergerPdf();
 
 	QString numeroFichierSur3Digits();
 
-	void mergerPdf();
+	static int calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer);
 
 	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution);
 
-	void enregistrerImage( QWidget* p_widget,
-						   QString p_urlImage,
-						   QString p_titre);
+	static void enregistrerImage( QWidget* p_widget,
+						          const QString p_urlImage,
+							      const QString p_titre);
 
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);

@@ -1059,8 +1059,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 }
 
 void PdfRenderer::enregistrerImage( QWidget *p_widget,
-                                    QString p_urlImage,
-                                    QString p_titre)
+                                    const QString p_urlImage,
+                                    const QString p_titre)
 {
     p_widget->grab().save(p_urlImage + ".png");
 
