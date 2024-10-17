@@ -6,6 +6,8 @@
 
 Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 
+![Copie d'écran d'AéroDMS, version 3.4](https://raw.githubusercontent.com/wiki/cvermot/AeroDMS/images/AeroDmsFactureOuverteExtrait.png)
+
 ## Technologies utilisées
 
 - Développé en C++
