@@ -20,7 +20,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 - Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
 
 ## Mise en place de l’environnement de développement
-Le développement est effectué sous Visual Studio 2022 (MSVC). Cette contrainte découle du fait que QtWebEngine n’est pas disponible lorsque Qt est compilé avec MinGw, cela interdit donc la compilation de l’application sous QtCreator sous Windows.
+Le développement est effectué sous Visual Studio 2022 (MSVC). Cette contrainte découle du fait que QtWebEngine n’est pas disponible lorsque Qt est compilé avec MinGw, cela interdit donc la compilation de l’application avec QtCreator sous Windows.
 
 ### Installation des outils
 Installer Qt, MSVC 2022 et le plugin Qt pour MSVC.
