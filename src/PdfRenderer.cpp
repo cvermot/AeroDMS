@@ -754,7 +754,6 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
 
     const AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails = db->recupererListeDetailsBaladesEtSorties(p_annee);
 
-
     AeroDmsTypes::ListeBaladesEtSortiesParIdSortie listesParIdSortie;
 
     //On ajoute le premier item, si la liste retournée par la requete n'est pas vide...
@@ -768,7 +767,6 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
         baladesEtSortiesAssociees.volsUniques.append(listeDetails.at(0));
         baladeParId.baladesEtSortiesAssociees.append(baladesEtSortiesAssociees);
         listesParIdSortie.push_back(baladeParId);
-
 
         QVector<int> idsVolsDejaAjoute;
         QVector<int> idsRecettesDejaAjoute;
@@ -839,14 +837,12 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
                 listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.append(details);
                 listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.append(details);
             }
-
         }
 
         //On finalise le groupe N-1
         const int nombreItemVol = listesParIdSortie.last().baladesEtSortiesAssociees.last().volsUniques.size();
         const int nombreItemRecette = std::max(int(listesParIdSortie.last().baladesEtSortiesAssociees.last().recettesUniques.size()), 1);
         listesParIdSortie.last().nombreDeLignes = listesParIdSortie.last().nombreDeLignes + nombreItemVol * nombreItemRecette;
-
 
         //Phase de génération HTML
 
@@ -865,8 +861,8 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
 
         for (int i = 0; i < listesParIdSortie.size(); i++)
         {
-            html = html + "<tr>";
-            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(listesParIdSortie.at(i).nombreDeLignes) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(0).volsUniques.at(0).nomSortie + "</td>";
+            html = html + "  <tr>\n";
+            html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(listesParIdSortie.at(i).nombreDeLignes) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(0).volsUniques.at(0).nomSortie + "</td>\n";
 
             for (int j = 0; j < listesParIdSortie.at(i).baladesEtSortiesAssociees.size(); j++)
             {
@@ -874,8 +870,8 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
                 const int nombreLignes = listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.size() * std::max(1, int(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.size()));
 
                 if (j != 0)
-                    html = html + "<tr>";
-                html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(nombreLignes) + "'>" + "#" + QString::number(nbItem) + " " + "</td >";
+                    html = html + "  <tr>\n";
+                html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(nombreLignes) + "'>" + "#" + QString::number(nbItem) + " " + "</td >\n";
 
                 int compteurLignesPourVol = 0;
                 int compteurLignesPourRecette = 0;
@@ -887,16 +883,16 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
                 {
 
                     if (k != 0)
-                        html = html + "<tr>";
+                        html = html + "  <tr>\n";
                     if (compteurLignesPourVol == 0)
                     {
                         compteurLignesPourVol = std::max(1, int(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.size()));
 
-                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dateVol.toString("dd/MM/yyyy") + "</td >";
-                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).nomPassagers + "</td>";
-                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dureeVol) + "</td>";
-                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).coutVol) + " €</td>";
-                        html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).montantRembouse) + " €</td>";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dateVol.toString("dd/MM/yyyy") + "</td >\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).nomPassagers + "</td>\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dureeVol) + "</td>\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).coutVol) + " €</td>\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).montantRembouse) + " €</td>\n";
                         compteurVol++;
                     }
                     if (compteurLignesPourRecette == 0)
@@ -905,26 +901,28 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
 
                         if (listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette != 0)
                         {
-                            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).intituleRecette + "</td >";
-                            html = html + "<td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette) + " €</td>";
+                            html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).intituleRecette + "</td >\n";
+                            html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette) + " €</td>\n";
                         }
                         else
                         {
-                            html = html + "<td class = 'tg-1zu3' colspan='2' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>Paiement non encore reçu</td >";
+                            html = html + "    <td class = 'tg-1zu3' colspan='2' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>Paiement non encore reçu</td >\n";
                         }
 
                         compteurRecettes++;
                     }
 
-                    html = html + "</tr>";
-
                     compteurLignesPourVol--;
                     compteurLignesPourRecette--;
+
+                    html = html + "  </tr>\n";
                 }
 
                 listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j);
             }
+            html = html + "  </tr>\n";
         }
+        html = html + "</tbody>\n</table>";
     }
     else
     {
@@ -960,7 +958,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures annuelles ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -981,7 +979,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1003,7 +1001,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1025,7 +1023,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1047,7 +1045,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>";
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);

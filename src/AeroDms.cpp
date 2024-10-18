@@ -2343,7 +2343,7 @@ void AeroDms::aPropos()
 {
     QMessageBox::about(this, tr("À propos de AeroDms"),
         "<b>AeroDms v"+QApplication::applicationVersion() + "</b> < br />< br /> "
-        "Logiciel de gestion de compta section d'une section aéronautique. <br /><br />"
+        "Logiciel de gestion de compta d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
         "Ce programme utilise la libraire <a href=\"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
