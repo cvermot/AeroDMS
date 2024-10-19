@@ -201,7 +201,6 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesAerogest( std::vector<
     while (index < p_entries.size())
     {
         QString data = QString(p_entries.at(index).Text.data());
-        qDebug() << data;
 
         if (data.contains(immatRe))
         {
@@ -223,7 +222,6 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesAerogest( std::vector<
         {
             QRegularExpressionMatch match = euroRe.match(data);
             donneesFactures.coutDuVol = match.captured("montant").toFloat();
-            qDebug() << "montant detecté";
         }
 
         if (data.contains(" minutes"))
@@ -622,7 +620,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuCsv(const Q
             {
                 QString str = csvItem.at(i);
                 str.replace(",", ".").replace(" ", "");
-                qDebug() << str;
                 if (str.contains(heureRe))
                 {
                     donnesFacture.dureeDuVol = extraireDureeRegex(str);

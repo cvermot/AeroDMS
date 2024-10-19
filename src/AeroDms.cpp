@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("5.4");
+    QApplication::setApplicationVersion("5.5");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -582,6 +582,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
+    connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
     //========================Menu Fichier
     QMenu* menuFichier = menuBar()->addMenu(tr("&Fichier"));
 
@@ -1153,8 +1154,9 @@ void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFac
 }
 void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier)
 {
-    //On met à jour la table des vols (champ Soumis CE)
+    //On met à jour la table des vols et des recettes (champ Soumis CE)
     peuplerTableVols();
+    peuplerTableRecettes();
 
     //On met à jour la table des subventions demandées
     peuplerTableSubventionsDemandees();
@@ -1168,6 +1170,12 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);
+}
+
+void AeroDms::mettreAJourEchecGenerationPdf()
+{
+    progressionGenerationPdf->close();
+    statusBar()->showMessage("Echec de la génération");
 }
 
 AeroDms::~AeroDms()
@@ -1351,8 +1359,6 @@ void AeroDms::peuplerTableRecettes()
     for (int i = 0; i < listeRecettesCotisations.size(); i++)
     {
         AeroDmsTypes::RecetteDetail recette = listeRecettesCotisations.at(i);
-
-        //qDebug() << "elements a afficher" << i << recette.intitule << recette.annee << recette.estSoumisCe << (!recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
 
         if ( (recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS )
             || (!recette.estSoumisCe && elementAAfficher == AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS)

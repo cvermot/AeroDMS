@@ -62,19 +62,20 @@ private :
 	int nombreEtapesEffectuees;
 	int indiceFichier;
 
-	void imprimerLaProchaineDemandeDeSubvention();
+	AeroDmsTypes::EtatGeneration imprimerLaProchaineDemandeDeSubvention();
 	void remplirLeChampMontant( QString& p_html, 
 		                        const float p_montant);
 	void remplirLeChampSignature(QString& p_html);
 
-	void imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
-		                                    const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
-		                                    const AeroDmsTypes::SubventionsParPilote p_totaux);
+	AeroDmsTypes::EtatGeneration imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
+		                                                            const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
+		                                                            const AeroDmsTypes::SubventionsParPilote p_totaux);
 	QString genererImagesStatistiques(const int p_annee);
 
 	void produireFichierPdfGlobal();
 
-	QString genererHtmlRecapBaladesSorties(const int p_annee);
+	QString genererHtmlRecapBaladesSorties( const int p_annee, 
+		                                    AeroDmsTypes::EtatGeneration& p_etatGenerationARetourner);
 
 	void mergerPdf();
 
@@ -92,6 +93,7 @@ signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);
 	void generationTerminee(QString p_cheminFichiers);
+	void echecGeneration();
 
 public slots:
     void chargementTermine(bool retour);

@@ -192,6 +192,13 @@ public:
         MailPilotes_SUBVENTION_NON_CONSOMMEE
     };
 
+    enum EtatGeneration
+    {
+        EtatGeneration_OK,
+        EtatGeneration_FICHIER_ABSENT,
+        EtatGeneration_CREATION_DOSSIER_IMPOSSIBLE
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande;
         QString idPilote;

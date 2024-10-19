@@ -173,16 +173,24 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                                                                                    false);
 
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
-        imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
-                                           listePilotesDeCetteAnnee, 
-                                           totaux);
-
+        const AeroDmsTypes::EtatGeneration generationRecapAnnuel =  imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
+                                                                                                       listePilotesDeCetteAnnee, 
+                                                                                                       totaux);
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+
+        if (generationRecapAnnuel != AeroDmsTypes::EtatGeneration_OK)
+        {
+            emit echecGeneration();
+        }
     }
     else
     {
-        qDebug() << "Erreur création repertoire";
+        QMessageBox::critical(this, tr("Création de répertoire impossible"), tr("Impossible de créer le repertoire de sortie sous :\n") +
+            p_cheminSortieFichiersGeneres +
+            tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
+
+        emit echecGeneration();
     }
 }
 
@@ -242,16 +250,25 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 
         db->sauvegarderLaBdd(cheminSortieFichiersGeneres);
 
-        imprimerLaProchaineDemandeDeSubvention();
+        if (imprimerLaProchaineDemandeDeSubvention() != AeroDmsTypes::EtatGeneration_OK)
+        {
+            emit echecGeneration();
+        }
     }
     else
     {
-        qDebug() << "Erreur création repertoire";
+        QMessageBox::critical(this, tr("Création de répertoire impossible"), tr("Impossible de créer le repertoire de sortie sous :\n") +
+            p_cheminSortieFichiersGeneres +
+            tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
+        
+        emit echecGeneration();
     }
 }
 
-void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
+AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
 {
+    AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
+
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
     QFile f(QString(ressourcesHtml.toLocalFile()).append("COMPTA_2023.htm"));
     QString templateCeTmp = "";
@@ -262,7 +279,11 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
     }
     else
     {
-        qDebug() << "Erreur ouverture fichier";
+        QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \"COMPTA_2023.htm\" attendu dans\n") +
+            ressourcesHtml.toString() +
+            tr("\nest introuvable. Impossible de générer les demandes de subventions.\n\n Arrêt"));
+
+        return AeroDmsTypes::EtatGeneration_FICHIER_ABSENT;
     }
     //QString templateCeTmp = templateCe;
     //Date de la demande
@@ -280,9 +301,9 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererLesSubventionesDejaAllouees(annee);
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel( annee, 
                                                                                      true );
-        imprimerLeFichierPdfDeRecapAnnuel( annee, 
-                                           listePilotesDeCetteAnnee, 
-                                           totaux);
+        etatGenerationARetourner =  imprimerLeFichierPdfDeRecapAnnuel( annee,
+                                                                       listePilotesDeCetteAnnee, 
+                                                                       totaux);
     }
     else if (db->recupererLesSubventionsAEmettre().size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
@@ -500,12 +521,16 @@ void PdfRenderer::imprimerLaProchaineDemandeDeSubvention()
         emit generationTerminee(cheminSortieFichiersGeneres);
     }
     nombreEtapesEffectuees++;
+
+    return etatGenerationARetourner;
 }
 
-void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee, 
-                                                     const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
-                                                     const AeroDmsTypes::SubventionsParPilote p_totaux)
+AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
+                                                                             const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,
+                                                                             const AeroDmsTypes::SubventionsParPilote p_totaux)
 {
+    AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
+
     QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
     QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
     QFile tableRecettes(QString(ressourcesHtml.toLocalFile()).append("TableauRecapRecettes.html"));
@@ -525,7 +550,15 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
     }
     else
     {
-        qDebug() << "Erreur ouverture fichier";
+        QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Un ou plusieurs fichiers parmi :\n")
+            + "     -\"TableauRecap.html\"\n"
+            + "     -\"TableauRecapItem.html\"\n"
+            + "     -\"TableauRecapRecettes.html\"\n"
+            + tr("attendus dans\n") 
+            + ressourcesHtml.toString()
+            + tr("\nsont introuvables. Impossible de générer les récapitulatifs annuels.\n\n Arrêt"));
+
+        return AeroDmsTypes::EtatGeneration_FICHIER_ABSENT;
     }
     templateTable.replace("__date__", QDate::currentDate().toString("dd/MM/yyyy"));
     templateTable.replace("__exercice__", QString::number(p_annee));
@@ -575,7 +608,7 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
 
     if (demandeEnCours.recapHdVAvecBaladesEtSorties)
     {
-        const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee);
+        const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee, etatGenerationARetourner);
         templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
@@ -588,12 +621,17 @@ void PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
         templateTable.replace("<!--Signature-->", "<p>[SignatureField#1]</p>");
     }
 
-    view->setHtml(templateTable,
-        ressourcesHtml);
+    if (etatGenerationARetourner == AeroDmsTypes::EtatGeneration_OK)
+    {
+        view->setHtml(templateTable,
+            ressourcesHtml);
+    }  
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
     demandeEnCours.nomFichier = ".Recap_pilote_"
         +(QString::number(p_annee));
+
+    return etatGenerationARetourner;
 }
 
 void PdfRenderer::produireFichierPdfGlobal()
@@ -621,7 +659,6 @@ void PdfRenderer::produireFichierPdfGlobal()
     document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
     document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
     document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
-    qDebug() << "Fin merge";
     document.Save(nomFichier.toStdString());
 }
 
@@ -748,7 +785,8 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html)
     
 }
 
-QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
+QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
+                                                     AeroDmsTypes::EtatGeneration & p_etatGenerationARetourner)
 {
     QString html = "";
 
@@ -854,7 +892,12 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties(const int p_annee)
         }
         else
         {
-            qDebug() << "Erreur ouverture fichier";
+            QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \TableauRecapBaladesSorties.html\" attendu dans\n") +
+                ressourcesHtml.toString() +
+                tr("\nest introuvable. Impossible de générer le tableau des recap balades et sorties.\n\n Arrêt"));
+
+            p_etatGenerationARetourner = AeroDmsTypes::EtatGeneration_FICHIER_ABSENT;
+            return "";
         }
 
         int nbItem = 0;
