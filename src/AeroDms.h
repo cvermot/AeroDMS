@@ -136,6 +136,8 @@ private:
     QAction* actionListeDeroulanteAnnee;
     QComboBox* listeDeroulantePilote;
     QAction* actionListeDeroulantePilote;
+    QComboBox* listeDeroulanteType;
+    QAction* actionListeDeroulanteType;
     QComboBox* listeDeroulanteElementsSoumis;
     QAction* actionListeDeroulanteElementsSoumis;
     QComboBox* listeDeroulanteStatistique;

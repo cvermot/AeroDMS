@@ -94,12 +94,14 @@ QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
         {
             return QIcon("./ressources/close.svg");
         }
+        else if (p_icone == "Cotisation")
+        {
+            return QIcon("./ressources/ticket.svg");
+        }
         else if (p_icone == "Tous")
         {
             return QIcon("./ressources/all-inclusive.svg");
-        }
-
-        
+        }   
 
         else if (p_icone == "A" || p_icone == "a")
         {
