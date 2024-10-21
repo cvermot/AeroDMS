@@ -39,7 +39,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
 
-    statusBar()->showMessage("Pret");
     setWindowTitle(tr("AeroDMS"));
     setMinimumSize(160, 160);
     showMaximized();
@@ -95,6 +94,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     gererChangementOnglet();
 
     verifierPresenceDeMiseAjour(cheminStockageBdd);
+
+    statusBar()->showMessage("Prêt");
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
