@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("5.5");
+    QApplication::setApplicationVersion("5.6");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -2118,6 +2118,8 @@ void AeroDms::supprimerLeVolDeLaVueVolsDetectes()
 
         vueVolsDetectes->clearSelection();
         supprimerLeVolSelectionne->setEnabled(false);
+
+        statusBar()->showMessage(tr("Vol supprimé avec succès de la liste des vols detectés"));
     }
 }
 
@@ -2826,6 +2828,8 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
     pdfView->pageNavigator()->jump(factures.at(idFactureDetectee).pageDansLeFichierPdf, QPoint());
 
     supprimerLeVolSelectionne->setEnabled(true);
+
+    statusBar()->showMessage(tr("Appuyez sur Echap pour désélectionner le vol"));
 }
 
 void AeroDms::ouvrirDossierDemandesSubventions()
@@ -2950,6 +2954,8 @@ void AeroDms::deselectionnerVolDetecte()
 
         vueVolsDetectes->clearSelection();
         supprimerLeVolSelectionne->setEnabled(false);
+
+        statusBar()->clearMessage();
     } 
 }
 
