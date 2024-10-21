@@ -49,6 +49,21 @@ public:
     QString fileName;
 
 private:
+    void lireParametresEtInitialiserBdd();
+    void initialiserOngletPilotes();
+    void initialiserOngletVols();
+    void initialiserOngletFactures();
+    void initialiserOngletRecettes();
+    void initialiserOngletAjoutDepenses();
+    void initialiserOngletAjoutRecettes();
+    void initialiserBarreDOutils();
+    void initialiserBarreDeFiltres();
+    void initialiserBoitesDeDialogues();
+    void initialiserMenuFichier();
+    void initialiserMenuOptions();
+    void initialiserMenuOutils();
+    void initialiserMenuAide();
+
     void chargerUneFacture(QString p_fichier);
 
     void peuplerListesPilotes();
@@ -143,6 +158,7 @@ private:
     QComboBox* listeDeroulanteStatistique;
     QAction* actionListeDeroulanteStatistique;
 
+    QString cheminStockageBdd;
     QString cheminStockageFacturesTraitees;
     QString cheminStockageFacturesATraiter;
     QString cheminSortieFichiersGeneres;

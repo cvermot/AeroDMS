@@ -39,6 +39,66 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
 
+    statusBar()->showMessage("Pret");
+    setWindowTitle(tr("AeroDMS"));
+    setMinimumSize(160, 160);
+    showMaximized();
+
+    installEventFilter(this);
+    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
+
+    //========================Initialisation des autres attributs
+    piloteAEditer = "";
+    volAEditer = -1;
+    factureIdEnBdd = 0;
+
+    lireParametresEtInitialiserBdd();
+
+    initialiserOngletPilotes();
+    initialiserOngletVols();
+    initialiserOngletFactures();
+    initialiserOngletRecettes();
+    initialiserOngletAjoutDepenses();
+    initialiserOngletAjoutRecettes();
+    initialiserOngletSubventionsDemandees();
+    initialiserOngletGraphiques();
+
+    //=============Barres d'outils et boites de dialogue
+    initialiserBarreDOutils();
+    initialiserBarreDeFiltres();
+    initialiserBoitesDeDialogues();
+
+    //========================Menus
+    initialiserMenuFichier();
+    initialiserMenuOptions();
+    initialiserMenuOutils();
+    initialiserMenuAide();
+
+    //=======================Peupler les vues tables, et initialiser les différents élements d'IHM dépendants
+    // du contexte.
+    peuplerListeDeroulanteAnnee();
+    peuplerListesPilotes();
+    peuplerListeSorties();
+    peuplerListeBaladesEtSorties();
+    peuplerTablePilotes();
+    peuplerTableVols();
+    peuplerTableFactures();
+    peuplerTableRecettes();
+    peuplerTableSubventionsDemandees();
+    peuplerStatistiques();
+    prevaliderDonnnesSaisies();
+    prevaliderDonnneesSaisiesRecette();
+    changerInfosVolSurSelectionTypeVol();
+    verifierSignatureNumerisee();
+
+    connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
+    gererChangementOnglet();
+
+    verifierPresenceDeMiseAjour(cheminStockageBdd);
+}
+
+void AeroDms::lireParametresEtInitialiserBdd()
+{
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AeroDMS", "AeroDMS");
 
@@ -111,6 +171,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
         settings.value("baseDeDonnees/nom", "").toString();
     const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/ressources/HTML");
+    cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
@@ -128,17 +189,17 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer(db,
         ressourcesHtml);
+}
 
-    installEventFilter(this);
-    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
-
+void AeroDms::initialiserOngletPilotes()
+{
     //==========Onglet Pilotes
     vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem("Prénom"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem("Année"));
 
-    QTableWidgetItem * headerHdVEntrainement = new QTableWidgetItem("HdV");
+    QTableWidgetItem* headerHdVEntrainement = new QTableWidgetItem("HdV");
     headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
     headerHdVEntrainement->setToolTip("Heures de vol d'entrainement");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, headerHdVEntrainement);
@@ -146,7 +207,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     headerSubventionEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
     headerSubventionEntrainement->setToolTip("Montant de la subvention d'entrainement déjà allouée");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, headerSubventionEntrainement);
-    
+
     QTableWidgetItem* headerHdVBalade = new QTableWidgetItem("HdV");
     headerHdVBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
     headerHdVBalade->setToolTip("Heures de vol de balade");
@@ -155,7 +216,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     headerSubventionBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
     headerSubventionBalade->setToolTip("Montant de la subvention balade déjà allouée");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, headerSubventionBalade);
-    
+
     QTableWidgetItem* headerHdVSortie = new QTableWidgetItem("HdV");
     headerHdVSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
     headerHdVSortie->setToolTip("Heures de vol de sortie");
@@ -164,7 +225,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     headerSubventionSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
     headerSubventionSortie->setToolTip("Montant de la subvention sortie déjà allouée");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, headerSubventionSortie);
-    
+
     QTableWidgetItem* headerHdVTotales = new QTableWidgetItem("HdV");
     headerHdVTotales->setIcon(AeroDmsServices::recupererIcone("Total"));
     headerHdVTotales->setToolTip("Heures de vol totales");
@@ -181,7 +242,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     vuePilotes->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vuePilotes, QIcon("./ressources/account-tie-hat.svg"), "Pilotes");
     connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
+}
 
+void AeroDms::initialiserOngletVols()
+{
     //==========Onglet Vols
     vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem("Pilote"));
@@ -204,7 +268,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
     connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
     connect(vueVols, &QTableWidget::cellClicked, this, &AeroDms::volsSelectionnes);
+}
 
+void AeroDms::initialiserOngletFactures()
+{
     //==========Onglet Factures
     vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);
     vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
@@ -224,7 +291,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     vueFactures->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueFactures->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueFactures, QIcon("./ressources/file-document.svg"), "Factures");
+}
 
+void AeroDms::initialiserOngletRecettes()
+{
     //==========Onglet Recettes
     vueRecettes = new QTableWidget(0, AeroDmsTypes::RecetteTableElement_NB_COLONNES, this);
     vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem("Date"));
@@ -235,7 +305,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem("ID"));
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
     mainTabWidget->addTab(vueRecettes, QIcon("./ressources/cash-multiple.svg"), "Recettes");
+}
 
+void AeroDms::initialiserOngletAjoutDepenses()
+{
     //==========Onglet Ajout dépense
     QHBoxLayout* ajoutVol = new QHBoxLayout(this);
     widgetAjoutVol = new QWidget(this);
@@ -398,7 +471,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     infosFacture->addWidget(remarqueFactureLabel, 6, 0);
     infosFacture->addWidget(remarqueFacture, 6, 1);
     infosFacture->addWidget(validerLaFacture, 7, 0, 2, 0);
+}
 
+void AeroDms::initialiserOngletAjoutRecettes()
+{
     //==========Onglet Ajout recette
     QHBoxLayout* ajoutRecette = new QHBoxLayout(this);
     widgetAjoutRecette = new QWidget(this);
@@ -451,22 +527,100 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     infosRecette->addWidget(montantRecetteLabel, 3, 0);
     infosRecette->addWidget(montantRecette, 3, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
+}
 
-    //=============Onglet Subventions demandées
-    initialiserOngletSubventionsDemandees();
+void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
+{
+    const QString fichierAVerifier = p_chemin + "/update/AeroDms.exe";
+    if (uneMaJEstDisponible(fichierAVerifier))
+    {
+        if (!db->laBddEstALaVersionAttendue())
+        {
+            passerLeLogicielEnLectureSeule();
 
+            QMessageBox::critical(this, 
+                "Une mise à jour est disponible", 
+                "Une mise à jour de l'application est disponible et doit être réalisée\n\
+car la base de données a évoluée.\n\n\
+L'application va passer en mode lecture seule.\
+\n\nPour mettre à jour l'application, recopier le fichier\n"
++ fichierAVerifier + "\ndans le répertoire de cette application.");
+        }
+        else
+        {
+            QMessageBox::information(this, 
+                "Une mise à jour est disponible", 
+                "Une mise à jour de l'application est disponible.\n\
+Il est fortement recommandé d'effectuer cette mise à jour.\
+\n\nPour mettre à jour l'application, recopier le fichier\n"
++ fichierAVerifier + "\ndans le répertoire de cette application.");
+        }
+    }
+    else if (!db->laBddEstALaVersionAttendue())
+    {
+        passerLeLogicielEnLectureSeule();
+
+        QMessageBox::critical(this,
+            "Erreur de version de base de données",
+            "La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
+L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
+Consultez le développeur/responsable de l'application pour plus d'informations.");
+    }
+}
+
+void AeroDms::passerLeLogicielEnLectureSeule()
+{
+    bouttonAjouterUnVol->setEnabled(false);
+    bouttonAjouterCotisation->setEnabled(false);
+    bouttonAjouterPilote->setEnabled(false);
+    bouttonAjouterSortie->setEnabled(false);
+    bouttonGenerePdf->setEnabled(false);
+
+    logicielEnModeLectureSeule = true;
+}
+
+void AeroDms::verifierSignatureNumerisee()
+{
+    if (!QFile("./ressources/signature.jpg").exists())
+    {
+        boutonSignatureManuelle->setEnabled(false);
+    }
+    else
+    {
+        boutonSignatureManuelle->activate(QAction::Trigger);
+    }
+}
+
+void AeroDms::initialiserOngletGraphiques()
+{
     //=============Onglet graphiques
-    initialiserOngletGraphiques();
+    graphiques = new QHBoxLayout(this);
+    widgetGraphiques = new QWidget(this);
+    widgetGraphiques->setLayout(graphiques);
+    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
+}
 
-    //=============General
-    statusBar()->showMessage("Pret");
+void AeroDms::initialiserOngletSubventionsDemandees()
+{
+    //=============Onglet Subventions demandées
+    vueSubventions = new QTableWidget(0, AeroDmsTypes::SubventionDemandeeTableElementTableElement_NB_COLONNES, this);
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem("Date"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem("Pilote"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem("Nom bénéficiaire"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem("Type de demande"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem("Montant"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem("Montant vol"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem("ID demande"));
+    vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
+    vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
+    vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);
+    mainTabWidget->addTab(vueSubventions, QIcon("./ressources/checkbook.svg"), "Subventions demandées");
+}
 
-    setWindowTitle(tr("AeroDMS"));
-    setMinimumSize(160, 160);
-    showMaximized();
-    //resize(480, 320);
-
-    QToolBar* toolBar = addToolBar(tr(""));
+void AeroDms::initialiserBarreDOutils()
+{
+    QToolBar* toolBar = addToolBar(tr("Outils"));
     const QIcon iconeAjouterUnVol = QIcon("./ressources/airplane-plus.svg");
     bouttonAjouterUnVol = new QAction(iconeAjouterUnVol, tr("Ajouter un &vol/une dépense"), this);
     bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
@@ -504,9 +658,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
+}
 
-    QToolBar* selectionToolBar = addToolBar(tr(""));
-
+void AeroDms::initialiserBarreDeFiltres()
+{
+    QToolBar* selectionToolBar = addToolBar(tr("Filtres"));
     listeDeroulanteAnnee = new QComboBox(this);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
@@ -542,7 +698,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS, AeroDmsServices::recupererIcone("Oui"));
     listeDeroulanteElementsSoumis->addItem("Éléments non soumis au CSE", AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS, AeroDmsServices::recupererIcone("Non"));
-    
+
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableFactures);
@@ -561,10 +717,13 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_STATUTS_PILOTES, QIcon("./ressources/chart-donut-variant.svg"));
     listeDeroulanteStatistique->addItem("Types d'aéronefs", AeroDmsTypes::Statistiques_AERONEFS);
     listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_AERONEFS, QIcon("./ressources/chart-donut-variant.svg"));
-    
+
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     actionListeDeroulanteStatistique = selectionToolBar->addWidget(listeDeroulanteStatistique);
+}
 
+void AeroDms::initialiserBoitesDeDialogues()
+{
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
@@ -579,7 +738,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
 
     dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
-    //connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
 
     //Dialogue de progression de génération PDF
     progressionGenerationPdf = new QProgressDialog("Génération PDF en cours", "", 0, 0, this);
@@ -595,6 +753,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
+}
+
+void AeroDms::initialiserMenuFichier()
+{
     //========================Menu Fichier
     QMenu* menuFichier = menuBar()->addMenu(tr("&Fichier"));
 
@@ -605,7 +767,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de demande de subventions"));
     menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/printer.svg"));
 
-    QAction *boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la dernière demande"), this);
+    QAction* boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
     connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
 
@@ -613,7 +775,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     menuOuvrirAutreDemande->setIcon(QIcon("./ressources/printer.svg"));
 
     peuplerMenuAutreDemande();
-    
+}
+
+void AeroDms::initialiserMenuOptions()
+{
     //========================Menu Options
     QMenu* menuOption = menuBar()->addMenu(tr("&Options"));
 
@@ -652,7 +817,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("Dépenses uniquement"), this);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
-    QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"),tr("Options du récapitulatif annuel"));
+    QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("Options du récapitulatif annuel"));
     boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), tr("Récapitulatif des recettes"), this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
     boutonOptionRecapAnnuelRecettes->setCheckable(true);
@@ -660,7 +825,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
     //Génération des graphiques
-    QMenu* graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(QIcon("./ressources/chart-areaspline.svg"),tr("Graphiques"));
+    QMenu* graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(QIcon("./ressources/chart-areaspline.svg"), tr("Graphiques"));
 
     boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(QIcon("./ressources/chart-bar-stacked.svg"), tr("Heures annuelles"), this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresAnnuelles);
@@ -739,7 +904,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonAucuneSignature->setFont(font);
     signature = AeroDmsTypes::Signature_SANS;
     boutonFusionnerLesPdf->setFont(font);
+}
 
+void AeroDms::initialiserMenuOutils()
+{
     //========================Menu Outils
     QMenu* menuOutils = menuBar()->addMenu(tr("Ou&tils"));
 
@@ -812,7 +980,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
     for (int i = 0; i < datesDemandes.size(); i++)
     {
-        QAction *action = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), this);
+        QAction* action = new QAction(QIcon("./ressources/email-multiple.svg"), tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), this);
         action->setData(datesDemandes.at(i).toString("yyyy-MM-dd"));
         menuMailDemandesSubvention->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -837,7 +1005,10 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOutils->addAction(boutonConversionHeureDecimalesVersHhMm);
     connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
+}
 
+void AeroDms::initialiserMenuAide()
+{
     //========================Menu Aide
     QMenu* helpMenu = menuBar()->addMenu(tr("&Aide"));
     QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("&Aide en ligne"), this);
@@ -857,118 +1028,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette &application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
-
-    //========================Initialisation des autres attributs
-    piloteAEditer = "";
-    volAEditer = -1;
-    factureIdEnBdd = 0;
-
-    peuplerListeDeroulanteAnnee();
-    peuplerListesPilotes();
-    peuplerListeSorties();
-    peuplerListeBaladesEtSorties();
-    peuplerTablePilotes();
-    peuplerTableVols();
-    peuplerTableFactures();
-    peuplerTableRecettes();
-    peuplerTableSubventionsDemandees();
-    peuplerStatistiques();
-    prevaliderDonnnesSaisies();
-    prevaliderDonnneesSaisiesRecette();
-    changerInfosVolSurSelectionTypeVol();
-    verifierSignatureNumerisee();
-
-    verifierPresenceDeMiseAjour(settings.value("baseDeDonnees/chemin", "").toString());
-
-    connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
-    gererChangementOnglet();
-}
-
-void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
-{
-    const QString fichierAVerifier = p_chemin + "/update/AeroDms.exe";
-    if (uneMaJEstDisponible(fichierAVerifier))
-    {
-        if (!db->laBddEstALaVersionAttendue())
-        {
-            passerLeLogicielEnLectureSeule();
-
-            QMessageBox::critical(this, 
-                "Une mise à jour est disponible", 
-                "Une mise à jour de l'application est disponible et doit être réalisée\n\
-car la base de données a évoluée.\n\n\
-L'application va passer en mode lecture seule.\
-\n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le répertoire de cette application.");
-        }
-        else
-        {
-            QMessageBox::information(this, 
-                "Une mise à jour est disponible", 
-                "Une mise à jour de l'application est disponible.\n\
-Il est fortement recommandé d'effectuer cette mise à jour.\
-\n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le répertoire de cette application.");
-        }
-    }
-    else if (!db->laBddEstALaVersionAttendue())
-    {
-        passerLeLogicielEnLectureSeule();
-
-        QMessageBox::critical(this,
-            "Erreur de version de base de données",
-            "La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
-L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
-Consultez le développeur/responsable de l'application pour plus d'informations.");
-    }
-}
-
-void AeroDms::passerLeLogicielEnLectureSeule()
-{
-    bouttonAjouterUnVol->setEnabled(false);
-    bouttonAjouterCotisation->setEnabled(false);
-    bouttonAjouterPilote->setEnabled(false);
-    bouttonAjouterSortie->setEnabled(false);
-    bouttonGenerePdf->setEnabled(false);
-
-    logicielEnModeLectureSeule = true;
-}
-
-void AeroDms::verifierSignatureNumerisee()
-{
-    if (!QFile("./ressources/signature.jpg").exists())
-    {
-        boutonSignatureManuelle->setEnabled(false);
-    }
-    else
-    {
-        boutonSignatureManuelle->activate(QAction::Trigger);
-    }
-}
-
-void AeroDms::initialiserOngletGraphiques()
-{
-    graphiques = new QHBoxLayout(this);
-    widgetGraphiques = new QWidget(this);
-    widgetGraphiques->setLayout(graphiques);
-    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
-}
-
-void AeroDms::initialiserOngletSubventionsDemandees()
-{
-    vueSubventions = new QTableWidget(0, AeroDmsTypes::SubventionDemandeeTableElementTableElement_NB_COLONNES, this);
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem("Date"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem("Pilote"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem("Nom bénéficiaire"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem("Type de demande"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem("Montant"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem("Montant vol"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem("ID demande"));
-    vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
-    vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
-    vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vueSubventions, QIcon("./ressources/checkbook.svg"), "Subventions demandées");
 }
 
 void AeroDms::changerModeSignature()
