@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
     QApplication::setApplicationName("AeroDms");
-    QApplication::setApplicationVersion("5.6");
+    QApplication::setApplicationVersion("5.7");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -542,7 +542,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
          || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
     {
         QMessageBox demandeConfirmationGeneration;
-        demandeConfirmationGeneration.setText(QString("Une mise à jour d'AéroDMS est disponible.\n")
+        demandeConfirmationGeneration.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
             + "Voulez vous l'exécuter maintenant ?");
         demandeConfirmationGeneration.setWindowTitle("Mise à jour disponible");
         demandeConfirmationGeneration.setIcon(QMessageBox::Question);
@@ -776,7 +776,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
 
     progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
-    boutonProgressionMiseAJour = new QPushButton("Quitter AéroDMS", this);
+    boutonProgressionMiseAJour = new QPushButton("Quitter AeroDMS", this);
     boutonProgressionMiseAJour->setDisabled(true);
     //connect(boutonProgressionMiseAJour, SIGNAL(clicked()), this, SLOT(TODO()));
     progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
@@ -2941,7 +2941,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
         }
     }
     progressionMiseAJour->setValue(nombreDeFichiers);
-    progressionMiseAJour->setLabelText(tr("Mise à jour terminée.\nAéroDMS doit redémarrer.\n\n AéroDMS va quitter. Veuillez relancer AéroDMS\npour que la mise à jour soit effective."));
+    progressionMiseAJour->setLabelText(tr("Mise à jour terminée.\nAeroDMS doit redémarrer.\n\n AeroDMS va quitter. Veuillez relancer AeroDMS\npour que la mise à jour soit effective."));
     boutonProgressionMiseAJour->setDisabled(false); 
         
 }
