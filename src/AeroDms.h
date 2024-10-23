@@ -82,8 +82,10 @@ private:
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
 
-    void verifierPresenceDeMiseAjour(const QString p_chemin);
-    bool uneMaJEstDisponible(const QString p_chemin);
+    bool uneMaJEstDisponible(const QString p_chemin,
+                             const QString p_fichier);
+    void mettreAJourApplication(const QString p_chemin);
+    void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule();
     bool eventFilter(QObject* object, QEvent* event);
 
@@ -167,6 +169,9 @@ private:
     //Barre de progression
     QProgressDialog *progressionGenerationPdf;
     QPushButton *boutonProgressionGenerationPdf;
+
+    QProgressDialog* progressionMiseAJour;
+    QPushButton* boutonProgressionMiseAJour;
 
     AeroDmsTypes::ParametresMetier parametresMetiers;
 
@@ -301,6 +306,7 @@ public slots:
     void ouvrirPdfGenere();
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
+    void verifierPresenceDeMiseAjour();
 
 };
 #endif // AERODMS_H

@@ -93,7 +93,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
     gererChangementOnglet();
 
-    verifierPresenceDeMiseAjour(cheminStockageBdd);
+    terminerMiseAJourApplication();
+    verifierPresenceDeMiseAjour();
 
     statusBar()->showMessage("Prêt");
 }
@@ -530,31 +531,50 @@ void AeroDms::initialiserOngletAjoutRecettes()
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 }
 
-void AeroDms::verifierPresenceDeMiseAjour(const QString p_chemin)
+void AeroDms::verifierPresenceDeMiseAjour()
 {
-    const QString fichierAVerifier = p_chemin + "/update/AeroDms.exe";
-    if (uneMaJEstDisponible(fichierAVerifier))
+    const QString dossierAVerifier = cheminStockageBdd + "/update/";
+    //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
+    //  -AeroDms.exe : mise à jour de l'application et eventuellement de ses librairies
+    //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
+    // de sécurité de Qt avec compatibilité des interfaces)
+    if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
+         || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
     {
-        if (!db->laBddEstALaVersionAttendue())
-        {
-            passerLeLogicielEnLectureSeule();
+        QMessageBox demandeConfirmationGeneration;
+        demandeConfirmationGeneration.setText(QString("Une mise à jour d'AéroDMS est disponible.\n")
+            + "Voulez vous l'exécuter maintenant ?");
+        demandeConfirmationGeneration.setWindowTitle("Mise à jour disponible");
+        demandeConfirmationGeneration.setIcon(QMessageBox::Question);
+        demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-            QMessageBox::critical(this, 
-                "Une mise à jour est disponible", 
-                "Une mise à jour de l'application est disponible et doit être réalisée\n\
+        const int ret = demandeConfirmationGeneration.exec();
+
+        switch (ret)
+        {
+        case QMessageBox::Yes:
+        {
+            mettreAJourApplication(cheminStockageBdd + "/update/");
+        }
+        break;
+
+        case QMessageBox::No:
+        default:
+        {
+            if (!db->laBddEstALaVersionAttendue())
+            {
+                passerLeLogicielEnLectureSeule();
+
+                QMessageBox::critical(this,
+                    "Version de base données incompatible",
+                    "Une mise à jour de l'application est disponible et doit être réalisée\n\
 car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
-\n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le répertoire de cette application.");
+\n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
+"de mise à jour\" du menu Aide.");
+            }
         }
-        else
-        {
-            QMessageBox::information(this, 
-                "Une mise à jour est disponible", 
-                "Une mise à jour de l'application est disponible.\n\
-Il est fortement recommandé d'effectuer cette mise à jour.\
-\n\nPour mettre à jour l'application, recopier le fichier\n"
-+ fichierAVerifier + "\ndans le répertoire de cette application.");
+        break;
         }
     }
     else if (!db->laBddEstALaVersionAttendue())
@@ -754,6 +774,19 @@ void AeroDms::initialiserBoitesDeDialogues()
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
+
+    progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
+    boutonProgressionMiseAJour = new QPushButton("Quitter AéroDMS", this);
+    boutonProgressionMiseAJour->setDisabled(true);
+    //connect(boutonProgressionMiseAJour, SIGNAL(clicked()), this, SLOT(TODO()));
+    progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
+    progressionMiseAJour->setAutoClose(false);
+    progressionMiseAJour->setWindowModality(Qt::WindowModal);
+    progressionMiseAJour->close();
+    progressionMiseAJour->setAutoReset(false);
+    progressionMiseAJour->setMinimumSize(QSize(300, 150));
+
+    connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
 }
 
 void AeroDms::initialiserMenuFichier()
@@ -1012,19 +1045,29 @@ void AeroDms::initialiserMenuAide()
 {
     //========================Menu Aide
     QMenu* helpMenu = menuBar()->addMenu(tr("&Aide"));
+
     QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("&Aide en ligne"), this);
     aideQtAction->setStatusTip(tr("&Ouvrir l'aide en ligne"));
     helpMenu->addAction(aideQtAction);
     connect(aideQtAction, SIGNAL(triggered()), this, SLOT(ouvrirAide()));
+
     helpMenu->addSeparator();
+
+    QAction* miseAJourAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("Vérifier la présence de mise à jour"), this);
+    helpMenu->addAction(miseAJourAction);
+    connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
+
     boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
+
     helpMenu->addSeparator();
+
     QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de &Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+
     QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette &application"));
     helpMenu->addAction(aboutAction);
@@ -2797,43 +2840,37 @@ void AeroDms::envoyerMail()
             + db->recupererMailDerniereDemandeDeSubvention(action->data().toString())
             + "?subject=[Section aéronautique] Chèques aéro&body="
             + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
-    }
-    
+    }  
 }
 
-bool AeroDms::uneMaJEstDisponible(const QString p_chemin)
+bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichier)
 { 
-    if (QFile().exists(p_chemin))
+    QString fichier = p_chemin + p_fichier;
+    if (QFile().exists(fichier))
     {
-        QFile fichierDistant(p_chemin);
+        QFile fichierDistant(fichier);
         if (fichierDistant.open(QFile::ReadOnly))
         {
             QString hashFichierDistant = "";
             QCryptographicHash hash(QCryptographicHash::Sha1);
             if (hash.addData(&fichierDistant))
             {
-                //QString hashString = QString::fromStdString(hash.result().toStdString());
-                //QMessageBox::critical(this, "Fichier présent", hash.result().toHex());
                 hashFichierDistant = hash.result().toHex();
             }
             hash.reset();
 
             //Calcul de la somme de controle de l'application courante
-            QFile fichierCourant(QCoreApplication::applicationFilePath());
-            //qDebug() << "courant" << QCoreApplication::applicationFilePath();
+            QFile fichierCourant(QCoreApplication::applicationDirPath()+"/"+p_fichier);
+
             if (fichierCourant.open(QFile::ReadOnly))
             {
                 QString hashFichierCourant = "";
                 if (hash.addData(&fichierCourant))
                 {
-                    //QString hashString = QString::fromStdString(hash.result().toStdString());
-                    //QMessageBox::critical(this, "Fichier présent", hash.result().toHex() + "\n" + hashFichierDistant);
                     hashFichierCourant = hash.result().toHex();
 
                     if (hashFichierDistant != hashFichierCourant)
                     {
-                        //QFile::copy(fichierAVerifier, QCoreApplication::applicationDirPath()+"/AeroDms_new.exe");
-                        //QApplication::quit();
                         return true;
                     }
                 }
@@ -2841,6 +2878,87 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin)
         }
     }
     return false;
+}
+
+void AeroDms::mettreAJourApplication(const QString p_chemin)
+{
+    //QFile fichierDistant(p_chemin);
+    //QFile fichierCourant(QCoreApplication::applicationFilePath());
+
+    //QString dossierCourantApplication = QFileInfo(QCoreApplication::applicationFilePath()).absolutePath();
+   
+    //Pour chaque élement présente dans p_chemin, on vérifie s'il existe dans l'aborescence locale
+    //Si c'est le cas on renomme le fichier local en suffixant par old_
+    //Ensuite dans tous les cas on recopie le fichier distant vers le dossier local
+
+
+    QDirIterator it(p_chemin, QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
+
+    int nombreDeFichiers = 0;
+    while (it.hasNext())
+    {
+        it.next();
+        nombreDeFichiers++;
+    }
+
+    progressionMiseAJour->setMaximum(nombreDeFichiers);
+    progressionMiseAJour->setValue(0);
+    progressionMiseAJour->show();
+
+    QThread::sleep(2);
+
+    //Pas de fonction reset de l'iterateur dans QDirIterator... on redémarre via un nouveau scope
+    {
+        int etapeMiseAJour = 0;
+
+        QDirIterator it(p_chemin, QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
+
+        QRegularExpression ini("^.*\\.ini$");
+        QRegularExpression sqlite("^.*\\.sqlite");
+
+        while (it.hasNext())
+        {
+            QString fichier = it.next();
+            //On ne replace pas les éventuels fichiers .ini ou .sqlite qui seraient présents dans le répertoire d'update
+            if (!fichier.contains(ini)
+                && !fichier.contains(sqlite))
+            {
+                progressionMiseAJour->setLabelText("Mise à jour de : "+it.fileName());
+
+                QString fichierLocal = "./" + fichier;
+                QString fichierDistant = fichier;
+                fichierLocal.replace(p_chemin, "");
+                QFileInfo infosFichierLocal(fichierLocal);
+                QString nouveauNomFichierLocal = infosFichierLocal.path() + "/old_" + infosFichierLocal.fileName();
+                QString nouveNomFichierLocal = infosFichierLocal.path() + "/old_" + infosFichierLocal.fileName();
+                
+                QFile::rename(fichierLocal, nouveauNomFichierLocal);
+                QFile::copy(fichierDistant, fichierLocal);
+
+                progressionMiseAJour->setValue(etapeMiseAJour);
+                etapeMiseAJour++;
+            }
+        }
+    }
+    progressionMiseAJour->setValue(nombreDeFichiers);
+    progressionMiseAJour->setLabelText(tr("Mise à jour terminée.\nAéroDMS doit redémarrer.\n\n AéroDMS va quitter. Veuillez relancer AéroDMS\npour que la mise à jour soit effective."));
+    boutonProgressionMiseAJour->setDisabled(false); 
+        
+}
+
+void AeroDms::terminerMiseAJourApplication()
+{
+    //Cette méthode termine une mise à jour précédement démarrée : elle supprime l'ensemble des fichiers old_*
+
+    QString dossierCourantApplication = QFileInfo(QCoreApplication::applicationFilePath()).absolutePath();
+
+    QDirIterator it(dossierCourantApplication, QStringList() << "old_*", QDir::Files, QDirIterator::Subdirectories);
+    while (it.hasNext())
+    {
+        QString cheminFichier = it.next();
+        QFile fichier(cheminFichier);
+        fichier.remove();
+    }
 }
 
 void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
@@ -3163,5 +3281,4 @@ bool AeroDms::eventFilter(QObject* object, QEvent* event)
     else
         return false;
 }
-
 

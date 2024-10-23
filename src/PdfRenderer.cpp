@@ -892,7 +892,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
         }
         else
         {
-            QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \TableauRecapBaladesSorties.html\" attendu dans\n") +
+            QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \"TableauRecapBaladesSorties.html\" attendu dans\n") +
                 ressourcesHtml.toString() +
                 tr("\nest introuvable. Impossible de générer le tableau des recap balades et sorties.\n\n Arrêt"));
 
