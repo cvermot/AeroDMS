@@ -2881,16 +2881,10 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichie
 }
 
 void AeroDms::mettreAJourApplication(const QString p_chemin)
-{
-    //QFile fichierDistant(p_chemin);
-    //QFile fichierCourant(QCoreApplication::applicationFilePath());
-
-    //QString dossierCourantApplication = QFileInfo(QCoreApplication::applicationFilePath()).absolutePath();
-   
+{  
     //Pour chaque élement présente dans p_chemin, on vérifie s'il existe dans l'aborescence locale
     //Si c'est le cas on renomme le fichier local en suffixant par old_
     //Ensuite dans tous les cas on recopie le fichier distant vers le dossier local
-
 
     QDirIterator it(p_chemin, QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
 
@@ -2930,7 +2924,6 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
                 fichierLocal.replace(p_chemin, "");
                 QFileInfo infosFichierLocal(fichierLocal);
                 QString nouveauNomFichierLocal = infosFichierLocal.path() + "/old_" + infosFichierLocal.fileName();
-                QString nouveNomFichierLocal = infosFichierLocal.path() + "/old_" + infosFichierLocal.fileName();
                 
                 QFile::rename(fichierLocal, nouveauNomFichierLocal);
                 QFile::copy(fichierDistant, fichierLocal);
