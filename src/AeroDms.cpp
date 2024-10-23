@@ -2883,7 +2883,7 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichie
 void AeroDms::mettreAJourApplication(const QString p_chemin)
 {  
     //Pour chaque élement présente dans p_chemin, on vérifie s'il existe dans l'aborescence locale
-    //Si c'est le cas on renomme le fichier local en suffixant par old_
+    //Si c'est le cas on renomme le fichier local en suffixant par xxx_
     //Ensuite dans tous les cas on recopie le fichier distant vers le dossier local
 
     QDirIterator it(p_chemin, QStringList() << "*", QDir::Files, QDirIterator::Subdirectories);
@@ -2923,7 +2923,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
                 QString fichierDistant = fichier;
                 fichierLocal.replace(p_chemin, "");
                 QFileInfo infosFichierLocal(fichierLocal);
-                QString nouveauNomFichierLocal = infosFichierLocal.path() + "/old_" + infosFichierLocal.fileName();
+                QString nouveauNomFichierLocal = infosFichierLocal.path() + "/xxx_" + infosFichierLocal.fileName();
                 
                 QFile::rename(fichierLocal, nouveauNomFichierLocal);
                 QFile::copy(fichierDistant, fichierLocal);
@@ -2936,16 +2936,14 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     progressionMiseAJour->setValue(nombreDeFichiers);
     progressionMiseAJour->setLabelText(tr("Mise à jour terminée.\nAeroDMS doit redémarrer.\n\n AeroDMS va quitter. Veuillez relancer AeroDMS\npour que la mise à jour soit effective."));
     boutonProgressionMiseAJour->setDisabled(false); 
-        
 }
 
 void AeroDms::terminerMiseAJourApplication()
 {
-    //Cette méthode termine une mise à jour précédement démarrée : elle supprime l'ensemble des fichiers old_*
-
+    //Cette méthode termine une mise à jour précédement démarrée : elle supprime l'ensemble des fichiers xxx_*
     QString dossierCourantApplication = QFileInfo(QCoreApplication::applicationFilePath()).absolutePath();
 
-    QDirIterator it(dossierCourantApplication, QStringList() << "old_*", QDir::Files, QDirIterator::Subdirectories);
+    QDirIterator it(dossierCourantApplication, QStringList() << "xxx_*", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
     {
         QString cheminFichier = it.next();
