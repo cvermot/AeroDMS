@@ -1054,7 +1054,7 @@ void AeroDms::initialiserMenuAide()
 
     helpMenu->addSeparator();
 
-    QAction* miseAJourAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("Vérifier la présence de mise à jour"), this);
+    QAction* miseAJourAction = new QAction(QIcon("./ressources/download-box.svg"), tr("Vérifier la présence de mise à jour"), this);
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
