@@ -537,13 +537,14 @@ void AeroDms::verifierPresenceDeMiseAjour()
     //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
     //  -AeroDms.exe : mise à jour de l'application et eventuellement de ses librairies
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
-    // de sécurité de Qt avec compatibilité des interfaces)
+    // de sécurité/maintenance de Qt avec compatibilité des interfaces)
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
          || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
     {
         QMessageBox demandeConfirmationGeneration;
         demandeConfirmationGeneration.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
             + "Voulez vous l'exécuter maintenant ?");
+        demandeConfirmationGeneration.setInformativeText("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v" + QApplication::applicationVersion() + "...main\">GitHub</a>.");
         demandeConfirmationGeneration.setWindowTitle("Mise à jour disponible");
         demandeConfirmationGeneration.setIcon(QMessageBox::Question);
         demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -2935,7 +2936,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     }
     progressionMiseAJour->setValue(nombreDeFichiers);
     progressionMiseAJour->setLabelText(tr("Mise à jour terminée.\nAeroDMS doit redémarrer.\n\n AeroDMS va quitter. Veuillez relancer AeroDMS\npour que la mise à jour soit effective."));
-    boutonProgressionMiseAJour->setDisabled(false); 
+    boutonProgressionMiseAJour->setDisabled(false);
 }
 
 void AeroDms::terminerMiseAJourApplication()
