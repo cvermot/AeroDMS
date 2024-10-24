@@ -942,7 +942,7 @@ void AeroDms::initialiserMenuOptions()
 
     menuOption->addSeparator();
 
-    boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("&Desactiver le scan automatique des factures"), this);
+    boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Desactiver le scan &automatique des factures"), this);
     boutonActivationScanAutoFactures->setStatusTip(tr("&Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOption->addAction(boutonActivationScanAutoFactures);
     connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
