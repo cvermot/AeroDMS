@@ -61,6 +61,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     initialiserOngletAjoutRecettes();
     initialiserOngletSubventionsDemandees();
     initialiserOngletGraphiques();
+    initialiserRaccourcisClavierSansActionIhm();
 
     //=============Barres d'outils et boites de dialogue
     initialiserBarreDOutils();
@@ -659,18 +660,21 @@ void AeroDms::initialiserBarreDOutils()
     const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
     bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("Ajouter un &pilote"), this);
     bouttonAjouterPilote->setStatusTip(tr("Ajouter un pilote"));
+    bouttonAjouterPilote->setShortcut(Qt::Key_F3);
     connect(bouttonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(bouttonAjouterPilote);
 
     const QIcon iconeAjouterCotisation = QIcon("./ressources/ticket.svg");
     bouttonAjouterCotisation = new QAction(iconeAjouterCotisation, tr("Ajouter une &cotisation pour un pilote"), this);
     bouttonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
+    bouttonAjouterCotisation->setShortcut(Qt::Key_F4);
     connect(bouttonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
     toolBar->addAction(bouttonAjouterCotisation);
 
     const QIcon iconeAjouterSortie = QIcon("./ressources/transit-connection-variant.svg");
     bouttonAjouterSortie = new QAction(iconeAjouterSortie, tr("Ajouter une &sortie"), this);
     bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
+    bouttonAjouterSortie->setShortcut(Qt::Key_F5);
     connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
 
@@ -686,6 +690,7 @@ void AeroDms::initialiserBarreDOutils()
     const QIcon iconeGenerePdfRecapHdv = QIcon("./ressources/account-file-text.svg");
     bouttonGenerePdfRecapHdv = new QAction(iconeGenerePdfRecapHdv, tr("Générer les PDF de récapitulatif &HdV de l'année sélectionnée"), this);
     bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
+    bouttonGenerePdfRecapHdv->setShortcut(Qt::CTRL + Qt::Key_R);
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
 }
@@ -805,6 +810,7 @@ void AeroDms::initialiserMenuFichier()
 
     QAction* boutonOuvrirDossierDemandes = new QAction(QIcon("./ressources/folder-open.svg"), tr("&Ouvrir le dossier contenant les demandes de subventions"), this);
     menuFichier->addAction(boutonOuvrirDossierDemandes);
+    boutonOuvrirDossierDemandes->setShortcut(QKeySequence::Open);
     connect(boutonOuvrirDossierDemandes, SIGNAL(triggered()), this, SLOT(ouvrirDossierDemandesSubventions()));
 
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de &demande de subventions"));
@@ -812,6 +818,7 @@ void AeroDms::initialiserMenuFichier()
 
     QAction* boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
+    boutonOuvrirDerniereDemande->setShortcut(QKeySequence::Print);
     connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
 
     menuOuvrirAutreDemande = menuOuvrirPdfDemandeSubvention->addMenu(tr("Ouvrir un &autre fichier de demande de subventions"));
@@ -1082,6 +1089,15 @@ void AeroDms::initialiserMenuAide()
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette &application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
+}
+
+void AeroDms::initialiserRaccourcisClavierSansActionIhm()
+{
+    ongletSuivantRaccourciClavier = new QShortcut(QKeySequence::MoveToNextPage, this);
+    connect(ongletSuivantRaccourciClavier, SIGNAL(activated()), this, SLOT(switchOnglet()));
+
+    ongletPrecedentRaccourciClavier = new QShortcut(QKeySequence::MoveToPreviousPage, this);
+    connect(ongletPrecedentRaccourciClavier, SIGNAL(activated()), this, SLOT(switchOnglet()));
 }
 
 void AeroDms::changerModeSignature()
@@ -2774,6 +2790,33 @@ void AeroDms::switchModeDebug()
     vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, masquageEstDemande);
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, masquageEstDemande);
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, masquageEstDemande);
+}
+
+void AeroDms::switchOnglet()
+{
+    if (sender() == ongletSuivantRaccourciClavier)
+    {
+        if (mainTabWidget->currentIndex() < mainTabWidget->count() - 1)
+        {
+            mainTabWidget->setCurrentIndex(mainTabWidget->currentIndex() + 1);
+        }
+        else
+        {
+            mainTabWidget->setCurrentIndex(0);
+        }
+    }
+    else if (sender() == ongletPrecedentRaccourciClavier)
+    {
+        if (mainTabWidget->currentIndex() > 0)
+        {
+            mainTabWidget->setCurrentIndex(mainTabWidget->currentIndex() - 1);
+        }
+        else
+        {
+            mainTabWidget->setCurrentIndex(mainTabWidget->count() - 1);
+        }
+    }
+    
 }
 
 void AeroDms::switchScanAutomatiqueDesFactures()

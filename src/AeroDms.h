@@ -63,6 +63,7 @@ private:
     void initialiserMenuOptions();
     void initialiserMenuOutils();
     void initialiserMenuAide();
+    void initialiserRaccourcisClavierSansActionIhm();
 
     void chargerUneFacture(QString p_fichier);
 
@@ -184,6 +185,10 @@ private:
     QAction* bouttonAjouterCotisation;
     QAction* bouttonAjouterPilote;
     QAction* bouttonAjouterSortie;
+
+    //QAction pour raccourcis claviers sans item d'IHM
+    QShortcut* ongletSuivantRaccourciClavier;
+    QShortcut* ongletPrecedentRaccourciClavier;
 
     //Menu Fichier
     QMenu* menuOuvrirAutreDemande;
@@ -308,6 +313,7 @@ public slots:
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
     void verifierPresenceDeMiseAjour();
+    void switchOnglet();
 
 };
 #endif // AERODMS_H
