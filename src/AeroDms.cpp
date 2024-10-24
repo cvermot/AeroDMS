@@ -46,6 +46,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     installEventFilter(this);
     connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
 
+
     //========================Initialisation des autres attributs
     piloteAEditer = "";
     volAEditer = -1;
@@ -583,7 +584,7 @@ L'application va passer en mode lecture seule.\
     {
         QMessageBox::information(this,
             "Pas de mise à jour disponible",
-            "Aucune mise à jour ne smeble disponible.\n\nSi vous attendiez une mise à jour, merci de\ncontacter la personne responsable de l'application.");
+            "Aucune mise à jour ne semble disponible.\n\nSi vous attendiez une mise à jour, merci de\ncontacter la personne responsable de l'application.");
     }
     else if (!db->laBddEstALaVersionAttendue())
     {
