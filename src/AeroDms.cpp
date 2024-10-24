@@ -835,13 +835,13 @@ void AeroDms::initialiserMenuOptions()
     QMenu* menuSignature = menuOption->addMenu(tr("&Signature"));
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
 
-    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature manuelle"), this);
+    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature &manuelle"), this);
     menuSignature->addAction(boutonAucuneSignature);
 
-    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'image d'une signature"), this);
+    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'&image d'une signature"), this);
     menuSignature->addAction(boutonSignatureManuelle);
 
-    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature numérique avec Lex Community"), this);
+    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature &numérique avec Lex Community"), this);
     menuSignature->addAction(boutonSignatureNumerique);
 
     connect(boutonAucuneSignature, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
@@ -850,9 +850,9 @@ void AeroDms::initialiserMenuOptions()
 
     QMenu* menuFusionnerLesPdf = menuOption->addMenu(tr("&Fusion des PDF"));
     menuFusionnerLesPdf->setIcon(QIcon("./ressources/paperclip.svg"));
-    boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("Fusionner les PDF"), this);
+    boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("&Fusionner les PDF"), this);
     menuFusionnerLesPdf->addAction(boutonFusionnerLesPdf);
-    boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("Ne pas fusionner les PDF"), this);
+    boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("&Ne pas fusionner les PDF"), this);
     menuFusionnerLesPdf->addAction(boutonNePasFusionnerLesPdf);
 
     connect(boutonFusionnerLesPdf, SIGNAL(triggered()), this, SLOT(changerFusionPdf()));
