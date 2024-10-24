@@ -178,6 +178,7 @@ private:
     //Bouttons
     QAction* bouttonGenerePdf;
     QAction* bouttonGenerePdfRecapHdv;
+    QAction* miseAJourAction;
     QAction* boutonModeDebug;
     QAction* bouttonAjouterUnVol;
     QAction* bouttonAjouterCotisation;
