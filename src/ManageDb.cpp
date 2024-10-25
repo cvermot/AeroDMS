@@ -149,7 +149,7 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const in
     {
         AeroDmsTypes::RecetteDetail recette;
         recette.typeDeRecette = "Cotisation";
-        recette.id = query.value("recetteId").toInt();
+        recette.id = query.value("cotisationId").toInt();
         recette.annee = query.value("annee").toInt();
         recette.intitule = query.value("Intitule").toString();
         recette.estSoumisCe = true;
@@ -481,12 +481,14 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
 
     while (query.next())
     {
-        liste.append(depilerRequeteVol(query));
+        //Récupération sans les champs facture et sortie
+        liste.append(depilerRequeteVol(query, false));
     }
     return liste;
 }
 
-AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
+AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
+                                               const bool p_avecFactureEtSortie)
 {
     AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
 
@@ -514,10 +516,13 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query)
     vol.activite = p_query.value("activite").toString();
     vol.volId = p_query.value("volId").toInt();
     vol.immat = p_query.value("immatriculation").toString();
-    vol.facture = p_query.value("facture").toInt();
-    if (!p_query.value("sortie").isNull())
+    if (p_avecFactureEtSortie)
     {
-        vol.baladeId = p_query.value("sortie").toInt();
+        vol.facture = p_query.value("facture").toInt();
+        if (!p_query.value("sortie").isNull())
+        {
+            vol.baladeId = p_query.value("sortie").toInt();
+        }
     }
 
     return vol;

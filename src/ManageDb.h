@@ -95,7 +95,8 @@ public:
     AeroDmsTypes::ListeVols recupererVols( const int p_annee = -1, 
                                            const QString p_piloteId = "*");
     AeroDmsTypes::Vol recupererVol(const int p_idVol);
-    AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query);
+    AeroDmsTypes::Vol depilerRequeteVol( const QSqlQuery p_query,
+                                         const bool p_avecFactureEtSortie = true);
     AeroDmsTypes::ListeDemandesRemboursementSoumises recupererDemandesRemboursementSoumises( const int p_annee,
                                                                                              const QString p_piloteId);
 
