@@ -40,7 +40,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     setCentralWidget(mainTabWidget);
 
     setWindowTitle(tr("AeroDMS"));
-    setMinimumSize(160, 160);
+    setMinimumSize(640, 480);
     showMaximized();
 
     installEventFilter(this);
@@ -314,7 +314,7 @@ void AeroDms::initialiserOngletRecettes()
 void AeroDms::initialiserOngletAjoutDepenses()
 {
     //==========Onglet Ajout dépense
-    QHBoxLayout* ajoutVol = new QHBoxLayout(this);
+    QHBoxLayout* ajoutVol = new QHBoxLayout();
     widgetAjoutVol = new QWidget(this);
     widgetAjoutVol->setLayout(ajoutVol);
     mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), "Ajout dépense");
@@ -397,7 +397,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
    -facture chargée."));
     connect(validerLeVol, &QPushButton::clicked, this, &AeroDms::enregistrerUnVol);
 
-    QGridLayout* infosVol = new QGridLayout(this);
+    QGridLayout* infosVol = new QGridLayout();
     QWidget* widgetDepenseVol = new QWidget(this);
     widgetDepenseVol->setLayout(infosVol);
     depenseTabWidget->addTab(widgetDepenseVol, QIcon("./ressources/airplane-clock.svg"), "Heures de vol");
@@ -460,7 +460,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
    -intitulé saisi.");
     connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
 
-    QGridLayout* infosFacture = new QGridLayout(this);
+    QGridLayout* infosFacture = new QGridLayout();
     QWidget* widgetDepenseFacture = new QWidget(this);
     widgetDepenseFacture->setLayout(infosFacture);
     depenseTabWidget->addTab(widgetDepenseFacture, QIcon("./ressources/file-document.svg"), "Facture");
@@ -480,7 +480,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
 void AeroDms::initialiserOngletAjoutRecettes()
 {
     //==========Onglet Ajout recette
-    QHBoxLayout* ajoutRecette = new QHBoxLayout(this);
+    QHBoxLayout* ajoutRecette = new QHBoxLayout();
     widgetAjoutRecette = new QWidget(this);
     widgetAjoutRecette->setLayout(ajoutRecette);
     mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
@@ -520,7 +520,7 @@ void AeroDms::initialiserOngletAjoutRecettes()
    -au moins un vol associé sélectionné."));
     connect(validerLaRecette, &QPushButton::clicked, this, &AeroDms::enregistrerUneRecette);
 
-    QGridLayout* infosRecette = new QGridLayout(this);
+    QGridLayout* infosRecette = new QGridLayout();
     ajoutRecette->addLayout(infosRecette, 1);
     infosRecette->addWidget(typeDeRecetteLabel, 0, 0);
     infosRecette->addWidget(typeDeRecette, 0, 1);
@@ -624,7 +624,7 @@ void AeroDms::verifierSignatureNumerisee()
 void AeroDms::initialiserOngletGraphiques()
 {
     //=============Onglet graphiques
-    graphiques = new QHBoxLayout(this);
+    graphiques = new QHBoxLayout();
     widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
     mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
