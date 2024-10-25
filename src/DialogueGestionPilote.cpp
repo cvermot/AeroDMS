@@ -32,7 +32,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(cancelButton, SIGNAL(rejected()), this, SLOT(annulationOuFinSaisie()));
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(annulationOuFinSaisie()));
     connect(this, SIGNAL(rejected()), this, SLOT(annulationOuFinSaisie()));
 
     okButton = new QPushButton(tr("&Ajouter"), this);
