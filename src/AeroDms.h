@@ -83,6 +83,8 @@ private:
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
 
+    QString rechercherDerniereDemande();
+
     bool uneMaJEstDisponible(const QString p_chemin,
                              const QString p_fichier);
     void mettreAJourApplication(const QString p_chemin);
@@ -171,6 +173,9 @@ private:
     QProgressDialog *progressionGenerationPdf;
     QPushButton *boutonProgressionGenerationPdf;
 
+    QProgressDialog* progressionImpression;
+    QPushButton* boutonProgressionImpression;
+
     QProgressDialog* progressionMiseAJour;
     QPushButton* boutonProgressionMiseAJour;
 
@@ -251,6 +256,8 @@ private:
 
 signals:
     void toucheEchapEstAppuyee();
+    void debuterImpression(int p_nombreDePagesAImprimer);
+    void mettreAJourNombreDePagesImprimees(int p_nombreDePagesTraitees);
 
 public slots:
     void selectionnerUneFacture();
@@ -281,6 +288,8 @@ public slots:
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
     void mettreAJourEchecGenerationPdf();
+    void ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer);
+    void mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees);
     void aPropos();
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
@@ -314,6 +323,7 @@ public slots:
     void gererChangementOnglet();
     void verifierPresenceDeMiseAjour();
     void switchOnglet();
+    void imprimer();
 
 };
 #endif // AERODMS_H

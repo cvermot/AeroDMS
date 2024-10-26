@@ -489,6 +489,8 @@ public:
         int tailleDePolice;
     };
     static const ResolutionEtParametresStatistiques K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
+
+    static const int K_DPI_PAR_DEFAUT = 72;
 };
 
 #endif // AERODMSTYPES_H

@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QToolBar>
 #include <QPdfPageNavigator>
 #include <QtCore>
+#include <QPrintDialog>
+#include <QPrinter>
 
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
@@ -45,7 +47,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     installEventFilter(this);
     connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
-
 
     //========================Initialisation des autres attributs
     piloteAEditer = "";
@@ -790,6 +791,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
 
+    //Dialogue progression mise à jour
     progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
     boutonProgressionMiseAJour = new QPushButton("Quitter AeroDMS", this);
     boutonProgressionMiseAJour->setDisabled(true);
@@ -802,6 +804,17 @@ void AeroDms::initialiserBoitesDeDialogues()
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
 
     connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
+
+    //Dialogue de progression impression de demande
+    progressionImpression = new QProgressDialog("Impression en cours", "", 0, 0, this);
+    progressionImpression->setAutoClose(true);
+    progressionImpression->setWindowModality(Qt::WindowModal);
+    progressionImpression->close();
+    progressionImpression->setAutoReset(true);
+    progressionImpression->setCancelButton(0);
+
+    connect(this, SIGNAL(debuterImpression(int)), this, SLOT(ouvrirFenetreProgressionImpression(int)));
+    connect(this, SIGNAL(mettreAJourNombreDePagesImprimees(int)), this, SLOT(mettreAJourFenetreProgressionImpression(int)));
 }
 
 void AeroDms::initialiserMenuFichier()
@@ -815,7 +828,7 @@ void AeroDms::initialiserMenuFichier()
     connect(boutonOuvrirDossierDemandes, SIGNAL(triggered()), this, SLOT(ouvrirDossierDemandesSubventions()));
 
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de &demande de subventions"));
-    menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/printer.svg"));
+    menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/file-pdf-box.svg"));
 
     QAction* boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
@@ -823,9 +836,13 @@ void AeroDms::initialiserMenuFichier()
     connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
 
     menuOuvrirAutreDemande = menuOuvrirPdfDemandeSubvention->addMenu(tr("Ouvrir un &autre fichier de demande de subventions"));
-    menuOuvrirAutreDemande->setIcon(QIcon("./ressources/printer.svg"));
+    menuOuvrirAutreDemande->setIcon(QIcon("./ressources/file-pdf-box.svg"));
 
     peuplerMenuAutreDemande();
+
+    QAction* boutonImprimer = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande"), this);
+    menuFichier->addAction(boutonImprimer);
+    connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimer()));
 }
 
 void AeroDms::initialiserMenuOptions()
@@ -1290,10 +1307,33 @@ void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFactures
     progressionGenerationPdf->setValue(0);
     progressionGenerationPdf->show();
 }
+
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
 {
     progressionGenerationPdf->setValue(p_nombreDeFacturesTraitees);
 }
+
+void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer)
+{
+    statusBar()->showMessage(tr("Impression en cours..."));
+    progressionImpression->setLabelText(tr("Impression en cours...\nPage 0/") + QString::number(p_nombreDePagesAImprimer));
+    progressionImpression->reset();
+    progressionImpression->setMaximum(p_nombreDePagesAImprimer);
+    progressionImpression->setValue(0);
+    progressionImpression->show();
+}
+
+void AeroDms::mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees)
+{
+    progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees) + "/" + QString::number(progressionImpression->maximum()));
+    progressionImpression->setValue(p_nombreDePagesTraitees);
+
+    if (p_nombreDePagesTraitees+1 == progressionImpression->maximum())
+    {
+        statusBar()->showMessage(tr("Impression terminée"));
+    }
+}
+
 void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier)
 {
     //On met à jour la table des vols et des recettes (champ Soumis CE)
@@ -3062,18 +3102,37 @@ void AeroDms::ouvrirDossierDemandesSubventions()
 
 void AeroDms::ouvrirPdfDemandeSuvbvention()
 {
+    const QString fichier = rechercherDerniereDemande();
+
+    if (fichier != "")
+    {
+        QDesktopServices::openUrl(QUrl(fichier, QUrl::TolerantMode));
+    }
+    else
+    {
+        QMessageBox::warning(this, tr("AeroDMS"),
+                                   tr("Fichier non trouvé\n"
+                                      "Aucun fichier fusionné de demande de subvention trouvé."), QMessageBox::Cancel);
+    }
+}
+
+QString AeroDms::rechercherDerniereDemande()
+{
     //Recherche de la dernière demande
     QDir fichierSortie(cheminSortieFichiersGeneres);
     fichierSortie.setSorting(QDir::Name | QDir::Reversed | QDir::DirsFirst);
     const QStringList fichiers = fichierSortie.entryList();
+
+    QString fichier = "";
+
     if (fichiers.size() >= 2)
     {
         //On recherche un fichier fusionné = un fichier dont le nom contient FichiersAssembles
         const QStringList filtre = QStringList("*FichiersAssembles.pdf");
         int i = 0;
         bool fichierTrouve = false;
-        QString fichier = "";
-        while (i < fichiers.size()-2 && !fichierTrouve)
+ 
+        while (i < fichiers.size() - 2 && !fichierTrouve)
         {
             //Indice n-1 et n-2 contiennent . et ..
             fichier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
@@ -3086,18 +3145,9 @@ void AeroDms::ouvrirPdfDemandeSuvbvention()
             }
             i++;
         }
+    }
 
-        if (fichierTrouve)
-        {
-            QDesktopServices::openUrl(QUrl(fichier, QUrl::TolerantMode));
-        }
-        else
-        {
-            QMessageBox::warning(this, tr("AeroDMS"),
-                tr("Fichier non trouvé\n"
-                    "Aucun fichier fusionné de demande de subvention trouvé."), QMessageBox::Cancel);
-        }
-    } 
+    return fichier;
 }
 
 void AeroDms::peuplerMenuAutreDemande()
@@ -3265,6 +3315,66 @@ void AeroDms::gererChangementOnglet()
         actionListeDeroulanteStatistique->setVisible(true);
         actionListeDeroulantePilote->setVisible(false);
     }
+}
+
+void AeroDms::imprimer()
+{
+    QPdfDocument *doc = new QPdfDocument(this);
+    doc->load(rechercherDerniereDemande());
+
+    while (doc->status() != QPdfDocument::Status::Ready)
+    {
+        QThread::usleep(10);
+    }
+
+    QPrinter printer;
+
+    QPrintDialog dialog(&printer, this);
+    dialog.setWindowTitle(tr("Imprimer la demande de subvention"));
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        delete doc;
+        return;
+    }
+        
+    emit ouvrirFenetreProgressionImpression(doc->pageCount());
+
+    printer.setResolution(printer.supportedResolutions().last());
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    for (int i = 0; i < doc->pageCount(); i++)
+    {
+        QSizeF size = doc->pagePointSize(i);
+        QImage image = doc->render( i, 
+                                    QSize( size.width()*printer.supportedResolutions().last()/AeroDmsTypes::K_DPI_PAR_DEFAUT,
+                                           size.height()*printer.supportedResolutions().last()/AeroDmsTypes::K_DPI_PAR_DEFAUT));
+        
+        //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
+        //pour l'impression
+        if (size.width() > size.height())
+        {
+            QTransform transformation;
+            transformation.rotate(90);
+            image = image.transformed(transformation);
+            painter.drawImage(-20, 20, image);
+        }
+        else
+        {
+            painter.drawImage(10, 10, image);
+        }
+        
+        //S'il reste des pages derrière... on démarre une nouvelle page
+        if (i + 1 < doc->pageCount())
+        {
+            printer.newPage();
+        }
+        emit mettreAJourFenetreProgressionImpression(i + 1);
+    }
+    
+    painter.end();
+    delete doc;
 }
 
 int AeroDms::calculerValeurGraphAGenererPdf()
