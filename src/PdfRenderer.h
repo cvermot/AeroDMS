@@ -72,12 +72,12 @@ private :
 		                                                            const AeroDmsTypes::SubventionsParPilote p_totaux);
 	QString genererImagesStatistiques(const int p_annee);
 
-	void produireFichierPdfGlobal();
+	const QString  produireFichierPdfGlobal();
 
 	QString genererHtmlRecapBaladesSorties( const int p_annee, 
 		                                    AeroDmsTypes::EtatGeneration& p_etatGenerationARetourner);
 
-	void mergerPdf();
+	QString mergerPdf();
 
 	QString numeroFichierSur3Digits();
 
@@ -92,7 +92,7 @@ private :
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);
-	void generationTerminee(QString p_cheminFichiers);
+	void generationTerminee(QString p_cheminFichiers, QString p_cheminFichierPdfGlobal);
 	void echecGeneration();
 
 public slots:

@@ -81,6 +81,8 @@ private:
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
+    void imprimer();
+
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
 
@@ -249,6 +251,8 @@ private:
     int volAEditer = -1;
     bool volPartiellementEditable = false;
     int factureIdEnBdd = 0;
+    QString fichierAImprimer = "";
+    QString dossierSortieGeneration = "";
 
     //Statistiques
     QWidget* widgetGraphiques;
@@ -288,7 +292,7 @@ public slots:
     void peuplerTableSubventionsDemandees();
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
-    void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier);
+    void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge);
     void mettreAJourEchecGenerationPdf();
     void ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer);
     void mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees);
@@ -319,13 +323,15 @@ public slots:
     void recupererVolDepuisCsv();
     void ouvrirPdfDemandeSuvbvention();
     void ouvrirDossierDemandesSubventions();
+    void ouvrirDossierFichierVenantDEtreGenere();
     void peuplerMenuAutreDemande();
     void ouvrirPdfGenere();
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
     void verifierPresenceDeMiseAjour();
     void switchOnglet();
-    void imprimer();
+    void imprimerApresGenerationPdf();
+    void imprimerLaDerniereDemande();
 
 };
 #endif // AERODMS_H

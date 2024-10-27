@@ -9,20 +9,29 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf()
 DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* parent) : QDialog(parent)
 {
 	boutonFermer = new QPushButton(tr("&Fermer"), this);
+	boutonFermer->setToolTip(tr("Fermer cette fenêtre sans action supplémentaire"));
 	boutonFermer->setDefault(false);
 	connect(boutonFermer, SIGNAL(clicked()), this, SLOT(reject()));
 
 	boutonOuvrirPdf = new QPushButton(tr("&Ouvrir PDF"), this);
+	boutonOuvrirPdf->setToolTip(tr("Ouvrir le fichier PDF généré dans le lecteur PDF par défaut"));
 	boutonOuvrirPdf->setDefault(true);
 	connect(boutonOuvrirPdf, SIGNAL(clicked()), this, SLOT(accept()));
 
+	boutonOuvrirDossier = new QPushButton(tr("Ouvrir le &dossier"), this);
+	boutonOuvrirDossier->setToolTip(tr("Ouvrir le dossier contenant les fichiers générés"));
+	boutonOuvrirDossier->setDefault(true);
+	connect(boutonOuvrirDossier, SIGNAL(clicked()), this, SLOT(demanderOuvrirLeDossier()));
+
 	boutonImprimer = new QPushButton(tr("&Imprimer"), this);
+	boutonImprimer->setToolTip(tr("Imprimer directement les fichiers générés"));
 	boutonImprimer->setDefault(true);
 	connect(boutonImprimer, SIGNAL(clicked()), this, SLOT(demanderImpression()));
 
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
 	buttonBox->addButton(boutonFermer, QDialogButtonBox::ActionRole);
 	buttonBox->addButton(boutonOuvrirPdf, QDialogButtonBox::ActionRole);
+	buttonBox->addButton(boutonOuvrirDossier, QDialogButtonBox::ActionRole);
 	buttonBox->addButton(boutonImprimer, QDialogButtonBox::ActionRole);
 
 	label = new QLabel(tr("Génération PDF en cours"), this);
@@ -53,6 +62,7 @@ void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 	boutonFermer->setEnabled(false);
 	boutonOuvrirPdf->setEnabled(false);
 	boutonImprimer->setEnabled(false);
+	boutonOuvrirDossier->setEnabled(false);
 }
 
 void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
@@ -64,6 +74,7 @@ void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 		boutonFermer->setEnabled(true);
 		boutonOuvrirPdf->setEnabled(true);
 		boutonImprimer->setEnabled(true);
+		boutonOuvrirDossier->setEnabled(true);
 	}
 }
 
@@ -71,6 +82,12 @@ void DialogueProgressionGenerationPdf::demanderImpression()
 {
 	hide();
 	emit imprimer();
+}
+
+void DialogueProgressionGenerationPdf::demanderOuvrirLeDossier()
+{
+	hide();
+	emit ouvrirLeDossier();
 }
 
 

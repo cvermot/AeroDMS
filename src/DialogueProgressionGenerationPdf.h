@@ -20,14 +20,17 @@ private:
     QPushButton *boutonFermer = nullptr;
     QPushButton *boutonOuvrirPdf = nullptr;
     QPushButton *boutonImprimer = nullptr;
-    QProgressBar* barreDeProgression = nullptr;
+    QPushButton *boutonOuvrirDossier = nullptr;
+    QProgressBar *barreDeProgression = nullptr;
     QLabel* label = nullptr;
 
 public slots:
     void demanderImpression();
+    void demanderOuvrirLeDossier();
 
 signals:
     void imprimer();
+    void ouvrirLeDossier();
 };
 
 #endif // DIALOGUEPROGRESSIONGENERATIONPDF_H

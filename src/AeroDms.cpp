@@ -791,13 +791,13 @@ void AeroDms::initialiserBoitesDeDialogues()
 
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
-    connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
+    connect(pdf, SIGNAL(generationTerminee(QString, QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString, QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
 
     progressionGenerationPdfPerso = new DialogueProgressionGenerationPdf(this);
     connect(progressionGenerationPdfPerso, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
-    connect(progressionGenerationPdfPerso, SIGNAL(imprimer()), this, SLOT(imprimer()));
-
+    connect(progressionGenerationPdfPerso, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
+    connect(progressionGenerationPdfPerso, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
 
     //Dialogue progression mise à jour
     progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
@@ -850,7 +850,7 @@ void AeroDms::initialiserMenuFichier()
 
     QAction* boutonImprimer = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande"), this);
     menuFichier->addAction(boutonImprimer);
-    connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimer()));
+    connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
 }
 
 void AeroDms::initialiserMenuOptions()
@@ -1348,8 +1348,11 @@ void AeroDms::mettreAJourFenetreProgressionImpression(const int p_nombreDePagesT
     }
 }
 
-void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier)
+void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge)
 {
+    fichierAImprimer = p_cheminFichierPdfMerge;
+    dossierSortieGeneration = p_cheminDossier;
+
     //On met à jour la table des vols et des recettes (champ Soumis CE)
     peuplerTableVols();
     peuplerTableRecettes();
@@ -3115,6 +3118,11 @@ void AeroDms::ouvrirDossierDemandesSubventions()
     QDesktopServices::openUrl(QUrl(cheminSortieFichiersGeneres, QUrl::TolerantMode));
 }
 
+void AeroDms::ouvrirDossierFichierVenantDEtreGenere()
+{
+    QDesktopServices::openUrl(QUrl(dossierSortieGeneration, QUrl::TolerantMode));
+}
+
 void AeroDms::ouvrirPdfDemandeSuvbvention()
 {
     const QString fichier = rechercherDerniereDemande();
@@ -3332,10 +3340,21 @@ void AeroDms::gererChangementOnglet()
     }
 }
 
+void AeroDms::imprimerApresGenerationPdf()
+{
+    imprimer();
+}
+void AeroDms::imprimerLaDerniereDemande()
+{
+    fichierAImprimer = rechercherDerniereDemande();
+    imprimer();
+}
+
+
 void AeroDms::imprimer()
 {
     QPdfDocument *doc = new QPdfDocument(this);
-    doc->load(rechercherDerniereDemande());
+    doc->load(fichierAImprimer);
 
     while (doc->status() != QPdfDocument::Status::Ready)
     {

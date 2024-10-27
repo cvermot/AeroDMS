@@ -53,7 +53,7 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
 }
 
-void PdfRenderer::mergerPdf()
+QString PdfRenderer::mergerPdf()
 {
     PoDoFo::PdfMemDocument document;
 
@@ -77,6 +77,8 @@ void PdfRenderer::mergerPdf()
     document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
 
     document.SaveUpdate(nomFichier.toStdString());
+
+    return nomFichier;
 }
 
 QString PdfRenderer::numeroFichierSur3Digits()
@@ -119,7 +121,7 @@ void PdfRenderer::chargementTermine(bool retour)
 void PdfRenderer::impressionTerminee( const QString& filePath, 
                                       bool success)
 {
-    mergerPdf();
+    const QString fichier = mergerPdf();
 
     nombreEtapesEffectuees++;
     emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -134,7 +136,7 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     //Sinon on emet directement la fin d'impression
     else
     {
-        emit generationTerminee(cheminSortieFichiersGeneres);
+        emit generationTerminee(cheminSortieFichiersGeneres, fichier);
     }
    
 }
@@ -513,12 +515,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     }
     else
     {
+        QString fichierMerge = "";
         if (demandeEnCours.mergerTousLesPdf)
         {
-            produireFichierPdfGlobal();
+            fichierMerge = produireFichierPdfGlobal();
         }
         
-        emit generationTerminee(cheminSortieFichiersGeneres);
+        emit generationTerminee(cheminSortieFichiersGeneres, fichierMerge);
     }
     nombreEtapesEffectuees++;
 
@@ -634,7 +637,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
     return etatGenerationARetourner;
 }
 
-void PdfRenderer::produireFichierPdfGlobal()
+const QString PdfRenderer::produireFichierPdfGlobal()
 {
     PoDoFo::PdfMemDocument document;
 
@@ -660,6 +663,8 @@ void PdfRenderer::produireFichierPdfGlobal()
     document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
     document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
     document.Save(nomFichier.toStdString());
+
+    return nomFichier;
 }
 
 void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)
