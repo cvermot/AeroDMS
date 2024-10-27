@@ -100,6 +100,9 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     verifierPresenceDeMiseAjour();
 
     statusBar()->showMessage("Prêt");
+
+    /*DialogueProgressionGenerationPdf* progression = new DialogueProgressionGenerationPdf(this);
+    progression->exec();*/
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
@@ -791,6 +794,11 @@ void AeroDms::initialiserBoitesDeDialogues()
     connect(pdf, SIGNAL(generationTerminee(QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
 
+    progressionGenerationPdfPerso = new DialogueProgressionGenerationPdf(this);
+    connect(progressionGenerationPdfPerso, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
+    connect(progressionGenerationPdfPerso, SIGNAL(imprimer()), this, SLOT(imprimer()));
+
+
     //Dialogue progression mise à jour
     progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
     boutonProgressionMiseAJour = new QPushButton("Quitter AeroDMS", this);
@@ -1300,17 +1308,23 @@ void AeroDms::peuplerStatistiques()
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
 {
-    boutonProgressionGenerationPdf->setDisabled(true);
-    progressionGenerationPdf->setLabelText("Génération PDF en cours");
-    progressionGenerationPdf->reset();
-    progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
-    progressionGenerationPdf->setValue(0);
-    progressionGenerationPdf->show();
+    //boutonProgressionGenerationPdf->setDisabled(true);
+    //progressionGenerationPdf->setLabelText("Génération PDF en cours");
+    //progressionGenerationPdf->reset();
+    //progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
+    //progressionGenerationPdf->setValue(0);
+    //progressionGenerationPdf->show();
+
+    progressionGenerationPdfPerso->setLabelText(tr("Génération PDF en cours"));
+    progressionGenerationPdfPerso->setMaximum(p_nombreDeFacturesATraiter);
+    progressionGenerationPdfPerso->setValue(0);
+    progressionGenerationPdfPerso->show();
 }
 
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
 {
     progressionGenerationPdf->setValue(p_nombreDeFacturesTraitees);
+    progressionGenerationPdfPerso->setValue(p_nombreDeFacturesTraitees);
 }
 
 void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer)
@@ -1347,8 +1361,9 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     peuplerMenuAutreDemande();
 
     //On met à jour la fenêtre de progression
-    progressionGenerationPdf->setLabelText("Génération PDF terminée");
-    boutonProgressionGenerationPdf->setDisabled(false);
+    //progressionGenerationPdf->setLabelText("Génération PDF terminée");
+    progressionGenerationPdfPerso->setLabelText(tr("Génération PDF terminée"));
+    //boutonProgressionGenerationPdf->setDisabled(false);
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);

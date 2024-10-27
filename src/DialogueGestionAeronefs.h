@@ -28,9 +28,6 @@ public:
     DialogueGestionAeronefs();
     DialogueGestionAeronefs(ManageDb* db, QWidget* parent = nullptr);
 
-    //AeroDmsTypes::Pilote recupererInfosPilote();
-    //void preparerMiseAJourPilote(const QString p_piloteId);
-
     void peuplerListeAeronefs();
 
 private:
@@ -38,31 +35,8 @@ private:
 
     QTableWidget* vueAeronefs;
 
-    /*QLineEdit* nom;
-    QLineEdit* prenom;
-    QLineEdit* aeroclub;
-    QCheckBox* estAyantDroit;
-    QComboBox* activitePrincipale;
-    QLineEdit* mail;
-    QLineEdit* telephone;
-    QLineEdit* remarque;
-    QCheckBox* estActif;
-    QCheckBox* estBrevete;
-
-    QString idPilote;
-
-    
-
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
-
-    void peuplerActivitePrincipale();*/
-
 private slots:
     void sauvegarderDonneesSaisies(int p_ligne, int p_colonne);
-    /*void prevaliderDonneesSaisies();
-    void annulationOuFinSaisie(); */
 };
 
 #endif // DIALOGUEGESTIONAERONEFS_H

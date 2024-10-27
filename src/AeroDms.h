@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
+#include "DialogueProgressionGenerationPdf.h"
 #include "StatistiqueWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -172,6 +173,7 @@ private:
     //Barre de progression
     QProgressDialog *progressionGenerationPdf;
     QPushButton *boutonProgressionGenerationPdf;
+    DialogueProgressionGenerationPdf* progressionGenerationPdfPerso;
 
     QProgressDialog* progressionImpression;
     QPushButton* boutonProgressionImpression;

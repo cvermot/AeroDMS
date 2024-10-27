@@ -104,6 +104,7 @@
     <ClCompile Include="AeroDmsServices.cpp" />
     <ClCompile Include="AeroDmsTypes.cpp" />
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
+    <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="PdfExtractor.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="AeroDmsServices.h" />
     <ClInclude Include="AeroDmsTypes.h" />
+    <QtMoc Include="DialogueProgressionGenerationPdf.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />
