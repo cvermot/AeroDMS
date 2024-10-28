@@ -51,7 +51,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 && aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
         {
             //qDebug() << entries.at(index).Text.data();
-            if (QString(entries.at(index).Text.data()).contains("SIRET : 78194723900013"))
+            if (QString(entries.at(index).Text.data()).contains("SIRET : 78194723900013")
+                || QString(entries.at(index).Text.data()).contains("SIRET : 781 947 239 00021") )
             {
                 aeroclub = AeroDmsTypes::Aeroclub_DACA;
                 //qDebug() << "Aéroclub trouvé : DACA";
@@ -84,7 +85,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             else if (QString(entries.at(index).Text.data()).contains("SEPAVIA"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_SEPAVIA;
-                //qDebug() << "Aéroclub trouvé : Aéroclub d'Andernos";
+                //qDebug() << "Aéroclub trouvé : SEPAVIA";
             }
             index++;
         }
@@ -383,16 +384,15 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vec
 
                 //Cout du vol, index +3 par rapport à la date
                 index = index + 1;
-                str = QString(p_entries.at(index).Text.data()).replace(",", ".").replace(" ", "");
-                if (str.contains(euroRe)
+                str = QString(p_entries.at(index).Text.data()).replace(",",".").replace(" ", "");
+                if (str.contains("€")
                     && donneesFactures.coutDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol)
                 {
-                    QRegularExpressionMatch match = euroRe.match(str);
                     //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
                     //(certaines factures indiquent un credit nul en dernière ligne)
-                    if (match.captured("montant").toFloat() != 0)
+                    if (str.replace("€","").toFloat() != 0)
                     {
-                        donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                        donneesFactures.coutDuVol = str.replace("€", "").toFloat();
                     }
                 }
             }
