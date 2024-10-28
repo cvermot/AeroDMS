@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     QPixmap pixmap("./ressources/splash.png");
-    QSplashScreen splash(pixmap);
+    QSplashScreen splash(pixmap, Qt::WindowStaysOnTopHint);
     splash.show();
     splash.showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
     a.processEvents();
@@ -53,6 +53,7 @@ int main(int argc, char *argv[])
 
     AeroDms w;
     w.show();
-    splash.finish(&w);
+    //splash.finish(&w);
+    QTimer::singleShot(500, &splash, &QWidget::close);
     return a.exec();
 }
