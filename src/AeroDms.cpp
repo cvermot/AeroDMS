@@ -1342,7 +1342,8 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     peuplerMenuAutreDemande();
 
     //On met à jour la fenêtre de progression
-    progressionGenerationPdfPerso->generationEstTerminee();
+    const bool fichierMergeDisponible = (fichierAImprimer != "");
+    progressionGenerationPdfPerso->generationEstTerminee(fichierMergeDisponible);
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);

@@ -71,7 +71,7 @@ void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 {
 	barreDeProgression->setValue(p_valeur);
-	label->setText(tr("Génération PDF terminée"));
+	label->setText(tr("Génération PDF en cours"));
 
 	if (p_valeur >= barreDeProgression->maximum())
 	{
@@ -79,12 +79,22 @@ void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 		boutonOuvrirPdf->setEnabled(true);
 		boutonImprimer->setEnabled(true);
 		boutonOuvrirDossier->setEnabled(true);
+		boutonOuvrirPdf->setToolTip(tr("Ouvrir le fichier PDF généré dans le lecteur PDF par défaut"));
+		boutonImprimer->setToolTip(tr("Imprimer directement les fichiers générés"));
 	}
 }
 
-void DialogueProgressionGenerationPdf::generationEstTerminee()
+void DialogueProgressionGenerationPdf::generationEstTerminee(const bool p_fichierMergeEstDisponible)
 {
 	label->setText(tr("Génération PDF terminée"));
+	boutonImprimer->setEnabled(p_fichierMergeEstDisponible);
+	boutonOuvrirPdf->setEnabled(p_fichierMergeEstDisponible);
+
+	if (!p_fichierMergeEstDisponible)
+	{
+		boutonOuvrirPdf->setToolTip(tr("Option indisponible lorsque l'option de fusion est désactivée"));
+		boutonImprimer->setToolTip(tr("Option indisponible lorsque l'option de fusion est désactivée"));
+	}
 }
 
 void DialogueProgressionGenerationPdf::demanderImpression()

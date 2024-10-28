@@ -15,7 +15,7 @@ public:
     //void setLabelText(const QString p_texte);
     void setMaximum(const int p_maximum);
     void setValue(const int p_valeur);
-    void generationEstTerminee();
+    void generationEstTerminee(const bool p_fichierMergeEstDisponible);
 
 private:
     QPushButton *boutonFermer = nullptr;
