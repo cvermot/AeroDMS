@@ -12,9 +12,10 @@ public:
     DialogueProgressionGenerationPdf();
     DialogueProgressionGenerationPdf(QWidget* parent = nullptr);
 
-    void setLabelText(const QString p_texte);
+    //void setLabelText(const QString p_texte);
     void setMaximum(const int p_maximum);
     void setValue(const int p_valeur);
+    void generationEstTerminee();
 
 private:
     QPushButton *boutonFermer = nullptr;

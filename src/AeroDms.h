@@ -173,8 +173,6 @@ private:
     QString cheminDeLaFactureCourante;
 
     //Barre de progression
-    QProgressDialog *progressionGenerationPdf;
-    QPushButton *boutonProgressionGenerationPdf;
     DialogueProgressionGenerationPdf* progressionGenerationPdfPerso;
 
     QProgressDialog* progressionImpression;

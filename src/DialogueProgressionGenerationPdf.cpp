@@ -48,15 +48,18 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* pare
 
 	setLayout(mainLayout);
 	setWindowTitle(tr("Génération PDF"));
+	setWindowModality(Qt::WindowModal);
 }
 
-void DialogueProgressionGenerationPdf::setLabelText(const QString p_texte)
+/*void DialogueProgressionGenerationPdf::setLabelText(const QString p_texte)
 {
 	label->setText(p_texte);
-}
+}*/
 
 void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 {
+	label->setText(tr("Génération PDF en cours"));
+
 	barreDeProgression->setMaximum(p_maximum);
 
 	boutonFermer->setEnabled(false);
@@ -68,6 +71,7 @@ void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 {
 	barreDeProgression->setValue(p_valeur);
+	label->setText(tr("Génération PDF terminée"));
 
 	if (p_valeur >= barreDeProgression->maximum())
 	{
@@ -76,6 +80,11 @@ void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 		boutonImprimer->setEnabled(true);
 		boutonOuvrirDossier->setEnabled(true);
 	}
+}
+
+void DialogueProgressionGenerationPdf::generationEstTerminee()
+{
+	label->setText(tr("Génération PDF terminée"));
 }
 
 void DialogueProgressionGenerationPdf::demanderImpression()
