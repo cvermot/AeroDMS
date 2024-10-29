@@ -1317,7 +1317,7 @@ void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImpri
 
 void AeroDms::mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees)
 {
-    progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees) + "/" + QString::number(progressionImpression->maximum()));
+    progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees+1) + "/" + QString::number(progressionImpression->maximum()));
     progressionImpression->setValue(p_nombreDePagesTraitees);
 
     if (p_nombreDePagesTraitees+1 == progressionImpression->maximum())
