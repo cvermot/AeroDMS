@@ -2199,6 +2199,12 @@ void AeroDms::enregistrerUnVol()
                     peuplerListesPilotes();
                 }
 
+                //On supprime la vol de la liste des vols détectés si on en avait chargé un
+                //On fait ceci avant la mise à jour de la statiusBar car supprimerLeVolDeLaVueVolsDetectes()
+                //en fait également une. De cette façon on masque le status de suppression et on affiche
+                //que le status d'ajout du vol
+                supprimerLeVolDeLaVueVolsDetectes();
+
             statusBar()->showMessage(QString("Vol ")
                 + typeDeVol->currentText() 
                 + " de "
@@ -2216,9 +2222,6 @@ void AeroDms::enregistrerUnVol()
                 + "€ / Subvention entrainement restante : "
                 + QString::number(subventionRestante, 'f', 2)
                 + "€");
-
-            //Et on supprime la vol de la liste des vols détectés si on en avait chargé un
-            supprimerLeVolDeLaVueVolsDetectes();
 
             //On rince les données de vol
             dureeDuVol->setTime(QTime::QTime(0, 0));
