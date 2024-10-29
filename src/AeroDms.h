@@ -223,7 +223,6 @@ private:
     QAction* boutonGraphResolutionFullHd;
     QAction* boutonGraphResolutionQhd;
     QAction* boutonGraphResolution4k;
-    QAction* boutonOuvrirAutomatiquementLesPdfGeneres;
 
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;

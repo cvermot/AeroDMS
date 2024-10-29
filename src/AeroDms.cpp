@@ -131,13 +131,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
-    if (settings.value("options/ouvertureAutomatiqueApresGeneration", "") == "")
-    {
-        settings.beginGroup("options");
-        settings.setValue("ouvertureAutomatiqueApresGeneration", "1");
-        settings.endGroup();
-    }
-
     if (settings.value("mailing/texteChequesDisponibles", "") == "")
     {
         settings.beginGroup("mailing");
@@ -189,8 +182,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
-    parametresMetiers.ouvertureAutomatiqueApresGeneration = settings.value("options/ouvertureAutomatiqueApresGeneration").toBool();
-
+    
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer(db,
         ressourcesHtml);
@@ -943,11 +935,6 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(QIcon("./ressources/check-all.svg"), tr("&Sélectionner tous les graphs et tous les récaps"), this);
     menuOptionsRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap);
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
-
-    boutonOuvrirAutomatiquementLesPdfGeneres = new QAction("Ouvrir automatiquement les &PDF à la fin de la génération", this);
-    boutonOuvrirAutomatiquementLesPdfGeneres->setCheckable(true);
-    boutonOuvrirAutomatiquementLesPdfGeneres->setChecked(parametresMetiers.ouvertureAutomatiqueApresGeneration);
-    menuOption->addAction(boutonOuvrirAutomatiquementLesPdfGeneres);
 
     connect(boutonDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
@@ -3208,11 +3195,8 @@ void AeroDms::ouvrirUnFichierDeDemandeDeSubvention()
 
 void AeroDms::ouvrirPdfGenere()
 {
-    if (boutonOuvrirAutomatiquementLesPdfGeneres->isChecked())
-    {
-        const int nombreElements = menuOuvrirAutreDemande->actions().at(0)->menu()->actions().size();  
-        QDesktopServices::openUrl(QUrl(menuOuvrirAutreDemande->actions().at(0)->menu()->actions().at(nombreElements - 1)->data().toString(), QUrl::TolerantMode));
-    }
+    const int nombreElements = menuOuvrirAutreDemande->actions().at(0)->menu()->actions().size();  
+    QDesktopServices::openUrl(QUrl(menuOuvrirAutreDemande->actions().at(0)->menu()->actions().at(nombreElements - 1)->data().toString(), QUrl::TolerantMode));
 }
 
 void AeroDms::deselectionnerVolDetecte()

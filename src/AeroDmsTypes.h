@@ -413,7 +413,6 @@ public:
         int delaisDeGardeBdd;
         QString texteMailDispoCheques;
         QString texteMailSubventionRestante;
-        bool ouvertureAutomatiqueApresGeneration;
     };
 
     struct TotauxRecettes {
