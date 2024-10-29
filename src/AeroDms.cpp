@@ -1282,9 +1282,9 @@ void AeroDms::peuplerStatistiques()
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
 {
+    progressionGenerationPdfPerso->show();
     progressionGenerationPdfPerso->setMaximum(p_nombreDeFacturesATraiter);
     progressionGenerationPdfPerso->setValue(0);
-    progressionGenerationPdfPerso->show();
 }
 
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
