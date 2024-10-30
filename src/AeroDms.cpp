@@ -1306,7 +1306,7 @@ void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFac
 void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer)
 {
     statusBar()->showMessage(tr("Impression en cours..."));
-    progressionImpression->setLabelText(tr("Impression en cours...\nPage 0/") + QString::number(p_nombreDePagesAImprimer));
+    progressionImpression->setLabelText(tr("Impression en cours...\nPage 1/") + QString::number(p_nombreDePagesAImprimer));
     progressionImpression->reset();
     progressionImpression->setMaximum(p_nombreDePagesAImprimer);
     progressionImpression->setValue(0);
