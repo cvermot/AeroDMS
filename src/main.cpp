@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     AeroDms w;
     w.show();
-    //splash.finish(&w);
+    
     QTimer::singleShot(500, &splash, &QWidget::close);
     return a.exec();
 }

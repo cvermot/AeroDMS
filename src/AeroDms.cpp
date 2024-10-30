@@ -536,15 +536,16 @@ void AeroDms::verifierPresenceDeMiseAjour()
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
          || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
     {
-        QMessageBox demandeConfirmationGeneration;
-        demandeConfirmationGeneration.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
+        QMessageBox dialogueMiseAJourDisponible;
+        dialogueMiseAJourDisponible.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
             + "Voulez vous l'exécuter maintenant ?");
-        demandeConfirmationGeneration.setInformativeText("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v" + QApplication::applicationVersion() + "...main\">GitHub</a>.");
-        demandeConfirmationGeneration.setWindowTitle("Mise à jour disponible");
-        demandeConfirmationGeneration.setIcon(QMessageBox::Question);
-        demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        dialogueMiseAJourDisponible.setWindowFlags(Qt::WindowStaysOnTopHint);
+        dialogueMiseAJourDisponible.setInformativeText("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v" + QApplication::applicationVersion() + "...main\">GitHub</a>.");
+        dialogueMiseAJourDisponible.setWindowTitle("Mise à jour disponible");
+        dialogueMiseAJourDisponible.setIcon(QMessageBox::Question);
+        dialogueMiseAJourDisponible.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-        const int ret = demandeConfirmationGeneration.exec();
+        const int ret = dialogueMiseAJourDisponible.exec();
 
         switch (ret)
         {
@@ -561,13 +562,17 @@ void AeroDms::verifierPresenceDeMiseAjour()
             {
                 passerLeLogicielEnLectureSeule();
 
-                QMessageBox::critical(this,
-                    "Version de base données incompatible",
-                    "Une mise à jour de l'application est disponible et doit être réalisée\n\
+                QMessageBox dialogueErreurVersionBdd;
+                dialogueErreurVersionBdd.setText("Une mise à jour de l'application est disponible et doit être réalisée\n\
 car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
 \n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
 "de mise à jour\" du menu Aide.");
+                dialogueErreurVersionBdd.setWindowFlags(Qt::WindowStaysOnTopHint);
+                dialogueErreurVersionBdd.setWindowTitle(tr("Version de base données incompatible"));
+                dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+                dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+                dialogueErreurVersionBdd.exec();
             }
         }
         break;
@@ -583,11 +588,15 @@ L'application va passer en mode lecture seule.\
     {
         passerLeLogicielEnLectureSeule();
 
-        QMessageBox::critical(this,
-            "Erreur de version de base de données",
-            "La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
+        QMessageBox dialogueErreurVersionBdd;
+        dialogueErreurVersionBdd.setText("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
-Consultez le développeur/responsable de l'application pour plus d'informations.");
+Consultez le développeur / responsable de l'application pour plus d'informations.");
+        dialogueErreurVersionBdd.setWindowFlags(Qt::WindowStaysOnTopHint);
+        dialogueErreurVersionBdd.setWindowTitle(tr("Erreur de version de base de données"));
+        dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+        dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+        dialogueErreurVersionBdd.exec();
     }
 }
 
@@ -787,6 +796,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
     progressionMiseAJour->setAutoClose(false);
     progressionMiseAJour->setWindowModality(Qt::WindowModal);
+    progressionMiseAJour->setWindowFlags(Qt::WindowStaysOnTopHint);
     progressionMiseAJour->close();
     progressionMiseAJour->setAutoReset(false);
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
@@ -1285,6 +1295,7 @@ void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFactures
     progressionGenerationPdfPerso->show();
     progressionGenerationPdfPerso->setMaximum(p_nombreDeFacturesATraiter);
     progressionGenerationPdfPerso->setValue(0);
+
 }
 
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
