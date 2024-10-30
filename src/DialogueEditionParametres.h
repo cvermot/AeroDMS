@@ -16,41 +16,32 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 
-#ifndef DIALOGUEPROGRESSIONGENERATIONPDF_H
-#define DIALOGUEPROGRESSIONGENERATIONPDF_H
+#ifndef DIALOGUEEDITIONPARAMETRES_H
+#define DIALOGUEEDITIONPARAMETRES_H
 #include <QDialog>
 #include <QtGui>
 #include <QtWidgets>
 
-class DialogueProgressionGenerationPdf : public QDialog
+#include "AeroDmsTypes.h"
+
+class DialogueEditionParametres : public QDialog
 {
     Q_OBJECT
 
 public:
-    DialogueProgressionGenerationPdf();
-    DialogueProgressionGenerationPdf(QWidget* parent = nullptr);
-
-    //void setLabelText(const QString p_texte);
-    void setMaximum(const int p_maximum);
-    void setValue(const int p_valeur);
-    void generationEstTerminee(const bool p_fichierMergeEstDisponible);
+    DialogueEditionParametres();
+    DialogueEditionParametres(const AeroDmsTypes::ParametresMetier p_parametresMetiers,
+        const AeroDmsTypes::ParametresSysteme p_parametresSysteme,
+        QWidget* parent = nullptr);
 
 private:
-    QPushButton *boutonFermer = nullptr;
-    QPushButton *boutonOuvrirPdf = nullptr;
-    QPushButton *boutonImprimer = nullptr;
-    QPushButton *boutonOuvrirDossier = nullptr;
-    QProgressBar *barreDeProgression = nullptr;
-    QLabel* label = nullptr;
+    
 
 public slots:
-    void demanderImpression();
-    void demanderOuvrirLeDossier();
 
 signals:
-    void imprimer();
-    void ouvrirLeDossier();
+  
 };
 
-#endif // DIALOGUEPROGRESSIONGENERATIONPDF_H
+#endif // DIALOGUEEDITIONPARAMETRES_H
 

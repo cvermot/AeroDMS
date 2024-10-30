@@ -415,6 +415,14 @@ public:
         QString texteMailSubventionRestante;
     };
 
+    struct ParametresSysteme {
+        QString cheminStockageBdd;
+        QString cheminStockageFacturesTraitees;
+        QString cheminStockageFacturesATraiter;
+        QString cheminSortieFichiersGeneres;
+        QString nomBdd;
+    };
+
     struct TotauxRecettes {
         double cotisations;
         double balades;

@@ -166,12 +166,6 @@ private:
     QComboBox* listeDeroulanteStatistique;
     QAction* actionListeDeroulanteStatistique;
 
-    QString cheminStockageBdd;
-    QString cheminStockageFacturesTraitees;
-    QString cheminStockageFacturesATraiter;
-    QString cheminSortieFichiersGeneres;
-    QString cheminDeLaFactureCourante;
-
     //Barre de progression
     DialogueProgressionGenerationPdf* progressionGenerationPdfPerso;
 
@@ -180,8 +174,6 @@ private:
 
     QProgressDialog* progressionMiseAJour;
     QPushButton* boutonProgressionMiseAJour;
-
-    AeroDmsTypes::ParametresMetier parametresMetiers;
 
     //Bouttons
     QAction* bouttonGenerePdf;
@@ -210,6 +202,7 @@ private:
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* boutonActivationScanAutoFactures;
+    QAction* boutonParametresDuLogiciel;
     QAction* boutonOptionRecapAnnuelRecettes;
     QAction* boutonOptionRecapAnnuelBaladesSorties;
     QAction* boutonGraphRecapAnnuelHeuresAnnuelles;
@@ -250,6 +243,16 @@ private:
     int factureIdEnBdd = 0;
     QString fichierAImprimer = "";
     QString dossierSortieGeneration = "";
+    QString cheminDeLaFactureCourante = "";
+
+    //Parametres
+    AeroDmsTypes::ParametresMetier parametresMetiers;
+    AeroDmsTypes::ParametresSysteme parametresSysteme;
+    QString cheminStockageBdd;
+    QString cheminStockageFacturesTraitees;
+    QString cheminStockageFacturesATraiter;
+    QString cheminSortieFichiersGeneres;
+    
 
     //Statistiques
     QWidget* widgetGraphiques;
@@ -329,6 +332,7 @@ public slots:
     void switchOnglet();
     void imprimerApresGenerationPdf();
     void imprimerLaDerniereDemande();
+    void ouvrirDialogueParametresApplication();
 
 };
 #endif // AERODMS_H

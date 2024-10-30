@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonutCombineWidget.h"
 #include "StatistiqueDonuts.h"
 
+#include "DialogueEditionParametres.h"
+
 #include <QtWidgets>
 #include <QToolBar>
 #include <QPdfPageNavigator>
@@ -169,10 +171,17 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.value("baseDeDonnees/nom", "").toString();
     const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/ressources/HTML");
+    //TODO : faire du ménage et utiliser parametresSysteme
     cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
+
+    parametresSysteme.cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
+    parametresSysteme.cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
+    parametresSysteme.cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
+    parametresSysteme.cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
+    parametresSysteme.nomBdd = settings.value("baseDeDonnees/chemin", "").toString();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -959,9 +968,16 @@ void AeroDms::initialiserMenuOptions()
     menuOption->addSeparator();
 
     boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Désactiver le scan &automatique des factures"), this);
-    boutonActivationScanAutoFactures->setStatusTip(tr("&Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    boutonActivationScanAutoFactures->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOption->addAction(boutonActivationScanAutoFactures);
     connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
+
+    menuOption->addSeparator();
+
+    boutonParametresDuLogiciel = new QAction(QIcon("./ressources/cog.svg"), tr("&Paramètres du logiciel"), this);
+    boutonParametresDuLogiciel->setStatusTip(tr("Ouvrir le panneau de configuration du logiciel"));
+    menuOption->addAction(boutonParametresDuLogiciel);
+    connect(boutonParametresDuLogiciel, SIGNAL(triggered()), this, SLOT(ouvrirDialogueParametresApplication()));
 
     QFont font;
     font.setWeight(QFont::Bold);
@@ -2874,6 +2890,14 @@ void AeroDms::switchScanAutomatiqueDesFactures()
         boutonActivationScanAutoFactures->setText(tr("Activer le scan automatique des factures"));
     }
     
+}
+
+void AeroDms::ouvrirDialogueParametresApplication()
+{
+    DialogueEditionParametres editionParametres(parametresMetiers,
+        parametresSysteme,
+        this);
+    editionParametres.exec();
 }
 
 void AeroDms::convertirHeureDecimalesVersHhMm()
