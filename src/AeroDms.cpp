@@ -743,18 +743,24 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteElementsSoumis = selectionToolBar->addWidget(listeDeroulanteElementsSoumis);
 
     listeDeroulanteStatistique = new QComboBox(this);
-    listeDeroulanteStatistique->addItem("Statistiques mensuelles", AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_ANNUELLES, QIcon("./ressources/chart-bar-stacked.svg"));
-    listeDeroulanteStatistique->addItem("Statistiques par pilote", AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, QIcon("./ressources/chart-pie.svg"));
-    listeDeroulanteStatistique->addItem("Statistiques par type de vol", AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, QIcon("./ressources/chart-pie.svg"));
-    listeDeroulanteStatistique->addItem("Statistiques par activité", AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, QIcon("./ressources/chart-pie.svg"));
-    listeDeroulanteStatistique->addItem("Statuts des pilotes", AeroDmsTypes::Statistiques_STATUTS_PILOTES);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_STATUTS_PILOTES, QIcon("./ressources/chart-donut-variant.svg"));
-    listeDeroulanteStatistique->addItem("Types d'aéronefs", AeroDmsTypes::Statistiques_AERONEFS);
-    listeDeroulanteStatistique->setItemIcon(AeroDmsTypes::Statistiques_AERONEFS, QIcon("./ressources/chart-donut-variant.svg"));
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-bar-stacked.svg"),
+        "Statistiques mensuelles", 
+        AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
+        "Statistiques par pilote", 
+        AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
+        "Statistiques par type de vol", 
+        AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
+        "Statistiques par activité", 
+        AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-donut-variant.svg"),
+        "Statuts des pilotes", 
+        AeroDmsTypes::Statistiques_STATUTS_PILOTES);
+    listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-donut-variant.svg"),
+        "Types d'aéronefs", 
+        AeroDmsTypes::Statistiques_AERONEFS);
 
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     actionListeDeroulanteStatistique = selectionToolBar->addWidget(listeDeroulanteStatistique);
