@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueEditionParametres.h"
 
 #include <QtWidgets>
+#include <QPrintDialog>
+#include <QPrinter>
 
 DialogueEditionParametres::DialogueEditionParametres()
 {
@@ -32,7 +34,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* mainLayout = new QGridLayout(this);
     setLayout(mainLayout);
 
-    QTabWidget* onglets = new QTabWidget(this);
+    onglets = new QTabWidget(this);
     mainLayout->addWidget(onglets, 0, 0, 10, 2);
 
     //Mailing
@@ -42,7 +44,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     onglets->addTab(mailingWidget, QIcon("./ressources/email-multiple.svg"), "Mailing");
 
     int ligneActuelle = mailingLayout->rowCount();
-    QTextEdit* texteChequeDispo = new QTextEdit(this);
+    texteChequeDispo = new QTextEdit(this);
     QLabel* texteChequeDispoLabel = new QLabel(tr("Chèques disponibles : "), this);
     mailingLayout->addWidget(texteChequeDispoLabel, ligneActuelle, 0);
     mailingLayout->addWidget(texteChequeDispo, ligneActuelle, 1);
@@ -50,7 +52,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     texteChequeDispo->setText(p_parametresMetiers.texteMailDispoCheques);
 
     ligneActuelle = mailingLayout->rowCount();
-    QTextEdit* texteSubventionRestantes = new QTextEdit(this);
+    texteSubventionRestantes = new QTextEdit(this);
     QLabel* texteSubventionRestantesLabel = new QLabel(tr("Subvention restante : "), this);
     mailingLayout->addWidget(texteSubventionRestantesLabel, ligneActuelle, 0);
     mailingLayout->addWidget(texteSubventionRestantes, ligneActuelle, 1);
@@ -63,12 +65,12 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     systemeWidget->setLayout(systemeLayout);
     onglets->addTab(systemeWidget, QIcon("./ressources/database-cog.svg"), "Parametres système");
 
-    QLineEdit* cheminBdd = new QLineEdit(this);
+    cheminBdd = new QLineEdit(this);
     QLabel* cheminBddLabel = new QLabel(tr("Dossier BDD : "), this);
     systemeLayout->addWidget(cheminBddLabel, ligneActuelle, 0);
     systemeLayout->addWidget(cheminBdd, ligneActuelle, 1);
     ligneActuelle = systemeLayout->rowCount();
-    QLineEdit* nomBdd = new QLineEdit(this);
+    nomBdd = new QLineEdit(this);
     QLabel* nomBddLabel = new QLabel(tr("Fichier BDD : "), this);
     systemeLayout->addWidget(nomBddLabel, ligneActuelle, 0);
     systemeLayout->addWidget(nomBdd, ligneActuelle, 1);
@@ -79,7 +81,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     nomBdd->setText(p_parametresSysteme.nomBdd);
 
     ligneActuelle = systemeLayout->rowCount();
-    QSpinBox* delaisGardeBdd = new QSpinBox(this);
+    delaisGardeBdd = new QSpinBox(this);
     QLabel* delaisGardeBddLabel = new QLabel(tr("Délais de garde BDD : "), this);
     systemeLayout->addWidget(delaisGardeBddLabel, ligneActuelle, 0);
     systemeLayout->addWidget(delaisGardeBdd, ligneActuelle, 1);
@@ -89,7 +91,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     delaisGardeBdd->setValue(p_parametresMetiers.delaisDeGardeBdd);
 
     ligneActuelle = systemeLayout->rowCount();
-    QLineEdit* factureATraiter = new QLineEdit(this);
+    factureATraiter = new QLineEdit(this);
     QLabel* factureATraiterLabel = new QLabel(tr("Dossier d'entrée des factures : "), this);
     systemeLayout->addWidget(factureATraiterLabel, ligneActuelle, 0);
     systemeLayout->addWidget(factureATraiter, ligneActuelle, 1);
@@ -99,7 +101,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     factureATraiter->setText(p_parametresSysteme.cheminStockageFacturesATraiter);
 
     ligneActuelle = systemeLayout->rowCount();
-    QLineEdit* facturesSaisies = new QLineEdit(this);
+    facturesSaisies = new QLineEdit(this);
     QLabel* facturesSaisiesLabel = new QLabel(tr("Dossier d'enregistrement des factures : "), this);
     systemeLayout->addWidget(facturesSaisiesLabel, ligneActuelle, 0);
     systemeLayout->addWidget(facturesSaisies, ligneActuelle, 1);
@@ -109,7 +111,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     facturesSaisies->setText(p_parametresSysteme.cheminStockageFacturesTraitees);
 
     ligneActuelle = systemeLayout->rowCount();
-    QLineEdit* sortieFichiersGeneres = new QLineEdit(this);
+    sortieFichiersGeneres = new QLineEdit(this);
     QLabel* sortieFichiersGeneresLabel = new QLabel(tr("Dossier de sortie des fichiers générés : "), this);
     systemeLayout->addWidget(sortieFichiersGeneresLabel, ligneActuelle, 0);
     systemeLayout->addWidget(sortieFichiersGeneres, ligneActuelle, 1);
@@ -125,7 +127,17 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     onglets->addTab(financeWidget, QIcon("./ressources/cash-multiple.svg"), "Parametres financiers");
 
     ligneActuelle = financeLayout->rowCount();
-    QDoubleSpinBox* montantSubventionEntrainement = new QDoubleSpinBox(this);
+    montantCotisationPilote = new QDoubleSpinBox(this);
+    QLabel* montantCotisationPiloteLabel = new QLabel(tr("Montant cotisation pilote : "), this);
+    financeLayout->addWidget(montantCotisationPiloteLabel, ligneActuelle, 0);
+    financeLayout->addWidget(montantCotisationPilote, ligneActuelle, 1);
+    QLabel* montantCotisationPiloteUnite = new QLabel(tr("€"), this);
+    financeLayout->addWidget(montantCotisationPiloteUnite, ligneActuelle, 2);
+
+    montantCotisationPilote->setValue(p_parametresMetiers.montantCotisationPilote);
+
+    ligneActuelle = financeLayout->rowCount();
+    montantSubventionEntrainement = new QDoubleSpinBox(this);
     montantSubventionEntrainement->setMaximum(10000);
     QLabel* montantSubventionEntrainementLabel = new QLabel(tr("Subvention annuelle entrainement : "), this);
     financeLayout->addWidget(montantSubventionEntrainementLabel, ligneActuelle, 0);
@@ -136,27 +148,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     montantSubventionEntrainement->setValue(p_parametresMetiers.montantSubventionEntrainement);
 
     ligneActuelle = financeLayout->rowCount();
-    QDoubleSpinBox* montantCotisationPilote = new QDoubleSpinBox(this);
-    QLabel* montantCotisationPiloteLabel = new QLabel(tr("Montant cotisation pilote : "), this);
-    financeLayout->addWidget(montantCotisationPiloteLabel, ligneActuelle, 0);
-    financeLayout->addWidget(montantCotisationPilote, ligneActuelle, 1);
-    QLabel* montantCotisationPiloteUnite = new QLabel(tr("€"), this);
-    financeLayout->addWidget(montantCotisationPiloteUnite, ligneActuelle, 2);
-
-    montantCotisationPilote->setValue(p_parametresMetiers.montantCotisationPilote);
-
-    ligneActuelle = financeLayout->rowCount();
-    QDoubleSpinBox* proportionRemboursementEntrainement = new QDoubleSpinBox(this);
-    QLabel* proportionRemboursementEntrainementLabel = new QLabel(tr("Proportion rembousement entrainement : "), this);
-    financeLayout->addWidget(proportionRemboursementEntrainementLabel, ligneActuelle, 0);
-    financeLayout->addWidget(proportionRemboursementEntrainement, ligneActuelle, 1);
-    QLabel* proportionRemboursementEntrainementUnite = new QLabel(tr("%"), this);
-    financeLayout->addWidget(proportionRemboursementEntrainementUnite, ligneActuelle, 2);
-
-    proportionRemboursementEntrainement->setValue(p_parametresMetiers.proportionRemboursementEntrainement*100);
-
-    ligneActuelle = financeLayout->rowCount();
-    QDoubleSpinBox* plafondHoraireRemboursementEntrainement = new QDoubleSpinBox(this);
+    plafondHoraireRemboursementEntrainement = new QDoubleSpinBox(this);
     plafondHoraireRemboursementEntrainement->setMaximum(10000);
     QLabel* plafondHoraireRemboursementEntrainementLabel = new QLabel(tr("Plafond coût horaire subvention entrainement : "), this);
     financeLayout->addWidget(plafondHoraireRemboursementEntrainementLabel, ligneActuelle, 0);
@@ -167,40 +159,134 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     plafondHoraireRemboursementEntrainement->setValue(p_parametresMetiers.plafondHoraireRemboursementEntrainement);
 
     ligneActuelle = financeLayout->rowCount();
-    QDoubleSpinBox* proportionRemboursementBalade = new QDoubleSpinBox(this);
+    proportionRemboursementEntrainement = new QDoubleSpinBox(this);
+    proportionRemboursementEntrainement->setMaximum(100);
+    QLabel* proportionRemboursementEntrainementLabel = new QLabel(tr("Proportion rembousement entrainement : "), this);
+    financeLayout->addWidget(proportionRemboursementEntrainementLabel, ligneActuelle, 0);
+    financeLayout->addWidget(proportionRemboursementEntrainement, ligneActuelle, 1);
+    QLabel* proportionRemboursementEntrainementUnite = new QLabel(tr("%"), this);
+    financeLayout->addWidget(proportionRemboursementEntrainementUnite, ligneActuelle, 2);
+
+    proportionRemboursementEntrainement->setValue(p_parametresMetiers.proportionRemboursementEntrainement*100);  
+
+    ligneActuelle = financeLayout->rowCount();
+    proportionRemboursementBalade = new QDoubleSpinBox(this);
+    proportionRemboursementBalade->setMaximum(100);
     QLabel* proportionRemboursementBaladeLabel = new QLabel(tr("Proportion rembousement balades : "), this);
     financeLayout->addWidget(proportionRemboursementBaladeLabel, ligneActuelle, 0);
     financeLayout->addWidget(proportionRemboursementBalade, ligneActuelle, 1);
     QLabel* proportionRemboursementBaladeUnite = new QLabel(tr("%"), this);
     financeLayout->addWidget(proportionRemboursementBaladeUnite, ligneActuelle, 2);
 
-    proportionRemboursementBalade->setValue(p_parametresMetiers.proportionParticipationBalade*100);
+    proportionRemboursementBalade->setValue(p_parametresMetiers.proportionRemboursementBalade *100);
 
     ligneActuelle = financeLayout->rowCount();
-    QLineEdit* nomTresorier = new QLineEdit(this);
+    proportionParticipationBalade = new QDoubleSpinBox(this);
+    proportionParticipationBalade->setMaximum(100);
+    QLabel* proportionParticipationBaladeLabel = new QLabel(tr("Proportion rembousement balades : "), this);
+    financeLayout->addWidget(proportionParticipationBaladeLabel, ligneActuelle, 0);
+    financeLayout->addWidget(proportionParticipationBalade, ligneActuelle, 1);
+    QLabel* proportionParticipationBaladeUnite = new QLabel(tr("%"), this);
+    financeLayout->addWidget(proportionParticipationBaladeUnite, ligneActuelle, 2);
+
+    proportionParticipationBalade->setValue(p_parametresMetiers.proportionParticipationBalade * 100);
+
+    ligneActuelle = financeLayout->rowCount();
+    nomTresorier = new QLineEdit(this);
     QLabel* nomTresorierLabel = new QLabel(tr("Nom du trésorier : "), this);
     financeLayout->addWidget(nomTresorierLabel, ligneActuelle, 0);
     financeLayout->addWidget(nomTresorier, ligneActuelle, 1, 1, 2);
 
     nomTresorier->setText(p_parametresMetiers.nomTresorier);
 
-    onglets->setFixedHeight(systemeLayout->sizeHint().height());
+    //Elements impression
+    QGridLayout* impressionLayout = new QGridLayout();
+    QWidget* impressionWidget = new QWidget(this);
+    impressionWidget->setLayout(impressionLayout);
+    onglets->addTab(impressionWidget, QIcon("./ressources/printer-pos-cog.svg"), "Parametres d'impression");
+
+    ligneActuelle = impressionLayout->rowCount();
+    imprimante = new QLineEdit(this);
+    QLabel* imprimanteLabel = new QLabel(tr("Imprimante : "), this);
+    impressionLayout->addWidget(imprimanteLabel, ligneActuelle, 0);
+    impressionLayout->addWidget(imprimante, ligneActuelle, 1);
+    QPushButton* boutonSelectionImprimante = new QPushButton("Séléctionner l'imprimante", this);
+    impressionLayout->addWidget(boutonSelectionImprimante, ligneActuelle, 2);
+    connect(boutonSelectionImprimante, SIGNAL(clicked()), this, SLOT(selectionnerImprimante()));
+
+    imprimante->setText(p_parametresSysteme.imprimante);
+
+    ligneActuelle = impressionLayout->rowCount();
+    impressionCouleur = new QComboBox(this);
+    QLabel* impressionCouleurLabel = new QLabel(tr("Couleur : "), this);
+    impressionLayout->addWidget(impressionCouleurLabel, ligneActuelle, 0);
+    impressionLayout->addWidget(impressionCouleur, ligneActuelle, 1);
+    impressionCouleur->addItem(QIcon("./ressources/invert-colors-off.svg"), tr("Noir et blanc"), QPrinter::GrayScale);
+    impressionCouleur->addItem(QIcon("./ressources/invert-colors.svg"), tr("Couleur"), QPrinter::Color);
+
+    impressionCouleur->setCurrentIndex(p_parametresSysteme.modeCouleurImpression);
 
     QPushButton *cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(annulationOuFinSaisie()));
-    connect(this, SIGNAL(rejected()), this, SLOT(annulationOuFinSaisie()));
 
     QPushButton* okButton = new QPushButton(tr("&Enregistrer"), this);
-    okButton->setDisabled(true);
     okButton->setDefault(true);
-    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(okButton, SIGNAL(clicked()), this, SLOT(enregistrerParametres()));
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
     buttonBox->addButton(cancelButton, QDialogButtonBox::ActionRole);
     buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
+
+    connect(onglets, &QTabWidget::currentChanged, this, &DialogueEditionParametres::gererChangementOnglet);
+}
+
+void DialogueEditionParametres::selectionnerImprimante()
+{
+    QPrinter printer;
+
+    QPrintDialog dialog(&printer, this);
+
+    if (dialog.exec() == QDialog::Accepted)
+    {
+        imprimante->setText(printer.printerName());
+    }
+}
+
+void DialogueEditionParametres::gererChangementOnglet()
+{
+    //qDebug() << onglets->widget(onglets->currentIndex())->sizeHint();
+    //onglets->setFixedHeight(onglets->widget(onglets->currentIndex())->sizeHint().height());
+    //resize(onglets->sizeHint());
+}
+
+void DialogueEditionParametres::enregistrerParametres()
+{
+    AeroDmsTypes::ParametresMetier parametresMetiers;
+    
+    parametresMetiers.montantSubventionEntrainement = montantSubventionEntrainement->value();
+    parametresMetiers.montantCotisationPilote = montantCotisationPilote->value();
+    parametresMetiers.proportionRemboursementEntrainement = proportionRemboursementEntrainement->value()/100;
+    parametresMetiers.proportionRemboursementBalade = proportionRemboursementBalade->value()/100;
+    parametresMetiers.plafondHoraireRemboursementEntrainement = plafondHoraireRemboursementEntrainement->value();
+    parametresMetiers.proportionParticipationBalade = proportionParticipationBalade->value()/100;
+    parametresMetiers.nomTresorier = nomTresorier->text();
+    parametresMetiers.delaisDeGardeBdd = delaisGardeBdd->value();
+    parametresMetiers.texteMailDispoCheques = texteChequeDispo->toPlainText();
+    parametresMetiers.texteMailSubventionRestante = texteSubventionRestantes->toPlainText();
+    
+    AeroDmsTypes::ParametresSysteme parametresSysteme;
+    parametresSysteme.cheminStockageBdd = cheminBdd->text();
+    parametresSysteme.cheminStockageFacturesTraitees = facturesSaisies->text();
+    parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
+    parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
+    parametresSysteme.nomBdd = nomBdd->text();
+    parametresSysteme.imprimante = imprimante->text();
+    parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
+
+    emit envoyerParametres(parametresMetiers, parametresSysteme);
+    accept();
 }
 

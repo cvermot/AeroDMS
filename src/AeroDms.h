@@ -250,11 +250,6 @@ private:
     //Parametres
     AeroDmsTypes::ParametresMetier parametresMetiers;
     AeroDmsTypes::ParametresSysteme parametresSysteme;
-    QString cheminStockageBdd;
-    QString cheminStockageFacturesTraitees;
-    QString cheminStockageFacturesATraiter;
-    QString cheminSortieFichiersGeneres;
-    
 
     //Statistiques
     QWidget* widgetGraphiques;
@@ -336,6 +331,8 @@ public slots:
     void imprimerLaDerniereDemande();
     void imprimerLaDerniereDemandeAgrafage();
     void ouvrirDialogueParametresApplication();
+    void enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
+                                           AeroDmsTypes::ParametresSysteme p_parametresSysteme);
 
 };
 #endif // AERODMS_H

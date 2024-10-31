@@ -141,6 +141,14 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
+    if (settings.value("impression/imprimante", "") == "")
+    {
+        settings.beginGroup("impression");
+        settings.setValue("imprimante", "");
+        settings.setValue("couleur", 1);
+        settings.endGroup();
+    }
+
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
     parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
 
@@ -171,17 +179,14 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.value("baseDeDonnees/nom", "").toString();
     const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/ressources/HTML");
-    //TODO : faire du ménage et utiliser parametresSysteme
-    cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
-    cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
-    cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
-    cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
 
     parametresSysteme.cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     parametresSysteme.cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     parametresSysteme.cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     parametresSysteme.cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
-    parametresSysteme.nomBdd = settings.value("baseDeDonnees/chemin", "").toString();
+    parametresSysteme.nomBdd = settings.value("baseDeDonnees/nom", "").toString();
+    parametresSysteme.imprimante = settings.value("impression/imprimante", "").toString();
+    parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -537,7 +542,7 @@ void AeroDms::initialiserOngletAjoutRecettes()
 
 void AeroDms::verifierPresenceDeMiseAjour()
 {
-    const QString dossierAVerifier = cheminStockageBdd + "/update/";
+    const QString dossierAVerifier = parametresSysteme.cheminStockageBdd + "/update/";
     //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
     //  -AeroDms.exe : mise à jour de l'application et eventuellement de ses librairies
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
@@ -560,7 +565,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         {
         case QMessageBox::Yes:
         {
-            mettreAJourApplication(cheminStockageBdd + "/update/");
+            mettreAJourApplication(parametresSysteme.cheminStockageBdd + "/update/");
         }
         break;
 
@@ -1758,7 +1763,7 @@ void AeroDms::selectionnerUneFacture()
     QString fichier = QFileDialog::getOpenFileName(
         this,
         "Ouvrir une facture",
-        cheminStockageFacturesATraiter,
+        parametresSysteme.cheminStockageFacturesATraiter,
         tr("Fichier PDF (*.pdf)"));
 
     if (!fichier.isNull())
@@ -1847,7 +1852,7 @@ void AeroDms::recupererVolDepuisCsv()
     QString fichier = QFileDialog::getOpenFileName(
         this,
         "Ouvrir un fichier CSV de récapitulatif de vol",
-        cheminStockageFacturesATraiter,
+        parametresSysteme.cheminStockageFacturesATraiter,
         tr("Fichier CSV (*.csv)"));
 
     if (!fichier.isNull())
@@ -2001,8 +2006,8 @@ void AeroDms::genererPdf()
         case QMessageBox::Yes:
         {
             pdf->imprimerLesDemandesDeSubvention(parametresMetiers.nomTresorier,
-                cheminSortieFichiersGeneres,
-                cheminStockageFacturesTraitees,
+                parametresSysteme.cheminSortieFichiersGeneres,
+                parametresSysteme.cheminStockageFacturesTraitees,
                 typeGenerationPdf,
                 signature,
                 boutonFusionnerLesPdf->font().bold(),
@@ -2025,8 +2030,8 @@ void AeroDms::genererPdf()
 void AeroDms::genererPdfRecapHdV()
 {
     pdf->imprimerLeRecapitulatifDesHeuresDeVol( listeDeroulanteAnnee->currentData().toInt(),
-                                                cheminSortieFichiersGeneres,
-                                                cheminStockageFacturesTraitees,
+                                                parametresSysteme.cheminSortieFichiersGeneres,
+                                                parametresSysteme.cheminStockageFacturesTraitees,
                                                 signature,
                                                 calculerValeurGraphAGenererPdf());
 }
@@ -2069,7 +2074,7 @@ void AeroDms::enregistrerUneFacture()
             nomDeLaFacture.append(".facture.");
             nomDeLaFacture.append(QString::number(idFactureBdd));
             nomDeLaFacture.append(".pdf");
-            QString cheminComplet = cheminStockageFacturesTraitees + "/";
+            QString cheminComplet = parametresSysteme.cheminStockageFacturesTraitees + "/";
             cheminComplet.append(nomDeLaFacture);
             QFile gestionnaireDeFichier;
             if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
@@ -2149,7 +2154,7 @@ void AeroDms::enregistrerUnVol()
             nomDeLaFacture.append(".");
             nomDeLaFacture.append(QString::number(idFactureBdd));
             nomDeLaFacture.append(".pdf");
-            QString cheminComplet = cheminStockageFacturesTraitees;
+            QString cheminComplet = parametresSysteme.cheminStockageFacturesTraitees;
             cheminComplet.append(nomDeLaFacture);
             QFile gestionnaireDeFichier;
             if (gestionnaireDeFichier.copy(cheminDeLaFactureCourante, cheminComplet))
@@ -2736,7 +2741,7 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
 void AeroDms::editerVol()
 {
     //On récupère le nom de la facture associée et on la charge
-    const QString cheminComplet = cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer);
+    const QString cheminComplet = parametresSysteme.cheminStockageFacturesTraitees + "/" + db->recupererNomFacture(volAEditer);
     chargerUneFacture(cheminComplet);
 
     //On indique que c'est une facture déjà en BDD
@@ -2901,7 +2906,65 @@ void AeroDms::ouvrirDialogueParametresApplication()
     DialogueEditionParametres editionParametres(parametresMetiers,
         parametresSysteme,
         this);
+    connect(&editionParametres,
+        SIGNAL(envoyerParametres(AeroDmsTypes::ParametresMetier, AeroDmsTypes::ParametresSysteme)),
+        this,
+        SLOT(enregistrerParametresApplication(AeroDmsTypes::ParametresMetier, AeroDmsTypes::ParametresSysteme)));
     editionParametres.exec();
+}
+
+void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
+                                                AeroDmsTypes::ParametresSysteme p_parametresSysteme)
+{
+    parametresMetiers = p_parametresMetiers;
+    parametresSysteme = p_parametresSysteme;
+
+    QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AeroDMS", "AeroDMS");
+
+    settings.beginGroup("baseDeDonnees");
+    settings.setValue("chemin", parametresSysteme.cheminStockageBdd);
+    settings.setValue("nom", parametresSysteme.nomBdd);
+    settings.endGroup();
+
+    settings.beginGroup("dossiers");
+    settings.setValue("facturesATraiter", parametresSysteme.cheminStockageFacturesATraiter);
+    settings.setValue("facturesSaisies", parametresSysteme.cheminStockageFacturesTraitees);
+    settings.setValue("sortieFichiersGeneres", parametresSysteme.cheminSortieFichiersGeneres);
+    settings.endGroup();
+
+    settings.beginGroup("noms");
+    settings.setValue("nomTresorier", parametresMetiers.nomTresorier);
+    settings.endGroup();
+    
+    settings.beginGroup("mailing");
+    settings.setValue("texteChequesDisponibles", parametresMetiers.texteMailDispoCheques);
+    settings.setValue("texteSubventionRestante", parametresMetiers.texteMailSubventionRestante);
+    settings.endGroup();
+
+    settings.beginGroup("impression");
+    settings.setValue("imprimante", parametresSysteme.imprimante);
+    settings.setValue("couleur", parametresSysteme.modeCouleurImpression);
+    settings.endGroup();
+
+    parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
+    parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
+
+    //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
+    QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, "AeroDMS");
+    settingsMetier.beginGroup("parametresMetier");
+    settingsMetier.setValue("montantSubventionEntrainement", parametresMetiers.montantSubventionEntrainement);
+    settingsMetier.setValue("montantCotisationPilote", parametresMetiers.montantCotisationPilote);
+    settingsMetier.setValue("proportionRemboursementEntrainement", parametresMetiers.proportionRemboursementEntrainement);
+    settingsMetier.setValue("plafondHoraireRemboursementEntrainement", parametresMetiers.plafondHoraireRemboursementEntrainement);
+    settingsMetier.setValue("proportionRemboursementBalade", parametresMetiers.proportionRemboursementBalade);
+    settingsMetier.setValue("proportionParticipationBalade", parametresMetiers.proportionParticipationBalade);
+    settingsMetier.endGroup();
+ 
+    settingsMetier.beginGroup("parametresSysteme");
+    settingsMetier.setValue("delaisDeGardeDbEnMs", parametresMetiers.delaisDeGardeBdd);
+    settingsMetier.endGroup();
 }
 
 void AeroDms::convertirHeureDecimalesVersHhMm()
@@ -3127,7 +3190,7 @@ void AeroDms::chargerUnVolDetecte(int row, int column)
 
 void AeroDms::ouvrirDossierDemandesSubventions()
 {
-    QDesktopServices::openUrl(QUrl(cheminSortieFichiersGeneres, QUrl::TolerantMode));
+    QDesktopServices::openUrl(QUrl(parametresSysteme.cheminSortieFichiersGeneres, QUrl::TolerantMode));
 }
 
 void AeroDms::ouvrirDossierFichierVenantDEtreGenere()
@@ -3154,7 +3217,7 @@ void AeroDms::ouvrirPdfDemandeSuvbvention()
 QString AeroDms::rechercherDerniereDemande()
 {
     //Recherche de la dernière demande
-    QDir fichierSortie(cheminSortieFichiersGeneres);
+    QDir fichierSortie(parametresSysteme.cheminSortieFichiersGeneres);
     fichierSortie.setSorting(QDir::Name | QDir::Reversed | QDir::DirsFirst);
     const QStringList fichiers = fichierSortie.entryList();
 
@@ -3170,7 +3233,7 @@ QString AeroDms::rechercherDerniereDemande()
         while (i < fichiers.size() - 2 && !fichierTrouve)
         {
             //Indice n-1 et n-2 contiennent . et ..
-            fichier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
+            fichier = parametresSysteme.cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
             const QDir dirCourant(fichier);
             const QStringList fichierFusionne = dirCourant.entryList(filtre);
             if (fichierFusionne.size() > 0)
@@ -3191,7 +3254,7 @@ void AeroDms::peuplerMenuAutreDemande()
     menuOuvrirAutreDemande->clear();
 
     //On ajoute les 10 dernières dates auxquelles on a généré des fichiers
-    QDir fichierSortie(cheminSortieFichiersGeneres);
+    QDir fichierSortie(parametresSysteme.cheminSortieFichiersGeneres);
     fichierSortie.setSorting(QDir::Name | QDir::Reversed | QDir::DirsFirst);
     const QStringList fichiers = fichierSortie.entryList();
     if (fichiers.size() >= 2)
@@ -3201,7 +3264,7 @@ void AeroDms::peuplerMenuAutreDemande()
         while (i < fichiers.size() - 2 && i < 10)
         {
             QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon("./ressources/folder.svg"), fichiers.at(i));
-            const QString dossier = cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
+            const QString dossier = parametresSysteme.cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
             const QDir dirCourant(dossier);
             const QStringList listeFichiers = dirCourant.entryList(QStringList("*.pdf"));
             if (listeFichiers.size() > 0)
@@ -3408,12 +3471,17 @@ void AeroDms::imprimer(QPrinter& p_printer)
     QPdfDocument *doc = new QPdfDocument(this);
     doc->load(fichierAImprimer);
 
+    int attenteChargementFichier = 0;
+    while ( doc->status() != QPdfDocument::Status::Ready
+            || attenteChargementFichier < 500)
+    {
+        attenteChargementFichier++;
+        QThread::usleep(10);
+    }
 
     if (doc->status() == QPdfDocument::Status::Ready)
     {
-        //QThread::usleep(10);
         emit ouvrirFenetreProgressionImpression(doc->pageCount());
-
 
         QPainter painter;
         painter.begin(&p_printer);

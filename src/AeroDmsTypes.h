@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AERODMSTYPES_H
 
 #include <QtWidgets>
+#include <QPrinter>
 
 #include "AeroDmsServices.h"
 
@@ -421,6 +422,8 @@ public:
         QString cheminStockageFacturesATraiter;
         QString cheminSortieFichiersGeneres;
         QString nomBdd;
+        QString imprimante;
+        QPrinter::ColorMode modeCouleurImpression;
     };
 
     struct TotauxRecettes {

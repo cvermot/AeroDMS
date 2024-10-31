@@ -35,11 +35,35 @@ public:
         QWidget* parent = nullptr);
 
 private:
+    QTabWidget* onglets = nullptr;
+    QLineEdit* imprimante = nullptr;
+    QTextEdit* texteChequeDispo = nullptr;
+    QTextEdit* texteSubventionRestantes = nullptr;
+    QLineEdit* nomTresorier = nullptr;
+    QSpinBox* delaisGardeBdd = nullptr;
+    QDoubleSpinBox* proportionRemboursementBalade = nullptr;
+    QDoubleSpinBox* proportionParticipationBalade = nullptr;
+    QDoubleSpinBox* proportionRemboursementEntrainement = nullptr;
+    QDoubleSpinBox* montantCotisationPilote = nullptr;
+    QDoubleSpinBox* plafondHoraireRemboursementEntrainement = nullptr;
+    QDoubleSpinBox* montantSubventionEntrainement = nullptr;
+
+    QLineEdit* cheminBdd = nullptr;
+    QLineEdit* nomBdd = nullptr;
+    QLineEdit* facturesSaisies = nullptr;
+    QLineEdit* factureATraiter = nullptr;
+    QLineEdit* sortieFichiersGeneres = nullptr;
+    QComboBox* impressionCouleur = nullptr;
     
 
 public slots:
+    void selectionnerImprimante();
+    void enregistrerParametres();
+    void gererChangementOnglet();
 
 signals:
+    void envoyerParametres( AeroDmsTypes::ParametresMetier parametresMetiers, 
+                            AeroDmsTypes::ParametresSysteme parametresSysteme);
   
 };
 
