@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtWidgets>
 #include <QPdfDocument>
 #include <QPdfView>
+#include <QPrinter>
 
 #include "ManageDb.h"
 #include "PdfRenderer.h"
@@ -81,7 +82,8 @@ private:
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
-    void imprimer();
+    void imprimer(QPrinter& p_printer);
+    bool selectionnerImprimante(QPrinter& p_printer);
 
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
@@ -332,6 +334,7 @@ public slots:
     void switchOnglet();
     void imprimerApresGenerationPdf();
     void imprimerLaDerniereDemande();
+    void imprimerLaDerniereDemandeAgrafage();
     void ouvrirDialogueParametresApplication();
 
 };

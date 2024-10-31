@@ -855,6 +855,10 @@ void AeroDms::initialiserMenuFichier()
     QAction* boutonImprimer = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande"), this);
     menuFichier->addAction(boutonImprimer);
     connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
+
+    QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande (agrafage)"), this);
+    menuFichier->addAction(boutonImprimerAgrafage);
+    connect(boutonImprimerAgrafage, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
 }
 
 void AeroDms::initialiserMenuOptions()
@@ -3347,72 +3351,104 @@ void AeroDms::gererChangementOnglet()
 
 void AeroDms::imprimerApresGenerationPdf()
 {
-    imprimer();
+    QPrinter imprimante;
+    if (selectionnerImprimante(imprimante))
+    {
+        imprimer(imprimante);
+    }
+    
 }
 void AeroDms::imprimerLaDerniereDemande()
 {
-    fichierAImprimer = rechercherDerniereDemande();
-    imprimer();
+    QPrinter imprimante;
+    if (selectionnerImprimante(imprimante))
+    {
+        fichierAImprimer = rechercherDerniereDemande();
+        imprimer(imprimante);
+    }
+    
+}
+void AeroDms::imprimerLaDerniereDemandeAgrafage()
+{
+    QPrinter imprimante;
+    if (selectionnerImprimante(imprimante))
+    {
+        QString dossier = QFileInfo(rechercherDerniereDemande()).absolutePath();
+
+        QDirIterator it(dossier, QStringList() << "*.pdf", QDir::Files, QDirIterator::Subdirectories);
+        while (it.hasNext())
+        {
+            it.next();
+            //On imprime tout sauf l'eventuel fichier assemblé
+            if (!it.filePath().contains("FichiersAssembles.pdf"))
+            {
+                fichierAImprimer = it.filePath();
+                imprimer(imprimante);
+            }
+        }
+    }
 }
 
+bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
+{
+    QPrintDialog dialog(&p_printer, this);
+    dialog.setWindowTitle(tr("Imprimer la demande de subvention"));
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        return false;
+    }
+    p_printer.setResolution(p_printer.supportedResolutions().last());
+    p_printer.setDuplex(QPrinter::DuplexNone);
+    //p_printer.setColorMode(QPrinter::Color);
 
-void AeroDms::imprimer()
+    return true;
+}
+void AeroDms::imprimer(QPrinter& p_printer)
 {
     QPdfDocument *doc = new QPdfDocument(this);
     doc->load(fichierAImprimer);
 
-    while (doc->status() != QPdfDocument::Status::Ready)
+
+    if (doc->status() == QPdfDocument::Status::Ready)
     {
-        QThread::usleep(10);
-    }
+        //QThread::usleep(10);
+        emit ouvrirFenetreProgressionImpression(doc->pageCount());
 
-    QPrinter printer;
 
-    QPrintDialog dialog(&printer, this);
-    dialog.setWindowTitle(tr("Imprimer la demande de subvention"));
-    if (dialog.exec() != QDialog::Accepted)
-    {
-        delete doc;
-        return;
-    }
-        
-    emit ouvrirFenetreProgressionImpression(doc->pageCount());
+        QPainter painter;
+        painter.begin(&p_printer);
 
-    printer.setResolution(printer.supportedResolutions().last());
-
-    QPainter painter;
-    painter.begin(&printer);
-
-    for (int i = 0; i < doc->pageCount(); i++)
-    {
-        QSizeF size = doc->pagePointSize(i);
-        QImage image = doc->render( i, 
-                                    QSize( size.width()*printer.supportedResolutions().last()/AeroDmsTypes::K_DPI_PAR_DEFAUT,
-                                           size.height()*printer.supportedResolutions().last()/AeroDmsTypes::K_DPI_PAR_DEFAUT));
-        
-        //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
-        //pour l'impression
-        if (size.width() > size.height())
+        for (int i = 0; i < doc->pageCount(); i++)
         {
-            QTransform transformation;
-            transformation.rotate(90);
-            image = image.transformed(transformation);
-            painter.drawImage(-20, 20, image);
+            QSizeF size = doc->pagePointSize(i);
+            QImage image = doc->render(i,
+                QSize(size.width() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
+                    size.height() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
+
+            //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
+            //pour l'impression
+            if (size.width() > size.height())
+            {
+                QTransform transformation;
+                transformation.rotate(90);
+                image = image.transformed(transformation);
+                painter.drawImage(-20, 20, image);
+            }
+            else
+            {
+                painter.drawImage(10, 10, image);
+            }
+
+            //S'il reste des pages derrière... on démarre une nouvelle page
+            if (i + 1 < doc->pageCount())
+            {
+                p_printer.newPage();
+            }
+            emit mettreAJourFenetreProgressionImpression(i + 1);
         }
-        else
-        {
-            painter.drawImage(10, 10, image);
-        }
-        
-        //S'il reste des pages derrière... on démarre une nouvelle page
-        if (i + 1 < doc->pageCount())
-        {
-            printer.newPage();
-        }
-        emit mettreAJourFenetreProgressionImpression(i + 1);
+
+        painter.end();
     }
-    
-    painter.end();
     delete doc;
 }
 
