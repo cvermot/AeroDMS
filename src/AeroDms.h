@@ -95,6 +95,8 @@ private:
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule();
+    void demanderFermetureSplashscreen();
+
     bool eventFilter(QObject* object, QEvent* event);
 
     ManageDb* db;
@@ -257,12 +259,15 @@ private:
     QWidget* m_contentArea = nullptr;
     QHBoxLayout* graphiques;
 
+    QSplashScreen* splash;
+
 signals:
     void toucheEchapEstAppuyee();
     void debuterImpression(int p_nombreDePagesAImprimer);
     void mettreAJourNombreDePagesImprimees(int p_nombreDePagesTraitees);
 
 public slots:
+    void fermerSplashscreen();
     void selectionnerUneFacture();
     void enregistrerUnVol();
     void enregistrerLesVols();

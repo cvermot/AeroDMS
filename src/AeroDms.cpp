@@ -34,9 +34,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtCore>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QPrinterInfo>
 
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
+    splash = new QSplashScreen(QPixmap("./ressources/splash.png"), Qt::WindowStaysOnTopHint);
+    splash->show();
+    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+
     QApplication::setApplicationName("AeroDms");
     QApplication::setApplicationVersion("6.0");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
@@ -102,6 +107,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     verifierPresenceDeMiseAjour();
 
     statusBar()->showMessage("Prêt");
+
+    demanderFermetureSplashscreen();
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
@@ -550,10 +557,11 @@ void AeroDms::verifierPresenceDeMiseAjour()
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
          || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
     {
+        demanderFermetureSplashscreen();
+
         QMessageBox dialogueMiseAJourDisponible;
         dialogueMiseAJourDisponible.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
             + "Voulez vous l'exécuter maintenant ?");
-        dialogueMiseAJourDisponible.setWindowFlags(Qt::WindowStaysOnTopHint);
         dialogueMiseAJourDisponible.setInformativeText("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v" + QApplication::applicationVersion() + "...main\">GitHub</a>.");
         dialogueMiseAJourDisponible.setWindowTitle("Mise à jour disponible");
         dialogueMiseAJourDisponible.setIcon(QMessageBox::Question);
@@ -574,6 +582,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         {
             if (!db->laBddEstALaVersionAttendue())
             {
+                demanderFermetureSplashscreen();
                 passerLeLogicielEnLectureSeule();
 
                 QMessageBox dialogueErreurVersionBdd;
@@ -582,7 +591,6 @@ car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
 \n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
 "de mise à jour\" du menu Aide.");
-                dialogueErreurVersionBdd.setWindowFlags(Qt::WindowStaysOnTopHint);
                 dialogueErreurVersionBdd.setWindowTitle(tr("Version de base données incompatible"));
                 dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
                 dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
@@ -600,13 +608,13 @@ L'application va passer en mode lecture seule.\
     }
     else if (!db->laBddEstALaVersionAttendue())
     {
+        demanderFermetureSplashscreen();
         passerLeLogicielEnLectureSeule();
 
         QMessageBox dialogueErreurVersionBdd;
         dialogueErreurVersionBdd.setText("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
 Consultez le développeur / responsable de l'application pour plus d'informations.");
-        dialogueErreurVersionBdd.setWindowFlags(Qt::WindowStaysOnTopHint);
         dialogueErreurVersionBdd.setWindowTitle(tr("Erreur de version de base de données"));
         dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
@@ -624,6 +632,25 @@ void AeroDms::passerLeLogicielEnLectureSeule()
 
     logicielEnModeLectureSeule = true;
 }
+
+void AeroDms::demanderFermetureSplashscreen()
+{
+    if (splash != nullptr)
+    {
+        QTimer::singleShot(500, this, &AeroDms::fermerSplashscreen);
+    }   
+}
+void AeroDms::fermerSplashscreen()
+{
+    if (splash != nullptr)
+    {
+        splash->close();
+
+        delete splash;
+        splash = nullptr;
+    }
+}
+
 
 void AeroDms::verifierSignatureNumerisee()
 {
@@ -816,7 +843,6 @@ void AeroDms::initialiserBoitesDeDialogues()
     progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
     progressionMiseAJour->setAutoClose(false);
     progressionMiseAJour->setWindowModality(Qt::WindowModal);
-    progressionMiseAJour->setWindowFlags(Qt::WindowStaysOnTopHint);
     progressionMiseAJour->close();
     progressionMiseAJour->setAutoReset(false);
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
@@ -3427,6 +3453,7 @@ void AeroDms::imprimerLaDerniereDemande()
     if (selectionnerImprimante(imprimante))
     {
         fichierAImprimer = rechercherDerniereDemande();
+        qDebug() << "imprimante selectionnee" << imprimante.printerName();
         imprimer(imprimante);
     }
     
@@ -3454,8 +3481,23 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 
 bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
 {
+    //QPrinterInfo::availablePrinters();
+    qDebug() << QPrinterInfo::availablePrinters();
     QPrintDialog dialog(&p_printer, this);
+    dialog.setWindowTitle("Imprimer les demandes de subventions");
+    //qDebug() << "debug print" << p_printer.printerName() << p_printer.isValid();
+    p_printer.setPrinterName(parametresSysteme.imprimante);
+    p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
+    //qDebug() <<"debug print" << p_printer.printerName() << p_printer.isValid();
+    p_printer.setPrinterName(parametresSysteme.imprimante);
+    
+    dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
+    dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
+    dialog.setOption(QAbstractPrintDialog::PrintCollateCopies, false);
+    dialog.setOption(QAbstractPrintDialog::PrintToFile, false);
+    dialog.setOption(QAbstractPrintDialog::PrintShowPageSize, false);
     dialog.setWindowTitle(tr("Imprimer la demande de subvention"));
+
     if (dialog.exec() != QDialog::Accepted)
     {
         return false;
