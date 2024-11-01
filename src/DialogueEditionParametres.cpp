@@ -249,6 +249,13 @@ void DialogueEditionParametres::selectionnerImprimante()
 
     QPrintDialog dialog(&printer, this);
 
+    dialog.setOption(QAbstractPrintDialog::PrintCollateCopies, false);
+    dialog.setOption(QAbstractPrintDialog::PrintCurrentPage, false);
+    dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
+    dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
+    dialog.setOption(QAbstractPrintDialog::PrintShowPageSize, false);
+    dialog.setOption(QAbstractPrintDialog::PrintToFile, false);
+
     if (dialog.exec() == QDialog::Accepted)
     {
         imprimante->setText(printer.printerName());

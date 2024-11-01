@@ -651,7 +651,6 @@ void AeroDms::fermerSplashscreen()
     }
 }
 
-
 void AeroDms::verifierSignatureNumerisee()
 {
     if (!QFile("./ressources/signature.jpg").exists())
@@ -1372,12 +1371,15 @@ void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImpri
 
 void AeroDms::mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees)
 {
-    progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees+1) + "/" + QString::number(progressionImpression->maximum()));
     progressionImpression->setValue(p_nombreDePagesTraitees);
 
     if (p_nombreDePagesTraitees+1 == progressionImpression->maximum())
     {
         statusBar()->showMessage(tr("Impression terminée"));
+    }
+    else
+    {
+        progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees + 1) + "/" + QString::number(progressionImpression->maximum()));
     }
 }
 
@@ -3453,7 +3455,6 @@ void AeroDms::imprimerLaDerniereDemande()
     if (selectionnerImprimante(imprimante))
     {
         fichierAImprimer = rechercherDerniereDemande();
-        qDebug() << "imprimante selectionnee" << imprimante.printerName();
         imprimer(imprimante);
     }
     
@@ -3481,15 +3482,10 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 
 bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
 {
-    //QPrinterInfo::availablePrinters();
-    qDebug() << QPrinterInfo::availablePrinters();
-    QPrintDialog dialog(&p_printer, this);
-    dialog.setWindowTitle("Imprimer les demandes de subventions");
-    //qDebug() << "debug print" << p_printer.printerName() << p_printer.isValid();
     p_printer.setPrinterName(parametresSysteme.imprimante);
     p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
-    //qDebug() <<"debug print" << p_printer.printerName() << p_printer.isValid();
-    p_printer.setPrinterName(parametresSysteme.imprimante);
+    QPrintDialog dialog(&p_printer, this);
+    dialog.setWindowTitle("Imprimer les demandes de subventions");
     
     dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
     dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
@@ -3504,7 +3500,6 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
     }
     p_printer.setResolution(p_printer.supportedResolutions().last());
     p_printer.setDuplex(QPrinter::DuplexNone);
-    //p_printer.setColorMode(QPrinter::Color);
 
     return true;
 }
