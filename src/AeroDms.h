@@ -234,6 +234,7 @@ private:
     QAction* scanAutoAca;
     QAction* scanAutoDaca;
     QAction* scanAutoSepavia;
+    QAction* scanAutoUaca;
     QAction* scanAutoGenerique1Passe;
     QAction* scanAutoGenerique;
     QAction* scanAutoCsv;

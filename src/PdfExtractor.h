@@ -41,12 +41,14 @@ private:
 	static AeroDmsTypes::DonneesFacture extraireDonneesACAndernos(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesSepavia(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::ListeDonneesFacture extraireDonneesUaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique1Passe(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
-
+	
 	static const float recupererMontantAca(QString p_chaine);
 
 	static const QDate extraireDateRegex(const QString p_date);
+	static const QDate extraireDateTiretsUsRegex(const QString p_date);
 	static const QTime extraireDureeRegex(const QString p_duree);
 };
 

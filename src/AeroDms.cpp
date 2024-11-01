@@ -1055,6 +1055,9 @@ void AeroDms::initialiserMenuOutils()
     scanAutoSepavia = new QAction(tr("&SEPAVIA"), this);
     scanAutoSepavia->setIcon(QIcon("./ressources/airplane-search.svg"));
     scanFacture->addAction(scanAutoSepavia);
+    scanAutoUaca = new QAction(tr("&UACA"), this);
+    scanAutoUaca->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanFacture->addAction(scanAutoUaca);
     scanFacture->addSeparator();
     scanAutoGenerique1Passe = new QAction(tr("&Générique (une passe)"), this);
     scanAutoGenerique1Passe->setIcon(QIcon("./ressources/text-box-search.svg"));
@@ -1072,6 +1075,7 @@ void AeroDms::initialiserMenuOutils()
     connect(scanAutoAca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoSepavia, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoUaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
@@ -1846,6 +1850,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     else if (sender() == scanAutoSepavia)
     {
         aeroclub = AeroDmsTypes::Aeroclub_SEPAVIA;
+    }
+    else if (sender() == scanAutoUaca)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_UACA;
     }
     else if (sender() == scanAutoGenerique)
     {
