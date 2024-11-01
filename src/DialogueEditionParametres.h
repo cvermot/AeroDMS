@@ -49,15 +49,20 @@ private:
     QDoubleSpinBox* montantSubventionEntrainement = nullptr;
 
     QLineEdit* cheminBdd = nullptr;
-    QLineEdit* nomBdd = nullptr;
     QLineEdit* facturesSaisies = nullptr;
     QLineEdit* factureATraiter = nullptr;
     QLineEdit* sortieFichiersGeneres = nullptr;
     QComboBox* impressionCouleur = nullptr;
+
+    QPushButton* boutonSelectionFactureATraiter = nullptr;
+    QPushButton* boutonSelectionFacturesSaisies = nullptr;
+    QPushButton* boutonSelectionSortieFichiersGeneres = nullptr;
     
 
 public slots:
     void selectionnerImprimante();
+    void selectionnerBdd();
+    void selectionnerRepertoire();
     void enregistrerParametres();
     void gererChangementOnglet();
 

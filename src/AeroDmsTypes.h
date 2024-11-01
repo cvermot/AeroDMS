@@ -169,6 +169,7 @@ public:
         Aeroclub_ACBA,
         Aeroclub_SEPAVIA,
         Aeroclub_ACAndernos,
+        Aeroclub_UACA,
         Aeroclub_GENERIQUE,
         Aeroclub_GENERIQUE_1_PASSE
     };
