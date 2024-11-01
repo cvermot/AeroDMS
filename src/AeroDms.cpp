@@ -827,6 +827,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     progressionGenerationPdfPerso = new DialogueProgressionGenerationPdf(this);
     connect(progressionGenerationPdfPerso, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
     connect(progressionGenerationPdfPerso, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
+    connect(progressionGenerationPdfPerso, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
     connect(progressionGenerationPdfPerso, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
 
     //Gestion des signaux liés à la génération PDF
@@ -886,7 +887,8 @@ void AeroDms::initialiserMenuFichier()
     menuFichier->addAction(boutonImprimer);
     connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
 
-    QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande (agrafage)"), this);
+    QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("Imprimer la dernière demande (&agrafage)"), this);
+    boutonImprimerAgrafage->setStatusTip(tr("Permet d'imprimer chaque fichier séparément.\n\nPour l'agrafage automatique par l'imprimante, pensez à\nsélectionner l'option adéquate dans les paramètres de l'imprimante."));
     menuFichier->addAction(boutonImprimerAgrafage);
     connect(boutonImprimerAgrafage, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
 }

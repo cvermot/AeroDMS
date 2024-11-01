@@ -39,16 +39,19 @@ private:
     QPushButton *boutonFermer = nullptr;
     QPushButton *boutonOuvrirPdf = nullptr;
     QPushButton *boutonImprimer = nullptr;
+    QPushButton* boutonImprimerAgrafage = nullptr;
     QPushButton *boutonOuvrirDossier = nullptr;
     QProgressBar *barreDeProgression = nullptr;
     QLabel* label = nullptr;
 
 public slots:
     void demanderImpression();
+    void demanderImpressionAgrafage();
     void demanderOuvrirLeDossier();
 
 signals:
     void imprimer();
+    void imprimerAgrafage();
     void ouvrirLeDossier();
 };
 

@@ -1,3 +1,21 @@
+/******************************************************************************\
+<QUas : a Free Software logbook for UAS operators>
+Copyright (C) 2023 Clément VERMOT-DESROCHES (clement@vermot.net)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/******************************************************************************/
+
 #include "DialogueProgressionGenerationPdf.h"
 #include <QtWidgets>
 
@@ -15,12 +33,12 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* pare
 
 	boutonOuvrirPdf = new QPushButton(tr("&Ouvrir PDF"), this);
 	boutonOuvrirPdf->setToolTip(tr("Ouvrir le fichier PDF généré dans le lecteur PDF par défaut"));
-	boutonOuvrirPdf->setDefault(true);
+	boutonOuvrirPdf->setDefault(false);
 	connect(boutonOuvrirPdf, SIGNAL(clicked()), this, SLOT(accept()));
 
 	boutonOuvrirDossier = new QPushButton(tr("Ouvrir le &dossier"), this);
 	boutonOuvrirDossier->setToolTip(tr("Ouvrir le dossier contenant les fichiers générés"));
-	boutonOuvrirDossier->setDefault(true);
+	boutonOuvrirDossier->setDefault(false);
 	connect(boutonOuvrirDossier, SIGNAL(clicked()), this, SLOT(demanderOuvrirLeDossier()));
 
 	boutonImprimer = new QPushButton(tr("&Imprimer"), this);
@@ -28,11 +46,17 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* pare
 	boutonImprimer->setDefault(true);
 	connect(boutonImprimer, SIGNAL(clicked()), this, SLOT(demanderImpression()));
 
+	boutonImprimerAgrafage = new QPushButton(tr("Imprimer avec &agrafage"), this);
+	boutonImprimerAgrafage->setToolTip(tr("Imprimer directement les fichiers générés"));
+	boutonImprimerAgrafage->setDefault(false);
+	connect(boutonImprimerAgrafage, SIGNAL(clicked()), this, SLOT(demanderImpressionAgrafage()));
+
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
 	buttonBox->addButton(boutonFermer, QDialogButtonBox::ActionRole);
 	buttonBox->addButton(boutonOuvrirPdf, QDialogButtonBox::ActionRole);
 	buttonBox->addButton(boutonOuvrirDossier, QDialogButtonBox::ActionRole);
 	buttonBox->addButton(boutonImprimer, QDialogButtonBox::ActionRole);
+	buttonBox->addButton(boutonImprimerAgrafage, QDialogButtonBox::ActionRole);
 
 	label = new QLabel(tr("Génération PDF en cours"), this);
 
@@ -103,6 +127,12 @@ void DialogueProgressionGenerationPdf::demanderImpression()
 {
 	hide();
 	emit imprimer();
+}
+
+void DialogueProgressionGenerationPdf::demanderImpressionAgrafage()
+{
+	hide();
+	emit imprimerAgrafage();
 }
 
 void DialogueProgressionGenerationPdf::demanderOuvrirLeDossier()
