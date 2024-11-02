@@ -87,6 +87,7 @@ void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 	boutonOuvrirDossier->setEnabled(false);
 
 	repaint();
+	show();
 }
 
 void DialogueProgressionGenerationPdf::setValue(const int p_valeur)

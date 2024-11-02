@@ -824,30 +824,11 @@ void AeroDms::initialiserBoitesDeDialogues()
 
     dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
 
-    //Dialogue de progression de génération PDF
-    progressionGenerationPdf = new DialogueProgressionGenerationPdf(this);
-    connect(progressionGenerationPdf, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
-    connect(progressionGenerationPdf, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
-    connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
-    connect(progressionGenerationPdf, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
-
     //Gestion des signaux liés à la génération PDF
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(mettreAJourNombreFacturesTraitees(int)), this, SLOT(mettreAJourFenetreProgressionGenerationPdf(int)));
     connect(pdf, SIGNAL(generationTerminee(QString, QString)), this, SLOT(mettreAJourBarreStatusFinGenerationPdf(QString, QString)));
     connect(pdf, SIGNAL(echecGeneration()), this, SLOT(mettreAJourEchecGenerationPdf()));
-
-    //Dialogue progression mise à jour
-    progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
-    boutonProgressionMiseAJour = new QPushButton("Quitter AeroDMS", this);
-    boutonProgressionMiseAJour->setDisabled(true);
-    progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
-    progressionMiseAJour->setAutoClose(false);
-    progressionMiseAJour->setWindowModality(Qt::WindowModal);
-    progressionMiseAJour->close();
-    progressionMiseAJour->setAutoReset(false);
-    progressionMiseAJour->setMinimumSize(QSize(300, 150));
-    connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
 }
 
 void AeroDms::initialiserMenuFichier()
@@ -1346,7 +1327,15 @@ void AeroDms::peuplerStatistiques()
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
 {
-    progressionGenerationPdf->show();
+    //Dialogue de progression de génération PDF
+    progressionGenerationPdf = new DialogueProgressionGenerationPdf(this);
+    connect(progressionGenerationPdf, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
+    connect(progressionGenerationPdf, SIGNAL(rejected()), this, SLOT(detruireFenetreProgressionGenerationPdf()));
+    connect(progressionGenerationPdf, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
+    connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
+    connect(progressionGenerationPdf, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
+
+    //progressionGenerationPdf->show();
     progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
     progressionGenerationPdf->setValue(0);
 
@@ -1369,6 +1358,15 @@ void AeroDms::detruireFenetreProgressionImpression()
 {
     delete progressionImpression;
     progressionImpression = nullptr;
+}
+
+void AeroDms::detruireFenetreProgressionGenerationPdf()
+{
+    if (progressionGenerationPdf != nullptr)
+    {
+        delete progressionGenerationPdf;
+        progressionGenerationPdf = nullptr;
+    }
 }
 
 void AeroDms::mettreAJourNbPagesFichierCourant(const int p_nombreDePagesAImprimer)
@@ -1403,6 +1401,7 @@ void AeroDms::mettreAJourEchecGenerationPdf()
 {
     progressionGenerationPdf->close();
     statusBar()->showMessage("Echec de la génération");
+    detruireFenetreProgressionGenerationPdf();
 }
 
 AeroDms::~AeroDms()
@@ -3094,6 +3093,18 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichie
 
 void AeroDms::mettreAJourApplication(const QString p_chemin)
 {  
+    //Dialogue progression mise à jour
+    QProgressDialog* progressionMiseAJour = new QProgressDialog("Mise à jour en cours...", "", 0, 0, this);
+    QPushButton* boutonProgressionMiseAJour = new QPushButton("Quitter AeroDMS", this);
+    boutonProgressionMiseAJour->setDisabled(true);
+    progressionMiseAJour->setCancelButton(boutonProgressionMiseAJour);
+    progressionMiseAJour->setAutoClose(false);
+    progressionMiseAJour->setWindowModality(Qt::WindowModal);
+    progressionMiseAJour->close();
+    progressionMiseAJour->setAutoReset(false);
+    progressionMiseAJour->setMinimumSize(QSize(300, 150));
+    connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
+
     //Pour chaque élement présente dans p_chemin, on vérifie s'il existe dans l'aborescence locale
     //Si c'est le cas on renomme le fichier local en suffixant par xxx_
     //Ensuite dans tous les cas on recopie le fichier distant vers le dossier local
@@ -3221,6 +3232,7 @@ void AeroDms::ouvrirDossierDemandesSubventions()
 void AeroDms::ouvrirDossierFichierVenantDEtreGenere()
 {
     QDesktopServices::openUrl(QUrl(dossierSortieGeneration, QUrl::TolerantMode));
+    detruireFenetreProgressionGenerationPdf();
 }
 
 void AeroDms::ouvrirPdfDemandeSuvbvention()
@@ -3330,6 +3342,8 @@ void AeroDms::ouvrirPdfGenere()
 {
     const int nombreElements = menuOuvrirAutreDemande->actions().at(0)->menu()->actions().size();  
     QDesktopServices::openUrl(QUrl(menuOuvrirAutreDemande->actions().at(0)->menu()->actions().at(nombreElements - 1)->data().toString(), QUrl::TolerantMode));
+
+    detruireFenetreProgressionGenerationPdf();
 }
 
 void AeroDms::deselectionnerVolDetecte()
@@ -3444,6 +3458,8 @@ void AeroDms::imprimerApresGenerationPdf()
     {
         imprimer(imprimante);
     }
+
+    detruireFenetreProgressionGenerationPdf();
 }
 void AeroDms::imprimerLaDerniereDemande()
 {
@@ -3492,6 +3508,8 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
         }
         progressionImpression->traitementFichierSuivant();
     }
+
+    detruireFenetreProgressionGenerationPdf();
 }
 
 bool AeroDms::selectionnerImprimante(QPrinter &p_printer)

@@ -173,11 +173,8 @@ private:
     QAction* actionListeDeroulanteStatistique;
 
     //Barre de progression
-    DialogueProgressionGenerationPdf* progressionGenerationPdf;
+    DialogueProgressionGenerationPdf* progressionGenerationPdf = nullptr;
     DialogueProgressionImpression* progressionImpression = nullptr;
-
-    QProgressDialog* progressionMiseAJour;
-    QPushButton* boutonProgressionMiseAJour;
 
     //Bouttons
     QAction* bouttonGenerePdf;
@@ -339,6 +336,7 @@ public slots:
     void enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
                                            AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionImpression();
+    void detruireFenetreProgressionGenerationPdf();
 
 };
 #endif // AERODMS_H

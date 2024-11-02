@@ -1191,6 +1191,10 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
     {
         nbGraph++;
     }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_STATUTS_PILOTES) == AeroDmsTypes::Statistiques_STATUTS_PILOTES)
+    {
+        nbGraph++;
+    }
 
     return nbGraph;
 }
