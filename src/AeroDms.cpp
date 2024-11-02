@@ -865,7 +865,6 @@ void AeroDms::initialiserMenuFichier()
 
     QAction* boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
-    boutonOuvrirDerniereDemande->setShortcut(QKeySequence::Print);
     connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
 
     menuOuvrirAutreDemande = menuOuvrirPdfDemandeSubvention->addMenu(tr("Ouvrir un &autre fichier de demande de subventions"));
@@ -877,8 +876,9 @@ void AeroDms::initialiserMenuFichier()
     menuFichier->addAction(boutonImprimer);
     connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
 
-    QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("Imprimer la dernière demande (&agrafage)"), this);
+    QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("Imprimer la dernière demande (avec &agrafage)"), this);
     boutonImprimerAgrafage->setStatusTip(tr("Permet d'imprimer chaque fichier séparément.\n\nPour l'agrafage automatique par l'imprimante, pensez à\nsélectionner l'option adéquate dans les paramètres de l'imprimante."));
+    boutonImprimerAgrafage->setShortcut(QKeySequence::Print);
     menuFichier->addAction(boutonImprimerAgrafage);
     connect(boutonImprimerAgrafage, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
 }
@@ -1020,8 +1020,8 @@ void AeroDms::initialiserMenuOutils()
     QMenu* menuOutils = menuBar()->addMenu(tr("Ou&tils"));
 
     menuOutils->addAction(bouttonAjouterUnVol);
-    menuOutils->addAction(bouttonAjouterCotisation);
     menuOutils->addAction(bouttonAjouterPilote);
+    menuOutils->addAction(bouttonAjouterCotisation);
     menuOutils->addAction(bouttonAjouterSortie);
     menuOutils->addSeparator();
     menuOutils->addAction(bouttonGenerePdf);
