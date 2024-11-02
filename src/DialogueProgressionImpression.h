@@ -16,43 +16,38 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 
-#ifndef DIALOGUEPROGRESSIONGENERATIONPDF_H
-#define DIALOGUEPROGRESSIONGENERATIONPDF_H
+#ifndef DIALOGUEPROGRESSIONIMPRESSION_H
+#define DIALOGUEPROGRESSIONIMPRESSION_H
 #include <QDialog>
 #include <QtGui>
 #include <QtWidgets>
 
-class DialogueProgressionGenerationPdf : public QDialog
+class DialogueProgressionImpression : public QDialog
 {
     Q_OBJECT
 
 public:
-    DialogueProgressionGenerationPdf();
-    DialogueProgressionGenerationPdf(QWidget* parent = nullptr);
+    DialogueProgressionImpression();
+    DialogueProgressionImpression(QWidget* parent = nullptr);
 
-    void setMaximum(const int p_maximum);
-    void setValue(const int p_valeur);
-    void generationEstTerminee(const bool p_fichierMergeEstDisponible);
+    void setMaximumPage(const int p_nbPage);
+    void setMaximumFichier(const int p_nbFichier);
+    void traitementFichierSuivant();
+    void traitementPageSuivante();
 
 private:
-    QPushButton *boutonFermer = nullptr;
-    QPushButton *boutonOuvrirPdf = nullptr;
-    QPushButton *boutonImprimer = nullptr;
-    QPushButton* boutonImprimerAgrafage = nullptr;
-    QPushButton *boutonOuvrirDossier = nullptr;
-    QProgressBar *barreDeProgression = nullptr;
+    QPushButton* boutonFermer = nullptr;
+    QProgressBar* barreDeProgressionFichier = nullptr;
+    QLabel* labelFichier = nullptr;
+    QProgressBar* barreDeProgressionPage = nullptr;
+    QLabel* labelPage = nullptr;
     QLabel* label = nullptr;
 
 public slots:
-    void demanderImpression();
-    void demanderImpressionAgrafage();
-    void demanderOuvrirLeDossier();
 
 signals:
-    void imprimer();
-    void imprimerAgrafage();
-    void ouvrirLeDossier();
+
 };
 
-#endif // DIALOGUEPROGRESSIONGENERATIONPDF_H
+#endif // DIALOGUEPROGRESSIONIMPRESSION_H
 

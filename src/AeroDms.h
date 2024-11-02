@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
 #include "DialogueProgressionGenerationPdf.h"
+#include "DialogueProgressionImpression.h"
 #include "StatistiqueWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -84,6 +85,7 @@ private:
 
     void imprimer(QPrinter& p_printer);
     bool selectionnerImprimante(QPrinter& p_printer);
+    void ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer);
 
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
@@ -171,10 +173,8 @@ private:
     QAction* actionListeDeroulanteStatistique;
 
     //Barre de progression
-    DialogueProgressionGenerationPdf* progressionGenerationPdfPerso;
-
-    QProgressDialog* progressionImpression;
-    QPushButton* boutonProgressionImpression;
+    DialogueProgressionGenerationPdf* progressionGenerationPdf;
+    DialogueProgressionImpression* progressionImpression = nullptr;
 
     QProgressDialog* progressionMiseAJour;
     QPushButton* boutonProgressionMiseAJour;
@@ -297,8 +297,7 @@ public slots:
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge);
     void mettreAJourEchecGenerationPdf();
-    void ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer);
-    void mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees);
+    void mettreAJourNbPagesFichierCourant(const int p_nombreDePagesAImprimer);
     void aPropos();
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
@@ -339,6 +338,7 @@ public slots:
     void ouvrirDialogueParametresApplication();
     void enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
                                            AeroDmsTypes::ParametresSysteme p_parametresSysteme);
+    void detruireFenetreProgressionImpression();
 
 };
 #endif // AERODMS_H

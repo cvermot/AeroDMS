@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonuts.h"
 
 #include "DialogueEditionParametres.h"
+#include "DialogueProgressionImpression.h"
 
 #include <QtWidgets>
 #include <QToolBar>
@@ -49,7 +50,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     setCentralWidget(mainTabWidget);
 
     setWindowTitle(tr("AeroDMS"));
-    setMinimumSize(640, 480);
+    setMinimumSize(800, 600);
     showMaximized();
 
     installEventFilter(this);
@@ -824,11 +825,11 @@ void AeroDms::initialiserBoitesDeDialogues()
     dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
 
     //Dialogue de progression de génération PDF
-    progressionGenerationPdfPerso = new DialogueProgressionGenerationPdf(this);
-    connect(progressionGenerationPdfPerso, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
-    connect(progressionGenerationPdfPerso, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
-    connect(progressionGenerationPdfPerso, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
-    connect(progressionGenerationPdfPerso, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
+    progressionGenerationPdf = new DialogueProgressionGenerationPdf(this);
+    connect(progressionGenerationPdf, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
+    connect(progressionGenerationPdf, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
+    connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
+    connect(progressionGenerationPdf, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
 
     //Gestion des signaux liés à la génération PDF
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
@@ -847,17 +848,6 @@ void AeroDms::initialiserBoitesDeDialogues()
     progressionMiseAJour->setAutoReset(false);
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
     connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
-
-    //Dialogue de progression impression de demande
-    progressionImpression = new QProgressDialog("Impression en cours", "", 0, 0, this);
-    progressionImpression->setAutoClose(true);
-    progressionImpression->setWindowModality(Qt::WindowModal);
-    progressionImpression->close();
-    progressionImpression->setAutoReset(true);
-    progressionImpression->setCancelButton(0);
-
-    connect(this, SIGNAL(debuterImpression(int)), this, SLOT(ouvrirFenetreProgressionImpression(int)));
-    connect(this, SIGNAL(mettreAJourNombreDePagesImprimees(int)), this, SLOT(mettreAJourFenetreProgressionImpression(int)));
 }
 
 void AeroDms::initialiserMenuFichier()
@@ -1354,39 +1344,34 @@ void AeroDms::peuplerStatistiques()
 
 void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter)
 {
-    progressionGenerationPdfPerso->show();
-    progressionGenerationPdfPerso->setMaximum(p_nombreDeFacturesATraiter);
-    progressionGenerationPdfPerso->setValue(0);
+    progressionGenerationPdf->show();
+    progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
+    progressionGenerationPdf->setValue(0);
 
 }
 
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
 {
-    progressionGenerationPdfPerso->setValue(p_nombreDeFacturesTraitees);
+    progressionGenerationPdf->setValue(p_nombreDeFacturesTraitees);
 }
 
-void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDePagesAImprimer)
+void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer)
 {
-    statusBar()->showMessage(tr("Impression en cours..."));
-    progressionImpression->setLabelText(tr("Impression en cours...\nPage 1/") + QString::number(p_nombreDePagesAImprimer));
-    progressionImpression->reset();
-    progressionImpression->setMaximum(p_nombreDePagesAImprimer);
-    progressionImpression->setValue(0);
-    progressionImpression->show();
+    progressionImpression = new DialogueProgressionImpression(this);
+    progressionImpression->setMaximumFichier(p_nombreDeFichiersAImprimer);
+
+    connect(progressionImpression, SIGNAL(accepted()), this, SLOT(detruireFenetreProgressionImpression()));
 }
 
-void AeroDms::mettreAJourFenetreProgressionImpression(const int p_nombreDePagesTraitees)
+void AeroDms::detruireFenetreProgressionImpression()
 {
-    progressionImpression->setValue(p_nombreDePagesTraitees);
+    delete progressionImpression;
+    progressionImpression = nullptr;
+}
 
-    if (p_nombreDePagesTraitees+1 == progressionImpression->maximum())
-    {
-        statusBar()->showMessage(tr("Impression terminée"));
-    }
-    else
-    {
-        progressionImpression->setLabelText(tr("Impression en cours...\nPage ") + QString::number(p_nombreDePagesTraitees + 1) + "/" + QString::number(progressionImpression->maximum()));
-    }
+void AeroDms::mettreAJourNbPagesFichierCourant(const int p_nombreDePagesAImprimer)
+{
+    progressionImpression->setMaximumPage(p_nombreDePagesAImprimer);
 }
 
 void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge)
@@ -1406,7 +1391,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
 
     //On met à jour la fenêtre de progression
     const bool fichierMergeDisponible = (fichierAImprimer != "");
-    progressionGenerationPdfPerso->generationEstTerminee(fichierMergeDisponible);
+    progressionGenerationPdf->generationEstTerminee(fichierMergeDisponible);
     const QString status = "Génération terminée. Fichiers disponibles sous "
                             +p_cheminDossier;
     statusBar()->showMessage(status);
@@ -1414,7 +1399,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
 
 void AeroDms::mettreAJourEchecGenerationPdf()
 {
-    progressionGenerationPdfPerso->close();
+    progressionGenerationPdf->close();
     statusBar()->showMessage("Echec de la génération");
 }
 
@@ -3457,36 +3442,53 @@ void AeroDms::imprimerApresGenerationPdf()
     {
         imprimer(imprimante);
     }
-    
 }
 void AeroDms::imprimerLaDerniereDemande()
 {
     QPrinter imprimante;
     if (selectionnerImprimante(imprimante))
     {
+        //On demande l'affichage de la fenêtre de génération
+        ouvrirFenetreProgressionImpression(1);
+
         fichierAImprimer = rechercherDerniereDemande();
+        progressionImpression->traitementFichierSuivant();
+
         imprimer(imprimante);
     }
-    
+    progressionImpression->traitementFichierSuivant();
 }
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
 {
     QPrinter imprimante;
     if (selectionnerImprimante(imprimante))
     {
-        QString dossier = QFileInfo(rechercherDerniereDemande()).absolutePath();
+        const QString dossier = QFileInfo(rechercherDerniereDemande()).absolutePath();
+        
+        //On compte les fichiers
+        QDir repertoire(dossier, "*.pdf", QDir::QDir::Name, QDir::Files);
 
-        QDirIterator it(dossier, QStringList() << "*.pdf", QDir::Files, QDirIterator::Subdirectories);
-        while (it.hasNext())
+        QFileInfoList liste = repertoire.entryInfoList();
+        //Le fichier assemblé est forcément le dernier de la liste car tous les fichiers sont suffixés
+        //par un chiffre dans l'ordre de génération. Si la fichier assemblé est présent, on le supprime 
+        //de la liste
+        if (liste.last().filePath().contains("FichiersAssembles.pdf"))
         {
-            it.next();
-            //On imprime tout sauf l'eventuel fichier assemblé
-            if (!it.filePath().contains("FichiersAssembles.pdf"))
-            {
-                fichierAImprimer = it.filePath();
-                imprimer(imprimante);
-            }
+            liste.removeLast();
         }
+
+        //On demande l'affichage de la fenêtre de génération
+        ouvrirFenetreProgressionImpression(liste.size());
+        
+        for (QFileInfo fichier : liste)
+        {
+            progressionImpression->traitementFichierSuivant();
+
+            //On imprime tout 
+            fichierAImprimer = fichier.filePath();
+            imprimer(imprimante);
+        }
+        progressionImpression->traitementFichierSuivant();
     }
 }
 
@@ -3520,7 +3522,7 @@ void AeroDms::imprimer(QPrinter& p_printer)
 
     int attenteChargementFichier = 0;
     while ( doc->status() != QPdfDocument::Status::Ready
-            || attenteChargementFichier < 500)
+            || attenteChargementFichier > 500)
     {
         attenteChargementFichier++;
         QThread::usleep(10);
@@ -3528,13 +3530,14 @@ void AeroDms::imprimer(QPrinter& p_printer)
 
     if (doc->status() == QPdfDocument::Status::Ready)
     {
-        emit ouvrirFenetreProgressionImpression(doc->pageCount());
+        progressionImpression->setMaximumPage(doc->pageCount());
 
         QPainter painter;
         painter.begin(&p_printer);
 
         for (int i = 0; i < doc->pageCount(); i++)
         {
+            progressionImpression->traitementPageSuivante();
             QSizeF size = doc->pagePointSize(i);
             QImage image = doc->render(i,
                 QSize(size.width() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
@@ -3558,9 +3561,9 @@ void AeroDms::imprimer(QPrinter& p_printer)
             if (i + 1 < doc->pageCount())
             {
                 p_printer.newPage();
-            }
-            emit mettreAJourFenetreProgressionImpression(i + 1);
+            } 
         }
+        progressionImpression->traitementPageSuivante();
 
         painter.end();
     }
