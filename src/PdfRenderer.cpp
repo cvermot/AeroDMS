@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueWidget.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
 #include "StatistiqueDonutCombineWidget.h"
+#include "StatistiqueDonuts.h"
 #include "StatistiqueHistogrammeEmpile.h"
 
 #include <podofo/podofo.h>
@@ -1092,6 +1093,26 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         enregistrerImage( stats,
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
+
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_STATUTS_PILOTES) == AeroDmsTypes::Statistiques_STATUTS_PILOTES)
+    {
+        StatistiqueDonuts* stats = new StatistiqueDonuts(db,
+            AeroDmsTypes::Statistiques_STATUTS_PILOTES,
+            m_contentArea,
+            0,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "statutsPilotes";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Aéronefs ") + QString::number(p_annee));
 
         html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
 

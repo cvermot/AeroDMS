@@ -3,7 +3,6 @@
 
 #include "StatistiqueDonuts.h"
 
-#include <QChart>
 #include <QChartView>
 #include <QGraphicsLayout>
 #include <QGridLayout>
@@ -21,24 +20,31 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
 {
     setMinimumSize(p_parametres.tailleMiniImage);
 
+    QChart::AnimationOption animation = QChart::AllAnimations;
+    if (p_parametres.tailleMiniImage != AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES.tailleMiniImage)
+    {
+        animation = QChart::NoAnimation;
+    }
+
     switch (p_statistique)
     {
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
         {
-            afficherStatsPilotes(p_db, p_parametres);
+            afficherStatsPilotes(p_db, p_parametres, animation);
             break;
         }
         case AeroDmsTypes::Statistiques_AERONEFS:
         default:
         {
-            afficherStatsAeronefs(p_db, p_annee, p_parametres);
+            afficherStatsAeronefs(p_db, p_annee, p_parametres, animation);
             break;
         }
     }
 }
 
 void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
-                                              const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
+                                              const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
+                                              QChart::AnimationOption p_animation)
 {
     QFont font("Arial", p_parametres.tailleDePolice);
 
@@ -51,7 +57,7 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     chart->legend()->setFont(font);
     chart->setTitle("Statistiques sur les pilotes");
     chart->setTitleFont(QFont("Arial", p_parametres.tailleDePolice * 1.5, QFont::Bold));
-    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setAnimationOptions(p_animation);
     chart->layout()->setContentsMargins(0, 0, 0, 0);
   
     qreal minSize = 0.5;
@@ -114,7 +120,8 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
 
 void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db, 
                                                int p_annee, 
-                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
+                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres,
+                                               QChart::AnimationOption p_animation)
 {
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
 
@@ -123,7 +130,7 @@ void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db,
     QChart* chart = chartView->chart();
     chart->legend()->setVisible(false);
     chart->setTitle("Statistiques sur les aéronefs");
-    chart->setAnimationOptions(QChart::AllAnimations);
+    chart->setAnimationOptions(p_animation);
     chart->layout()->setContentsMargins(0, 0, 0, 0);
 
     qreal minSize = 0.5;
