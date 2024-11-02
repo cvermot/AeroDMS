@@ -1030,6 +1030,7 @@ void AeroDms::initialiserMenuOutils()
     menuOutils->addSeparator();
 
     QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des &factures"));
+    scanFacture->setToolTipsVisible(true);
     scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
     scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
     scanAutoOpenFlyer = new QAction(tr("&OpenFlyer (CAPAM, ACB)"), this);
@@ -1061,6 +1062,7 @@ void AeroDms::initialiserMenuOutils()
     scanAutoCsv = new QAction(tr("&Importer les vols depuis un fichier CSV"), this);
     scanAutoCsv->setIcon(QIcon("./ressources/file-delimited-outline.svg"));
     scanAutoCsv->setDisabled(true);
+    scanAutoCsv->setToolTip("Importe les données associées à une facture depuis un fichier CSV.\nNécessite de charger au préalable la facture qui servira de justificatif.\n\nFormat attendu :\nDate;Durée;Immat;Cout\n01/01/2000;1:30;F-ABCD;100,99 €");
     scanFacture->addAction(scanAutoCsv);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAerogest, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
