@@ -1120,6 +1120,7 @@ void AeroDms::initialiserMenuAide()
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
     boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
+    boutonModeDebug->setCheckable(true);
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
 
@@ -2929,6 +2930,7 @@ void AeroDms::ouvrirDialogueParametresApplication()
 {
     DialogueEditionParametres editionParametres(parametresMetiers,
         parametresSysteme,
+        boutonModeDebug->isChecked() ,
         this);
     connect(&editionParametres,
         SIGNAL(envoyerParametres(AeroDmsTypes::ParametresMetier, AeroDmsTypes::ParametresSysteme)),

@@ -32,6 +32,7 @@ public:
     DialogueEditionParametres();
     DialogueEditionParametres(const AeroDmsTypes::ParametresMetier p_parametresMetiers,
         const AeroDmsTypes::ParametresSysteme p_parametresSysteme,
+        const bool p_editionParametresCritiques,
         QWidget* parent = nullptr);
 
 private:

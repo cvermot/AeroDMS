@@ -29,6 +29,7 @@ DialogueEditionParametres::DialogueEditionParametres()
 
 DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::ParametresMetier p_parametresMetiers,
     const AeroDmsTypes::ParametresSysteme p_parametresSysteme,
+    const bool p_editionParametresCritiques,
     QWidget* parent) : QDialog(parent)
 {
     const int K_COLONNE_LABEL = 0;
@@ -183,6 +184,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     systemeLayout->addWidget(cheminBdd, ligneActuelle, K_COLONNE_CHAMP);
     QPushButton* boutonSelectionBdd = new QPushButton("Sélectionner", this);
     systemeLayout->addWidget(boutonSelectionBdd, ligneActuelle, K_COLONNE_UNITE_BOUTON, 1, 1);
+    cheminBdd->setEnabled(p_editionParametresCritiques);
+    boutonSelectionBdd->setEnabled(p_editionParametresCritiques);
     connect(boutonSelectionBdd, SIGNAL(clicked()), this, SLOT(selectionnerBdd()));
 
     cheminBdd->setText(p_parametresSysteme.cheminStockageBdd + "/" + p_parametresSysteme.nomBdd);
@@ -194,6 +197,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     systemeLayout->addWidget(delaisGardeBdd, ligneActuelle, K_COLONNE_CHAMP);
     QLabel* delaisGardeBddLabelUnite = new QLabel(tr("ms"), this);
     systemeLayout->addWidget(delaisGardeBddLabelUnite, ligneActuelle, K_COLONNE_UNITE_BOUTON);
+    delaisGardeBdd->setEnabled(p_editionParametresCritiques);
 
     delaisGardeBdd->setValue(p_parametresMetiers.delaisDeGardeBdd);
 
@@ -215,6 +219,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     systemeLayout->addWidget(facturesSaisies, ligneActuelle, K_COLONNE_CHAMP);
     boutonSelectionFacturesSaisies = new QPushButton("Sélectionner", this);
     systemeLayout->addWidget(boutonSelectionFacturesSaisies, ligneActuelle, K_COLONNE_UNITE_BOUTON);
+    facturesSaisies->setEnabled(p_editionParametresCritiques);
+    boutonSelectionFacturesSaisies->setEnabled(p_editionParametresCritiques);
     connect(boutonSelectionFacturesSaisies, SIGNAL(clicked()), this, SLOT(selectionnerRepertoire()));
 
     facturesSaisies->setText(p_parametresSysteme.cheminStockageFacturesTraitees);
@@ -226,6 +232,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     systemeLayout->addWidget(sortieFichiersGeneres, ligneActuelle, K_COLONNE_CHAMP);
     boutonSelectionSortieFichiersGeneres = new QPushButton("Sélectionner", this);
     systemeLayout->addWidget(boutonSelectionSortieFichiersGeneres, ligneActuelle, K_COLONNE_UNITE_BOUTON);
+    sortieFichiersGeneres->setEnabled(p_editionParametresCritiques);
+    boutonSelectionSortieFichiersGeneres->setEnabled(p_editionParametresCritiques);
     connect(boutonSelectionFacturesSaisies, SIGNAL(clicked()), this, SLOT(selectionnerRepertoire()));
 
     sortieFichiersGeneres->setText(p_parametresSysteme.cheminSortieFichiersGeneres);
@@ -243,6 +251,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
+
+    resize(800, size().height());
 
     connect(onglets, &QTabWidget::currentChanged, this, &DialogueEditionParametres::gererChangementOnglet);
 }
