@@ -230,9 +230,9 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
 
-    resize(800, size().height());
-
     connect(onglets, &QTabWidget::currentChanged, this, &DialogueEditionParametres::gererChangementOnglet);
+
+    resize(800, onglets->widget(0)->sizeHint().height());
 }
 
 void DialogueEditionParametres::selectionnerImprimante()
@@ -304,7 +304,7 @@ void DialogueEditionParametres::gererChangementOnglet()
 {
     //qDebug() << onglets->widget(onglets->currentIndex())->sizeHint();
     //onglets->setFixedHeight(onglets->widget(onglets->currentIndex())->sizeHint().height());
-    //resize(onglets->widget(onglets->currentIndex())->sizeHint());
+    //resize(800, onglets->widget(onglets->currentIndex())->sizeHint().height());
 }
 
 void DialogueEditionParametres::enregistrerParametres()

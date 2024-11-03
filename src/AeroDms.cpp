@@ -1094,6 +1094,12 @@ void AeroDms::initialiserMenuOutils()
     menuOutils->addAction(boutonGestionAeronefs);
     connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
+    boutonEditerLePiloteSelectionne = new QAction(QIcon("./ressources/account-edit.svg"), tr("É&diter le pilote sélectionné"), this);
+    boutonEditerLePiloteSelectionne->setToolTip("Permet d'éditer le pilote actuellement sélectionné. Fonction disponible uniquement si un pilote est sélectionné dans la vue currente.");
+    boutonEditerLePiloteSelectionne->setEnabled(false);
+    menuOutils->addAction(boutonEditerLePiloteSelectionne);
+    connect(boutonEditerLePiloteSelectionne, SIGNAL(triggered()), this, SLOT(editerPilote()));
+
     menuOutils->addSeparator();
 
     QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir &une heure en décimal"), this);
@@ -1411,6 +1417,15 @@ AeroDms::~AeroDms()
 
 void AeroDms::peuplerTablePilotes()
 {
+    //On mette à jour l'info pilote a editer en cas de demande d'édition du pilote via le menu outils,
+    //si on a sélectionné un pilote donné et pas "Tous les pilotes"
+    boutonEditerLePiloteSelectionne->setEnabled(false);
+    if (listeDeroulantePilote->currentData().toString() != "*")
+    {
+        piloteAEditer = listeDeroulantePilote->currentData().toString();
+        boutonEditerLePiloteSelectionne->setEnabled(true);
+    }  
+
     const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes( listeDeroulanteAnnee->currentData().toInt(), 
                                                                                                        listeDeroulantePilote->currentData().toString());
     vuePilotes->setRowCount(listeSubventions.size());
@@ -2647,7 +2662,7 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         anneeAEditer = vuePilotes->item( ligneSelectionnee,
                                          AeroDmsTypes::PiloteTableElement_ANNEE)->text().toInt();
 
-        QAction editer(QIcon("./ressources/account-tie-hat.svg"),"Editer le pilote", this);
+        QAction editer(QIcon("./ressources/account-tie-hat.svg"),"Éditer le pilote", this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
         menuClicDroitPilote.addAction(&editer);
 
@@ -2743,7 +2758,7 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         const bool leVolEstSupprimable = (vueVols->item(ligneSelectionnee, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text() == "Non");
         volPartiellementEditable = !leVolEstSupprimable;
 
-        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Editer le vol", this);
+        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Éditer le vol", this);
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
         menuClicDroitVol.addAction(&editerLeVol);
 

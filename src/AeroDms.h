@@ -236,6 +236,8 @@ private:
     QAction* scanAutoGenerique;
     QAction* scanAutoCsv;
 
+    QAction* boutonEditerLePiloteSelectionne;
+
     //Données internes
     QString piloteAEditer = "";
     float montantSubventionDejaAlloue = 0.0;
