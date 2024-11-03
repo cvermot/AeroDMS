@@ -1,6 +1,6 @@
 /******************************************************************************\
-<QUas : a Free Software logbook for UAS operators>
-Copyright (C) 2023 Clément VERMOT-DESROCHES (clement@vermot.net)
+<AeroDms : logiciel de gestion compta section aéronautique>
+Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     telephone = new QLineEdit(this);
     QLabel* telephoneLabel = new QLabel(tr("Téléphone : "), this);
 
-    remarque = new QLineEdit(this);
+    remarque = new QTextEdit(this);
     QLabel* remarqueLabel = new QLabel(tr("Remarque : "), this);
 
     estActif = new QCheckBox(this);
@@ -141,7 +141,7 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.aeroclub = aeroclub->text();
     pilote.mail = mail->text();
     pilote.telephone = telephone->text();
-    pilote.remarque = remarque->text();
+    pilote.remarque = remarque->toPlainText();
     pilote.activitePrincipale = activitePrincipale->currentText();
     pilote.estActif = estActif->checkState() == Qt::Checked;
     pilote.estBrevete = estBrevete->checkState() == Qt::Checked;

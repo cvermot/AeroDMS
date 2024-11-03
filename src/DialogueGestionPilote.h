@@ -39,7 +39,7 @@ private:
     QComboBox* activitePrincipale;
     QLineEdit* mail;
     QLineEdit* telephone;
-    QLineEdit* remarque;
+    QTextEdit* remarque;
     QCheckBox* estActif;
     QCheckBox* estBrevete;
 
