@@ -1136,7 +1136,7 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
     generator.setSize(p_widget.size());
     generator.setViewBox(p_widget.rect());
     generator.setTitle(p_titre);
-    generator.setDescription(tr("Image générée avec AeroDms v") + QApplication::applicationVersion());
+    generator.setDescription(tr("Image générée avec ")+ QApplication::applicationName() +" v" + QApplication::applicationVersion());
     p_widget.render(&generator);
 }
 

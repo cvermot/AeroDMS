@@ -43,7 +43,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     splash->show();
     splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 
-    QApplication::setApplicationName("AeroDms");
+    QApplication::setApplicationName("AeroDMS");
     QApplication::setApplicationVersion("6.1");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
@@ -1154,7 +1154,7 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
-    QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
+    QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDMS"), this);
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
@@ -2637,8 +2637,8 @@ void AeroDms::ouvrirGestionAeronefs()
 
 void AeroDms::aPropos()
 {
-    QMessageBox::about(this, tr("À propos de AeroDms"),
-        "<b>AeroDms v"+QApplication::applicationVersion() + "</b> < br />< br /> "
+    QMessageBox::about(this, tr("À propos de AeroDMS"),
+        "<b>"+ QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> < br />< br /> "
         "Logiciel de gestion de compta d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
