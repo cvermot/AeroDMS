@@ -52,6 +52,7 @@ public:
     QString fileName;
 
 private:
+    void initialiserBaseApplication();
     void lireParametresEtInitialiserBdd();
     void initialiserOngletPilotes();
     void initialiserOngletVols();
@@ -98,6 +99,7 @@ private:
     void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule();
     void demanderFermetureSplashscreen();
+    void ouvrirSplashscreen();
 
     bool eventFilter(QObject* object, QEvent* event);
 

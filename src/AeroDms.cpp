@@ -39,28 +39,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 {
-    splash = new QSplashScreen(QPixmap("./ressources/splash.png"), Qt::WindowStaysOnTopHint);
-    splash->show();
-    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+    ouvrirSplashscreen();
 
-    QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("6.1");
-    QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
-    mainTabWidget = new QTabWidget(this);
-    setCentralWidget(mainTabWidget);
-
-    setWindowTitle(tr("AeroDMS"));
-    setMinimumSize(800, 600);
-    showMaximized();
-
-    installEventFilter(this);
-    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
-
-    //========================Initialisation des autres attributs
-    piloteAEditer = "";
-    volAEditer = -1;
-    factureIdEnBdd = 0;
-
+    initialiserBaseApplication();
     lireParametresEtInitialiserBdd();
 
     initialiserOngletPilotes();
@@ -110,6 +91,27 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage("Prêt");
 
     demanderFermetureSplashscreen();
+}
+
+void AeroDms::initialiserBaseApplication()
+{
+    QApplication::setApplicationName("AeroDMS");
+    QApplication::setApplicationVersion("6.1");
+    QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
+    mainTabWidget = new QTabWidget(this);
+    setCentralWidget(mainTabWidget);
+
+    setWindowTitle(tr("AeroDMS"));
+    setMinimumSize(800, 600);
+    showMaximized();
+
+    installEventFilter(this);
+    connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
+
+    //========================Initialisation des autres attributs
+    piloteAEditer = "";
+    volAEditer = -1;
+    factureIdEnBdd = 0;
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
@@ -634,6 +636,13 @@ void AeroDms::passerLeLogicielEnLectureSeule()
     bouttonGenerePdf->setEnabled(false);
 
     logicielEnModeLectureSeule = true;
+}
+
+void AeroDms::ouvrirSplashscreen()
+{
+    splash = new QSplashScreen(QPixmap("./ressources/splash.png"), Qt::WindowStaysOnTopHint);
+    splash->show();
+    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 }
 
 void AeroDms::demanderFermetureSplashscreen()
