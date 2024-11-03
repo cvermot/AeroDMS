@@ -854,11 +854,12 @@ void AeroDms::initialiserMenuFichier()
     peuplerMenuAutreDemande();
 
     QAction* boutonImprimer = new QAction(QIcon("./ressources/printer.svg"), tr("&Imprimer la dernière demande"), this);
+    boutonImprimer->setStatusTip(tr("Imprime la dernière demande de subvention en une seule fois (pas d'agrafage séparé)"));
     menuFichier->addAction(boutonImprimer);
     connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
 
     QAction* boutonImprimerAgrafage = new QAction(QIcon("./ressources/printer.svg"), tr("Imprimer la dernière demande (avec &agrafage)"), this);
-    boutonImprimerAgrafage->setStatusTip(tr("Permet d'imprimer chaque fichier séparément.\n\nPour l'agrafage automatique par l'imprimante, pensez à\nsélectionner l'option adéquate dans les paramètres de l'imprimante."));
+    boutonImprimerAgrafage->setStatusTip(tr("Permet d'imprimer chaque fichier séparément. Pour l'agrafage automatique par l'imprimante, pensez à\nsélectionner l'option adéquate dans les paramètres de l'imprimante."));
     boutonImprimerAgrafage->setShortcut(QKeySequence::Print);
     menuFichier->addAction(boutonImprimerAgrafage);
     connect(boutonImprimerAgrafage, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
@@ -908,11 +909,14 @@ void AeroDms::initialiserMenuOptions()
     boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), tr("Récapitulatif des &recettes"), this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
     boutonOptionRecapAnnuelRecettes->setCheckable(true);
+    boutonOptionRecapAnnuelRecettes->setStatusTip(tr("Permet d'ajouter le récapitulatif des recettes dans le récap des heures de vol"));
     boutonOptionRecapAnnuelBaladesSorties = new QAction(QIcon("./ressources/airplane-search.svg"), tr("Récapitulatif des &balades et sorties"), this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
+    boutonOptionRecapAnnuelBaladesSorties->setStatusTip(tr("Permet d'ajouter le récapitulatif des balades et sorties (dates, durées, noms des passagers, couts et recettes...) dans le récap des heures de vol"));
     //Génération des graphiques
     QMenu* graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(QIcon("./ressources/chart-areaspline.svg"), tr("&Graphiques"));
+    graphiquesDuRecapAnnuel->setStatusTip(tr("Séléctionne les graphiques à ajouter au récapitulatif annuel des heures de vol"));
 
     boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(QIcon("./ressources/chart-bar-stacked.svg"), tr("&Heures annuelles"), this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresAnnuelles);
@@ -961,11 +965,13 @@ void AeroDms::initialiserMenuOptions()
     graphiquesDuRecapAnnuel->addSeparator();
     boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/check-all.svg"), tr("&Sélectionner tous les graphs"), this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphs->setStatusTip(tr("Ajoute tous les graphiques au récap des heures de vol"));
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
     menuOptionsRecapAnnuel->addSeparator();
     boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(QIcon("./ressources/check-all.svg"), tr("&Sélectionner tous les graphs et tous les récaps"), this);
     menuOptionsRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap);
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap->setStatusTip(tr("Ajoute tous les graphiques, le tableau des recettes et le tableau des balades au récap des heures de vol"));
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
     connect(boutonDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
@@ -975,7 +981,7 @@ void AeroDms::initialiserMenuOptions()
     menuOption->addSeparator();
 
     boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Désactiver le scan &automatique des factures"), this);
-    boutonActivationScanAutoFactures->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
+    boutonActivationScanAutoFactures->setStatusTip(tr("Active/désactive le scan à l'ouverture des factures PDF. Cette option permet de désactiver le scan automatique si une facture fait planter le logiciel par exemple."));
     menuOption->addAction(boutonActivationScanAutoFactures);
     connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
 
@@ -999,6 +1005,7 @@ void AeroDms::initialiserMenuOutils()
 {
     //========================Menu Outils
     QMenu* menuOutils = menuBar()->addMenu(tr("Ou&tils"));
+    menuOutils->setToolTipsVisible(true);
 
     menuOutils->addAction(bouttonAjouterUnVol);
     menuOutils->addAction(bouttonAjouterPilote);
@@ -1012,7 +1019,7 @@ void AeroDms::initialiserMenuOutils()
 
     QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des &factures"));
     scanFacture->setToolTipsVisible(true);
-    scanFacture->setToolTip(tr("Scan une facture en se basant sur une des méthode\nutilisée par le logiciel pour un type de facture déjà connu."));
+    scanFacture->setStatusTip(tr("Scan une facture en se basant sur une des méthode utilisée par le logiciel pour un type de facture déjà connu."));
     scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
     scanAutoOpenFlyer = new QAction(tr("&OpenFlyer (CAPAM, ACB)"), this);
     scanAutoOpenFlyer->setIcon(QIcon("./ressources/airplane-search.svg"));
@@ -1043,7 +1050,8 @@ void AeroDms::initialiserMenuOutils()
     scanAutoCsv = new QAction(tr("&Importer les vols depuis un fichier CSV"), this);
     scanAutoCsv->setIcon(QIcon("./ressources/file-delimited-outline.svg"));
     scanAutoCsv->setDisabled(true);
-    scanAutoCsv->setToolTip("Importe les données associées à une facture depuis un fichier CSV.\nNécessite de charger au préalable la facture qui servira de justificatif.\n\nFormat attendu :\nDate;Durée;Immat;Cout\n01/01/2000;1:30;F-ABCD;100,99 €");
+    scanAutoCsv->setStatusTip(tr("Importe les données associées à une facture depuis un fichier CSV. Nécessite de charger au préalable la facture qui servira de justificatif."));
+    scanAutoCsv->setToolTip(tr("Format du CSV attendu :\nDate;Durée;Immat;Cout\n01/01/2000;1:30;F-ABCD;100,99 €"));
     scanFacture->addAction(scanAutoCsv);
     connect(scanAutoOpenFlyer, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoAerogest, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
@@ -1089,13 +1097,12 @@ void AeroDms::initialiserMenuOutils()
 
     menuOutils->addSeparator();
     QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
-    boutonGestionAeronefs->setToolTip("");
-    boutonGestionAeronefs->setStatusTip(tr(""));
+    boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
     menuOutils->addAction(boutonGestionAeronefs);
     connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
     boutonEditerLePiloteSelectionne = new QAction(QIcon("./ressources/account-edit.svg"), tr("É&diter le pilote sélectionné"), this);
-    boutonEditerLePiloteSelectionne->setToolTip("Permet d'éditer le pilote actuellement sélectionné. Fonction disponible uniquement si un pilote est sélectionné dans la vue currente.");
+    boutonEditerLePiloteSelectionne->setStatusTip(tr("Permet d'éditer le pilote actuellement sélectionné. Fonction disponible uniquement si un pilote est sélectionné dans la vue courante."));
     boutonEditerLePiloteSelectionne->setEnabled(false);
     menuOutils->addAction(boutonEditerLePiloteSelectionne);
     connect(boutonEditerLePiloteSelectionne, SIGNAL(triggered()), this, SLOT(editerPilote()));
@@ -1115,17 +1122,19 @@ void AeroDms::initialiserMenuAide()
 
     QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("Aide en &ligne"), this);
     aideQtAction->setShortcut(Qt::Key_F1);
-    aideQtAction->setStatusTip(tr("&Ouvrir l'aide en ligne"));
+    aideQtAction->setStatusTip(tr("Ouvrir l'aide en ligne"));
     helpMenu->addAction(aideQtAction);
     connect(aideQtAction, SIGNAL(triggered()), this, SLOT(ouvrirAide()));
 
     helpMenu->addSeparator();
 
     miseAJourAction = new QAction(QIcon("./ressources/download-box.svg"), tr("&Vérifier la présence de mise à jour"), this);
+    miseAJourAction->setStatusTip(tr("Vérifie la présence de mise à jour et permet d'effectuer la mise à jour le cas échéant"));
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
     boutonModeDebug = new QAction(QIcon("./ressources/bug.svg"), tr("Activer le mode &debug"), this);
+    boutonModeDebug->setStatusTip(tr("Active/désactive le mode débug. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
     boutonModeDebug->setCheckable(true);
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
@@ -1133,12 +1142,12 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addSeparator();
 
     QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
-    aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de &Qt"));
+    aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
     QAction* aboutAction = new QAction(QIcon("./ressources/shield-airplane.svg"), tr("À propos de &AeroDms"), this);
-    aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette &application"));
+    aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
     helpMenu->addAction(aboutAction);
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aPropos()));
 }
