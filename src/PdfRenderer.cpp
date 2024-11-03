@@ -995,7 +995,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
     {
-        StatistiqueWidget* stats = new StatistiqueHistogrammeEmpile( db,
+        StatistiqueHistogrammeEmpile stats( db,
                                                                      p_annee,
                                                                      m_contentArea,
                                                                      QChart::NoAnimation, 
@@ -1015,7 +1015,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE) == AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE)
     {
-        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+        StatistiqueDiagrammeCirculaireWidget stats(db,
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE,
             m_contentArea,
@@ -1036,7 +1036,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
     {
-        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+        StatistiqueDiagrammeCirculaireWidget stats(db,
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL,
             m_contentArea,
@@ -1058,7 +1058,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
     {
-        StatistiqueWidget* stats = new StatistiqueDiagrammeCirculaireWidget(db,
+        StatistiqueDiagrammeCirculaireWidget stats(db,
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE,
             m_contentArea,
@@ -1080,7 +1080,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
     {
-        StatistiqueDonutCombineWidget* stats = new StatistiqueDonutCombineWidget(db,
+        StatistiqueDonutCombineWidget stats(db,
             AeroDmsTypes::Statistiques_AERONEFS,
             m_contentArea,
             p_annee,
@@ -1102,7 +1102,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_STATUTS_PILOTES) == AeroDmsTypes::Statistiques_STATUTS_PILOTES)
     {
-        StatistiqueDonuts* stats = new StatistiqueDonuts(db,
+        StatistiqueDonuts stats(db,
             AeroDmsTypes::Statistiques_STATUTS_PILOTES,
             m_contentArea,
             0,
@@ -1125,21 +1125,19 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     return html;
 }
 
-void PdfRenderer::enregistrerImage( QWidget *p_widget,
+void PdfRenderer::enregistrerImage( QWidget &p_widget,
                                     const QString p_urlImage,
                                     const QString p_titre)
 {
-    p_widget->grab().save(p_urlImage + ".png");
+    p_widget.grab().save(p_urlImage + ".png");
 
     QSvgGenerator generator;
     generator.setFileName(p_urlImage + ".svg");
-    generator.setSize(p_widget->size());
-    generator.setViewBox(p_widget->rect());
+    generator.setSize(p_widget.size());
+    generator.setViewBox(p_widget.rect());
     generator.setTitle(p_titre);
     generator.setDescription(tr("Image générée avec AeroDms v") + QApplication::applicationVersion());
-    p_widget->render(&generator);
-
-    delete p_widget;
+    p_widget.render(&generator);
 }
 
 AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution)

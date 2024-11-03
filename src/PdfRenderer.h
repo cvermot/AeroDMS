@@ -85,7 +85,7 @@ private :
 
 	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution);
 
-	static void enregistrerImage( QWidget* p_widget,
+	static void enregistrerImage( QWidget &p_widget,
 						          const QString p_urlImage,
 							      const QString p_titre);
 
