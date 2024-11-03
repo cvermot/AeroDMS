@@ -555,8 +555,10 @@ void AeroDms::verifierPresenceDeMiseAjour()
     //  -AeroDms.exe : mise à jour de l'application et eventuellement de ses librairies
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
     // de sécurité/maintenance de Qt avec compatibilité des interfaces)
+    //  -podofo.dll : mise à jour de la librairie PDF et des librairies associées
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
-         || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll"))
+         || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll")
+         || uneMaJEstDisponible(dossierAVerifier, "podofo.dll"))
     {
         demanderFermetureSplashscreen();
 
@@ -771,12 +773,18 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteType = selectionToolBar->addWidget(listeDeroulanteType);
 
     listeDeroulanteElementsSoumis = new QComboBox(this);
-    listeDeroulanteElementsSoumis->addItem("Éléments soumis et non soumis au CSE", AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS);
-    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS, AeroDmsServices::recupererIcone("Tous"));
-    listeDeroulanteElementsSoumis->addItem("Éléments soumis au CSE", AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS);
-    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS, AeroDmsServices::recupererIcone("Oui"));
-    listeDeroulanteElementsSoumis->addItem("Éléments non soumis au CSE", AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
-    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS, AeroDmsServices::recupererIcone("Non"));
+    listeDeroulanteElementsSoumis->addItem("Éléments soumis et non soumis au CSE", 
+        AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS);
+    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS, 
+        AeroDmsServices::recupererIcone("Tous"));
+    listeDeroulanteElementsSoumis->addItem("Éléments soumis au CSE", 
+        AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS);
+    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS, 
+        AeroDmsServices::recupererIcone("Oui"));
+    listeDeroulanteElementsSoumis->addItem("Éléments non soumis au CSE", 
+        AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
+    listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS, 
+        AeroDmsServices::recupererIcone("Non"));
 
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
