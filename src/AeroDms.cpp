@@ -1402,11 +1402,6 @@ void AeroDms::detruireFenetreProgressionGenerationPdf()
     }
 }
 
-void AeroDms::mettreAJourNbPagesFichierCourant(const int p_nombreDePagesAImprimer)
-{
-    progressionImpression->setMaximumPage(p_nombreDePagesAImprimer);
-}
-
 void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge)
 {
     fichierAImprimer = p_cheminFichierPdfMerge;
@@ -3504,8 +3499,6 @@ void AeroDms::imprimerApresGenerationPdf()
     {
         imprimer(imprimante);
     }
-
-    detruireFenetreProgressionGenerationPdf();
 }
 void AeroDms::imprimerLaDerniereDemande()
 {
@@ -3522,6 +3515,7 @@ void AeroDms::imprimerLaDerniereDemande()
     }
     progressionImpression->traitementFichierSuivant();
 }
+
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
 {
     QPrinter imprimante;
@@ -3554,17 +3548,16 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
         }
         progressionImpression->traitementFichierSuivant();
     }
-
-    detruireFenetreProgressionGenerationPdf();
 }
 
 bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
 {
     p_printer.setPrinterName(parametresSysteme.imprimante);
     p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
+    p_printer.setDuplex(QPrinter::DuplexNone);
+
     QPrintDialog dialog(&p_printer, this);
     dialog.setWindowTitle("Imprimer les demandes de subventions");
-    
     dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
     dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
     dialog.setOption(QAbstractPrintDialog::PrintCollateCopies, false);
@@ -3576,8 +3569,7 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
     {
         return false;
     }
-    p_printer.setResolution(p_printer.supportedResolutions().last());
-    p_printer.setDuplex(QPrinter::DuplexNone);
+    //p_printer.setResolution(p_printer.supportedResolutions().last());
 
     return true;
 }
@@ -3606,8 +3598,10 @@ void AeroDms::imprimer(QPrinter& p_printer)
             progressionImpression->traitementPageSuivante();
             QSizeF size = doc->pagePointSize(i);
             QImage image = doc->render(i,
-                QSize(size.width() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
-                    size.height() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
+                QSize(size.width() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
+                    size.height() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
+                //QSize(size.width() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
+                //    size.height() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
 
             //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
             //pour l'impression

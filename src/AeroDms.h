@@ -298,7 +298,6 @@ public slots:
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge);
     void mettreAJourEchecGenerationPdf();
-    void mettreAJourNbPagesFichierCourant(const int p_nombreDePagesAImprimer);
     void aPropos();
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
