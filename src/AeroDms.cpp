@@ -564,7 +564,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
          || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll")
          || uneMaJEstDisponible(dossierAVerifier, "podofo.dll"))
     {
-        demanderFermetureSplashscreen();
+        fermerSplashscreen();
 
         QMessageBox dialogueMiseAJourDisponible;
         dialogueMiseAJourDisponible.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
@@ -589,7 +589,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         {
             if (!db->laBddEstALaVersionAttendue())
             {
-                demanderFermetureSplashscreen();
+                fermerSplashscreen();
                 passerLeLogicielEnLectureSeule();
 
                 QMessageBox dialogueErreurVersionBdd;
@@ -615,7 +615,7 @@ L'application va passer en mode lecture seule.\
     }
     else if (!db->laBddEstALaVersionAttendue())
     {
-        demanderFermetureSplashscreen();
+        fermerSplashscreen();
         passerLeLogicielEnLectureSeule();
 
         QMessageBox dialogueErreurVersionBdd;
