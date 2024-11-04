@@ -325,6 +325,8 @@ void AeroDms::initialiserOngletRecettes()
     vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
     vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem("ID"));
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
+    vueRecettes->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    vueRecettes->setSelectionBehavior(QAbstractItemView::SelectRows);
     mainTabWidget->addTab(vueRecettes, QIcon("./ressources/cash-multiple.svg"), "Recettes");
 }
 
