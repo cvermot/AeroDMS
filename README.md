@@ -13,12 +13,13 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 - Développé en C++
 - Base de données [SQLite](https://www.sqlite.org/)
 - Librairie [Qt](https://www.qt.io/) (6.8.0)
-  - GUI (QtGui)
-  - Lecture PDF (QtPdf)
-  - Écriture PDF à partir d’un template HTML via WebEngine (QtWebEngine)
-  - Accès à la BDD SQLite (QtSql)
-  - Affichage des statistiques (QtCharts)
-  - Export des graphiques en SVG (QtSvg)
+  - GUI (Qt Gui)
+  - Lecture PDF (Qt Pdf)
+  - Écriture PDF à partir d’un template HTML via WebEngine (Qt Web Engine)
+  - Accès à la BDD SQLite (Qt Sql)
+  - Affichage des statistiques (Qt Charts)
+  - Export des graphiques en SVG (Qt Svg)
+  - Impression (Qt Print Support)
 - Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
 
 ## Mise en place de l’environnement de développement
