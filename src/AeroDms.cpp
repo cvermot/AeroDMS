@@ -1387,6 +1387,8 @@ void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAIm
     progressionImpression->setMaximumFichier(p_nombreDeFichiersAImprimer);
 
     connect(progressionImpression, SIGNAL(accepted()), this, SLOT(detruireFenetreProgressionImpression()));
+
+    update();
 }
 
 void AeroDms::detruireFenetreProgressionImpression()
@@ -3510,6 +3512,8 @@ void AeroDms::imprimerLaDerniereDemande()
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(1);
 
+        QThread::usleep(500);
+
         fichierAImprimer = rechercherDerniereDemande();
         progressionImpression->traitementFichierSuivant();
 
@@ -3539,6 +3543,8 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(liste.size());
+
+        QThread::usleep(500);
         
         for (QFileInfo fichier : liste)
         {
