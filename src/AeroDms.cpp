@@ -1755,6 +1755,9 @@ void AeroDms::ajouterUneCotisationEnBdd()
     {
         db->ajouterCotisation(infosCotisation);
         statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " mise à jour pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
+
+        //On met à jour la table des pilotes (en cas de changement de couleur)
+        peuplerTablePilotes();
     }
 }
 
