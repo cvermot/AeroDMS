@@ -96,7 +96,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("6.1");
+    QApplication::setApplicationVersion("6.2");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
