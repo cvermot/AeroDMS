@@ -54,11 +54,13 @@ private:
     QLineEdit* factureATraiter = nullptr;
     QLineEdit* sortieFichiersGeneres = nullptr;
     QComboBox* impressionCouleur = nullptr;
+    QComboBox* resolutionImpression = nullptr;
 
     QPushButton* boutonSelectionFactureATraiter = nullptr;
     QPushButton* boutonSelectionFacturesSaisies = nullptr;
     QPushButton* boutonSelectionSortieFichiersGeneres = nullptr;
     
+    void peuplerResolutionImpression(QPrinter& printer);
 
 public slots:
     void selectionnerImprimante();

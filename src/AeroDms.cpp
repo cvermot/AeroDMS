@@ -156,6 +156,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.beginGroup("impression");
         settings.setValue("imprimante", "");
         settings.setValue("couleur", 1);
+        settings.setValue("resolution", 600);
         settings.endGroup();
     }
 
@@ -197,6 +198,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.nomBdd = settings.value("baseDeDonnees/nom", "").toString();
     parametresSysteme.imprimante = settings.value("impression/imprimante", "").toString();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
+    parametresSysteme.resolutionImpression = settings.value("impression/resolution", 600).toInt();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -3014,6 +3016,7 @@ void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p
     settings.beginGroup("impression");
     settings.setValue("imprimante", parametresSysteme.imprimante);
     settings.setValue("couleur", parametresSysteme.modeCouleurImpression);
+    settings.setValue("resolution", parametresSysteme.resolutionImpression);
     settings.endGroup();
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
@@ -3518,8 +3521,9 @@ void AeroDms::imprimerLaDerniereDemande()
         progressionImpression->traitementFichierSuivant();
 
         imprimer(imprimante);
+
+        progressionImpression->traitementFichierSuivant();
     }
-    progressionImpression->traitementFichierSuivant();
 }
 
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
@@ -3562,6 +3566,7 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
 {
     p_printer.setPrinterName(parametresSysteme.imprimante);
     p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
+    p_printer.setResolution(parametresSysteme.resolutionImpression);
     p_printer.setDuplex(QPrinter::DuplexNone);
 
     QPrintDialog dialog(&p_printer, this);

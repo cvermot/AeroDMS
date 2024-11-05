@@ -425,6 +425,7 @@ public:
         QString nomBdd;
         QString imprimante;
         QPrinter::ColorMode modeCouleurImpression;
+        int resolutionImpression;
     };
 
     struct TotauxRecettes {

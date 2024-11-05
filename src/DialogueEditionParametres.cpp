@@ -144,7 +144,25 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionLayout->addWidget(boutonSelectionImprimante, ligneActuelle, K_COLONNE_UNITE_BOUTON);
     connect(boutonSelectionImprimante, SIGNAL(clicked()), this, SLOT(selectionnerImprimante()));
 
+    ligneActuelle = impressionLayout->rowCount();
+    resolutionImpression = new QComboBox(this);
+    impressionLayout->addWidget(new QLabel(tr("Résolution : "), this), ligneActuelle, K_COLONNE_LABEL);
+    impressionLayout->addWidget(resolutionImpression, ligneActuelle, K_COLONNE_CHAMP);
+
     imprimante->setText(p_parametresSysteme.imprimante);
+    QPrinter printer;
+    printer.setPrinterName(p_parametresSysteme.imprimante);
+    if (p_parametresSysteme.imprimante != ""
+        && printer.isValid())
+    {
+        peuplerResolutionImpression(printer);
+    }
+    else
+    {
+        resolutionImpression->addItem("600 DPI", 600);
+        resolutionImpression->setEnabled(false);
+    }
+    //TODO imprimante->setText(p_parametresSysteme.resolutionImpression);
 
     ligneActuelle = impressionLayout->rowCount();
     impressionCouleur = new QComboBox(this);
@@ -251,6 +269,19 @@ void DialogueEditionParametres::selectionnerImprimante()
     if (dialog.exec() == QDialog::Accepted)
     {
         imprimante->setText(printer.printerName());
+
+        peuplerResolutionImpression(printer);
+    }
+}
+
+void DialogueEditionParametres::peuplerResolutionImpression(QPrinter &printer)
+{
+    resolutionImpression->clear();
+    resolutionImpression->setEnabled(true);
+    QList<int> resolutions = printer.supportedResolutions();
+    for (int resolution : resolutions)
+    {
+        resolutionImpression->addItem(QString::number(resolution) + " DPI", resolution);
     }
 }
 
@@ -332,6 +363,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
     parametresSysteme.imprimante = imprimante->text();
+    parametresSysteme.resolutionImpression = resolutionImpression->currentData().toInt();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
 
     emit envoyerParametres(parametresMetiers, parametresSysteme);
