@@ -51,18 +51,39 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     onglets->addTab(mailingWidget, QIcon("./ressources/email-multiple.svg"), "Mailing");
 
     int ligneActuelle = mailingLayout->rowCount();
+    objetChequeDispo = new QLineEdit(this);
+    mailingLayout->addWidget(new QLabel(tr("Chèques disponibles (objet) : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(objetChequeDispo, ligneActuelle, K_COLONNE_CHAMP);
+
+    objetChequeDispo->setText(p_parametresMetiers.objetMailDispoCheques);
+
+    ligneActuelle = mailingLayout->rowCount();
     texteChequeDispo = new QTextEdit(this);
-    mailingLayout->addWidget(new QLabel(tr("Chèques disponibles : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(new QLabel(tr("Chèques disponibles (texte) : "), this), ligneActuelle, K_COLONNE_LABEL);
     mailingLayout->addWidget(texteChequeDispo, ligneActuelle, K_COLONNE_CHAMP);
 
     texteChequeDispo->setText(p_parametresMetiers.texteMailDispoCheques);
 
     ligneActuelle = mailingLayout->rowCount();
+    objetSubventionRestantes = new QLineEdit(this);
+    mailingLayout->addWidget(new QLabel(tr("Subvention restante (objet) : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(objetSubventionRestantes, ligneActuelle, K_COLONNE_CHAMP);
+
+    objetSubventionRestantes->setText(p_parametresMetiers.objetMailSubventionRestante);
+
+    ligneActuelle = mailingLayout->rowCount();
     texteSubventionRestantes = new QTextEdit(this);
-    mailingLayout->addWidget(new QLabel(tr("Subvention restante : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(new QLabel(tr("Subvention restante (texte) : "), this), ligneActuelle, K_COLONNE_LABEL);
     mailingLayout->addWidget(texteSubventionRestantes, ligneActuelle, K_COLONNE_CHAMP);
 
     texteSubventionRestantes->setText(p_parametresMetiers.texteMailSubventionRestante);
+
+    ligneActuelle = mailingLayout->rowCount();
+    objetAutresMailings = new QLineEdit(this);
+    mailingLayout->addWidget(new QLabel(tr("Autres mailings (objet) : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(objetAutresMailings, ligneActuelle, K_COLONNE_CHAMP);
+
+    objetAutresMailings->setText(p_parametresMetiers.objetMailAutresMailings);
 
     //Elements financiers
     QGridLayout* financeLayout = new QGridLayout();
@@ -350,8 +371,11 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresMetiers.proportionParticipationBalade = proportionParticipationBalade->value()/100;
     parametresMetiers.nomTresorier = nomTresorier->text();
     parametresMetiers.delaisDeGardeBdd = delaisGardeBdd->value();
+    parametresMetiers.objetMailDispoCheques = objetChequeDispo->text();
     parametresMetiers.texteMailDispoCheques = texteChequeDispo->toPlainText();
+    parametresMetiers.objetMailSubventionRestante = objetSubventionRestantes->text();
     parametresMetiers.texteMailSubventionRestante = texteSubventionRestantes->toPlainText();
+    parametresMetiers.objetMailAutresMailings = objetAutresMailings->text();
     
     AeroDmsTypes::ParametresSysteme parametresSysteme;
 

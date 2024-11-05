@@ -38,8 +38,11 @@ public:
 private:
     QTabWidget* onglets = nullptr;
     QLineEdit* imprimante = nullptr;
+    QLineEdit* objetChequeDispo = nullptr;
     QTextEdit* texteChequeDispo = nullptr;
+    QLineEdit* objetSubventionRestantes = nullptr;
     QTextEdit* texteSubventionRestantes = nullptr;
+    QLineEdit* objetAutresMailings = nullptr;
     QLineEdit* nomTresorier = nullptr;
     QSpinBox* delaisGardeBdd = nullptr;
     QDoubleSpinBox* proportionRemboursementBalade = nullptr;

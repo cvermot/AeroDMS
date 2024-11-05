@@ -413,8 +413,11 @@ public:
         float proportionParticipationBalade;
         QString nomTresorier;
         int delaisDeGardeBdd;
+        QString objetMailDispoCheques;
         QString texteMailDispoCheques;
+        QString objetMailSubventionRestante;
         QString texteMailSubventionRestante;
+        QString objetMailAutresMailings;
     };
 
     struct ParametresSysteme {

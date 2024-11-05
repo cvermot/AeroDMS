@@ -146,10 +146,19 @@ void AeroDms::lireParametresEtInitialiserBdd()
     if (settings.value("mailing/texteChequesDisponibles", "") == "")
     {
         settings.beginGroup("mailing");
+        settings.setValue("objetChequesDisponibles", tr("[Section aéronautique] Chèques aéro"));
         settings.setValue("texteChequesDisponibles", tr("Bonjour,\n\nVos chèques sont disponibles. \n\nCordialement"));
+        settings.setValue("objetSubventionRestante", tr("[Section aéronautique] Subvention entrainement"));
         settings.setValue("texteSubventionRestante", tr("Bonjour,\n\nSauf erreur de notre part, vous disposez encore d'un budget entrainement non consommé. \n\nCordialement"));
+        settings.setValue("objetAutresMailings", tr("[Section aéronautique] "));
         settings.endGroup();
     }
+
+    parametresMetiers.objetMailDispoCheques = settings.value("mailing/objetChequesDisponibles", "[Section aéronautique] Chèques aéro").toString();
+    parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
+    parametresMetiers.objetMailSubventionRestante = settings.value("mailing/objetSubventionRestante", "[Section aéronautique] Subvention entrainement").toString();
+    parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
+    parametresMetiers.objetMailAutresMailings = settings.value("mailing/objetAutresMailings", "[Section aéronautique] ").toString();
 
     if (settings.value("impression/imprimante", "") == "")
     {
@@ -160,8 +169,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
-    parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
-    parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
 
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
@@ -3011,6 +3018,10 @@ void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p
     settings.beginGroup("mailing");
     settings.setValue("texteChequesDisponibles", parametresMetiers.texteMailDispoCheques);
     settings.setValue("texteSubventionRestante", parametresMetiers.texteMailSubventionRestante);
+
+    settings.setValue("objetChequesDisponibles", parametresMetiers.objetMailDispoCheques);
+    settings.setValue("objetSubventionRestante", parametresMetiers.objetMailSubventionRestante);
+    settings.setValue("objetAutresMailings", parametresMetiers.objetMailAutresMailings);
     settings.endGroup();
 
     settings.beginGroup("impression");
@@ -3058,38 +3069,38 @@ void AeroDms::envoyerMail()
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_AYANT_COTISE)
-            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+            + "?subject="+ parametresMetiers.objetMailAutresMailings +"&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifsAyantCotiseCetteAnnee)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIF_AYANT_COTISE)
-            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+            + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifsBrevetes)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIFS_ET_BREVETES)
-            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+            + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE)
-            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + "?subject=" + parametresMetiers.objetMailSubventionRestante + "&body="
             + parametresMetiers.texteMailSubventionRestante, QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesActifs)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailPilotes(listeDeroulanteAnnee->currentData().toInt(), AeroDmsTypes::MailPilotes_ACTIFS)
-            + "?subject=[Section aéronautique]&body=", QUrl::TolerantMode));
+            + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
     }
     else if (sender() == mailingPilotesDerniereDemandeSubvention)
     {
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailDerniereDemandeDeSubvention()
-            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
             + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }
     else
@@ -3097,7 +3108,7 @@ void AeroDms::envoyerMail()
         QAction* action = qobject_cast<QAction*>(sender());
         QDesktopServices::openUrl(QUrl("mailto:"
             + db->recupererMailDerniereDemandeDeSubvention(action->data().toString())
-            + "?subject=[Section aéronautique] Chèques aéro&body="
+            + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
             + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
     }  
 }
