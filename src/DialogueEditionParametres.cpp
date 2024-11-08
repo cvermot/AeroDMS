@@ -183,7 +183,11 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
         resolutionImpression->addItem("600 DPI", 600);
         resolutionImpression->setEnabled(false);
     }
-    //TODO imprimante->setText(p_parametresSysteme.resolutionImpression);
+    if (resolutionImpression->findData(p_parametresSysteme.resolutionImpression) != -1)
+    {
+        resolutionImpression->setCurrentIndex(resolutionImpression->findData(p_parametresSysteme.resolutionImpression));
+    }
+    
 
     ligneActuelle = impressionLayout->rowCount();
     impressionCouleur = new QComboBox(this);
@@ -299,10 +303,18 @@ void DialogueEditionParametres::peuplerResolutionImpression(QPrinter &printer)
 {
     resolutionImpression->clear();
     resolutionImpression->setEnabled(true);
-    QList<int> resolutions = printer.supportedResolutions();
-    for (int resolution : resolutions)
+    const QList<int> resolutions = printer.supportedResolutions();
+    const int resolutionMax = *std::max_element(resolutions.begin(), resolutions.end());
+    int resolution = 100;
+    for (resolution = 100; resolution <= resolutionMax; resolution = resolution + 100)
     {
         resolutionImpression->addItem(QString::number(resolution) + " DPI", resolution);
+    }
+
+    //On gère le cas ou la plus haute résolution n'est pas un multiple de 100 => on ajoute la plus haute résolution
+    if (resolutionImpression->itemData(resolutionImpression->count()-1).toInt() < resolutionMax)
+    {
+        resolutionImpression->addItem(QString::number(resolutionMax) + " DPI", resolutionMax);
     }
 }
 
