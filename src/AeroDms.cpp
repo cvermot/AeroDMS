@@ -96,7 +96,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("6.3");
+    QApplication::setApplicationVersion("6.4");
     QApplication::setWindowIcon(QIcon("./ressources/shield-airplane.svg"));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -3594,6 +3594,7 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
         return false;
     }
     //p_printer.setResolution(p_printer.supportedResolutions().last());
+    p_printer.setResolution(parametresSysteme.resolutionImpression);
 
     return true;
 }
