@@ -903,14 +903,17 @@ void AeroDms::initialiserMenuOptions()
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
 
     boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature &manuelle"), this);
+    boutonAucuneSignature->setStatusTip(tr("Ne pas remplir le champ signature. Chaque document sera signé au stylo par le trésorier."));
     boutonAucuneSignature->setCheckable(true);
     menuSignature->addAction(boutonAucuneSignature);
 
     boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'&image d'une signature"), this);
+    boutonSignatureManuelle->setStatusTip(tr("Utiliser une image de signature pour remplir le champ signature."));
     boutonSignatureManuelle->setCheckable(true);
     menuSignature->addAction(boutonSignatureManuelle);
 
     boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature &numérique avec Lex Community"), this);
+    boutonSignatureNumerique->setStatusTip(tr("Préparer le document pour une signature numérique via Lex Community."));
     boutonSignatureNumerique->setCheckable(true);
     menuSignature->addAction(boutonSignatureNumerique);
 
@@ -921,9 +924,11 @@ void AeroDms::initialiserMenuOptions()
     QMenu* menuFusionnerLesPdf = menuOption->addMenu(tr("&Fusion des PDF"));
     menuFusionnerLesPdf->setIcon(QIcon("./ressources/paperclip.svg"));
     boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("&Fusionner les PDF"), this);
+    boutonFusionnerLesPdf->setStatusTip(tr("Fusionne tous les PDF générés en un seul fichier PDF (les PDF \"unitaires\" restent disponibles dans le dossier de génération)"));
     boutonFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonFusionnerLesPdf);
     boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("&Ne pas fusionner les PDF"), this);
+    boutonNePasFusionnerLesPdf->setStatusTip(tr("Ne pas générer le PDF fusionné"));
     boutonNePasFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonNePasFusionnerLesPdf);
 
@@ -933,13 +938,16 @@ void AeroDms::initialiserMenuOptions()
     QMenu* menuDemandesAGenerer = menuOption->addMenu(tr("&Demandes à générer"));
     menuDemandesAGenerer->setIcon(QIcon("./ressources/file-cog.svg"));
     boutonDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("&Toutes"), this);
+    boutonDemandesAGenererToutes->setStatusTip(tr("Générer tout (recette et dépenses)"));
     boutonDemandesAGenererToutes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
     boutonDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("&Recettes uniquement"), this);
+    boutonDemandesAGenererRecettes->setStatusTip(tr("Générer uniquement les documents de remises de recettes"));
     boutonDemandesAGenererRecettes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererRecettes);
     boutonDemandesAGenererRecettes->setCheckable(true);
     boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("&Dépenses uniquement"), this);
+    boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
     QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
