@@ -52,6 +52,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     initialiserOngletAjoutRecettes();
     initialiserOngletSubventionsDemandees();
     initialiserOngletGraphiques();
+    connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
+
     initialiserRaccourcisClavierSansActionIhm();
 
     //=============Barres d'outils et boites de dialogue
@@ -82,7 +84,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     changerInfosVolSurSelectionTypeVol();
     verifierSignatureNumerisee();
 
-    connect(mainTabWidget, &QTabWidget::currentChanged, this, &AeroDms::gererChangementOnglet);
     gererChangementOnglet();
 
     terminerMiseAJourApplication();
@@ -902,12 +903,15 @@ void AeroDms::initialiserMenuOptions()
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
 
     boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature &manuelle"), this);
+    boutonAucuneSignature->setCheckable(true);
     menuSignature->addAction(boutonAucuneSignature);
 
     boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'&image d'une signature"), this);
+    boutonSignatureManuelle->setCheckable(true);
     menuSignature->addAction(boutonSignatureManuelle);
 
     boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature &numérique avec Lex Community"), this);
+    boutonSignatureNumerique->setCheckable(true);
     menuSignature->addAction(boutonSignatureNumerique);
 
     connect(boutonAucuneSignature, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
@@ -917,8 +921,10 @@ void AeroDms::initialiserMenuOptions()
     QMenu* menuFusionnerLesPdf = menuOption->addMenu(tr("&Fusion des PDF"));
     menuFusionnerLesPdf->setIcon(QIcon("./ressources/paperclip.svg"));
     boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("&Fusionner les PDF"), this);
+    boutonFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonFusionnerLesPdf);
     boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("&Ne pas fusionner les PDF"), this);
+    boutonNePasFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonNePasFusionnerLesPdf);
 
     connect(boutonFusionnerLesPdf, SIGNAL(triggered()), this, SLOT(changerFusionPdf()));
@@ -927,9 +933,12 @@ void AeroDms::initialiserMenuOptions()
     QMenu* menuDemandesAGenerer = menuOption->addMenu(tr("&Demandes à générer"));
     menuDemandesAGenerer->setIcon(QIcon("./ressources/file-cog.svg"));
     boutonDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("&Toutes"), this);
+    boutonDemandesAGenererToutes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
     boutonDemandesAGenererRecettes = new QAction(QIcon("./ressources/file-document-plus.svg"), tr("&Recettes uniquement"), this);
+    boutonDemandesAGenererRecettes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererRecettes);
+    boutonDemandesAGenererRecettes->setCheckable(true);
     boutonDemandesAGenererDepenses = new QAction(QIcon("./ressources/file-document-minus.svg"), tr("&Dépenses uniquement"), this);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
@@ -1023,10 +1032,13 @@ void AeroDms::initialiserMenuOptions()
     QFont font;
     font.setWeight(QFont::Bold);
     boutonDemandesAGenererToutes->setFont(font);
+    boutonDemandesAGenererToutes->setChecked(true);
     typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     boutonAucuneSignature->setFont(font);
+    boutonAucuneSignature->setChecked(true);
     signature = AeroDmsTypes::Signature_SANS;
     boutonFusionnerLesPdf->setFont(font);
+    boutonFusionnerLesPdf->setChecked(true);
 }
 
 void AeroDms::initialiserMenuOutils()
@@ -1196,21 +1208,27 @@ void AeroDms::changerModeSignature()
     boutonAucuneSignature->setFont(font);
     boutonSignatureManuelle->setFont(font);
     boutonSignatureNumerique->setFont(font);
+    boutonAucuneSignature->setChecked(false);
+    boutonSignatureManuelle->setChecked(false);
+    boutonSignatureNumerique->setChecked(false);
 
     font.setWeight(QFont::Bold);
     if (sender() == boutonAucuneSignature)
     {
         boutonAucuneSignature->setFont(font);
+        boutonAucuneSignature->setChecked(true);
         signature = AeroDmsTypes::Signature_SANS;
     }
     else if (sender() == boutonSignatureManuelle)
     {
         boutonSignatureManuelle->setFont(font);
+        boutonSignatureManuelle->setChecked(true);
         signature = AeroDmsTypes::Signature_MANUSCRITE_IMAGE;
     }
     else if (sender() == boutonSignatureNumerique)
     {
         boutonSignatureNumerique->setFont(font);
+        boutonSignatureNumerique->setChecked(true);
         signature = AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY;
     }
 }
@@ -1269,21 +1287,27 @@ void AeroDms::changerDemandesAGenerer()
     boutonDemandesAGenererToutes->setFont(font);
     boutonDemandesAGenererRecettes->setFont(font);
     boutonDemandesAGenererDepenses->setFont(font);
+    boutonDemandesAGenererToutes->setChecked(false);
+    boutonDemandesAGenererRecettes->setChecked(false);
+    boutonDemandesAGenererDepenses->setChecked(false);
 
     font.setWeight(QFont::Bold);
     if (sender() == boutonDemandesAGenererToutes)
     {
         boutonDemandesAGenererToutes->setFont(font);
+        boutonDemandesAGenererToutes->setChecked(true);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     }
     else if (sender() == boutonDemandesAGenererRecettes)
     {
         boutonDemandesAGenererRecettes->setFont(font);
+        boutonDemandesAGenererRecettes->setChecked(true);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT;
     }
     else if (sender() == boutonDemandesAGenererDepenses)
     {
         boutonDemandesAGenererDepenses->setFont(font);
+        boutonDemandesAGenererDepenses->setChecked(true);
         typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT;
     }
 }
@@ -1294,15 +1318,19 @@ void AeroDms::changerFusionPdf()
     font.setWeight(QFont::Normal);
     boutonFusionnerLesPdf->setFont(font);
     boutonNePasFusionnerLesPdf->setFont(font);
+    boutonFusionnerLesPdf->setChecked(false);
+    boutonNePasFusionnerLesPdf->setChecked(false);
 
     font.setWeight(QFont::Bold);
     if (sender() == boutonFusionnerLesPdf)
     {
         boutonFusionnerLesPdf->setFont(font);
+        boutonFusionnerLesPdf->setChecked(true);
     }
     else if (sender() == boutonNePasFusionnerLesPdf)
     {
         boutonNePasFusionnerLesPdf->setFont(font);
+        boutonNePasFusionnerLesPdf->setChecked(true);
     }
 }
 
@@ -3129,7 +3157,7 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichie
             }
             hash.reset();
 
-            //Calcul de la somme de controle de l'application courante
+            //Calcul de la somme de controle du fichier courant
             QFile fichierCourant(QCoreApplication::applicationDirPath()+"/"+p_fichier);
 
             if (fichierCourant.open(QFile::ReadOnly))
