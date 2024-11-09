@@ -226,52 +226,52 @@ void AeroDms::initialiserOngletPilotes()
 {
     //==========Onglet Pilotes
     vuePilotes = new QTableWidget(0, AeroDmsTypes::PiloteTableElement_NB_COLONNES, this);
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem("Nom"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem("Prénom"));
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem("Année"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem(tr("Nom")));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem(tr("Prénom")));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem(tr("Année")));
 
-    QTableWidgetItem* headerHdVEntrainement = new QTableWidgetItem("HdV");
+    QTableWidgetItem* headerHdVEntrainement = new QTableWidgetItem(tr("HdV"));
     headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
     headerHdVEntrainement->setToolTip("Heures de vol d'entrainement");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, headerHdVEntrainement);
-    QTableWidgetItem* headerSubventionEntrainement = new QTableWidgetItem("Subvention");
+    QTableWidgetItem* headerSubventionEntrainement = new QTableWidgetItem(tr("Subvention"));
     headerSubventionEntrainement->setIcon(AeroDmsServices::recupererIcone("Entrainement"));
-    headerSubventionEntrainement->setToolTip("Montant de la subvention d'entrainement déjà allouée");
+    headerSubventionEntrainement->setToolTip(tr("Montant de la subvention d'entrainement déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, headerSubventionEntrainement);
 
-    QTableWidgetItem* headerHdVBalade = new QTableWidgetItem("HdV");
+    QTableWidgetItem* headerHdVBalade = new QTableWidgetItem(tr("HdV"));
     headerHdVBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
-    headerHdVBalade->setToolTip("Heures de vol de balade");
+    headerHdVBalade->setToolTip((tr("Heures de vol de balade")));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, headerHdVBalade);
-    QTableWidgetItem* headerSubventionBalade = new QTableWidgetItem("Subvention");
+    QTableWidgetItem* headerSubventionBalade = new QTableWidgetItem(tr("Subvention"));
     headerSubventionBalade->setIcon(AeroDmsServices::recupererIcone("Balade"));
-    headerSubventionBalade->setToolTip("Montant de la subvention balade déjà allouée");
+    headerSubventionBalade->setToolTip(tr("Montant de la subvention balade déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, headerSubventionBalade);
 
-    QTableWidgetItem* headerHdVSortie = new QTableWidgetItem("HdV");
+    QTableWidgetItem* headerHdVSortie = new QTableWidgetItem((tr("HdV")));
     headerHdVSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
-    headerHdVSortie->setToolTip("Heures de vol de sortie");
+    headerHdVSortie->setToolTip(tr("Heures de vol de sortie"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, headerHdVSortie);
-    QTableWidgetItem* headerSubventionSortie = new QTableWidgetItem("Subvention");
+    QTableWidgetItem* headerSubventionSortie = new QTableWidgetItem(tr("Subvention"));
     headerSubventionSortie->setIcon(AeroDmsServices::recupererIcone("Sortie"));
-    headerSubventionSortie->setToolTip("Montant de la subvention sortie déjà allouée");
+    headerSubventionSortie->setToolTip(tr("Montant de la subvention sortie déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, headerSubventionSortie);
 
-    QTableWidgetItem* headerHdVTotales = new QTableWidgetItem("HdV");
+    QTableWidgetItem* headerHdVTotales = new QTableWidgetItem(tr("HdV"));
     headerHdVTotales->setIcon(AeroDmsServices::recupererIcone("Total"));
-    headerHdVTotales->setToolTip("Heures de vol totales");
+    headerHdVTotales->setToolTip(tr("Heures de vol totales"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, headerHdVTotales);
-    QTableWidgetItem* headerSubventionTotale = new QTableWidgetItem("Subvention");
+    QTableWidgetItem* headerSubventionTotale = new QTableWidgetItem(tr("Subvention"));
     headerSubventionTotale->setIcon(AeroDmsServices::recupererIcone("Total"));
-    headerSubventionTotale->setToolTip("Montant total de la subvention déjà allouée");
+    headerSubventionTotale->setToolTip(tr("Montant total de la subvention déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, headerSubventionTotale);
 
-    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem("Pilote Id (masqué)"));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(tr("Pilote Id (masqué)")));
     vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_PILOTE_ID, true);
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
     vuePilotes->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vuePilotes, QIcon("./ressources/account-tie-hat.svg"), "Pilotes");
+    mainTabWidget->addTab(vuePilotes, QIcon("./ressources/account-tie-hat.svg"), tr("Pilotes"));
     connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
 }
 
@@ -279,24 +279,24 @@ void AeroDms::initialiserOngletVols()
 {
     //==========Onglet Vols
     vueVols = new QTableWidget(0, AeroDmsTypes::VolTableElement_NB_COLONNES, this);
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem("Pilote"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem("Date"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem("Type"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem("Durée"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem("Coût"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem("Subvention"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem("Remarque"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem("Activité"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem("Durée en minutes"));
-    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem("ID"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(tr("Pilote")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(tr("Date")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_TYPE_DE_VOL, new QTableWidgetItem(tr("Type")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(tr("Durée")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(tr("Coût")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(tr("Subvention")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(tr("Soumis CE")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_REMARQUE, new QTableWidgetItem(tr("Remarque")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(tr("Immatriculation")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(tr("Activité")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(tr("Durée en minutes")));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(tr("ID")));
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, true);
     vueVols->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueVols->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), "Vols");
+    mainTabWidget->addTab(vueVols, QIcon("./ressources/airplane.svg"), tr("Vols"));
     connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
     connect(vueVols, &QTableWidget::cellClicked, this, &AeroDms::volsSelectionnes);
 }
@@ -305,39 +305,39 @@ void AeroDms::initialiserOngletFactures()
 {
     //==========Onglet Factures
     vueFactures = new QTableWidget(0, AeroDmsTypes::FactureTableElement_NB_COLONNES, this);
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem("Montant"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem("Payeur"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_SORTIE, new QTableWidgetItem("Nom sortie"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_TYPE_SORTIE, new QTableWidgetItem("Type de dépense"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_DATE, new QTableWidgetItem("Date"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_ANNEE, new QTableWidgetItem("Année"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_FACTURE, new QTableWidgetItem("Nom facture"));
-    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem("Facture ID"));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_INTITULE, new QTableWidgetItem(tr("Intitulé")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_MONTANT, new QTableWidgetItem(tr("Montant")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_PAYEUR, new QTableWidgetItem(tr("Payeur")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_SORTIE, new QTableWidgetItem(tr("Nom sortie")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_TYPE_SORTIE, new QTableWidgetItem(tr("Type de dépense")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_DATE, new QTableWidgetItem(tr("Date")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_ANNEE, new QTableWidgetItem(tr("Année")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_SOUMIS_CE, new QTableWidgetItem(tr("Soumis CE")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_NOM_FACTURE, new QTableWidgetItem(tr("Nom facture")));
+    vueFactures->setHorizontalHeaderItem(AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem(tr("Facture ID")));
     vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_FACTURE_ID, true);
     vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_NOM_FACTURE, true);
     vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, true);
     vueFactures->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueFactures->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueFactures->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vueFactures, QIcon("./ressources/file-document.svg"), "Factures");
+    mainTabWidget->addTab(vueFactures, QIcon("./ressources/file-document.svg"), tr("Factures"));
 }
 
 void AeroDms::initialiserOngletRecettes()
 {
     //==========Onglet Recettes
     vueRecettes = new QTableWidget(0, AeroDmsTypes::RecetteTableElement_NB_COLONNES, this);
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem("Date"));
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem("Type"));
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem("Intitulé"));
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem("Montant"));
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem("Soumis CE"));
-    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem("ID"));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(tr("Date")));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_TYPE_DE_RECETTE, new QTableWidgetItem(tr("Type")));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(tr("Intitulé")));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(tr("Montant")));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_SOUMIS_CE, new QTableWidgetItem(tr("Soumis CE")));
+    vueRecettes->setHorizontalHeaderItem(AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(tr("ID")));
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, true);
     vueRecettes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueRecettes->setSelectionBehavior(QAbstractItemView::SelectRows);
-    mainTabWidget->addTab(vueRecettes, QIcon("./ressources/cash-multiple.svg"), "Recettes");
+    mainTabWidget->addTab(vueRecettes, QIcon("./ressources/cash-multiple.svg"), tr("Recettes"));
 }
 
 void AeroDms::initialiserOngletAjoutDepenses()
@@ -346,7 +346,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
     QHBoxLayout* ajoutVol = new QHBoxLayout();
     widgetAjoutVol = new QWidget(this);
     widgetAjoutVol->setLayout(ajoutVol);
-    mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), "Ajout dépense");
+    mainTabWidget->addTab(widgetAjoutVol, QIcon("./ressources/file-document-minus.svg"), tr("Ajout dépense"));
 
     pdfDocument = new QPdfDocument(this);
     pdfView = new QPdfView(this);
@@ -379,10 +379,10 @@ void AeroDms::initialiserOngletAjoutDepenses()
     QLabel* aeroclubPiloteSelectionneLabel = new QLabel(tr("Aéroclub : "), this);
 
     activite = new QComboBox(this);
-    activite->setToolTip("L'activité est fournie à titre statistique uniquement.\n"
+    activite->setToolTip(tr("L'activité est fournie à titre statistique uniquement.\n"
         "Ce champ est rempli automatiquement à partir de l'activité\n"
         "par défaut renseignée pour le pilote sélectionné.\n"
-        "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités.");
+        "Il est modifiable ici pour les pilotes qui pratiqueraient plusieurs activités."));
     activite->addItems(db->recupererListeActivites());
     AeroDmsServices::ajouterIconesComboBox(*activite);
     QLabel* activiteLabel = new QLabel(tr("Activité : "), this);
@@ -482,11 +482,11 @@ void AeroDms::initialiserOngletAjoutDepenses()
     QLabel* remarqueFactureLabel = new QLabel(tr("Intitulé : "), this);
 
     validerLaFacture = new QPushButton("Valider la facture", this);
-    validerLaFacture->setToolTip("Validation possible si : \n\
+    validerLaFacture->setToolTip(tr("Validation possible si : \n\
    -facture chargée,\n\
    -montant de la facture renseignée,\n\
    -payeur et sortie sélectionnés,\n\
-   -intitulé saisi.");
+   -intitulé saisi."));
     connect(validerLaFacture, &QPushButton::clicked, this, &AeroDms::enregistrerUneFacture);
 
     QGridLayout* infosFacture = new QGridLayout();
@@ -512,7 +512,7 @@ void AeroDms::initialiserOngletAjoutRecettes()
     QHBoxLayout* ajoutRecette = new QHBoxLayout();
     widgetAjoutRecette = new QWidget(this);
     widgetAjoutRecette->setLayout(ajoutRecette);
-    mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), "Ajout recette");
+    mainTabWidget->addTab(widgetAjoutRecette, QIcon("./ressources/file-document-plus.svg"), tr("Ajout recette"));
 
     listeBaladesEtSorties = new QListWidget(this);
     ajoutRecette->addWidget(listeBaladesEtSorties, 3);
@@ -541,7 +541,7 @@ void AeroDms::initialiserOngletAjoutRecettes()
     QLabel* montantRecetteLabel = new QLabel(tr("Montant : "), this);
     connect(montantRecette, &QDoubleSpinBox::valueChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
 
-    validerLaRecette = new QPushButton("Valider la recette", this);
+    validerLaRecette = new QPushButton(tr("Valider la recette"), this);
     validerLaRecette->setToolTip(tr("Validation possible si :\n\
    -montant de recette saisi (non nul),\n\
    -nom de l'émetteur du chèque saisi,\n\
@@ -577,10 +577,10 @@ void AeroDms::verifierPresenceDeMiseAjour()
         fermerSplashscreen();
 
         QMessageBox dialogueMiseAJourDisponible;
-        dialogueMiseAJourDisponible.setText(QString("Une mise à jour d'AeroDMS est disponible.\n")
-            + "Voulez vous l'exécuter maintenant ?");
-        dialogueMiseAJourDisponible.setInformativeText("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v" + QApplication::applicationVersion() + "...main\">GitHub</a>.");
-        dialogueMiseAJourDisponible.setWindowTitle("Mise à jour disponible");
+        dialogueMiseAJourDisponible.setText(QString(tr("Une mise à jour d'AeroDMS est disponible.\n"))
+            + tr("Voulez vous l'exécuter maintenant ?"));
+        dialogueMiseAJourDisponible.setInformativeText(tr("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v") + QApplication::applicationVersion() + "...main\">GitHub</a>.");
+        dialogueMiseAJourDisponible.setWindowTitle(tr("Mise à jour disponible"));
         dialogueMiseAJourDisponible.setIcon(QMessageBox::Question);
         dialogueMiseAJourDisponible.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
@@ -603,11 +603,11 @@ void AeroDms::verifierPresenceDeMiseAjour()
                 passerLeLogicielEnLectureSeule();
 
                 QMessageBox dialogueErreurVersionBdd;
-                dialogueErreurVersionBdd.setText("Une mise à jour de l'application est disponible et doit être réalisée\n\
+                dialogueErreurVersionBdd.setText(tr("Une mise à jour de l'application est disponible et doit être réalisée\n\
 car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
 \n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
-"de mise à jour\" du menu Aide.");
+"de mise à jour\" du menu Aide."));
                 dialogueErreurVersionBdd.setWindowTitle(tr("Version de base données incompatible"));
                 dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
                 dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
@@ -620,8 +620,8 @@ L'application va passer en mode lecture seule.\
     else if (sender() == miseAJourAction)
     {
         QMessageBox::information(this,
-            "Pas de mise à jour disponible",
-            "Aucune mise à jour ne semble disponible.\n\nSi vous attendiez une mise à jour, merci de\ncontacter la personne responsable de l'application.");
+            tr("Pas de mise à jour disponible"),
+            tr("Aucune mise à jour ne semble disponible.\n\nSi vous attendiez une mise à jour, merci de\ncontacter la personne responsable de l'application."));
     }
     else if (!db->laBddEstALaVersionAttendue())
     {
@@ -629,9 +629,9 @@ L'application va passer en mode lecture seule.\
         passerLeLogicielEnLectureSeule();
 
         QMessageBox dialogueErreurVersionBdd;
-        dialogueErreurVersionBdd.setText("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
+        dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
-Consultez le développeur / responsable de l'application pour plus d'informations.");
+Consultez le développeur / responsable de l'application pour plus d'informations."));
         dialogueErreurVersionBdd.setWindowTitle(tr("Erreur de version de base de données"));
         dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
@@ -693,7 +693,7 @@ void AeroDms::initialiserOngletGraphiques()
     graphiques = new QHBoxLayout();
     widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
-    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), "Graphiques"); 
+    mainTabWidget->addTab(widgetGraphiques, QIcon("./ressources/chart-areaspline.svg"), tr("Graphiques")); 
 }
 
 void AeroDms::initialiserOngletSubventionsDemandees()
@@ -726,7 +726,7 @@ void AeroDms::initialiserBarreDOutils()
 
     const QIcon iconeAjouterPilote = QIcon("./ressources/account-tie-hat.svg");
     bouttonAjouterPilote = new QAction(iconeAjouterPilote, tr("Ajouter un &pilote"), this);
-    bouttonAjouterPilote->setStatusTip(tr("Ajouter un pilote"));
+    bouttonAjouterPilote->setStatusTip(tr("Ajout d'un pilote"));
     bouttonAjouterPilote->setShortcut(Qt::Key_F3);
     connect(bouttonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(bouttonAjouterPilote);
@@ -749,7 +749,7 @@ void AeroDms::initialiserBarreDOutils()
 
     const QIcon iconeGenerePdf = QIcon("./ressources/file-cog.svg");
     bouttonGenerePdf = new QAction(iconeGenerePdf, tr("&Générer les PDF de demande de subvention"), this);
-    bouttonGenerePdf->setStatusTip(tr("Générer les PDF de demande de subvention"));
+    bouttonGenerePdf->setStatusTip(tr("Génère les fichiers de demandes : remplissage des formulaires et génération de PDF associant les factures"));
     bouttonGenerePdf->setShortcut(Qt::CTRL + Qt::Key_G);
     connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
     toolBar->addAction(bouttonGenerePdf);
@@ -794,15 +794,15 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteType = selectionToolBar->addWidget(listeDeroulanteType);
 
     listeDeroulanteElementsSoumis = new QComboBox(this);
-    listeDeroulanteElementsSoumis->addItem("Éléments soumis et non soumis au CSE", 
+    listeDeroulanteElementsSoumis->addItem(tr("Éléments soumis et non soumis au CSE"), 
         AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS, 
         AeroDmsServices::recupererIcone("Tous"));
-    listeDeroulanteElementsSoumis->addItem("Éléments soumis au CSE", 
+    listeDeroulanteElementsSoumis->addItem(tr("Éléments soumis au CSE"),
         AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS, 
         AeroDmsServices::recupererIcone("Oui"));
-    listeDeroulanteElementsSoumis->addItem("Éléments non soumis au CSE", 
+    listeDeroulanteElementsSoumis->addItem(tr("Éléments non soumis au CSE"),
         AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS, 
         AeroDmsServices::recupererIcone("Non"));
@@ -814,22 +814,22 @@ void AeroDms::initialiserBarreDeFiltres()
 
     listeDeroulanteStatistique = new QComboBox(this);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-bar-stacked.svg"),
-        "Statistiques mensuelles", 
+        tr("Statistiques mensuelles"),
         AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
-        "Statistiques par pilote", 
+        tr("Statistiques par pilote"),
         AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
-        "Statistiques par type de vol", 
+        tr("Statistiques par type de vol"),
         AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-pie.svg"),
-        "Statistiques par activité", 
+        tr("Statistiques par activité"),
         AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-donut-variant.svg"),
-        "Statuts des pilotes", 
+        tr("Statuts des pilotes"),
         AeroDmsTypes::Statistiques_STATUTS_PILOTES);
     listeDeroulanteStatistique->addItem(QIcon("./ressources/chart-donut-variant.svg"),
-        "Types d'aéronefs", 
+        tr("Types d'aéronefs"),
         AeroDmsTypes::Statistiques_AERONEFS);
 
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
