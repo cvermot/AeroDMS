@@ -36,7 +36,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     const int K_COLONNE_CHAMP = 1;
     const int K_COLONNE_BOUTON = 2;
 
-    setWindowTitle(tr("AeroDms - Paramètres"));
+    setWindowTitle(tr("AeroDMS - Paramètres"));
 
     QGridLayout* mainLayout = new QGridLayout(this);
     setLayout(mainLayout);
