@@ -429,6 +429,7 @@ public:
         QString imprimante;
         QPrinter::ColorMode modeCouleurImpression;
         int resolutionImpression;
+        bool forcageImpressionRecto;
     };
 
     struct TotauxRecettes {

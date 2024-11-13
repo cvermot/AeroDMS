@@ -198,6 +198,13 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     impressionCouleur->setCurrentIndex(p_parametresSysteme.modeCouleurImpression);
 
+    ligneActuelle = impressionLayout->rowCount();
+    forcageImpressionRectoSimple = new QCheckBox(this);
+    impressionLayout->addWidget(new QLabel(tr("Forcage de l'impression recto simple : "), this), ligneActuelle, K_COLONNE_LABEL);
+    impressionLayout->addWidget(forcageImpressionRectoSimple, ligneActuelle, K_COLONNE_CHAMP);
+
+    forcageImpressionRectoSimple->setChecked(p_parametresSysteme.forcageImpressionRecto);
+
     //Parametres système
     QGridLayout* systemeLayout = new QGridLayout();
     QWidget* systemeWidget = new QWidget(this);
@@ -401,6 +408,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.imprimante = imprimante->text();
     parametresSysteme.resolutionImpression = resolutionImpression->currentData().toInt();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
+    parametresSysteme.forcageImpressionRecto = (forcageImpressionRectoSimple->checkState() == Qt::Checked);
 
     emit envoyerParametres(parametresMetiers, parametresSysteme);
     accept();

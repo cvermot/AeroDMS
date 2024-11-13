@@ -58,6 +58,7 @@ private:
     QLineEdit* sortieFichiersGeneres = nullptr;
     QComboBox* impressionCouleur = nullptr;
     QComboBox* resolutionImpression = nullptr;
+    QCheckBox* forcageImpressionRectoSimple = nullptr;
 
     QPushButton* boutonSelectionFactureATraiter = nullptr;
     QPushButton* boutonSelectionFacturesSaisies = nullptr;

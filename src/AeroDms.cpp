@@ -167,6 +167,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.setValue("imprimante", "");
         settings.setValue("couleur", 1);
         settings.setValue("resolution", 600);
+        settings.setValue("forcageImpressionRecto", true);
         settings.endGroup();
     }
 
@@ -207,6 +208,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.imprimante = settings.value("impression/imprimante", "").toString();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
     parametresSysteme.resolutionImpression = settings.value("impression/resolution", 600).toInt();
+    parametresSysteme.resolutionImpression = settings.value("impression/forcageImpressionRecto", true).toBool();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -3064,6 +3066,7 @@ void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p
     settings.setValue("imprimante", parametresSysteme.imprimante);
     settings.setValue("couleur", parametresSysteme.modeCouleurImpression);
     settings.setValue("resolution", parametresSysteme.resolutionImpression);
+    settings.setValue("forcageImpressionRecto", parametresSysteme.forcageImpressionRecto);
     settings.endGroup();
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
@@ -3614,7 +3617,6 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
     p_printer.setPrinterName(parametresSysteme.imprimante);
     p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
     p_printer.setResolution(parametresSysteme.resolutionImpression);
-    p_printer.setDuplex(QPrinter::DuplexNone);
 
     QPrintDialog dialog(&p_printer, this);
     dialog.setWindowTitle("Imprimer les demandes de subventions");
@@ -3631,6 +3633,12 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
     }
     //p_printer.setResolution(p_printer.supportedResolutions().last());
     p_printer.setResolution(parametresSysteme.resolutionImpression);
+    //En mode forcage recto on force le mode à recto-verso : on inserera ensuite
+    //un page blanche entre chaque page qui fera que le rendu sera un recto simple
+    if (parametresSysteme.forcageImpressionRecto)
+    {
+        p_printer.setDuplex(QPrinter::DuplexLongSide);
+    }
 
     return true;
 }
@@ -3661,8 +3669,6 @@ void AeroDms::imprimer(QPrinter& p_printer)
             QImage image = doc->render(i,
                 QSize(size.width() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
                     size.height() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
-                //QSize(size.width() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
-                //    size.height() * p_printer.supportedResolutions().last() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
 
             //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
             //pour l'impression
@@ -3682,6 +3688,12 @@ void AeroDms::imprimer(QPrinter& p_printer)
             if (i + 1 < doc->pageCount())
             {
                 p_printer.newPage();
+
+                //Et si on est en mode forcage Recto, on ajoute une page blanche
+                if (parametresSysteme.forcageImpressionRecto)
+                {
+                    p_printer.newPage();
+                }  
             } 
         }
         progressionImpression->traitementPageSuivante();
