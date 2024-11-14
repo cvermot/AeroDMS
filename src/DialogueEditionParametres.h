@@ -59,6 +59,8 @@ private:
     QComboBox* impressionCouleur = nullptr;
     QComboBox* resolutionImpression = nullptr;
     QCheckBox* forcageImpressionRectoSimple = nullptr;
+    QSpinBox* margesHautBas = nullptr;
+    QSpinBox* margesGaucheDroite = nullptr;
 
     QPushButton* boutonSelectionFactureATraiter = nullptr;
     QPushButton* boutonSelectionFacturesSaisies = nullptr;

@@ -197,7 +197,6 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     {
         resolutionImpression->setCurrentIndex(resolutionImpression->findData(p_parametresSysteme.resolutionImpression));
     }
-    
 
     ligneActuelle = impressionLayout->rowCount();
     impressionCouleur = new QComboBox(this);
@@ -215,6 +214,26 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionLayout->addWidget(forcageImpressionRectoSimple, ligneActuelle, K_COLONNE_CHAMP);
 
     forcageImpressionRectoSimple->setChecked(p_parametresSysteme.forcageImpressionRecto);
+
+    ligneActuelle = impressionLayout->rowCount();
+    margesHautBas = new QSpinBox(this);
+    margesHautBas->setSuffix(" px");
+    margesHautBas->setMaximum(100);
+    margesHautBas->setToolTip(tr("Marges verticales des tableaux de récapitulatif des heures de vol et des formulaires de demandes de subventions."));
+    impressionLayout->addWidget(new QLabel(tr("Marges haut et bas"), this), ligneActuelle, K_COLONNE_LABEL);
+    impressionLayout->addWidget(margesHautBas, ligneActuelle, K_COLONNE_CHAMP);
+
+    margesHautBas->setValue(p_parametresSysteme.margesHautBas);
+
+    ligneActuelle = impressionLayout->rowCount();
+    margesGaucheDroite = new QSpinBox(this);
+    margesGaucheDroite->setSuffix(" px");
+    margesGaucheDroite->setMaximum(100);
+    margesGaucheDroite->setToolTip(tr("Marges latérale des tableaux de récapitulatif des heures de vol et des formulaires de demandes de subventions."));
+    impressionLayout->addWidget(new QLabel(tr("Marges gauche et droite"), this), ligneActuelle, K_COLONNE_LABEL);
+    impressionLayout->addWidget(margesGaucheDroite, ligneActuelle, K_COLONNE_CHAMP);
+
+    margesGaucheDroite->setValue(p_parametresSysteme.margesGaucheDroite);
 
     //Parametres système
     const QString texteToolTipChampSecurise = "Ce champ n'est pas éditable par sécurité.\nPour le rendre éditable, passer en mode débug (menu Aide/Activer le mode debug).";
@@ -427,6 +446,9 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.resolutionImpression = resolutionImpression->currentData().toInt();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
     parametresSysteme.forcageImpressionRecto = (forcageImpressionRectoSimple->checkState() == Qt::Checked);
+
+    parametresSysteme.margesHautBas = margesHautBas->value();
+    parametresSysteme.margesGaucheDroite = margesGaucheDroite->value();
 
     emit envoyerParametres(parametresMetiers, parametresSysteme);
     accept();

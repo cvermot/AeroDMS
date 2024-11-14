@@ -40,9 +40,11 @@ PdfRenderer::PdfRenderer()
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
                           QString p_cheminTemplatesHtml, 
+                          QMarginsF p_marges,
                           QWidget* parent)
 {
     db = p_db;
+    marges = p_marges;
 	view = new QWebEnginePage(this);
     nombreEtapesEffectuees = 0;
     indiceFichier = 0;
@@ -52,6 +54,11 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
+}
+
+void PdfRenderer::mettreAJourMarges(QMarginsF p_marges)
+{
+    marges = p_marges;
 }
 
 QString PdfRenderer::mergerPdf()
@@ -106,8 +113,10 @@ void PdfRenderer::chargementTermine(bool retour)
     QString nomFichier = cheminSortieFichiersGeneres
         + demandeEnCours.nomFichier;
 
-    //De base le format est portrait
-    QPageLayout pageLayout(QPageLayout(QPageSize(QPageSize::A4), QPageLayout::Portrait, QMarginsF()));
+    //De base le format est portrait, on passe portrait
+    QPageLayout pageLayout( QPageLayout(QPageSize(QPageSize::A4), 
+                            QPageLayout::Portrait, 
+                            marges));
     if (demandeEnCours.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL)
     {
         pageLayout.setOrientation(QPageLayout::Landscape);
@@ -176,9 +185,9 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                                                                                    false);
 
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
-        const AeroDmsTypes::EtatGeneration generationRecapAnnuel =  imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
-                                                                                                       listePilotesDeCetteAnnee, 
-                                                                                                       totaux);
+        const AeroDmsTypes::EtatGeneration generationRecapAnnuel = imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
+                                                                                                      listePilotesDeCetteAnnee, 
+                                                                                                      totaux);
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
 

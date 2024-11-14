@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QWidget>
 #include <QWebEnginePage>
+#include <QMarginsF>
 #include "ManageDb.h"
 
 class PdfRenderer : public QWidget {
@@ -28,8 +29,11 @@ class PdfRenderer : public QWidget {
 public:
 	PdfRenderer();
 	PdfRenderer( ManageDb *p_db,
-		         QString p_cheminTemplatesHtml, 
+		         QString p_cheminTemplatesHtml,
+				 QMarginsF p_marges,
 		         QWidget* parent = nullptr);
+
+	void mettreAJourMarges(QMarginsF p_marges);
 
 	void imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 		                                  const QString p_cheminSortieFichiersGeneres,
@@ -49,6 +53,7 @@ public:
 private :
 	QWebEnginePage* view;
 	ManageDb *db;
+	QMarginsF marges;
 	QUrl ressourcesHtml;
 
 	QString cheminSortieFichiersGeneres;

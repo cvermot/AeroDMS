@@ -191,6 +191,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
     {
         settingsMetier.beginGroup("parametresSysteme");
         settingsMetier.setValue("delaisDeGardeDbEnMs", "50");
+        settingsMetier.setValue("margesHautBas", "20");
+        settingsMetier.setValue("margesGaucheDroite", "20");
         settingsMetier.endGroup();
     }
 
@@ -209,6 +211,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
     parametresSysteme.resolutionImpression = settings.value("impression/resolution", 600).toInt();
     parametresSysteme.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
+    parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
+    parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -217,11 +221,15 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toFloat();
     parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
-    parametresMetiers.delaisDeGardeBdd = settings.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
+    parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer(db,
-        ressourcesHtml);
+        ressourcesHtml,
+        QMarginsF(parametresSysteme.margesGaucheDroite,
+            parametresSysteme.margesHautBas,
+            parametresSysteme.margesGaucheDroite,
+            parametresSysteme.margesHautBas));
 }
 
 void AeroDms::initialiserOngletPilotes()
@@ -3086,7 +3094,15 @@ void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p
  
     settingsMetier.beginGroup("parametresSysteme");
     settingsMetier.setValue("delaisDeGardeDbEnMs", parametresMetiers.delaisDeGardeBdd);
+    settingsMetier.setValue("margesHautBas", parametresSysteme.margesHautBas);
+    settingsMetier.setValue("margesGaucheDroite", parametresSysteme.margesGaucheDroite);
     settingsMetier.endGroup();
+
+    //On met à jour les marges...
+    pdf->mettreAJourMarges(QMarginsF(parametresSysteme.margesGaucheDroite,
+            parametresSysteme.margesHautBas,
+            parametresSysteme.margesGaucheDroite,
+            parametresSysteme.margesHautBas));
 }
 
 void AeroDms::convertirHeureDecimalesVersHhMm()
@@ -3675,9 +3691,9 @@ void AeroDms::imprimer(QPrinter& p_printer)
             if (size.width() > size.height())
             {
                 QTransform transformation;
-                transformation.rotate(90);
+                transformation.rotate(270);
                 image = image.transformed(transformation);
-                painter.drawImage(-20, 20, image);
+                painter.drawImage(0, 0, image);
             }
             else
             {

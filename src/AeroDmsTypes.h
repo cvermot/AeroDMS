@@ -430,6 +430,8 @@ public:
         QPrinter::ColorMode modeCouleurImpression;
         int resolutionImpression;
         bool forcageImpressionRecto;
+        int margesHautBas;
+        int margesGaucheDroite;
     };
 
     struct TotauxRecettes {
