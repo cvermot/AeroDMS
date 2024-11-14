@@ -208,7 +208,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.imprimante = settings.value("impression/imprimante", "").toString();
     parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
     parametresSysteme.resolutionImpression = settings.value("impression/resolution", 600).toInt();
-    parametresSysteme.resolutionImpression = settings.value("impression/forcageImpressionRecto", true).toBool();
+    parametresSysteme.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
