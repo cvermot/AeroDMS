@@ -85,6 +85,7 @@ void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
 	boutonOuvrirPdf->setEnabled(false);
 	boutonImprimer->setEnabled(false);
 	boutonOuvrirDossier->setEnabled(false);
+	boutonImprimerAgrafage->setEnabled(false);
 
 	repaint();
 	show();
@@ -101,6 +102,7 @@ void DialogueProgressionGenerationPdf::setValue(const int p_valeur)
 		boutonOuvrirPdf->setEnabled(true);
 		boutonImprimer->setEnabled(true);
 		boutonOuvrirDossier->setEnabled(true);
+		boutonImprimerAgrafage->setEnabled(true);
 		boutonOuvrirPdf->setToolTip(tr("Ouvrir le fichier PDF généré dans le lecteur PDF par défaut"));
 		boutonImprimer->setToolTip(tr("Imprimer directement les fichiers générés"));
 	}
