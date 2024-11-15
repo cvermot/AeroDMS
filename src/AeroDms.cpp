@@ -1421,8 +1421,8 @@ void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFactures
     progressionGenerationPdf = new DialogueProgressionGenerationPdf(this);
     connect(progressionGenerationPdf, SIGNAL(accepted()), this, SLOT(ouvrirPdfGenere()));
     connect(progressionGenerationPdf, SIGNAL(rejected()), this, SLOT(detruireFenetreProgressionGenerationPdf()));
-    connect(progressionGenerationPdf, SIGNAL(imprimer()), this, SLOT(imprimerApresGenerationPdf()));
-    connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDerniereDemandeAgrafage()));
+    connect(progressionGenerationPdf, SIGNAL(imprimer()), this, SLOT(imprimerLaDemande()));
+    connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDemandeAgrafage()));
     connect(progressionGenerationPdf, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
 
     //progressionGenerationPdf->show();
@@ -3565,15 +3565,13 @@ void AeroDms::gererChangementOnglet()
     }
 }
 
-void AeroDms::imprimerApresGenerationPdf()
-{
-    QPrinter imprimante;
-    if (selectionnerImprimante(imprimante))
-    {
-        imprimer(imprimante);
-    }
-}
 void AeroDms::imprimerLaDerniereDemande()
+{
+    fichierAImprimer = rechercherDerniereDemande();
+    imprimerLaDemande();
+}
+
+void AeroDms::imprimerLaDemande()
 {
     QPrinter imprimante;
     if (selectionnerImprimante(imprimante))
@@ -3583,9 +3581,6 @@ void AeroDms::imprimerLaDerniereDemande()
 
         QThread::usleep(500);
 
-        fichierAImprimer = rechercherDerniereDemande();
-        progressionImpression->traitementFichierSuivant();
-
         imprimer(imprimante);
 
         progressionImpression->traitementFichierSuivant();
@@ -3594,13 +3589,17 @@ void AeroDms::imprimerLaDerniereDemande()
 
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
 {
+    dossierSortieGeneration = QFileInfo(rechercherDerniereDemande()).absolutePath();
+    imprimerLaDemandeAgrafage();
+}
+
+void AeroDms::imprimerLaDemandeAgrafage()
+{
     QPrinter imprimante;
     if (selectionnerImprimante(imprimante))
-    {
-        const QString dossier = QFileInfo(rechercherDerniereDemande()).absolutePath();
-        
+    {   
         //On compte les fichiers
-        QDir repertoire(dossier, "*.pdf", QDir::QDir::Name, QDir::Files);
+        QDir repertoire(dossierSortieGeneration, "*.pdf", QDir::QDir::Name, QDir::Files);
 
         QFileInfoList liste = repertoire.entryInfoList();
         //Le fichier assemblé est forcément le dernier de la liste car tous les fichiers sont suffixés
@@ -3618,8 +3617,6 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
         
         for (QFileInfo fichier : liste)
         {
-            progressionImpression->traitementFichierSuivant();
-
             //On imprime tout 
             fichierAImprimer = fichier.filePath();
             imprimer(imprimante);
@@ -3660,6 +3657,8 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
 }
 void AeroDms::imprimer(QPrinter& p_printer)
 {
+    progressionImpression->traitementFichierSuivant();
+
     QPdfDocument *doc = new QPdfDocument(this);
     doc->load(fichierAImprimer);
 
@@ -3674,7 +3673,7 @@ void AeroDms::imprimer(QPrinter& p_printer)
     if (doc->status() == QPdfDocument::Status::Ready)
     {
         progressionImpression->setMaximumPage(doc->pageCount());
-
+        
         QPainter painter;
         painter.begin(&p_printer);
 
@@ -3697,7 +3696,7 @@ void AeroDms::imprimer(QPrinter& p_printer)
             }
             else
             {
-                painter.drawImage(10, 10, image);
+                painter.drawImage(0, 0, image);
             }
 
             //S'il reste des pages derrière... on démarre une nouvelle page

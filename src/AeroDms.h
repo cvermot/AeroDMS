@@ -332,7 +332,8 @@ public slots:
     void gererChangementOnglet();
     void verifierPresenceDeMiseAjour();
     void switchOnglet();
-    void imprimerApresGenerationPdf();
+    void imprimerLaDemande();
+    void imprimerLaDemandeAgrafage();
     void imprimerLaDerniereDemande();
     void imprimerLaDerniereDemandeAgrafage();
     void ouvrirDialogueParametresApplication();
