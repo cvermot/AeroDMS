@@ -61,7 +61,7 @@ DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : 
 	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
-	setWindowTitle(tr("AeroDms - Impression"));
+	setWindowTitle(QApplication::applicationName() + " - " + tr("Impression"));
 	setWindowModality(Qt::WindowModal);
 	resize(450, size().height());
 }

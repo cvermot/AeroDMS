@@ -61,7 +61,7 @@ DialogueAjouterSortie::DialogueAjouterSortie(QWidget* parent) : QDialog(parent)
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Ajouter une sortie"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Ajouter une sortie"));
     prevaliderDonneesSaisies();
 }
 

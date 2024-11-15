@@ -122,7 +122,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     peuplerActivitePrincipale();
     AeroDmsServices::ajouterIconesComboBox(*activitePrincipale);
 
-    setWindowTitle(tr("Ajouter un pilote"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Ajouter un pilote"));
 }
 
 void DialogueGestionPilote::peuplerActivitePrincipale()
@@ -201,7 +201,7 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     remarque->setText(pilote.remarque);
     activitePrincipale->setCurrentIndex(activitePrincipale->findText(pilote.activitePrincipale));
 
-    setWindowTitle(tr("Mettre à jour le pilote"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Mettre à jour le pilote"));
     okButton->setText(tr("&Modifier"));
 }
 
@@ -220,6 +220,6 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     estActif->setChecked(true);
     estBrevete->setChecked(true);
 
-    setWindowTitle(tr("Ajouter un pilote"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Ajouter un pilote"));
     okButton->setText(tr("&Ajouter"));
 }

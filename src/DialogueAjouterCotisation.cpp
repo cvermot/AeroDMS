@@ -165,7 +165,7 @@ void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
     montantSubventionAnnuelle->setMinimum(p_montantSubventionDejaAlloue);
     montantSubventionAnnuelle->setValue(database->recupererSubventionEntrainement(p_pilote, p_annee));
 
-    setWindowTitle(tr("Modifier une cotisation pilote"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Modifier une cotisation pilote"));
     okButton->setText("&Modifier");
 
     modeEdition = true;
@@ -182,7 +182,7 @@ void DialogueAjouterCotisation::rincerFenetre()
     modeEdition = false;
     okButton->setText("&Ajouter");
 
-    setWindowTitle(tr("Ajouter une cotisation pilote"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Ajouter une cotisation pilote"));
 
     //On rince les autres valeurs
     listePilote->setCurrentIndex(0);

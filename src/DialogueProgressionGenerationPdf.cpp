@@ -71,7 +71,7 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* pare
 	mainLayout->addWidget(buttonBox);
 
 	setLayout(mainLayout);
-	setWindowTitle(tr("Génération PDF"));
+	setWindowTitle(QApplication::applicationName() + " - " + tr("Génération PDF"));
 	setWindowModality(Qt::WindowModal);
 }
 

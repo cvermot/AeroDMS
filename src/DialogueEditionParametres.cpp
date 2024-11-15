@@ -36,7 +36,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     const int K_COLONNE_CHAMP = 1;
     const int K_COLONNE_BOUTON = 2;
 
-    setWindowTitle(tr("AeroDMS - Paramètres"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Paramètres"));
 
     QGridLayout* mainLayout = new QGridLayout(this);
     setLayout(mainLayout);
@@ -292,14 +292,14 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = systemeLayout->rowCount();
     sortieFichiersGeneres = new QLineEdit(this);
-    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockées les formulaires de demandes de subventions génerées.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
+    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockées les formulaires de demandes de subventions génerées.\nDans le cadre d'une installation utilisée par plusieurs utilisateurs, ce repertoire doit être accessible par tous les utilisateurs.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
     systemeLayout->addWidget(new QLabel(tr("Dossier de sortie des fichiers générés : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(sortieFichiersGeneres, ligneActuelle, K_COLONNE_CHAMP);
     boutonSelectionSortieFichiersGeneres = new QPushButton("Sélectionner", this);
     systemeLayout->addWidget(boutonSelectionSortieFichiersGeneres, ligneActuelle, K_COLONNE_BOUTON);
     sortieFichiersGeneres->setEnabled(p_editionParametresCritiques);
     boutonSelectionSortieFichiersGeneres->setEnabled(p_editionParametresCritiques);
-    connect(boutonSelectionFacturesSaisies, SIGNAL(clicked()), this, SLOT(selectionnerRepertoire()));
+    connect(boutonSelectionSortieFichiersGeneres, SIGNAL(clicked()), this, SLOT(selectionnerRepertoire()));
 
     sortieFichiersGeneres->setText(p_parametresSysteme.cheminSortieFichiersGeneres);
 
@@ -364,7 +364,7 @@ void DialogueEditionParametres::peuplerResolutionImpression(QPrinter &printer)
 
 void DialogueEditionParametres::selectionnerBdd()
 {
-    QFileDialog dialog(this ,tr("Sélectionner le fichier base de données"), cheminBdd->text(), tr("Base de données SQLite(*.sqlite)"));
+    QFileDialog dialog(this , QApplication::applicationName() + " - " + tr("Sélectionner le fichier base de données"), cheminBdd->text(), tr("Base de données SQLite(*.sqlite)"));
     dialog.setFileMode(QFileDialog::ExistingFile);
 
     if (dialog.exec() == QDialog::Accepted)
@@ -381,14 +381,17 @@ void DialogueEditionParametres::selectionnerRepertoire()
     if (sender() == boutonSelectionFactureATraiter)
     {
         dialog.setDirectory(factureATraiter->text());
+        dialog.setWindowTitle(QApplication::applicationName() + " - " + tr("Sélection du répertoire par défaut des factures à traiter"));
     }
     else if (sender() == boutonSelectionFacturesSaisies)
     {
         dialog.setDirectory(facturesSaisies->text());
+        dialog.setWindowTitle(QApplication::applicationName() + " - " + tr("Sélection du répertoire de stockage des factures traitées"));
     }
     else if (sender() == boutonSelectionSortieFichiersGeneres)
     {
         dialog.setDirectory(sortieFichiersGeneres->text());
+        dialog.setWindowTitle(QApplication::applicationName() + " - " + tr("Sélection du répertoire de sortie des fichiers générés"));
     }
 
     if (dialog.exec() == QDialog::Accepted)

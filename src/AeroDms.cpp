@@ -590,7 +590,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         dialogueMiseAJourDisponible.setText(QString(tr("Une mise à jour d'AeroDMS est disponible.\n"))
             + tr("Voulez vous l'exécuter maintenant ?"));
         dialogueMiseAJourDisponible.setInformativeText(tr("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v") + QApplication::applicationVersion() + "...main\">GitHub</a>.");
-        dialogueMiseAJourDisponible.setWindowTitle(tr("Mise à jour disponible"));
+        dialogueMiseAJourDisponible.setWindowTitle(QApplication::applicationName() + " - " + tr("Mise à jour disponible"));
         dialogueMiseAJourDisponible.setIcon(QMessageBox::Question);
         dialogueMiseAJourDisponible.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
@@ -618,7 +618,7 @@ car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
 \n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
 "de mise à jour\" du menu Aide."));
-                dialogueErreurVersionBdd.setWindowTitle(tr("Version de base données incompatible"));
+                dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Version de base données incompatible"));
                 dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
                 dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
                 dialogueErreurVersionBdd.exec();
@@ -642,7 +642,7 @@ L'application va passer en mode lecture seule.\
         dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
 Consultez le développeur / responsable de l'application pour plus d'informations."));
-        dialogueErreurVersionBdd.setWindowTitle(tr("Erreur de version de base de données"));
+        dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version de base de données"));
         dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
         dialogueErreurVersionBdd.exec();
@@ -1881,7 +1881,7 @@ void AeroDms::selectionnerUneFacture()
 {
     QString fichier = QFileDialog::getOpenFileName(
         this,
-        "Ouvrir une facture",
+        QApplication::applicationName() + " - " + "Ouvrir une facture",
         parametresSysteme.cheminStockageFacturesATraiter,
         tr("Fichier PDF (*.pdf)"));
 
@@ -1974,7 +1974,7 @@ void AeroDms::recupererVolDepuisCsv()
 {
     QString fichier = QFileDialog::getOpenFileName(
         this,
-        "Ouvrir un fichier CSV de récapitulatif de vol",
+        QApplication::applicationName() + " - " + "Ouvrir un fichier CSV de récapitulatif de vol",
         parametresSysteme.cheminStockageFacturesATraiter,
         tr("Fichier CSV (*.csv)"));
 
@@ -2109,7 +2109,7 @@ void AeroDms::genererPdf()
         + "Remboursement factures : " + nbFactures + "<br />"
         + "Remise chèques cotisations : " + nbCotisations + "<br />"
         + "Remise chèques balades et sorties : " + nbBaladesSorties + "<br />");
-    demandeConfirmationGeneration.setWindowTitle("Génération des PDF de demande");
+    demandeConfirmationGeneration.setWindowTitle(QApplication::applicationName() + " - " + "Génération des PDF de demande");
     demandeConfirmationGeneration.setIcon(QMessageBox::Question);
     demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
@@ -2703,7 +2703,7 @@ void AeroDms::ouvrirGestionAeronefs()
 
 void AeroDms::aPropos()
 {
-    QMessageBox::about(this, tr("À propos de AeroDMS"),
+    QMessageBox::about(this, tr("À propos de ")+ QApplication::applicationName(),
         "<b>"+ QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> < br />< br /> "
         "Logiciel de gestion de compta d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous"
@@ -2920,7 +2920,7 @@ void AeroDms::supprimerVol()
 {
     QMessageBox demandeConfirmationSuppression;
     demandeConfirmationSuppression.setText("Voulez vous réellement supprimer le vol ?");
-    demandeConfirmationSuppression.setWindowTitle("Suppression d'un vol");
+    demandeConfirmationSuppression.setWindowTitle(QApplication::applicationName() + " - " + "Suppression d'un vol");
     demandeConfirmationSuppression.setIcon(QMessageBox::Question);
     demandeConfirmationSuppression.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     
@@ -3632,13 +3632,12 @@ bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
     p_printer.setResolution(parametresSysteme.resolutionImpression);
 
     QPrintDialog dialog(&p_printer, this);
-    dialog.setWindowTitle("Imprimer les demandes de subventions");
     dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
     dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
     dialog.setOption(QAbstractPrintDialog::PrintCollateCopies, false);
     dialog.setOption(QAbstractPrintDialog::PrintToFile, false);
     dialog.setOption(QAbstractPrintDialog::PrintShowPageSize, false);
-    dialog.setWindowTitle(tr("Imprimer la demande de subvention"));
+    dialog.setWindowTitle(QApplication::applicationName() + " - " + tr("Imprimer la demande de subvention"));
 
     if (dialog.exec() != QDialog::Accepted)
     {

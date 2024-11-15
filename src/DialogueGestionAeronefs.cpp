@@ -34,7 +34,7 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db, QWidget* parent) 
 
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Gestion des aéronefs"));
+    setWindowTitle(QApplication::applicationName() + " - " + tr("Gestion des aéronefs"));
 
     vueAeronefs = new QTableWidget(0, AeroDmsTypes::AeronefTableElement_NB_COLONNES, this);
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
