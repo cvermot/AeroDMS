@@ -1487,7 +1487,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
 void AeroDms::mettreAJourEchecGenerationPdf()
 {
     progressionGenerationPdf->close();
-    statusBar()->showMessage("Echec de la génération");
+    statusBar()->showMessage("Échec de la génération");
     detruireFenetreProgressionGenerationPdf();
 }
 
@@ -1855,17 +1855,17 @@ void AeroDms::ajouterUnPiloteEnBdd()
         } 
         case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
         {
-            statusBar()->showMessage("Echec ajout pilote : le pilote existe déjà");
+            statusBar()->showMessage("Échec ajout pilote : le pilote existe déjà");
             QMessageBox::critical(this, 
-                QApplication::applicationName() + " - " + tr("Echec ajoute pilote"), 
+                QApplication::applicationName() + " - " + tr("Échec ajoute pilote"), 
                 tr("Un pilote existe avec ce nom\nexiste déjà. Ajout impossible."));
             break;
         }
         case AeroDmsTypes::ResultatCreationPilote_AUTRE:
         {
-            statusBar()->showMessage("Echec ajout pilote : erreur indéterminée");
+            statusBar()->showMessage("Échec ajout pilote : erreur indéterminée");
             QMessageBox::critical(this, 
-                QApplication::applicationName() + " - " + tr("Echec ajoute pilote"), 
+                QApplication::applicationName() + " - " + tr("Échec ajoute pilote"), 
                 tr("Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible."));
             break;
         }
