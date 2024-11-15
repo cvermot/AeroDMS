@@ -75,6 +75,7 @@ void DialogueProgressionImpression::setMaximumFichier(const int p_nbFichier)
 
 	boutonFermer->setEnabled(false);
 
+	grab();
 	repaint();
 	show();
 }
