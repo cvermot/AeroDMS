@@ -630,7 +630,7 @@ L'application va passer en mode lecture seule.\
     else if (sender() == miseAJourAction)
     {
         QMessageBox::information(this,
-            tr("Pas de mise à jour disponible"),
+            QApplication::applicationName() + " - " + tr("Pas de mise à jour disponible"),
             tr("Aucune mise à jour ne semble disponible.\n\nSi vous attendiez une mise à jour, merci de\ncontacter la personne responsable de l'application."));
     }
     else if (!db->laBddEstALaVersionAttendue())
@@ -1787,7 +1787,9 @@ void AeroDms::ajouterUneCotisationEnBdd()
         //On contrôle que le pilote n'a pas déjà une cotisation pour cette année
         if (db->piloteEstAJourDeCotisation(infosCotisation.idPilote, infosCotisation.annee))
         {
-            QMessageBox::critical(this, "Cotisation déja reglée", "Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie.");
+            QMessageBox::critical(this, 
+                QApplication::applicationName() + " - " + tr("Cotisation déja reglée"), 
+                tr("Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie."));
         }
         //Si le pilote n'a pas deja une cotisation pour cette année la, on ajoute la cotisation en BDD
         else
@@ -1854,13 +1856,17 @@ void AeroDms::ajouterUnPiloteEnBdd()
         case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
         {
             statusBar()->showMessage("Echec ajout pilote : le pilote existe déjà");
-            QMessageBox::critical(this, "Echec ajoute pilote", "Un pilote existe avec ce nom\nexiste déjà. Ajout impossible.");
+            QMessageBox::critical(this, 
+                QApplication::applicationName() + " - " + tr("Echec ajoute pilote"), 
+                tr("Un pilote existe avec ce nom\nexiste déjà. Ajout impossible."));
             break;
         }
         case AeroDmsTypes::ResultatCreationPilote_AUTRE:
         {
             statusBar()->showMessage("Echec ajout pilote : erreur indéterminée");
-            QMessageBox::critical(this, "Echec ajoute pilote", "Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible.");
+            QMessageBox::critical(this, 
+                QApplication::applicationName() + " - " + tr("Echec ajoute pilote"), 
+                tr("Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible."));
             break;
         }
     }
@@ -2118,7 +2124,7 @@ void AeroDms::genererPdf()
          + db->recupererLesCotisationsAEmettre().size()
          + db->recupererLesRecettesBaladesEtSortiesAEmettre().size()) == 0)
     {
-        demandeConfirmationGeneration.setInformativeText("Rien à génerer. Génération indisponible.");
+        demandeConfirmationGeneration.setInformativeText(tr("Rien à génerer. Génération indisponible."));
         demandeConfirmationGeneration.setStandardButtons( QMessageBox::Close);
     }
 
@@ -2171,7 +2177,7 @@ void AeroDms::enregistrerUneFacture()
     if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
     {
         estEnEchec = true;
-        QMessageBox::critical(this, tr("AeroDMS"),
+        QMessageBox::critical(this, QApplication::applicationName() + " - " + tr("Cotisation non payée"),
             tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
                "Impossible d'enregistrer une facture à rembourser à son profit."), QMessageBox::Cancel);
     }
@@ -2459,10 +2465,10 @@ void AeroDms::enregistrerUneRecette()
     if (volsCoches.size() == 0)
     {
         QMessageBox::critical( this, 
-                               "Vol non sélectionné", 
-                               "La dépense doit être associée à au moins un vol. \n\
+            QApplication::applicationName() + " - " + "Vol non sélectionné",
+                               tr("La dépense doit être associée à au moins un vol. \n\
 Sélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\n\
-Saisie non prise en compte.");
+Saisie non prise en compte."));
     }
     else
     {
@@ -2920,8 +2926,8 @@ void AeroDms::editerVol()
 void AeroDms::supprimerVol()
 {
     QMessageBox demandeConfirmationSuppression;
-    demandeConfirmationSuppression.setText("Voulez vous réellement supprimer le vol ?");
-    demandeConfirmationSuppression.setWindowTitle(QApplication::applicationName() + " - " + "Suppression d'un vol");
+    demandeConfirmationSuppression.setText(tr("Voulez vous réellement supprimer le vol ?"));
+    demandeConfirmationSuppression.setWindowTitle(QApplication::applicationName() + " - " + tr("Suppression d'un vol"));
     demandeConfirmationSuppression.setIcon(QMessageBox::Question);
     demandeConfirmationSuppression.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     
@@ -2933,11 +2939,11 @@ void AeroDms::supprimerVol()
         {
             if (db->supprimerUnVol(volAEditer))
             {
-                statusBar()->showMessage("Vol supprimé avec succès.");
+                statusBar()->showMessage(tr("Vol supprimé avec succès."));
             }
             else
             {
-                statusBar()->showMessage("Vol non supprimé : le vol est associé à une recette d'une sortie. Suppression impossible.");
+                statusBar()->showMessage(tr("Vol non supprimé : le vol est associé à une recette d'une sortie. Suppression impossible."));
             }
             peuplerTablePilotes();
             peuplerTableVols();
@@ -3360,7 +3366,7 @@ void AeroDms::ouvrirPdfDemandeSuvbvention()
     }
     else
     {
-        QMessageBox::warning(this, tr("AeroDMS"),
+        QMessageBox::warning(this, QApplication::applicationName() + " - " + tr("Fichier non trouvé"),
                                    tr("Fichier non trouvé\n"
                                       "Aucun fichier fusionné de demande de subvention trouvé."), QMessageBox::Cancel);
     }
@@ -3489,7 +3495,7 @@ bool AeroDms::lePiloteEstAJourDeCotisation()
     //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
     if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
     {
-        QMessageBox::critical(this, tr("AeroDMS"),
+        QMessageBox::critical(this, QApplication::applicationName() + " - " + tr("Pilote non à jour de cotisation"),
             tr("Le pilote n'est pas a jour de sa cotisation pour l'année du vol.\n"
                 "Impossible d'enregistrer le vol."), QMessageBox::Cancel);
         return false;

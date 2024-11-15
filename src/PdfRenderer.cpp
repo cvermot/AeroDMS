@@ -201,7 +201,9 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     }
     else
     {
-        QMessageBox::critical(this, tr("Création de répertoire impossible"), tr("Impossible de créer le repertoire de sortie sous :\n") +
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Création de répertoire impossible"), 
+            tr("Impossible de créer le repertoire de sortie sous :\n") +
             p_cheminSortieFichiersGeneres +
             tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
 
@@ -272,7 +274,9 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     }
     else
     {
-        QMessageBox::critical(this, tr("Création de répertoire impossible"), tr("Impossible de créer le repertoire de sortie sous :\n") +
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Création de répertoire impossible"), 
+            tr("Impossible de créer le repertoire de sortie sous :\n") +
             p_cheminSortieFichiersGeneres +
             tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
         
@@ -294,7 +298,9 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     }
     else
     {
-        QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \"COMPTA_2023.htm\" attendu dans\n") +
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Fichier template introuvable"), 
+            tr("Le fichier \"COMPTA_2023.htm\" attendu dans\n") +
             ressourcesHtml.toString() +
             tr("\nest introuvable. Impossible de générer les demandes de subventions.\n\n Arrêt"));
 
@@ -566,7 +572,9 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
     }
     else
     {
-        QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Un ou plusieurs fichiers parmi :\n")
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Fichier template introuvable"), 
+            tr("Un ou plusieurs fichiers parmi :\n")
             + "     -\"TableauRecap.html\"\n"
             + "     -\"TableauRecapItem.html\"\n"
             + "     -\"TableauRecapRecettes.html\"\n"
@@ -910,7 +918,9 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
         }
         else
         {
-            QMessageBox::critical(this, tr("Fichier template introuvable"), tr("Le fichier \"TableauRecapBaladesSorties.html\" attendu dans\n") +
+            QMessageBox::critical(this, 
+                QApplication::applicationName() + " - " + tr("Fichier template introuvable"), 
+                tr("Le fichier \"TableauRecapBaladesSorties.html\" attendu dans\n") +
                 ressourcesHtml.toString() +
                 tr("\nest introuvable. Impossible de générer le tableau des recap balades et sorties.\n\n Arrêt"));
 

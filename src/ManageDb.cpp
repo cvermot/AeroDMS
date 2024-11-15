@@ -31,19 +31,16 @@ ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd)
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
         QMessageBox::critical(
             this,
-            "Unable to load database",
-            "This software needs the SQLITE driver"
+            QApplication::applicationName() + " - " + tr("Impossible de charger la base de données"),
+            tr("Ce logiciel nécessite le driver Qt SQLite. Celui ci n'est pas disponible.")
         );
 
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(database);
-    //if (!db.open())
-    //{
-    //    QMessageBox::warning(this, "Erreur Ouverture", db.lastError().text());
-    //}
 
     if (!db.open()) {
-        QMessageBox::critical(0, qApp->tr("Impossible d'ouvrir la base de données"),
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Impossible d'ouvrir la base de données"),
             "Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : \n"
                 +db.lastError().text()
                 +"\nCliquez Annuler pour quitter", QMessageBox::Cancel);
