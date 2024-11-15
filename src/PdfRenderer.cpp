@@ -155,7 +155,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                          const QString p_cheminSortieFichiersGeneres,
                                                          const QString p_cheminStockageFactures,
                                                          const AeroDmsTypes::Signature p_signature,
-                                                         const int p_graphAGenerer)
+                                                         const int p_graphAGenerer,
+                                                         const QString p_nomTresorier)
 {
     nombreEtapesEffectuees = 0;
     indiceFichier = 0;
@@ -168,6 +169,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     demandeEnCours.recapHdVAvecRecettes = true;
 
     demandeEnCours.recapHdvGraphAGenerer = p_graphAGenerer;
+
+    demandeEnCours.nomTresorier = p_nomTresorier;
 
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;

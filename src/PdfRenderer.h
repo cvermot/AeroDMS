@@ -48,7 +48,8 @@ public:
 		                                        const QString p_cheminSortieFichiersGeneres,
 		                                        const QString p_cheminStockageFactures,
 		                                        const AeroDmsTypes::Signature p_signature,
-		                                        const int p_graphAGenerer);
+		                                        const int p_graphAGenerer,
+		                                        const QString p_nomTresorier);
 
 private :
 	QWebEnginePage* view;

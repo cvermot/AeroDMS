@@ -2156,7 +2156,8 @@ void AeroDms::genererPdfRecapHdV()
                                                 parametresSysteme.cheminSortieFichiersGeneres,
                                                 parametresSysteme.cheminStockageFacturesTraitees,
                                                 signature,
-                                                calculerValeurGraphAGenererPdf());
+                                                calculerValeurGraphAGenererPdf(),
+                                                parametresMetiers.nomTresorier);
 }
 
 void AeroDms::enregistrerUneFacture()
