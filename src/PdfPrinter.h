@@ -42,12 +42,14 @@ private:
 	void imprimer(QPrinter& p_printer, 
 		const bool p_forcerImpressionRecto);
 	void ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer);
-	void detruireFenetreProgressionImpression();
 
 	DialogueProgressionImpression *progressionImpression;
 	QString fichierAImprimer = "";
 	QString dossierAImprimer = "";
 	bool demandeImpressionEstConfirmee = false;
+
+private slots:
+	void detruireFenetreProgressionImpression();
 	
 };
 

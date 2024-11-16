@@ -136,7 +136,10 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     nombreEtapesEffectuees++;
     emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
 
-    db->ajouterDemandeCeEnBdd(demandeEnCours);
+    if (demandeEnCours.typeDeDemande != AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL)
+    {
+        db->ajouterDemandeCeEnBdd(demandeEnCours);
+    }
 
     //Si la demande ne concerne pas un document unique, on fait les demandes suivantes
     if (!laDemandeEstPourUnDocumentUnique)
@@ -186,7 +189,6 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
                                                                                                                    "*",
                                                                                                                    false);
-
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
         const AeroDmsTypes::EtatGeneration generationRecapAnnuel = imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
                                                                                                       listePilotesDeCetteAnnee, 
