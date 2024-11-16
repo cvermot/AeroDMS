@@ -59,4 +59,3 @@ private slots:
 };
 
 #endif // DIALOGUEGESTIONPILOTE_H
-

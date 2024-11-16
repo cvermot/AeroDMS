@@ -55,4 +55,3 @@ signals:
 };
 
 #endif // DIALOGUEPROGRESSIONGENERATIONPDF_H
-

@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef NESTEDDONUTSWIDGET_H
-#define NESTEDDONUTSWIDGET_H
+#ifndef STATISTIQUEDONUTS_H
+#define STATISTIQUEDONUTS_H
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
@@ -35,4 +35,4 @@ private:
         QChart::AnimationOption p_animation);
 };
 
-#endif
+#endif //STATISTIQUEDONUTS_H

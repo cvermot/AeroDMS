@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef PIEDRILLDOWNCHART_H
-#define PIEDRILLDOWNCHART_H
+#ifndef STATISTIQUEDIAGRAMMECIRCULAIRE_H
+#define STATISTIQUEDIAGRAMMECIRCULAIRE_H
 
 #include <QChart>
 
@@ -23,4 +23,4 @@ private:
     QAbstractSeries* m_currentSeries = nullptr;
 };
 
-#endif
+#endif //STATISTIQUEDIAGRAMMECIRCULAIRE_H

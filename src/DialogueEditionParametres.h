@@ -82,4 +82,3 @@ signals:
 };
 
 #endif // DIALOGUEEDITIONPARAMETRES_H
-

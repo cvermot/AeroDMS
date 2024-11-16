@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef DONUTBREAKDOWNWIDGET_H
-#define DONUTBREAKDOWNWIDGET_H
+#ifndef STATISTIQUEDONUTCOMBINEWIDGET_H
+#define STATISTIQUEDONUTCOMBINEWIDGET_H
 
 #include <QChart>
 
@@ -26,4 +26,4 @@ private:
     int indiceCouleurEnCours = 0;
 };
 
-#endif
+#endif //STATISTIQUEDONUTCOMBINEWIDGET_H

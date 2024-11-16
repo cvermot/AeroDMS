@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef PIEDRILLDOWNSLICE_H
-#define PIEDRILLDOWNSLICE_H
+#ifndef STATISTIQUEDIAGRAMMECIRCULAIREPARTIE_H
+#define STATISTIQUEDIAGRAMMECIRCULAIREPARTIE_H
 
 #include <QPieSlice>
 
@@ -24,4 +24,4 @@ private:
     QString m_prefix;
 };
 
-#endif
+#endif //STATISTIQUEDIAGRAMMECIRCULAIREPARTIE_H

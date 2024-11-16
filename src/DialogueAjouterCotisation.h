@@ -63,4 +63,3 @@ public slots:
 };
 
 #endif // DIALOGUEAJOUTERCOTISATION_H
-

@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef DONUTBREAKDOWNCHART_H
-#define DONUTBREAKDOWNCHART_H
+#ifndef STATISTIQUEDONUTCOMBINE_H
+#define STATISTIQUEDONUTCOMBINE_H
 
 #include <QChart>
 
@@ -22,4 +22,4 @@ private:
     QPieSeries* m_mainSeries = nullptr;
 };
 
-#endif
+#endif //STATISTIQUEDONUTCOMBINE_H

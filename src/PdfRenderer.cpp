@@ -1218,4 +1218,3 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
 
     return nbGraph;
 }
-

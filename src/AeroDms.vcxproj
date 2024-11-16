@@ -108,6 +108,7 @@
     <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="DialogueProgressionImpression.cpp" />
     <ClCompile Include="PdfExtractor.cpp" />
+    <ClCompile Include="PdfPrinter.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaireWidget.cpp" />
@@ -137,6 +138,7 @@
     <QtMoc Include="DialogueProgressionGenerationPdf.h" />
     <QtMoc Include="DialogueEditionParametres.h" />
     <QtMoc Include="DialogueProgressionImpression.h" />
+    <QtMoc Include="PdfPrinter.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />

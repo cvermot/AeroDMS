@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef PIEDRILLDOWNWIDGET_H
-#define PIEDRILLDOWNWIDGET_H
+#ifndef STATISTIQUEDIAGRAMMECIRCULAIREWIDGET_H
+#define STATISTIQUEDIAGRAMMECIRCULAIREWIDGET_H
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
@@ -23,4 +23,4 @@ public:
                                                    const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES) ;
 };
 
-#endif
+#endif //STATISTIQUEDIAGRAMMECIRCULAIREWIDGET_H

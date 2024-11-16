@@ -27,7 +27,6 @@ class DialogueProgressionImpression : public QDialog
     Q_OBJECT
 
 public:
-    DialogueProgressionImpression();
     DialogueProgressionImpression(QWidget* parent = nullptr);
 
     void setMaximumPage(const int p_nbPage);
@@ -50,4 +49,3 @@ signals:
 };
 
 #endif // DIALOGUEPROGRESSIONIMPRESSION_H
-

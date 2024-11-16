@@ -53,4 +53,3 @@ private:
 };
 
 #endif // PDFEXTRACTOR_H
-

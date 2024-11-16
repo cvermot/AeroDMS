@@ -44,4 +44,3 @@ public slots:
 };
 
 #endif // DIALOGUEAJOUTERSORTIE_H
-

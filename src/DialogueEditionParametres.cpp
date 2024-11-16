@@ -180,10 +180,10 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionLayout->addWidget(new QLabel(tr("Résolution : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(resolutionImpression, ligneActuelle, K_COLONNE_CHAMP);
 
-    imprimante->setText(p_parametresSysteme.imprimante);
+    imprimante->setText(p_parametresSysteme.parametresImpression.imprimante);
     QPrinter printer;
-    printer.setPrinterName(p_parametresSysteme.imprimante);
-    if (p_parametresSysteme.imprimante != ""
+    printer.setPrinterName(p_parametresSysteme.parametresImpression.imprimante);
+    if (p_parametresSysteme.parametresImpression.imprimante != ""
         && printer.isValid())
     {
         peuplerResolutionImpression(printer);
@@ -193,9 +193,9 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
         resolutionImpression->addItem("600 DPI", 600);
         resolutionImpression->setEnabled(false);
     }
-    if (resolutionImpression->findData(p_parametresSysteme.resolutionImpression) != -1)
+    if (resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression) != -1)
     {
-        resolutionImpression->setCurrentIndex(resolutionImpression->findData(p_parametresSysteme.resolutionImpression));
+        resolutionImpression->setCurrentIndex(resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression));
     }
 
     ligneActuelle = impressionLayout->rowCount();
@@ -205,7 +205,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionCouleur->addItem(QIcon("./ressources/invert-colors-off.svg"), tr("Noir et blanc"), QPrinter::GrayScale);
     impressionCouleur->addItem(QIcon("./ressources/invert-colors.svg"), tr("Couleur"), QPrinter::Color);
 
-    impressionCouleur->setCurrentIndex(p_parametresSysteme.modeCouleurImpression);
+    impressionCouleur->setCurrentIndex(p_parametresSysteme.parametresImpression.modeCouleurImpression);
 
     ligneActuelle = impressionLayout->rowCount();
     forcageImpressionRectoSimple = new QCheckBox(this);
@@ -213,7 +213,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionLayout->addWidget(new QLabel(tr("Forcage de l'impression recto simple : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(forcageImpressionRectoSimple, ligneActuelle, K_COLONNE_CHAMP);
 
-    forcageImpressionRectoSimple->setChecked(p_parametresSysteme.forcageImpressionRecto);
+    forcageImpressionRectoSimple->setChecked(p_parametresSysteme.parametresImpression.forcageImpressionRecto);
 
     ligneActuelle = impressionLayout->rowCount();
     margesHautBas = new QSpinBox(this);
@@ -349,8 +349,7 @@ void DialogueEditionParametres::peuplerResolutionImpression(QPrinter &printer)
     resolutionImpression->setEnabled(true);
     const QList<int> resolutions = printer.supportedResolutions();
     const int resolutionMax = *std::max_element(resolutions.begin(), resolutions.end());
-    int resolution = 100;
-    for (resolution = 100; resolution <= resolutionMax; resolution = resolution + 100)
+    for (int resolution = 100; resolution <= resolutionMax; resolution = resolution + 100)
     {
         resolutionImpression->addItem(QString::number(resolution) + " DPI", resolution);
     }
@@ -445,10 +444,10 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesTraitees = facturesSaisies->text();
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
-    parametresSysteme.imprimante = imprimante->text();
-    parametresSysteme.resolutionImpression = resolutionImpression->currentData().toInt();
-    parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
-    parametresSysteme.forcageImpressionRecto = (forcageImpressionRectoSimple->checkState() == Qt::Checked);
+    parametresSysteme.parametresImpression.imprimante = imprimante->text();
+    parametresSysteme.parametresImpression.resolutionImpression = resolutionImpression->currentData().toInt();
+    parametresSysteme.parametresImpression.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());
+    parametresSysteme.parametresImpression.forcageImpressionRecto = (forcageImpressionRectoSimple->checkState() == Qt::Checked);
 
     parametresSysteme.margesHautBas = margesHautBas->value();
     parametresSysteme.margesGaucheDroite = margesGaucheDroite->value();
@@ -456,4 +455,3 @@ void DialogueEditionParametres::enregistrerParametres()
     emit envoyerParametres(parametresMetiers, parametresSysteme);
     accept();
 }
-

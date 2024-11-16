@@ -84,10 +84,6 @@ private:
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
-    void imprimer(QPrinter& p_printer);
-    bool selectionnerImprimante(QPrinter& p_printer);
-    void ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer);
-
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
 
@@ -176,7 +172,6 @@ private:
 
     //Barre de progression
     DialogueProgressionGenerationPdf* progressionGenerationPdf = nullptr;
-    DialogueProgressionImpression* progressionImpression = nullptr;
 
     //Bouttons
     QAction* bouttonGenerePdf;
@@ -339,7 +334,6 @@ public slots:
     void ouvrirDialogueParametresApplication();
     void enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
                                            AeroDmsTypes::ParametresSysteme p_parametresSysteme);
-    void detruireFenetreProgressionImpression();
     void detruireFenetreProgressionGenerationPdf();
 
 };

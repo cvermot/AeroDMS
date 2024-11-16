@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef BARPERCENTWIDGET_H
-#define BARPERCENTWIDGET_H
+#ifndef STATISTIQUEHISTOGRAMMEEMPILE_H
+#define STATISTIQUEHISTOGRAMMEEMPILE_H
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
@@ -19,4 +19,4 @@ public:
                                            const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 };
 
-#endif
+#endif //STATISTIQUEHISTOGRAMMEEMPILE_H

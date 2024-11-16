@@ -139,5 +139,3 @@ void DialogueProgressionGenerationPdf::demanderOuvrirLeDossier()
 	hide();
 	emit ouvrirLeDossier();
 }
-
-

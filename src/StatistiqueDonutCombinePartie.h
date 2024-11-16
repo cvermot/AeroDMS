@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
-#ifndef DONUTBREAKDOWNMAINSLICE_H
-#define DONUTBREAKDOWNMAINSLICE_H
+#ifndef STATISTIQUEDONUTCOMBINEPARTIE_H
+#define STATISTIQUEDONUTCOMBINEPARTIE_H
 
 #include <QPieSlice>
 
@@ -27,4 +27,4 @@ private:
     QString m_name;
 };
 
-#endif
+#endif //STATISTIQUEDONUTCOMBINEPARTIE_H

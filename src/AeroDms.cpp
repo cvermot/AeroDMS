@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "AeroDmsServices.h"
 #include "PdfRenderer.h"
 #include "PdfExtractor.h"
+#include "PdfPrinter.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
@@ -207,10 +208,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     parametresSysteme.cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
     parametresSysteme.nomBdd = settings.value("baseDeDonnees/nom", "").toString();
-    parametresSysteme.imprimante = settings.value("impression/imprimante", "").toString();
-    parametresSysteme.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
-    parametresSysteme.resolutionImpression = settings.value("impression/resolution", 600).toInt();
-    parametresSysteme.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
+    parametresSysteme.parametresImpression.imprimante = settings.value("impression/imprimante", "").toString();
+    parametresSysteme.parametresImpression.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
+    parametresSysteme.parametresImpression.resolutionImpression = settings.value("impression/resolution", 600).toInt();
+    parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
 
@@ -1425,31 +1426,13 @@ void AeroDms::ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFactures
     connect(progressionGenerationPdf, SIGNAL(imprimerAgrafage()), this, SLOT(imprimerLaDemandeAgrafage()));
     connect(progressionGenerationPdf, SIGNAL(ouvrirLeDossier()), this, SLOT(ouvrirDossierFichierVenantDEtreGenere()));
 
-    //progressionGenerationPdf->show();
     progressionGenerationPdf->setMaximum(p_nombreDeFacturesATraiter);
     progressionGenerationPdf->setValue(0);
-
 }
 
 void AeroDms::mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees)
 {
     progressionGenerationPdf->setValue(p_nombreDeFacturesTraitees);
-}
-
-void AeroDms::ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer)
-{
-    progressionImpression = new DialogueProgressionImpression(this);
-    progressionImpression->setMaximumFichier(p_nombreDeFichiersAImprimer);
-
-    connect(progressionImpression, SIGNAL(accepted()), this, SLOT(detruireFenetreProgressionImpression()));
-
-    update();
-}
-
-void AeroDms::detruireFenetreProgressionImpression()
-{
-    delete progressionImpression;
-    progressionImpression = nullptr;
 }
 
 void AeroDms::detruireFenetreProgressionGenerationPdf()
@@ -3078,10 +3061,10 @@ void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p
     settings.endGroup();
 
     settings.beginGroup("impression");
-    settings.setValue("imprimante", parametresSysteme.imprimante);
-    settings.setValue("couleur", parametresSysteme.modeCouleurImpression);
-    settings.setValue("resolution", parametresSysteme.resolutionImpression);
-    settings.setValue("forcageImpressionRecto", parametresSysteme.forcageImpressionRecto);
+    settings.setValue("imprimante", parametresSysteme.parametresImpression.imprimante);
+    settings.setValue("couleur", parametresSysteme.parametresImpression.modeCouleurImpression);
+    settings.setValue("resolution", parametresSysteme.parametresImpression.resolutionImpression);
+    settings.setValue("forcageImpressionRecto", parametresSysteme.parametresImpression.forcageImpressionRecto);
     settings.endGroup();
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
@@ -3580,18 +3563,8 @@ void AeroDms::imprimerLaDerniereDemande()
 
 void AeroDms::imprimerLaDemande()
 {
-    QPrinter imprimante;
-    if (selectionnerImprimante(imprimante))
-    {
-        //On demande l'affichage de la fenêtre de génération
-        ouvrirFenetreProgressionImpression(1);
-
-        QThread::usleep(500);
-
-        imprimer(imprimante);
-
-        progressionImpression->traitementFichierSuivant();
-    }
+    PdfPrinter impression;
+    impression.imprimerFichier(fichierAImprimer, parametresSysteme.parametresImpression);
 }
 
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
@@ -3602,126 +3575,8 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 
 void AeroDms::imprimerLaDemandeAgrafage()
 {
-    QPrinter imprimante;
-    if (selectionnerImprimante(imprimante))
-    {   
-        //On compte les fichiers
-        QDir repertoire(dossierSortieGeneration, "*.pdf", QDir::QDir::Name, QDir::Files);
-
-        QFileInfoList liste = repertoire.entryInfoList();
-        //Le fichier assemblé est forcément le dernier de la liste car tous les fichiers sont suffixés
-        //par un chiffre dans l'ordre de génération. Si la fichier assemblé est présent, on le supprime 
-        //de la liste
-        if (liste.last().filePath().contains("FichiersAssembles.pdf"))
-        {
-            liste.removeLast();
-        }
-
-        //On demande l'affichage de la fenêtre de génération
-        ouvrirFenetreProgressionImpression(liste.size());
-
-        QThread::usleep(500);
-        
-        for (QFileInfo fichier : liste)
-        {
-            //On imprime tout 
-            fichierAImprimer = fichier.filePath();
-            imprimer(imprimante);
-        }
-        progressionImpression->traitementFichierSuivant();
-    }
-}
-
-bool AeroDms::selectionnerImprimante(QPrinter &p_printer)
-{
-    p_printer.setPrinterName(parametresSysteme.imprimante);
-    p_printer.setColorMode(parametresSysteme.modeCouleurImpression);
-    p_printer.setResolution(parametresSysteme.resolutionImpression);
-
-    QPrintDialog dialog(&p_printer, this);
-    dialog.setOption(QAbstractPrintDialog::PrintSelection, false);
-    dialog.setOption(QAbstractPrintDialog::PrintPageRange, false);
-    dialog.setOption(QAbstractPrintDialog::PrintCollateCopies, false);
-    dialog.setOption(QAbstractPrintDialog::PrintToFile, false);
-    dialog.setOption(QAbstractPrintDialog::PrintShowPageSize, false);
-    dialog.setWindowTitle(QApplication::applicationName() + " - " + tr("Imprimer la demande de subvention"));
-
-    if (dialog.exec() != QDialog::Accepted)
-    {
-        return false;
-    }
-    //p_printer.setResolution(p_printer.supportedResolutions().last());
-    p_printer.setResolution(parametresSysteme.resolutionImpression);
-    //En mode forcage recto on force le mode à recto-verso : on inserera ensuite
-    //un page blanche entre chaque page qui fera que le rendu sera un recto simple
-    if (parametresSysteme.forcageImpressionRecto)
-    {
-        p_printer.setDuplex(QPrinter::DuplexLongSide);
-    }
-
-    return true;
-}
-void AeroDms::imprimer(QPrinter& p_printer)
-{
-    progressionImpression->traitementFichierSuivant();
-
-    QPdfDocument *doc = new QPdfDocument(this);
-    doc->load(fichierAImprimer);
-
-    int attenteChargementFichier = 0;
-    while ( doc->status() != QPdfDocument::Status::Ready
-            || attenteChargementFichier > 500)
-    {
-        attenteChargementFichier++;
-        QThread::usleep(10);
-    }
-
-    if (doc->status() == QPdfDocument::Status::Ready)
-    {
-        progressionImpression->setMaximumPage(doc->pageCount());
-        
-        QPainter painter;
-        painter.begin(&p_printer);
-
-        for (int i = 0; i < doc->pageCount(); i++)
-        {
-            progressionImpression->traitementPageSuivante();
-            QSizeF size = doc->pagePointSize(i);
-            QImage image = doc->render(i,
-                QSize(size.width() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
-                    size.height() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
-
-            //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
-            //pour l'impression
-            if (size.width() > size.height())
-            {
-                QTransform transformation;
-                transformation.rotate(270);
-                image = image.transformed(transformation);
-                painter.drawImage(0, 0, image);
-            }
-            else
-            {
-                painter.drawImage(0, 0, image);
-            }
-
-            //S'il reste des pages derrière... on démarre une nouvelle page
-            if (i + 1 < doc->pageCount())
-            {
-                p_printer.newPage();
-
-                //Et si on est en mode forcage Recto, on ajoute une page blanche
-                if (parametresSysteme.forcageImpressionRecto)
-                {
-                    p_printer.newPage();
-                }  
-            } 
-        }
-        progressionImpression->traitementPageSuivante();
-
-        painter.end();
-    }
-    delete doc;
+    PdfPrinter impression;
+    impression.imprimerDossier(dossierSortieGeneration, parametresSysteme.parametresImpression);
 }
 
 int AeroDms::calculerValeurGraphAGenererPdf()
@@ -3783,4 +3638,3 @@ bool AeroDms::eventFilter(QObject* object, QEvent* event)
     else
         return false;
 }
-

@@ -19,10 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueProgressionImpression.h"
 #include <QtWidgets>
 
-DialogueProgressionImpression::DialogueProgressionImpression()
-{
-
-}
 
 DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : QDialog(parent)
 {
@@ -37,7 +33,7 @@ DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : 
 	label = new QLabel(tr("Impression en cours...\n"), this);
 	label->setAlignment(Qt::AlignCenter);
 
-	labelFichier = new QLabel(tr("Fichier 2/5"), this);
+	labelFichier = new QLabel(tr("Initialisation en cours..."), this);
 	labelFichier->setAlignment(Qt::AlignCenter);
 
 	barreDeProgressionFichier = new QProgressBar(this);
@@ -92,7 +88,7 @@ void DialogueProgressionImpression::traitementFichierSuivant()
 {
 	barreDeProgressionFichier->setValue(barreDeProgressionFichier->value()+1);
 
-	if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
+    if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
 		&& barreDeProgressionFichier->value() >= barreDeProgressionFichier->maximum())
 	{
 		boutonFermer->setEnabled(true);
@@ -113,11 +109,5 @@ void DialogueProgressionImpression::traitementPageSuivante()
 	if (barreDeProgressionPage->value() < barreDeProgressionPage->maximum())
 	{
 		labelPage->setText(tr("Page ") + QString::number(barreDeProgressionPage->value()) + "/" + QString::number(barreDeProgressionPage->maximum() - 1));
-	}
-
-	if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
-		&& barreDeProgressionFichier->value() >= barreDeProgressionFichier->maximum())
-	{
-		boutonFermer->setEnabled(true);
-	}
+	}	
 }

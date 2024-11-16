@@ -420,18 +420,22 @@ public:
         QString objetMailAutresMailings;
     };
 
+    struct ParametresImpression {
+        QString imprimante;
+        QPrinter::ColorMode modeCouleurImpression;
+        int resolutionImpression;
+        bool forcageImpressionRecto;
+    };
+
     struct ParametresSysteme {
         QString cheminStockageBdd;
         QString cheminStockageFacturesTraitees;
         QString cheminStockageFacturesATraiter;
         QString cheminSortieFichiersGeneres;
         QString nomBdd;
-        QString imprimante;
-        QPrinter::ColorMode modeCouleurImpression;
-        int resolutionImpression;
-        bool forcageImpressionRecto;
         int margesHautBas;
         int margesGaucheDroite;
+        ParametresImpression parametresImpression;
     };
 
     struct TotauxRecettes {
