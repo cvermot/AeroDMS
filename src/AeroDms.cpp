@@ -162,10 +162,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
     parametresMetiers.objetMailAutresMailings = settings.value("mailing/objetAutresMailings", "[Section aéronautique] ").toString();
 
-    if (settings.value("impression/imprimante", "") == "")
+    if (settings.value("impression/imprimante") == "")
     {
         settings.beginGroup("impression");
-        settings.setValue("imprimante", "");
+        settings.setValue("imprimante", "Imprimante par défaut");
         settings.setValue("couleur", 1);
         settings.setValue("resolution", 600);
         settings.setValue("forcageImpressionRecto", true);
@@ -208,7 +208,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
     parametresSysteme.cheminSortieFichiersGeneres = settings.value("dossiers/sortieFichiersGeneres", "").toString();
     parametresSysteme.nomBdd = settings.value("baseDeDonnees/nom", "").toString();
-    parametresSysteme.parametresImpression.imprimante = settings.value("impression/imprimante", "").toString();
+    parametresSysteme.parametresImpression.imprimante = settings.value("impression/imprimante", "Imprimante par défaut").toString();
     parametresSysteme.parametresImpression.modeCouleurImpression = static_cast<QPrinter::ColorMode>(settings.value("impression/couleur", "").toInt());
     parametresSysteme.parametresImpression.resolutionImpression = settings.value("impression/resolution", 600).toInt();
     parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();

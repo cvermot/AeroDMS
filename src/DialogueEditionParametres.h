@@ -66,7 +66,7 @@ private:
     QPushButton* boutonSelectionFacturesSaisies = nullptr;
     QPushButton* boutonSelectionSortieFichiersGeneres = nullptr;
     
-    void peuplerResolutionImpression(QPrinter& printer);
+    void peuplerResolutionImpression(const int p_resolutionMax);
 
 public slots:
     void selectionnerImprimante();

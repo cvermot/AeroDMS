@@ -167,6 +167,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = impressionLayout->rowCount();
     imprimante = new QLineEdit(this);
+    imprimante->setEnabled(false);
     imprimante->setToolTip(tr("Imprimante par défaut qui sera séléctionnée par le logiciel lors des demandes d'impression."));
     impressionLayout->addWidget(new QLabel(tr("Imprimante : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(imprimante, ligneActuelle, K_COLONNE_CHAMP);
@@ -186,12 +187,15 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     if (p_parametresSysteme.parametresImpression.imprimante != ""
         && printer.isValid())
     {
-        peuplerResolutionImpression(printer);
+        const QList<int> resolutions = printer.supportedResolutions();
+        const int resolutionMax = *std::max_element(resolutions.begin(), resolutions.end());
+        peuplerResolutionImpression(resolutionMax);
     }
     else
     {
-        resolutionImpression->addItem("600 DPI", 600);
-        resolutionImpression->setEnabled(false);
+        peuplerResolutionImpression(600);
+        //resolutionImpression->addItem("600 DPI", 600);
+        //resolutionImpression->setEnabled(false);
     }
     if (resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression) != -1)
     {
@@ -209,7 +213,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = impressionLayout->rowCount();
     forcageImpressionRectoSimple = new QCheckBox(this);
-    forcageImpressionRectoSimple->setToolTip(tr("Force l'imprimante à imprimer en recto simple même en cas de configuration recto-verso par défaut."));
+    forcageImpressionRectoSimple->setToolTip(tr("Force l'imprimante à imprimer en recto simple même en cas de configuration recto-verso par défaut.\n\nAttention : sur une imprimante non compatible recto-verso automatique ou si l'option recto-verso\nautomatique n'est pas activée sur une imprimante compatible, l'activation de la présente fonction\nde forcage de recto simple provoquera l'insertion d'un page blanche entre chaque page."));
     impressionLayout->addWidget(new QLabel(tr("Forcage de l'impression recto simple : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(forcageImpressionRectoSimple, ligneActuelle, K_COLONNE_CHAMP);
 
@@ -339,25 +343,25 @@ void DialogueEditionParametres::selectionnerImprimante()
     {
         imprimante->setText(printer.printerName());
 
-        peuplerResolutionImpression(printer);
+        const QList<int> resolutions = printer.supportedResolutions();
+        const int resolutionMax = *std::max_element(resolutions.begin(), resolutions.end());
+        peuplerResolutionImpression(resolutionMax);
     }
 }
 
-void DialogueEditionParametres::peuplerResolutionImpression(QPrinter &printer)
+void DialogueEditionParametres::peuplerResolutionImpression(const int p_resolutionMax)
 {
     resolutionImpression->clear();
-    resolutionImpression->setEnabled(true);
-    const QList<int> resolutions = printer.supportedResolutions();
-    const int resolutionMax = *std::max_element(resolutions.begin(), resolutions.end());
-    for (int resolution = 100; resolution <= resolutionMax; resolution = resolution + 100)
+    
+    for (int resolution = 100; resolution <= p_resolutionMax; resolution = resolution + 100)
     {
         resolutionImpression->addItem(QString::number(resolution) + " DPI", resolution);
     }
 
     //On gère le cas ou la plus haute résolution n'est pas un multiple de 100 => on ajoute la plus haute résolution
-    if (resolutionImpression->itemData(resolutionImpression->count()-1).toInt() < resolutionMax)
+    if (resolutionImpression->itemData(resolutionImpression->count()-1).toInt() < p_resolutionMax)
     {
-        resolutionImpression->addItem(QString::number(resolutionMax) + " DPI", resolutionMax);
+        resolutionImpression->addItem(QString::number(p_resolutionMax) + " DPI", p_resolutionMax);
     }
 }
 
