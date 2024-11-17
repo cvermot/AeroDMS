@@ -102,7 +102,7 @@ void AeroDms::initialiserBaseApplication()
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
 
-    setWindowTitle(tr("AeroDMS"));
+    setWindowTitle(QApplication::applicationName());
     setMinimumSize(800, 600);
     showMaximized();
 
@@ -118,7 +118,7 @@ void AeroDms::initialiserBaseApplication()
 void AeroDms::lireParametresEtInitialiserBdd()
 {
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AeroDMS", "AeroDMS");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), QApplication::applicationName());
 
     if (settings.value("baseDeDonnees/chemin", "") == "")
     {
@@ -174,7 +174,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
 
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
-    QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, "AeroDMS");
+    QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, QApplication::applicationName());
     if (settingsMetier.value("parametresMetier/montantSubventionEntrainement", "") == "")
     {
         settingsMetier.beginGroup("parametresMetier");
