@@ -68,7 +68,7 @@ private:
     void initialiserMenuAide();
     void initialiserRaccourcisClavierSansActionIhm();
 
-    void chargerUneFacture(QString p_fichier);
+    void chargerUneFacture(const QString p_fichier);
 
     void peuplerListesPilotes();
     void peuplerListeSorties();
@@ -333,8 +333,8 @@ public slots:
     void imprimerLaDerniereDemande();
     void imprimerLaDerniereDemandeAgrafage();
     void ouvrirDialogueParametresApplication();
-    void enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
-                                           AeroDmsTypes::ParametresSysteme p_parametresSysteme);
+    void enregistrerParametresApplication( const AeroDmsTypes::ParametresMetier p_parametresMetiers,
+                                           const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionGenerationPdf();
 
 };

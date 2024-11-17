@@ -25,11 +25,6 @@ QRegularExpression heureHMinRe("(?<heure>\\d)h {0,1}(?<minutes>\\d\\d)min");
 QRegularExpression euroRe("(?<montant>\\d+\\[.,]\\d+)€");
 QRegularExpression immatRe("(?<immat>F-[A-Z]{4})");
 
-PdfExtractor::PdfExtractor()
-{
-    
-}
-
 AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const QString p_fichier,
                                                                           const AeroDmsTypes::Aeroclub p_aeroclub)
 {

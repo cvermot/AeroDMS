@@ -20,10 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 
-DialogueGestionAeronefs::DialogueGestionAeronefs()
-{
-
-}
 
 DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db, QWidget* parent) : QDialog(parent)
 {
@@ -68,7 +64,8 @@ void DialogueGestionAeronefs::peuplerListeAeronefs()
     vueAeronefs->blockSignals(false);
 }
 
-void DialogueGestionAeronefs::sauvegarderDonneesSaisies(int p_ligne, int p_colonne)
+void DialogueGestionAeronefs::sauvegarderDonneesSaisies(const int p_ligne, 
+    const int p_colonne)
 {
     AeroDmsTypes::AeronefTableElement elementEdite = AeroDmsTypes::AeronefTableElement_TYPE;
 

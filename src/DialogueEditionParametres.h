@@ -29,7 +29,6 @@ class DialogueEditionParametres : public QDialog
     Q_OBJECT
 
 public:
-    DialogueEditionParametres();
     DialogueEditionParametres(const AeroDmsTypes::ParametresMetier p_parametresMetiers,
         const AeroDmsTypes::ParametresSysteme p_parametresSysteme,
         const bool p_editionParametresCritiques,
@@ -76,8 +75,8 @@ public slots:
     void gererChangementOnglet();
 
 signals:
-    void envoyerParametres( AeroDmsTypes::ParametresMetier parametresMetiers, 
-                            AeroDmsTypes::ParametresSysteme parametresSysteme);
+    void envoyerParametres( const AeroDmsTypes::ParametresMetier parametresMetiers, 
+                            const AeroDmsTypes::ParametresSysteme parametresSysteme);
   
 };
 

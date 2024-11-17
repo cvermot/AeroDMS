@@ -27,10 +27,9 @@ class PdfRenderer : public QWidget {
 	Q_OBJECT
 
 public:
-	PdfRenderer();
 	PdfRenderer( ManageDb *p_db,
-		         QString p_cheminTemplatesHtml,
-				 QMarginsF p_marges,
+		         const QString p_cheminTemplatesHtml,
+				 const QMarginsF p_marges,
 		         QWidget* parent = nullptr);
 
 	void mettreAJourMarges(QMarginsF p_marges);

@@ -28,7 +28,6 @@ class ManageDb : public QWidget {
 
 public:
     ManageDb(const QString& database, const int p_delaisDeGardeBdd);
-    ManageDb();
 
     void sauvegarderLaBdd(const QString p_repertoireDeSauvegarde);
     const bool laBddEstALaVersionAttendue();

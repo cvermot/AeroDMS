@@ -20,10 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "QMessageBox"
 #include "AeroDmsServices.h"
 
-ManageDb::ManageDb()
-{
-}
-
 ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd) 
 {
     delaisDeGardeBdd = p_delaisDeGardeBdd;

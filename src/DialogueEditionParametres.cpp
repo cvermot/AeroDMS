@@ -22,11 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPrintDialog>
 #include <QPrinter>
 
-DialogueEditionParametres::DialogueEditionParametres()
-{
-
-}
-
 DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::ParametresMetier p_parametresMetiers,
     const AeroDmsTypes::ParametresSysteme p_parametresSysteme,
     const bool p_editionParametresCritiques,

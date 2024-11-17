@@ -25,7 +25,6 @@ class DialogueAjouterSortie : public QDialog
     Q_OBJECT
 
 public:
-    DialogueAjouterSortie();
     DialogueAjouterSortie(QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();

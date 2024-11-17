@@ -29,18 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QChart>
 #include <QSvgGenerator>
 
-PdfRenderer::PdfRenderer()
-{
-    db = new ManageDb();
-    view = new QWebEnginePage(this);
-    nombreEtapesEffectuees = 0;
-    indiceFichier = 0;
-    laDemandeEstPourUnDocumentUnique = false;
-}
-
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
-                          QString p_cheminTemplatesHtml, 
-                          QMarginsF p_marges,
+                          const QString p_cheminTemplatesHtml, 
+                          const QMarginsF p_marges,
                           QWidget* parent)
 {
     db = p_db;

@@ -27,7 +27,6 @@ class DialogueProgressionGenerationPdf : public QDialog
     Q_OBJECT
 
 public:
-    DialogueProgressionGenerationPdf();
     DialogueProgressionGenerationPdf(QWidget* parent = nullptr);
 
     void setMaximum(const int p_maximum);

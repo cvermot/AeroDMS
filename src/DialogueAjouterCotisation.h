@@ -25,7 +25,6 @@ class DialogueAjouterCotisation : public QDialog
     Q_OBJECT
 
 public:
-    DialogueAjouterCotisation();
     DialogueAjouterCotisation( ManageDb* db, 
                                const float p_montantCotisation, 
                                const float p_budgetEntrainement, 

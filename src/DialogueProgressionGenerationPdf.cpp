@@ -19,11 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueProgressionGenerationPdf.h"
 #include <QtWidgets>
 
-DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf()
-{
-
-}
-
 DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* parent) : QDialog(parent)
 {
 	boutonFermer = new QPushButton(tr("&Fermer"), this);

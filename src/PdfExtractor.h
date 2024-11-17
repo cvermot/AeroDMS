@@ -29,8 +29,6 @@ class PdfExtractor : public QWidget {
 	Q_OBJECT
 
 public:
-	PdfExtractor();
-
 	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuPdf( const QString p_fichier,
 		                                                                const AeroDmsTypes::Aeroclub p_aeroclub = AeroDmsTypes::Aeroclub_INCONNU);
 	static AeroDmsTypes::ListeDonneesFacture  recupererLesDonneesDuCsv(const QString p_fichier);

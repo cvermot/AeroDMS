@@ -20,11 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 
-DialogueGestionPilote::DialogueGestionPilote()
-{
-
-}
-
 DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QDialog(parent)
 {
     database = db;

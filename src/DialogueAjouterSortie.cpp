@@ -19,11 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 
-DialogueAjouterSortie::DialogueAjouterSortie()
-{
-    
-}
-
 DialogueAjouterSortie::DialogueAjouterSortie(QWidget* parent) : QDialog(parent)
 {
     cancelButton = new QPushButton(tr("&Annuler"), this);

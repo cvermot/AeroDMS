@@ -2051,7 +2051,7 @@ void AeroDms::recupererVolDepuisCsv()
 }
 
 
-void AeroDms::chargerUneFacture(QString p_fichier)
+void AeroDms::chargerUneFacture(const QString p_fichier)
 {
     cheminDeLaFactureCourante = p_fichier;
     factureIdEnBdd = -1;
@@ -3090,8 +3090,8 @@ void AeroDms::ouvrirDialogueParametresApplication()
     editionParametres.exec();
 }
 
-void AeroDms::enregistrerParametresApplication( AeroDmsTypes::ParametresMetier p_parametresMetiers,
-                                                AeroDmsTypes::ParametresSysteme p_parametresSysteme)
+void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMetier p_parametresMetiers,
+                                                const AeroDmsTypes::ParametresSysteme p_parametresSysteme)
 {
     parametresMetiers = p_parametresMetiers;
     parametresSysteme = p_parametresSysteme;
