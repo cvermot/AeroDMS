@@ -58,7 +58,7 @@ DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : 
 
 	setLayout(mainLayout);
 	setWindowTitle(QApplication::applicationName() + " - " + tr("Impression"));
-	setWindowModality(Qt::WindowModal);
+	setWindowModality(Qt::ApplicationModal);
 	resize(450, size().height());
 }
 
@@ -100,6 +100,7 @@ void DialogueProgressionImpression::traitementFichierSuivant()
 		labelFichier->setText(tr("Fichier ") + QString::number(barreDeProgressionFichier->value()) + "/" + QString::number(barreDeProgressionFichier->maximum() - 1));
 		barreDeProgressionPage->setValue(0);
 	}
+	qDebug() << "modalité " << isModal();
 }
 
 void DialogueProgressionImpression::traitementPageSuivante()

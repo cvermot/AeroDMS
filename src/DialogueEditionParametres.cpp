@@ -194,8 +194,6 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     else
     {
         peuplerResolutionImpression(600);
-        //resolutionImpression->addItem("600 DPI", 600);
-        //resolutionImpression->setEnabled(false);
     }
     if (resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression) != -1)
     {
