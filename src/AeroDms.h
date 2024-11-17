@@ -87,8 +87,8 @@ private:
 
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();
-
-    QString rechercherDerniereDemande();
+    
+    const QString rechercherDerniereDemande();
 
     bool uneMaJEstDisponible(const QString p_chemin,
                              const QString p_fichier);

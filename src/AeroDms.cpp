@@ -3418,7 +3418,7 @@ void AeroDms::ouvrirPdfDemandeSuvbvention()
     }
 }
 
-QString AeroDms::rechercherDerniereDemande()
+const QString AeroDms::rechercherDerniereDemande()
 {
     //Recherche de la dernière demande
     QDir fichierSortie(parametresSysteme.cheminSortieFichiersGeneres);
