@@ -89,7 +89,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     terminerMiseAJourApplication();
     verifierPresenceDeMiseAjour();
 
-    statusBar()->showMessage("Prêt");
+    statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
 }
@@ -1461,7 +1461,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     //On met à jour la fenêtre de progression
     const bool fichierMergeDisponible = (fichierAImprimer != "");
     progressionGenerationPdf->generationEstTerminee(fichierMergeDisponible);
-    const QString status = "Génération terminée. Fichiers disponibles sous "
+    const QString status = tr("Génération terminée. Fichiers disponibles sous ")
                             +p_cheminDossier;
     statusBar()->showMessage(status);
 }
@@ -1469,7 +1469,7 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
 void AeroDms::mettreAJourEchecGenerationPdf()
 {
     progressionGenerationPdf->close();
-    statusBar()->showMessage("Échec de la génération");
+    statusBar()->showMessage(tr("Échec de la génération des demandes de subventions"));
     detruireFenetreProgressionGenerationPdf();
 }
 
@@ -1786,13 +1786,13 @@ void AeroDms::ajouterUneCotisationEnBdd()
             //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
             peuplerListesPilotes();
 
-            statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " ajoutée pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
+            statusBar()->showMessage(tr("Cotisation ") + QString::number(infosCotisation.annee) + tr(" ajoutée pour le pilote ") + db->recupererNomPrenomPilote(infosCotisation.idPilote));
         }
     }
     else
     {
         db->ajouterCotisation(infosCotisation);
-        statusBar()->showMessage("Cotisation " + QString::number(infosCotisation.annee) + " mise à jour pour le pilote " + db->recupererNomPrenomPilote(infosCotisation.idPilote));
+        statusBar()->showMessage(tr("Cotisation ") + QString::number(infosCotisation.annee) + tr(" mise à jour pour le pilote ") + db->recupererNomPrenomPilote(infosCotisation.idPilote));
 
         //On met à jour la table des pilotes (en cas de changement de couleur)
         peuplerTablePilotes();
@@ -1827,17 +1827,17 @@ void AeroDms::ajouterUnPiloteEnBdd()
         {
             if (pilote.idPilote == "")
             {
-                statusBar()->showMessage("Pilote ajouté avec succès");
+                statusBar()->showMessage(tr("Pilote ajouté avec succès"));
             }
             else
             {
-                statusBar()->showMessage("Pilote modifié avec succès");
+                statusBar()->showMessage(tr("Pilote modifié avec succès"));
             } 
             break;
         } 
         case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
         {
-            statusBar()->showMessage("Échec ajout pilote : le pilote existe déjà");
+            statusBar()->showMessage(tr("Échec ajout pilote : le pilote existe déjà"));
             QMessageBox::critical(this, 
                 QApplication::applicationName() + " - " + tr("Échec ajoute pilote"), 
                 tr("Un pilote existe avec ce nom\nexiste déjà. Ajout impossible."));
@@ -1845,7 +1845,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
         }
         case AeroDmsTypes::ResultatCreationPilote_AUTRE:
         {
-            statusBar()->showMessage("Échec ajout pilote : erreur indéterminée");
+            statusBar()->showMessage(tr("Échec ajout pilote : erreur indéterminée"));
             QMessageBox::critical(this, 
                 QApplication::applicationName() + " - " + tr("Échec ajoute pilote"), 
                 tr("Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible."));
@@ -1862,14 +1862,14 @@ void AeroDms::ajouterUneSortieEnBdd()
     peuplerListeBaladesEtSorties();
     peuplerListeSorties();
 
-    statusBar()->showMessage("Sortie " + sortie.nom + " ajoutée");
+    statusBar()->showMessage(tr("Sortie ") + sortie.nom + tr(" ajoutée"));
 }
 
 void AeroDms::selectionnerUneFacture()
 {
     QString fichier = QFileDialog::getOpenFileName(
         this,
-        QApplication::applicationName() + " - " + "Ouvrir une facture",
+        QApplication::applicationName() + " - " + tr("Ouvrir une facture"),
         parametresSysteme.cheminStockageFacturesATraiter,
         tr("Fichier PDF (*.pdf)"));
 
@@ -2198,7 +2198,7 @@ void AeroDms::enregistrerUneFacture()
             }
             else
             {
-                statusBar()->showMessage("Impossible de déplacer la facture : arrêt.");
+                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt."));
                 estEnEchec = true;
             }
         }
@@ -2216,20 +2216,20 @@ void AeroDms::enregistrerUneFacture()
                 choixBaladeFacture->currentData().toInt(),
                 remarqueFacture->text());
 
-            statusBar()->showMessage(QString("Facture ")
+            statusBar()->showMessage(QString(tr("Facture "))
                 + remarqueFacture->text()
-                + " du "
+                + tr(" du ")
                 + dateDeFacture->date().toString("dd/MM/yyyy")
                 + " ("
                 + QString::number(montantFacture->value(), 'f', 2)
-                + "€) ajoutée.");
+                + tr("€) ajoutée."));
 
             montantFacture->setValue(0);
             remarqueFacture->clear();
         }
         else
         {
-            statusBar()->showMessage("Erreur ajout");
+            statusBar()->showMessage(tr("Erreur d'ajout de la facture"));
         }
     }
     //On met à jour la vue
@@ -2278,7 +2278,7 @@ void AeroDms::enregistrerUnVol()
             }
             else
             {
-                statusBar()->showMessage("Impossible de déplacer la facture : arrêt.");
+                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt."));
                 estEnEchec = true;
             }
         }
@@ -2346,11 +2346,11 @@ void AeroDms::enregistrerUnVol()
                 //que le status d'ajout du vol
                 supprimerLeVolDeLaVueVolsDetectes();
 
-            statusBar()->showMessage(QString("Vol ")
+            statusBar()->showMessage(QString(tr("Vol "))
                 + typeDeVol->currentText() 
-                + " de "
+                + tr(" de ")
                 + db->recupererNomPrenomPilote(idPilote)
-                + " du " 
+                + tr(" du ")
                 + dateDuVol->date().toString("dd/MM/yyyy") 
                 + " (" 
                 + dureeDuVol->time().toString("hh:mm")
@@ -2358,9 +2358,9 @@ void AeroDms::enregistrerUnVol()
                 + QString::number(prixDuVol->value(), 'f', 2)
                 + "€) "
                 + volAjouteModifie
-                + ". Montant subvention : "
+                + tr(". Montant subvention : ")
                 + QString::number(montantSubventionne, 'f', 2)
-                + "€ / Subvention entrainement restante : "
+                + tr("€ / Subvention entrainement restante : ")
                 + QString::number(subventionRestante, 'f', 2)
                 + "€");
 
@@ -2378,7 +2378,7 @@ void AeroDms::enregistrerUnVol()
         }
         else
         {
-            statusBar()->showMessage("Erreur ajout");
+            statusBar()->showMessage(tr("Erreur d'ajout du vol"));
         }
     }
     //On met à jour la table des pilotes et celle des vols
@@ -2447,7 +2447,7 @@ void AeroDms::enregistrerUneRecette()
     if (volsCoches.size() == 0)
     {
         QMessageBox::critical( this, 
-            QApplication::applicationName() + " - " + "Vol non sélectionné",
+            QApplication::applicationName() + " - " + tr("Vol non sélectionné"),
                                tr("La dépense doit être associée à au moins un vol. \n\
 Sélectionnez au moins un vol dans la partie gauche de la fenêtre.\n\n\
 Saisie non prise en compte."));
@@ -2458,7 +2458,7 @@ Saisie non prise en compte."));
                                            typeDeRecette->currentText(),
                                            nomEmetteurChequeRecette->text() + " / " + banqueNumeroChequeRecette->text(),
                                            montantRecette->value());
-        statusBar()->showMessage("Recette ajoutee");
+        statusBar()->showMessage(tr("Recette ajoutée"));
 
         nomEmetteurChequeRecette->clear();
         banqueNumeroChequeRecette->clear();
@@ -2613,16 +2613,16 @@ void AeroDms::mettreAJourInfosSurSelectionPilote()
     if (choixPilote->currentIndex() != 0)
     {
         aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
-        QString cotisation = "(Cotisation payée pour l'année "
+        QString cotisation = tr("(Cotisation payée pour l'année ")
             + QString::number(dateDuVol->date().year())
             + ")";
         if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
         {
-            cotisation = "(Cotisation non payée pour l'année "
+            cotisation = tr("(Cotisation non payée pour l'année ")
                 + QString::number(dateDuVol->date().year())
                 + ")";
         }
-        statusBar()->showMessage("Subvention restante pour ce pilote, pour l'année "
+        statusBar()->showMessage(tr("Subvention restante pour ce pilote, pour l'année ")
             + QString::number(dateDuVol->date().year())
             + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year()))
             + " € "
@@ -2803,11 +2803,11 @@ void AeroDms::volsSelectionnes()
 
             hdvTotales = hdvTotales + vueVols->item(numeroLigne, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES)->data(0).toInt();
 
-            statusBar()->showMessage("Vols sélectionnés : Coût total : "
+            statusBar()->showMessage(tr("Vols sélectionnés : Coût total : ")
                 + QString::number(coutTotal, 'f', 2)
-                + " € / Montant subventionné total : "
+                + tr(" € / Montant subventionné total : ")
                 + QString::number(montantTotalSubventionne, 'f', 2)
-                + " € / Nombres d'heures de vol totales : "
+                + tr(" € / Nombres d'heures de vol totales : ")
                 + AeroDmsServices::convertirMinutesEnHeuresMinutes(hdvTotales));
         }
     }
