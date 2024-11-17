@@ -29,9 +29,9 @@ class PdfPrinter : public QWidget {
 
 public:
 	PdfPrinter();
-	void imprimerDossier(const QString p_dossier,
+	AeroDmsTypes::EtatImpression imprimerDossier(const QString p_dossier,
 		const AeroDmsTypes::ParametresImpression p_parametresImpression);
-    void imprimerFichier(const QString p_fichier, 
+	AeroDmsTypes::EtatImpression imprimerFichier(const QString p_fichier,
 		const AeroDmsTypes::ParametresImpression p_parametresImpression);
 
 private:

@@ -19,7 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueProgressionImpression.h"
 #include <QtWidgets>
 
-
 DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : QDialog(parent)
 {
 	boutonFermer = new QPushButton(tr("&Fermer"), this);
@@ -100,7 +99,6 @@ void DialogueProgressionImpression::traitementFichierSuivant()
 		labelFichier->setText(tr("Fichier ") + QString::number(barreDeProgressionFichier->value()) + "/" + QString::number(barreDeProgressionFichier->maximum() - 1));
 		barreDeProgressionPage->setValue(0);
 	}
-	qDebug() << "modalité " << isModal();
 }
 
 void DialogueProgressionImpression::traitementPageSuivante()

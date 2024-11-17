@@ -25,7 +25,7 @@ PdfPrinter::PdfPrinter()
     progressionImpression = new DialogueProgressionImpression(this);
 }
 
-void PdfPrinter::imprimerDossier(const QString p_dossier, 
+AeroDmsTypes::EtatImpression PdfPrinter::imprimerDossier(const QString p_dossier,
     const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
     dossierAImprimer = p_dossier;
@@ -33,14 +33,15 @@ void PdfPrinter::imprimerDossier(const QString p_dossier,
 
     if (demandeImpressionEstConfirmee)
     {
-        if (progressionImpression->exec() == QDialog::Accepted)
+        if (progressionImpression->exec() == QDialog::Rejected)
         {
-            return;
+            return AeroDmsTypes::EtatImpression_TERMINEE;
         }
     }
+    return AeroDmsTypes::EtatImpression_ANNULEE_PAR_UTILISATEUR;
 }
 
-void PdfPrinter::imprimerFichier(const QString p_fichier, 
+AeroDmsTypes::EtatImpression PdfPrinter::imprimerFichier(const QString p_fichier,
     const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
     fichierAImprimer = p_fichier;
@@ -48,11 +49,12 @@ void PdfPrinter::imprimerFichier(const QString p_fichier,
 
     if (demandeImpressionEstConfirmee)
     {
-        if (progressionImpression->exec() == QDialog::Accepted)
+        if (progressionImpression->exec() == QDialog::Rejected)
         {
-            return;
+            return AeroDmsTypes::EtatImpression_TERMINEE;
         }
     }
+    return AeroDmsTypes::EtatImpression_ANNULEE_PAR_UTILISATEUR;
 }
 
 void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_parametresImpression)

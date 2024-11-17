@@ -201,6 +201,12 @@ public:
         EtatGeneration_CREATION_DOSSIER_IMPOSSIBLE
     };
 
+    enum EtatImpression
+    {
+        EtatImpression_TERMINEE,
+        EtatImpression_ANNULEE_PAR_UTILISATEUR
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande;
         QString idPilote;

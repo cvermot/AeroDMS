@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
 #include "DialogueProgressionGenerationPdf.h"
-#include "DialogueProgressionImpression.h"
 #include "StatistiqueWidget.h"
 
 QT_BEGIN_NAMESPACE
@@ -83,6 +82,8 @@ private:
     void initialiserOngletSubventionsDemandees();
 
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
+
+    void afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression);
 
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();

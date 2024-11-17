@@ -28,7 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonuts.h"
 
 #include "DialogueEditionParametres.h"
-#include "DialogueProgressionImpression.h"
 
 #include <QtWidgets>
 #include <QToolBar>
@@ -2342,7 +2341,7 @@ void AeroDms::enregistrerUnVol()
                 }
 
                 //On supprime la vol de la liste des vols détectés si on en avait chargé un
-                //On fait ceci avant la mise à jour de la statiusBar car supprimerLeVolDeLaVueVolsDetectes()
+                //On fait ceci avant la mise à jour de la statusBar car supprimerLeVolDeLaVueVolsDetectes()
                 //en fait également une. De cette façon on masque le status de suppression et on affiche
                 //que le status d'ajout du vol
                 supprimerLeVolDeLaVueVolsDetectes();
@@ -3564,7 +3563,8 @@ void AeroDms::imprimerLaDerniereDemande()
 void AeroDms::imprimerLaDemande()
 {
     PdfPrinter impression;
-    impression.imprimerFichier(fichierAImprimer, parametresSysteme.parametresImpression);
+    const AeroDmsTypes::EtatImpression etatImpression = impression.imprimerFichier(fichierAImprimer, parametresSysteme.parametresImpression);
+    afficherEtatImpression(etatImpression);
 }
 
 void AeroDms::imprimerLaDerniereDemandeAgrafage()
@@ -3576,7 +3576,26 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 void AeroDms::imprimerLaDemandeAgrafage()
 {
     PdfPrinter impression;
-    impression.imprimerDossier(dossierSortieGeneration, parametresSysteme.parametresImpression);
+    const AeroDmsTypes::EtatImpression etatImpression = impression.imprimerDossier(dossierSortieGeneration, parametresSysteme.parametresImpression);
+    afficherEtatImpression(etatImpression);
+}
+
+void AeroDms::afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression)
+{
+    switch (p_etatImpression)
+    {
+        case AeroDmsTypes::EtatImpression_TERMINEE:
+        {
+            statusBar()->showMessage(tr("Impression terminée avec succès"));
+        }
+        break;
+        case AeroDmsTypes::EtatImpression_ANNULEE_PAR_UTILISATEUR:
+        default:
+        {
+            statusBar()->showMessage(tr("Impression annulée par l'utilisateur"));
+        }
+        break;
+    }
 }
 
 int AeroDms::calculerValeurGraphAGenererPdf()
