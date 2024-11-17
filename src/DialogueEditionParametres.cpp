@@ -48,7 +48,9 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* mailingLayout = new QGridLayout();
     QWidget* mailingWidget = new QWidget(this);
     mailingWidget->setLayout(mailingLayout);
-    onglets->addTab(mailingWidget, QIcon("./ressources/email-multiple.svg"), "Mailing");
+    onglets->addTab(mailingWidget, 
+        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING), 
+        tr("Mailing"));
 
     int ligneActuelle = mailingLayout->rowCount();
     objetChequeDispo = new QLineEdit(this);
@@ -94,7 +96,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* financeLayout = new QGridLayout();
     QWidget* financeWidget = new QWidget(this);
     financeWidget->setLayout(financeLayout);
-    onglets->addTab(financeWidget, QIcon("./ressources/cash-multiple.svg"), "Financiers");
+    onglets->addTab(financeWidget, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FINANCIER), "Financiers");
 
     ligneActuelle = financeLayout->rowCount();
     montantCotisationPilote = new QDoubleSpinBox(this);

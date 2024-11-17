@@ -49,166 +49,437 @@ const QTime AeroDmsServices::convertirHeuresDecimalesEnQTime(const double p_heur
 }
 
 QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
+{  
+    if (p_icone == "ULM")
+    {
+        return recupererIcone(Icone_ULM);
+    }
+    else if (p_icone == "Avion")
+    {
+        return recupererIcone(Icone_AVION);
+    }
+    else if (p_icone == "Planeur")
+    {
+        return recupererIcone(Icone_PLANEUR);
+    }
+    else if (p_icone == "Hélicoptère")
+    {
+        return recupererIcone(Icone_HELICOPTERE);
+    }
+    else if (p_icone == "Avion électrique")
+    {
+        return recupererIcone(Icone_AVION_ELECTRIQUE);
+    }
+    else if (p_icone == "Balade")
+    {
+        return recupererIcone(Icone_BALADE);
+    }
+    else if (p_icone == "Sortie")
+    {
+        return recupererIcone(Icone_SORTIE);
+    }
+    else if (p_icone == "Entrainement")
+    {
+        return recupererIcone(Icone_ENTRAINEMENT);
+    }
+    else if (p_icone == "Oui")
+    {
+        return recupererIcone(Icone_OUI);
+    }
+    else if (p_icone == "Non")
+    {
+        return recupererIcone(Icone_NON);
+    }  
+    else
+    {
+        return recupererIcone(Icone_INCONNUE);
+    }
+}
+
+QIcon AeroDmsServices::recupererIcone(const QChar p_caractere)
 {
-        if (p_icone == "ULM")
-        {
-            return QIcon("./ressources/feather.svg");
-        }
-        else if (p_icone == "Avion")
-        {
-            return QIcon("./ressources/airplane.svg");
-        }
-        else if (p_icone == "Planeur")
-        {
-            return QIcon("./ressources/airplane-landing.svg");
-        }
-        else if (p_icone == "Hélicoptère")
-        {
-            return QIcon("./ressources/helicopter.svg");
-        }
-        else if (p_icone == "Avion électrique")
-        {
-            return QIcon("./ressources/lightning-bolt.svg");
-        }
-        else if (p_icone == "Balade")
-        {
-            return QIcon("./ressources/account-group.svg");
-        }
-        else if (p_icone == "Sortie")
-        {
-            return QIcon("./ressources/bag-checked.svg");
-        }
-        else if (p_icone == "Entrainement")
-        {
-            return QIcon("./ressources/airport.svg");
-        }
-        else if (p_icone == "Total")
-        {
-            return QIcon("./ressources/sigma.svg");
-        }
-        else if (p_icone == "Oui")
-        {
-            return QIcon("./ressources/check.svg");
-        }
-        else if (p_icone == "Non")
-        {
-            return QIcon("./ressources/close.svg");
-        }
-        else if (p_icone == "Cotisation")
-        {
-            return QIcon("./ressources/ticket.svg");
-        }
-        else if (p_icone == "Tous")
-        {
-            return QIcon("./ressources/all-inclusive.svg");
-        }   
+    return recupererIcone(AeroDmsServices::Icone(p_caractere.toLatin1()));
+}
 
-        else if (p_icone == "A" || p_icone == "a")
-        {
-            return QIcon("./ressources/alpha-a.svg");
-        }
-        else if (p_icone == "B" || p_icone == "b")
-        {
-            return QIcon("./ressources/alpha-b.svg");
-        }
-        else if (p_icone == "C" || p_icone == "c")
-        {
-            return QIcon("./ressources/alpha-c.svg");
-        }
-        else if (p_icone == "D" || p_icone == "d")
-        {
-            return QIcon("./ressources/alpha-d.svg");
-        }
-        else if (p_icone == "E" || p_icone == "e")
-        {
-            return QIcon("./ressources/alpha-e.svg");
-        }
-        else if (p_icone == "F" || p_icone == "f")
-        {
-            return QIcon("./ressources/alpha-f.svg");
-        }
-        else if (p_icone == "G" || p_icone == "g")
-        {
-            return QIcon("./ressources/alpha-g.svg");
-        }
-        else if (p_icone == "H" || p_icone == "h")
-        {
-            return QIcon("./ressources/alpha-h.svg");
-        }
-        else if (p_icone == "I" || p_icone == "i")
-        {
-            return QIcon("./ressources/alpha-i.svg");
-        }
-        else if (p_icone == "J" || p_icone == "j")
-        {
-            return QIcon("./ressources/alpha-j.svg");
-        }
-        else if (p_icone == "K" || p_icone == "k")
-        {
-            return QIcon("./ressources/alpha-k.svg");
-        }
-        else if (p_icone == "L" || p_icone == "l")
-        {
-            return QIcon("./ressources/alpha-l.svg");
-        }
-        else if (p_icone == "M" || p_icone == "m")
-        {
-            return QIcon("./ressources/alpha-m.svg");
-        }
-        else if (p_icone == "N" || p_icone == "n")
-        {
-            return QIcon("./ressources/alpha-n.svg");
-        }
-        else if (p_icone == "O" || p_icone == "o")
-        {
-            return QIcon("./ressources/alpha-o.svg");
-        }
-        else if (p_icone == "P" || p_icone == "p")
-        {
-            return QIcon("./ressources/alpha-p.svg");
-        }
-        else if (p_icone == "Q" || p_icone == "q")
-        {
-            return QIcon("./ressources/alpha-q.svg");
-        }
-        else if (p_icone == "R" || p_icone == "r")
-        {
-            return QIcon("./ressources/alpha-r.svg");
-        }
-        else if (p_icone == "S" || p_icone == "s")
-        {
-            return QIcon("./ressources/alpha-s.svg");
-        }
-        else if (p_icone == "T" || p_icone == "t")
-        {
-            return QIcon("./ressources/alpha-t.svg");
-        }
-        else if (p_icone == "U" || p_icone == "u")
-        {
-            return QIcon("./ressources/alpha-u.svg");
-        }
-        else if (p_icone == "V" || p_icone == "v")
-        {
-            return QIcon("./ressources/alpha-v.svg");
-        }
-        else if (p_icone == "W" || p_icone == "w")
-        {
-            return QIcon("./ressources/alpha-w.svg");
-        }
-        else if (p_icone == "X" || p_icone == "x")
-        {
-            return QIcon("./ressources/alpha-x.svg");
-        }
-        else if (p_icone == "Y" || p_icone == "y")
-        {
-            return QIcon("./ressources/alpha-y.svg");
-        }
-        else if (p_icone == "Z" || p_icone == "z")
-        {
-            return QIcon("./ressources/alpha-z.svg");
-        }
+QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
+{
+    switch (p_icone)
+    {
+    case AeroDmsServices::Icone_ULM:
+    {
+        return QIcon("./ressources/feather.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_AVION:
+    {
+        return QIcon("./ressources/airplane.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_PLANEUR:
+    {
+        return QIcon("./ressources/airplane-landing.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_HELICOPTERE:
+    {
+        return QIcon("./ressources/helicopter.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_AVION_ELECTRIQUE:
+    {
+        return QIcon("./ressources/lightning-bolt.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_BALADE:
+    {
+        return QIcon("./ressources/account-group.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_SORTIE:
+    {
+        return QIcon("./ressources/bag-checked.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_ENTRAINEMENT:
+    {
+        return QIcon("./ressources/airport.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_TOTAL:
+    {
+        return QIcon("./ressources/sigma.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_OUI:
+    {
+        return QIcon("./ressources/check.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_NON:
+    {
+        return QIcon("./ressources/close.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_COTISATION:
+    {
+        return QIcon("./ressources/ticket.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_RECETTE:
+    {
+        return QIcon("./ressources/file-document-plus.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_DEPENSE:
+    {
+        return QIcon("./ressources/file-document-minus.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_FACTURE:
+    {
+        return QIcon("./ressources/file-document.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_FINANCIER:
+    {
+        return QIcon("./ressources/cash-multiple.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_TOUS:
+    {
+        return QIcon("./ressources/all-inclusive.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_PILOTE:
+    {
+        return QIcon("./ressources/account-tie-hat.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_GENERE_DEMANDE_SUBVENTIONS:
+    {
+        return QIcon("./ressources/file-cog.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_GENERE_RECAP_HDV:
+    {
+        return QIcon("./ressources/account-file-text.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_AJOUTER_VOL:
+    {
+        return QIcon("./ressources/airplane-plus.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_MAILING:
+    {
+        return QIcon("./ressources/email-multiple.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_IMPRIMER:
+    {
+        return QIcon("./ressources/printer.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_OUVRIR_DOSSIER:
+    {
+        return QIcon("./ressources/folder-open.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_FICHIER:
+    {
+        return QIcon("./ressources/file.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_DEBUG:
+    {
+        return QIcon("./ressources/bug.svg");
+    }
+    break;
 
+    case AeroDmsServices::Icone_STATS_BARRES_EMPILEES:
+    {
+        return QIcon("./ressources/chart-bar-stacked.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_STATS_CAMEMBERT:
+    {
+        return QIcon("./ressources/chart-pie.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_STATS_DONUT:
+    {
+        return QIcon("./ressources/chart-donut-variant.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_STATS:
+    {
+        return QIcon("./ressources/chart-areaspline.svg");
+    }
+    break;
+
+    case AeroDmsServices::Icone_A:
+    case AeroDmsServices::Icone_A_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-a.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_B:
+    case AeroDmsServices::Icone_B_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-b.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_C:
+    case AeroDmsServices::Icone_C_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-c.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_D:
+    case AeroDmsServices::Icone_D_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-d.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_E:
+    case AeroDmsServices::Icone_E_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-e.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_F:
+    case AeroDmsServices::Icone_F_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-f.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_G:
+    case AeroDmsServices::Icone_G_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-g.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_H:
+    case AeroDmsServices::Icone_H_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-h.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_I:
+    case AeroDmsServices::Icone_I_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-i.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_J:
+    case AeroDmsServices::Icone_J_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-j.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_K:
+    case AeroDmsServices::Icone_K_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-k.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_L:
+    case AeroDmsServices::Icone_L_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-l.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_M:
+    case AeroDmsServices::Icone_M_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-m.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_N:
+    case AeroDmsServices::Icone_N_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-n.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_O:
+    case AeroDmsServices::Icone_O_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-o.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_P:
+    case AeroDmsServices::Icone_P_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-p.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_Q:
+    case AeroDmsServices::Icone_Q_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-q.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_R:
+    case AeroDmsServices::Icone_R_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-r.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_S:
+    case AeroDmsServices::Icone_S_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-s.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_T:
+    case AeroDmsServices::Icone_T_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-t.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_U:
+    case AeroDmsServices::Icone_U_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-u.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_V:
+    case AeroDmsServices::Icone_V_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-v.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_W:
+    case AeroDmsServices::Icone_W_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-w.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_X:
+    case AeroDmsServices::Icone_X_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-x.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_Y:
+    case AeroDmsServices::Icone_Y_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-y.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_Z:
+    case AeroDmsServices::Icone_Z_MINUSCULE:
+    {
+        return QIcon("./ressources/alpha-z.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_MOINS_1:
+    {
+        return QIcon("./ressources/numeric-negative-1.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_0:
+    {
+        return QIcon("./ressources/numeric-0.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_1:
+    {
+        return QIcon("./ressources/numeric-positive-1.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_2:
+    {
+        return QIcon("./ressources/numeric-positive-2.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_3:
+    {
+        return QIcon("./ressources/numeric-positive-3.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_4:
+    {
+        return QIcon("./ressources/numeric-positive-4.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_5:
+    {
+        return QIcon("./ressources/numeric-positive-5.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_6:
+    {
+        return QIcon("./ressources/numeric-positive-6.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_7:
+    {
+        return QIcon("./ressources/numeric-positive-7.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_8:
+    {
+        return QIcon("./ressources/numeric-positive-8.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_9:
+    {
+        return QIcon("./ressources/numeric-positive-9.svg");
+    }
+    break;
+
+    case AeroDmsServices::Icone_ICONE_APPLICATION:
+    {
+        return QIcon("./ressources/shield-airplane.svg");
+    }
+    break;
+    case Icone_INCONNUE:
+    default:
+    {
         return QIcon("./ressources/help.svg");
+    }
+    }
 
 }
 

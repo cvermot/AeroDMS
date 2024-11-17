@@ -56,9 +56,9 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     annee->addItem(QString::number(anneeCourante - 1));
     annee->addItem(QString::number(anneeCourante));
     annee->addItem(QString::number(anneeCourante + 1));
-    annee->setItemIcon(0, QIcon("./ressources/numeric-negative-1.svg"));
-    annee->setItemIcon(1, QIcon("./ressources/numeric-0.svg"));
-    annee->setItemIcon(2, QIcon("./ressources/numeric-positive-1.svg"));
+    annee->setItemIcon(0, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MOINS_1));
+    annee->setItemIcon(1, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_0));
+    annee->setItemIcon(2, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_1));
 
     montant = new QDoubleSpinBox(this);
     QLabel* montantLabel = new QLabel(tr("Montant : "), this);
@@ -110,7 +110,8 @@ void DialogueAjouterCotisation::peuplerListePilote()
     listePilote->addItem("", "");
     for (int i = 0; i < listePilotes.size(); i++)
     {
-        const AeroDmsTypes::Pilote pilote = listePilotes.at(i);
+        AeroDmsTypes::Pilote pilote = listePilotes.at(i);
+        AeroDmsServices::normaliser(pilote.prenom);
         listePilote->addItem( AeroDmsServices::recupererIcone(pilote.prenom.at(0)),
                               QString(pilote.prenom).append(" ").append(pilote.nom),
                               listePilotes.at(i).idPilote);
