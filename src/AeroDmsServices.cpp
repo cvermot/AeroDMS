@@ -160,6 +160,11 @@ QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon("./ressources/close.svg");
     }
     break;
+    case AeroDmsServices::Icone_TOUT_COCHER:
+    {
+        return QIcon("./ressources/check-all.svg");
+    }
+    break;
     case AeroDmsServices::Icone_COTISATION:
     {
         return QIcon("./ressources/ticket.svg");
@@ -228,6 +233,21 @@ QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
     case AeroDmsServices::Icone_FICHIER:
     {
         return QIcon("./ressources/file.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_SCAN_AUTO_FACTURE:
+    {
+        return QIcon("./ressources/file-search.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_SCAN_AUTO_FACTURE_GENERIQUE:
+    {
+        return QIcon("./ressources/text-box-search.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_SCAN_AUTO_VOL:
+    {
+        return QIcon("./ressources/airplane-search.svg");
     }
     break;
     case AeroDmsServices::Icone_DEBUG:

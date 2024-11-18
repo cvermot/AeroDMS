@@ -116,6 +116,9 @@ public:
         Icone_IMPRIMER,
         Icone_OUVRIR_DOSSIER,
         Icone_FICHIER,
+        Icone_SCAN_AUTO_FACTURE,
+        Icone_SCAN_AUTO_FACTURE_GENERIQUE,
+        Icone_SCAN_AUTO_VOL,
         Icone_DEBUG,
 
         Icone_STATS_BARRES_EMPILEES,
@@ -126,6 +129,7 @@ public:
         Icone_OUI,
         Icone_NON,
         Icone_TOUS,
+        Icone_TOUT_COCHER,
         Icone_MOINS_1,
 
         Icone_ICONE_APPLICATION,

@@ -992,11 +992,15 @@ void AeroDms::initialiserMenuOptions()
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
     QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
-    boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), tr("Récapitulatif des &recettes"), this);
+    boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), 
+        tr("Récapitulatif des &recettes"), 
+        this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
     boutonOptionRecapAnnuelRecettes->setCheckable(true);
     boutonOptionRecapAnnuelRecettes->setStatusTip(tr("Permet d'ajouter le récapitulatif des recettes dans le récap des heures de vol"));
-    boutonOptionRecapAnnuelBaladesSorties = new QAction(QIcon("./ressources/airplane-search.svg"), tr("Récapitulatif des &balades et sorties"), this);
+    boutonOptionRecapAnnuelBaladesSorties = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL),
+        tr("Récapitulatif des &balades et sorties"), 
+        this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
     boutonOptionRecapAnnuelBaladesSorties->setStatusTip(tr("Permet d'ajouter le récapitulatif des balades et sorties (dates, durées, noms des passagers, couts et recettes...) dans le récap des heures de vol"));
@@ -1045,15 +1049,21 @@ void AeroDms::initialiserMenuOptions()
     QMenu* resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Résolution des graphiques"));
 
-    boutonGraphResolutionFullHd = new QAction(QIcon("./ressources/high-definition.svg"), tr("&Full HD (1920 × 1080)"), this);
+    boutonGraphResolutionFullHd = new QAction(QIcon("./ressources/standard-definition.svg"), 
+        tr("&Full HD (1920 × 1080)"), 
+        this);
     resolutionGraphiques->addAction(boutonGraphResolutionFullHd);
     boutonGraphResolutionFullHd->setCheckable(true);
 
-    boutonGraphResolutionQhd = new QAction(QIcon("./ressources/high-definition.svg"), tr("&QHD (2560 × 1440)"), this);
+    boutonGraphResolutionQhd = new QAction(QIcon("./ressources/high-definition.svg"), 
+        tr("&QHD (2560 × 1440)"), 
+        this);
     resolutionGraphiques->addAction(boutonGraphResolutionQhd);
     boutonGraphResolutionQhd->setCheckable(true);
 
-    boutonGraphResolution4k = new QAction(QIcon("./ressources/ultra-high-definition.svg"), tr("&UHD (3840 × 2160)"), this);
+    boutonGraphResolution4k = new QAction(QIcon("./ressources/ultra-high-definition.svg"), 
+        tr("&UHD (3840 × 2160)"),
+        this);
     resolutionGraphiques->addAction(boutonGraphResolution4k);
     boutonGraphResolution4k->setCheckable(true);
 
@@ -1063,13 +1073,17 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphResolution4k->activate(QAction::Trigger);
 
     graphiquesDuRecapAnnuel->addSeparator();
-    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(QIcon("./ressources/check-all.svg"), tr("&Sélectionner tous les graphs"), this);
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUT_COCHER),
+        tr("&Sélectionner tous les graphs"), 
+        this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
     boutonGraphRecapAnnuelSelectionnerTousLesGraphs->setStatusTip(tr("Ajoute tous les graphiques au récap des heures de vol"));
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
     menuOptionsRecapAnnuel->addSeparator();
-    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(QIcon("./ressources/check-all.svg"), tr("&Sélectionner tous les graphs et tous les récaps"), this);
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUT_COCHER),
+        tr("&Sélectionner tous les graphs et tous les récaps"), 
+        this);
     menuOptionsRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap);
     boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap->setStatusTip(tr("Ajoute tous les graphiques, le tableau des recettes et le tableau des balades au récap des heures de vol"));
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
@@ -1080,7 +1094,9 @@ void AeroDms::initialiserMenuOptions()
 
     menuOption->addSeparator();
 
-    boutonActivationScanAutoFactures = new QAction(QIcon("./ressources/file-search.svg"), tr("Désactiver le scan &automatique des factures"), this);
+    boutonActivationScanAutoFactures = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE), 
+        tr("Désactiver le scan &automatique des factures"), 
+        this);
     boutonActivationScanAutoFactures->setStatusTip(tr("Active/désactive le scan à l'ouverture des factures PDF. Cette option permet de désactiver le scan automatique si une facture fait planter le logiciel par exemple."));
     menuOption->addAction(boutonActivationScanAutoFactures);
     connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
@@ -1123,31 +1139,31 @@ void AeroDms::initialiserMenuOutils()
     QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des &factures"));
     scanFacture->setToolTipsVisible(true);
     scanFacture->setStatusTip(tr("Scan une facture en se basant sur une des méthode utilisée par le logiciel pour un type de facture déjà connu."));
-    scanFacture->setIcon(QIcon("./ressources/file-search.svg"));
+    scanFacture->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE));
     scanAutoOpenFlyer = new QAction(tr("&OpenFlyer (CAPAM, ACB)"), this);
-    scanAutoOpenFlyer->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoOpenFlyer->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoOpenFlyer);
     scanAutoAerogest = new QAction(tr("&Aerogest (ACBA)"), this);
-    scanAutoAerogest->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoAerogest->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAerogest);
     scanAutoAca = new QAction(tr("Aér&oclub d'Andernos"), this);
-    scanAutoAca->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoAca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAca);
     scanAutoDaca = new QAction(tr("&DACA"), this);
-    scanAutoDaca->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoDaca);
     scanAutoSepavia = new QAction(tr("&SEPAVIA"), this);
-    scanAutoSepavia->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoSepavia->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoSepavia);
     scanAutoUaca = new QAction(tr("&UACA"), this);
-    scanAutoUaca->setIcon(QIcon("./ressources/airplane-search.svg"));
+    scanAutoUaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoUaca);
     scanFacture->addSeparator();
     scanAutoGenerique1Passe = new QAction(tr("&Générique (une passe)"), this);
-    scanAutoGenerique1Passe->setIcon(QIcon("./ressources/text-box-search.svg"));
+    scanAutoGenerique1Passe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
     scanFacture->addAction(scanAutoGenerique1Passe);
     scanAutoGenerique = new QAction(tr("Générique (&multi-passe)"), this);
-    scanAutoGenerique->setIcon(QIcon("./ressources/text-box-search.svg"));
+    scanAutoGenerique->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
     scanFacture->addAction(scanAutoGenerique);
     scanFacture->addSeparator();
     scanAutoCsv = new QAction(tr("&Importer les vols depuis un fichier CSV"), this);
