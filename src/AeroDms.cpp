@@ -97,7 +97,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("6.7");
+    QApplication::setApplicationVersion("6.8");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
