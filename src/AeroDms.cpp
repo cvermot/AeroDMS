@@ -391,8 +391,9 @@ void AeroDms::initialiserOngletAjoutDepenses()
 
     aeroclubPiloteSelectionne = new QLineEdit(this);
     aeroclubPiloteSelectionne->setToolTip(tr("Nom de l'aéroclub renseigné pour le pilote sélectionné et au nom duquel le\n"
-        "remboursement sera émis. En cas de changement d'aéroclub, modifier\n"
-        "l'aéroclub du pilote avant de générer les demandes de subvention."));
+        "remboursement sera émis. En cas de changement d'aéroclub, modifier l'aéroclub\n"
+        "du pilote avant de générer les demandes de subvention.\n"
+        "Changement réalisable via l'option \"Éditer le pilote sélectionné\" du menu Options."));
     aeroclubPiloteSelectionne->setEnabled(false);
     QLabel* aeroclubPiloteSelectionneLabel = new QLabel(tr("Aéroclub : "), this);
 
@@ -1910,6 +1911,13 @@ void AeroDms::ajouterUnPiloteEnBdd()
         peuplerListeBaladesEtSorties();
         peuplerTablePilotes();
         peuplerTableVols();
+
+        //Si on est en ajout de vol, on reséléctionne le pilote...
+        if (mainTabWidget->currentWidget() == widgetAjoutVol)
+        {
+            choixPilote->setCurrentIndex(choixPilote->findData(pilote.idPilote));
+            aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
+        }
     }
 
     switch (resultat)
@@ -2827,7 +2835,9 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         anneeAEditer = vuePilotes->item( ligneSelectionnee,
                                          AeroDmsTypes::PiloteTableElement_ANNEE)->text().toInt();
 
-        QAction editer(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE),tr("Éditer le pilote"), this);
+        QAction editer(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE),
+            tr("Éditer le pilote"), 
+            this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
         menuClicDroitPilote.addAction(&editer);
 
@@ -2923,11 +2933,15 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         const bool leVolEstSupprimable = (vueVols->item(ligneSelectionnee, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text() == "Non");
         volPartiellementEditable = !leVolEstSupprimable;
 
-        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), "Éditer le vol", this);
+        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), 
+            tr("Éditer le vol"), 
+            this);
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
         menuClicDroitVol.addAction(&editerLeVol);
 
-        QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), "Supprimer le vol", this);
+        QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), 
+            tr("Supprimer le vol"), 
+            this);
         connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
         menuClicDroitVol.addAction(&supprimerLeVol);
         supprimerLeVol.setEnabled(leVolEstSupprimable);
