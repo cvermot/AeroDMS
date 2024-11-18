@@ -194,7 +194,7 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
         }
         index++;
     }
-    //qDebug() << donneesFactures.dateDuVol << donneesFactures.dureeDuVol << donneesFactures.coutDuVol;
+
     return donneesFactures;
 }
 
@@ -281,7 +281,6 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vecto
         }
         index++;
     }
-    //qDebug() << donneesFacture.dateDuVol << donneesFacture.dureeDuVol << donneesFacture.coutDuVol;
 
     return donneesFacture;
 }
@@ -334,7 +333,6 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                 }
                 donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
             }
-            //qDebug() << donneesFactures.dateDuVol << donneesFactures.dureeDuVol << donneesFactures.coutDuVol;
 
             liste.append(donneesFactures);
         }

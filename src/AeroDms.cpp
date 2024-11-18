@@ -92,8 +92,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
-
-    //qDebug() << "icones number" << AeroDmsServices::Icone_9 << AeroDmsServices::Icone_MOINS_1 << AeroDmsServices::Icone_A ;
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -1543,14 +1541,7 @@ AeroDms::~AeroDms()
 
 void AeroDms::peuplerTablePilotes()
 {
-    //On mette à jour l'info pilote a editer en cas de demande d'édition du pilote via le menu outils,
-    //si on a sélectionné un pilote donné et pas "Tous les pilotes"
-    boutonEditerLePiloteSelectionne->setEnabled(false);
-    if (listeDeroulantePilote->currentData().toString() != "*")
-    {
-        piloteAEditer = listeDeroulantePilote->currentData().toString();
-        boutonEditerLePiloteSelectionne->setEnabled(true);
-    }  
+    gererBoutonEditionPilote();
 
     const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes( listeDeroulanteAnnee->currentData().toInt(), 
                                                                                                        listeDeroulantePilote->currentData().toString());
@@ -1586,6 +1577,26 @@ void AeroDms::peuplerTablePilotes()
         }
     }
     vuePilotes->resizeColumnsToContents();
+}
+
+void AeroDms::gererBoutonEditionPilote()
+{
+    //On mette à jour l'info pilote a editer en cas de demande d'édition du pilote via le menu outils,
+    //si on a sélectionné un pilote donné et pas "Tous les pilotes"
+    boutonEditerLePiloteSelectionne->setEnabled(false);
+    if (mainTabWidget->currentWidget() == widgetAjoutVol)
+    {
+        if (choixPilote->currentIndex() != 0)
+        {
+            piloteAEditer = choixPilote->currentData().toString();
+            boutonEditerLePiloteSelectionne->setEnabled(true);
+        }
+    }
+    else if (listeDeroulantePilote->currentData().toString() != "*")
+    {
+        piloteAEditer = listeDeroulantePilote->currentData().toString();
+        boutonEditerLePiloteSelectionne->setEnabled(true);
+    }
 }
 
 void AeroDms::peuplerTableVols()
@@ -2699,6 +2710,8 @@ void AeroDms::mettreAJourInfosSurSelectionPilote()
         aeroclubPiloteSelectionne->setText("");
         statusBar()->clearMessage();
     }
+
+    gererBoutonEditionPilote();
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()
@@ -3619,6 +3632,19 @@ void AeroDms::gererChangementOnglet()
     {
         actionListeDeroulanteStatistique->setVisible(true);
         actionListeDeroulantePilote->setVisible(false);
+    }
+
+    //On gère aussi le bouton d'édition pilote. De base on désactive, et dans 
+    //les onglets qui permettent l'édition des pilotes, on appelle la méthode
+    //qui gère le bouton associé
+    boutonEditerLePiloteSelectionne->setEnabled(false);
+    if (mainTabWidget->currentWidget() == vueVols
+        || mainTabWidget->currentWidget() == vueSubventions
+        || mainTabWidget->currentWidget() == vueFactures
+        || mainTabWidget->currentWidget() == vueRecettes
+        || mainTabWidget->currentWidget() == widgetAjoutVol )
+    {
+        gererBoutonEditionPilote();
     }
 }
 

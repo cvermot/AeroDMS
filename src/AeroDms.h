@@ -76,6 +76,8 @@ private:
     void peuplerListeDeroulanteAnnee();
     void peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p_factures);
 
+    void gererBoutonEditionPilote();
+
     bool lePiloteEstAJourDeCotisation();
 
     void initialiserOngletGraphiques();
