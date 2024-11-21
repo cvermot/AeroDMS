@@ -220,6 +220,8 @@ private:
     QAction* boutonGraphResolutionFullHd;
     QAction* boutonGraphResolutionQhd;
     QAction* boutonGraphResolution4k;
+    QAction* boutonGraphRatioIso216;
+    QAction* boutonGraphRatio16x9;
 
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
@@ -315,6 +317,7 @@ public slots:
     void changerDemandesAGenerer();
     void changerFusionPdf();
     void changerResolutionExportGraphiques();
+    void changerRatioExportGraphiques();
     void selectionnerTousLesGraphsPourRecapAnnuel();
     void verifierSignatureNumerisee();
     void envoyerMail();

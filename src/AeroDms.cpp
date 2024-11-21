@@ -1099,7 +1099,28 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphResolutionFullHd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
     connect(boutonGraphResolutionQhd, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
     connect(boutonGraphResolution4k, SIGNAL(triggered()), this, SLOT(changerResolutionExportGraphiques()));
+
+    resolutionGraphiques->addSeparator();
+
+    boutonGraphRatioIso216 = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RATIO),
+        tr("Ratio ISO 216"),
+        this);
+    boutonGraphRatioIso216->setToolTip(tr("Ratio d'une page A4"));
+    resolutionGraphiques->addAction(boutonGraphRatioIso216);
+    boutonGraphRatioIso216->setCheckable(true);
+
+    boutonGraphRatio16x9 = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RATIO),
+        tr("Ratio 16/9"),
+        this);
+    boutonGraphRatio16x9->setToolTip(tr("Ratio d'une écran"));
+    resolutionGraphiques->addAction(boutonGraphRatio16x9);
+    boutonGraphRatio16x9->setCheckable(true);
+
+    connect(boutonGraphRatioIso216, SIGNAL(triggered()), this, SLOT(changerRatioExportGraphiques()));
+    connect(boutonGraphRatio16x9, SIGNAL(triggered()), this, SLOT(changerRatioExportGraphiques()));
+
     boutonGraphResolution4k->activate(QAction::Trigger);
+    boutonGraphRatioIso216->activate(QAction::Trigger);
 
     graphiquesDuRecapAnnuel->addSeparator();
     boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUT_COCHER),
@@ -1386,6 +1407,30 @@ void AeroDms::changerResolutionExportGraphiques()
     {
         boutonGraphResolution4k->setChecked(true);
         boutonGraphResolution4k->setFont(font);
+    }
+}
+
+void AeroDms::changerRatioExportGraphiques()
+{
+    QFont font;
+    font.setWeight(QFont::Normal);
+    boutonGraphRatioIso216->setFont(font);
+    boutonGraphRatio16x9->setFont(font);
+
+    boutonGraphRatioIso216->setChecked(false);
+    boutonGraphRatio16x9->setChecked(false);
+
+    font.setWeight(QFont::Bold);
+
+    if (sender() == boutonGraphRatioIso216)
+    {
+        boutonGraphRatioIso216->setChecked(true);
+        boutonGraphRatioIso216->setFont(font);
+    }
+    else
+    {
+        boutonGraphRatio16x9->setChecked(true);
+        boutonGraphRatio16x9->setFont(font);
     }
 }
 
@@ -3830,6 +3875,12 @@ int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Resolution_4K;
     }
+
+    if (boutonGraphRatio16x9->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Resolution_RATIO_16_9;
+    }
+    //Sinon par défaut le ratio d'une page A4.
 
     return valeur;
 }

@@ -129,16 +129,16 @@ public:
         Unites_EUROS
     };
 
-    enum Statistiques {
-        Statistiques_HEURES_ANNUELLES       = 0x1,
-        Statistiques_HEURES_PAR_PILOTE      = 0x2,
-        Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,
-        Statistiques_HEURES_PAR_ACTIVITE    = 0x8,
-        Statistiques_STATUTS_PILOTES        = 0x10,
-        Statistiques_AERONEFS               = 0x20,
-        Statistiques_EUROS_PAR_PILOTE       = 0x40,
-        Statistiques_EUROS_PAR_TYPE_DE_VOL  = 0x80,
-        Statistiques_EUROS_PAR_ACTIVITE     = 0x100
+    enum Statistiques {                              //     RESO|STATS
+        Statistiques_HEURES_ANNUELLES       = 0x1,   //     XXXX|0000 0000 0001
+        Statistiques_HEURES_PAR_PILOTE      = 0x2,   //     XXXX|0000 0000 0010
+        Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,   //     XXXX|0000 0000 0100
+        Statistiques_HEURES_PAR_ACTIVITE    = 0x8,   //     XXXX|0000 0000 1000
+        Statistiques_STATUTS_PILOTES        = 0x10,  //     XXXX|0000 0001 0000
+        Statistiques_AERONEFS               = 0x20,  //     XXXX|0000 0010 0000
+        Statistiques_EUROS_PAR_PILOTE       = 0x40,  //     XXXX|0000 0100 0000
+        Statistiques_EUROS_PAR_TYPE_DE_VOL  = 0x80,  //     XXXX|0000 1000 0000
+        Statistiques_EUROS_PAR_ACTIVITE     = 0x100  //     XXXX|0001 0000 0000
     };
 
                                      //Encodage vers PdrRenderer : 4 bits pour la résolution puis 12 bits pour la stats

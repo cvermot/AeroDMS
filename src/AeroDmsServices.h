@@ -121,6 +121,8 @@ public:
         Icone_SCAN_AUTO_VOL,
         Icone_DEBUG,
 
+        Icone_RATIO,
+
         Icone_STATS_BARRES_EMPILEES,
         Icone_STATS_CAMEMBERT,
         Icone_STATS_DONUT,

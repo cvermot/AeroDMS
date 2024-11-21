@@ -256,6 +256,12 @@ QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
     }
     break;
 
+    case AeroDmsServices::Icone_RATIO:
+    {
+        return QIcon("./ressources/aspect-ratio.svg");
+    }
+    break;
+
     case AeroDmsServices::Icone_STATS_BARRES_EMPILEES:
     {
         return QIcon("./ressources/chart-bar-stacked.svg");

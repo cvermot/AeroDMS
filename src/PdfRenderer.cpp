@@ -1227,8 +1227,6 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
 
     const AeroDmsTypes::Resolution resolution = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE_RESOLUTION);
 
-    qDebug() << "résolution" << resolution << p_resolution;
-
     if (resolution == AeroDmsTypes::Resolution_Full_HD)
     {
         resolutionEtParametres.tailleMiniImage = QSize(1920, 1080);
@@ -1243,6 +1241,15 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
     {
         resolutionEtParametres.tailleMiniImage = QSize(3840, 2160);
         resolutionEtParametres.tailleDePolice = 30;
+    }
+
+    const AeroDmsTypes::Resolution ratio = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE_RATIO);
+
+    if (ratio != AeroDmsTypes::Resolution_RATIO_16_9)
+    {
+        //on met en ratio 1.414
+        //On met 1.43 pour que ça rentre dans les pages des fichiers générés
+        resolutionEtParametres.tailleMiniImage.setHeight(resolutionEtParametres.tailleMiniImage.width()/1.43);
     }
 
     return resolutionEtParametres;
