@@ -254,35 +254,41 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
                 liste.append(item);
             }
             //On rince les donnéee
+            item = AeroDmsTypes::K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES;
             item.piloteId = query.value("pilote").toString();
             item.nomPrenomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
-            item.minutesVolAvion = 0;
-            item.minutesVolAvionElectrique = 0;
-            item.minutesVolUlm = 0;
-            item.minutesVolPlaneur = 0;
-            item.minutesVolHelicoptere = 0;
         }
 
         //On complete les données
         if (query.value("activite").toString() == "Avion")
         {
             item.minutesVolAvion = item.minutesVolAvion + query.value("tempsDeVol").toInt();
+            item.coutVolAvion = item.coutVolAvion + query.value("coutVol").toFloat();
+            item.subventionVolAvion = item.subventionVolAvion + query.value("subventionVol").toFloat();
         }
         else if (query.value("activite").toString() == "Avion électrique")
         {
             item.minutesVolAvionElectrique = item.minutesVolAvionElectrique + query.value("tempsDeVol").toInt();
+            item.coutVolAvionElectrique = item.coutVolAvionElectrique + query.value("coutVol").toFloat();
+            item.subventionVolAvionElectrique = item.subventionVolAvionElectrique + query.value("subventionVol").toFloat();
         }
         else if (query.value("activite").toString() == "ULM")
         {
             item.minutesVolUlm = item.minutesVolUlm + query.value("tempsDeVol").toInt();
+            item.coutVolUlm = item.coutVolUlm + query.value("coutVol").toFloat();
+            item.subventionVolUlm = item.subventionVolUlm + query.value("subventionVol").toFloat();
         }
         else if (query.value("activite").toString() == "Planeur")
         {
             item.minutesVolPlaneur = item.minutesVolPlaneur + query.value("tempsDeVol").toInt();
+            item.coutVolPlaneur = item.coutVolPlaneur + query.value("coutVol").toFloat();
+            item.subventionVolPlaneur = item.subventionVolPlaneur + query.value("subventionVol").toFloat();
         }
         else if (query.value("activite").toString() == "Hélicoptère")
         {
             item.minutesVolHelicoptere = item.minutesVolHelicoptere + query.value("tempsDeVol").toInt();
+            item.coutVolHelicoptere = item.coutVolHelicoptere + query.value("coutVol").toFloat();
+            item.subventionVolHelicoptere = item.subventionVolHelicoptere + query.value("subventionVol").toFloat();
         }
     }
 

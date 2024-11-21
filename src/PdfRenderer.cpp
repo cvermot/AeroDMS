@@ -1049,6 +1049,27 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE) == AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE)
+    {
+        StatistiqueDiagrammeCirculaireWidget stats(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
+            m_contentArea,
+            QChart::NoAnimation,
+            false,
+            tailleImage);
+        const QString urlImage = cheminSortie + "subventionPilote";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Heures par pilote ") + QString::number(p_annee));
+
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
     {
         StatistiqueDiagrammeCirculaireWidget stats(db,
@@ -1071,6 +1092,28 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
     }
 
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL)
+    {
+        StatistiqueDiagrammeCirculaireWidget stats(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL,
+            m_contentArea,
+            QChart::NoAnimation,
+            false,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "subventionTypeVol";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Type de vol ") + QString::number(p_annee));
+
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
     {
         StatistiqueDiagrammeCirculaireWidget stats(db,
@@ -1082,6 +1125,28 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             tailleImage);
 
         const QString urlImage = cheminSortie + "activite";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Activités ") + QString::number(p_annee));
+
+        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE)
+    {
+        StatistiqueDiagrammeCirculaireWidget stats(db,
+            p_annee,
+            AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
+            m_contentArea,
+            QChart::NoAnimation,
+            false,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "subventionActivite";
 
         enregistrerImage(stats,
             urlImage,
@@ -1160,7 +1225,9 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
     QSize size(1920,1080);
     AeroDmsTypes::ResolutionEtParametresStatistiques resolutionEtParametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
 
-    const AeroDmsTypes::Resolution resolution = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE);
+    const AeroDmsTypes::Resolution resolution = static_cast<AeroDmsTypes::Resolution>(p_resolution & AeroDmsTypes::Resolution_MASQUE_RESOLUTION);
+
+    qDebug() << "résolution" << resolution << p_resolution;
 
     if (resolution == AeroDmsTypes::Resolution_Full_HD)
     {
@@ -1192,11 +1259,23 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
     {
         nbGraph++;
     }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE) == AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE)
+    {
+        nbGraph++;
+    }
     if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL)
     {
         nbGraph++;
     }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL)
+    {
+        nbGraph++;
+    }
     if ((p_graphAGenerer & AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE)
     {
         nbGraph++;
     }

@@ -103,3 +103,28 @@ const AeroDmsTypes::ResolutionEtParametresStatistiques AeroDmsTypes::K_INIT_RESO
     QSize(800,600),
     10
 };
+
+const AeroDmsTypes::StatsHeuresDeVolParActivite AeroDmsTypes::K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES =
+{
+    "" ,//QString piloteId;
+    "",//QString nomPrenomPilote;
+
+    0,//int minutesVolAvion;
+    0,//int minutesVolAvionElectrique;
+    0,//int minutesVolUlm;
+    0,//int minutesVolPlaneur;
+    0,//int minutesVolHelicoptere;
+
+    0.0,//float subventionVolAvion;
+    0.0,//float subventionVolAvionElectrique;
+    0.0,//float subventionVolUlm;
+    0.0,//float subventionVolPlaneur;
+    0.0,//float subventionVolHelicoptere;
+
+    0.0,//float coutVolAvion;
+    0.0,//float coutVolAvionElectrique;
+    0.0,//float coutVolUlm;
+    0.0,//float coutVolPlaneur;
+    0.0,//float coutVolHelicoptere;
+};
+

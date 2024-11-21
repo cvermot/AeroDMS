@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. juil. 26 18:35:10 2024
+-- File generated with SQLiteStudio v3.4.4 on jeu. nov. 21 22:55:16 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -38,7 +38,7 @@ INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePo
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.6', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.7', NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -259,7 +259,9 @@ pilote.nom,
 pilote.prenom,
 vol.activite,
 strftime('%Y', vol.date) AS annee,
-SUM(vol.duree) as tempsDeVol
+SUM(vol.duree) AS tempsDeVol,
+SUM(vol.cout) AS coutVol,
+SUM(vol.montantRembourse) AS subventionVol
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
 GROUP BY activite, pilote, annee

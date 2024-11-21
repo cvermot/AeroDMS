@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
 
 #include "StatistiqueDiagrammeCirculairePartie.h"
-#include "AeroDmsTypes.h"
 #include "AeroDmsServices.h"
 
-StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries)
+StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries, const AeroDmsTypes::Unites p_unites)
     : m_drilldownSeries(drilldownSeries),
     m_prefix(prefix)
 {
+    unites = p_unites;
     setValue(value);
     if (value != 0)
     {
@@ -27,8 +27,18 @@ QAbstractSeries* StatistiqueDiagrammeCirculairePartie::drilldownSeries() const
 
 void StatistiqueDiagrammeCirculairePartie::updateLabel()
 {
+    QString valeur = "";
+    if (unites == AeroDmsTypes::Unites_HEURES)
+    {
+        valeur = AeroDmsServices::convertirMinutesEnHeuresMinutes(value());
+    }
+    else
+    {
+        valeur = QString::number(value()) + " €";
+    }
+
     setLabel(QStringLiteral("%1 : %2, %3%").arg(m_prefix,
-        AeroDmsServices::convertirMinutesEnHeuresMinutes(value()),
+        valeur,
         QString::number(percentage() * 100, 'f', 1)));
 }
 

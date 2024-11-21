@@ -4,6 +4,8 @@
 #ifndef STATISTIQUEDIAGRAMMECIRCULAIREPARTIE_H
 #define STATISTIQUEDIAGRAMMECIRCULAIREPARTIE_H
 
+#include "AeroDmsTypes.h"
+
 #include <QPieSlice>
 
 QT_FORWARD_DECLARE_CLASS(QAbstractSeries);
@@ -12,7 +14,7 @@ class StatistiqueDiagrammeCirculairePartie : public QPieSlice
 {
     Q_OBJECT
 public:
-    StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries);
+    StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries, const AeroDmsTypes::Unites p_unites = AeroDmsTypes::Unites_HEURES);
     QAbstractSeries* drilldownSeries() const;
 
 public slots:
@@ -21,6 +23,7 @@ public slots:
 
 private:
     QAbstractSeries* m_drilldownSeries = nullptr;
+    AeroDmsTypes::Unites unites;
     QString m_prefix;
 };
 

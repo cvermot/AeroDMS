@@ -37,10 +37,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
     switch (p_statistique)
     {
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
-        {
-            
+        { 
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db, 
-                                                                                                              p_annee);
+                                                                                                      p_annee);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -51,7 +50,6 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             {
                 donneesTypeDeVolParPilote->setName("Temps de vol par pilote");
             }
-            
 
             for (int i = 0; i < subventionParPilote.size(); i++)
             {
@@ -63,6 +61,44 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
 
                 QObject::connect(detailParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
                 *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailParPilote->sum(), subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, detailParPilote);
+
+            }
+
+            QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+
+            chart->changeSeries(donneesTypeDeVolParPilote);
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE:
+        {
+            const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes(p_db,
+                p_annee);
+
+            auto donneesTypeDeVolParPilote = new QPieSeries(this);
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Subvention par pilote (cliquez pour le détail par pilote)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Subvention par pilote");
+            }
+
+            for (int i = 0; i < subventionParPilote.size(); i++)
+            {
+                auto detailParPilote = new QPieSeries(this);
+                detailParPilote->setName("Détails par type de vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.montantRembourse, 
+                    "Entrainement", p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.montantRembourse, 
+                    "Sorties", p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+                *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.montantRembourse, 
+                    "Balades", p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+
+                QObject::connect(detailParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailParPilote->sum(), 
+                    subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, detailParPilote, AeroDmsTypes::Unites_EUROS);
 
             }
 
@@ -138,27 +174,32 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             if (detailAvion->sum() != 0)
             {
                 QObject::connect(detailAvion, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), "Avion", p_parametres.tailleDePolice, detailAvion);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), 
+                    "Avion", p_parametres.tailleDePolice, detailAvion);
             }
             if (detailAvionElectrique->sum() != 0)
             {
                 QObject::connect(detailAvionElectrique, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), "Avion électrique", p_parametres.tailleDePolice, detailAvionElectrique);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), 
+                    "Avion électrique", p_parametres.tailleDePolice, detailAvionElectrique);
             }
             if (detailUlm->sum() != 0)
             {
                 QObject::connect(detailUlm, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), "ULM", p_parametres.tailleDePolice, detailUlm);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), 
+                    "ULM", p_parametres.tailleDePolice, detailUlm);
             }
             if (detailPlaneur->sum() != 0)
             {
                 QObject::connect(detailPlaneur, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), "Planeur", p_parametres.tailleDePolice, detailPlaneur);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), 
+                    "Planeur", p_parametres.tailleDePolice, detailPlaneur);
             }
             if (detailHelicoptere->sum() != 0)
             {
                 QObject::connect(detailHelicoptere, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
-                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), "Hélicoptère", p_parametres.tailleDePolice, detailHelicoptere);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), 
+                    "Hélicoptère", p_parametres.tailleDePolice, detailHelicoptere);
             }   
 
             QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
@@ -167,8 +208,112 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         }
         break;
 
+        case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
+        {
+            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee);
+
+            auto donneesTypeDeVolParPilote = new QPieSeries(this);
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Subvention par activité (cliquez pour le détail des heures par pilote dans l'activité)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Subvention par activité");
+            }
+
+            auto detailAvion = new QPieSeries(this);
+            detailAvion->setName("Avion");
+            auto detailAvionElectrique = new QPieSeries(this);
+            detailAvionElectrique->setName("Avion électrique");
+            auto detailUlm = new QPieSeries(this);
+            detailUlm->setName("ULM");
+            auto detailPlaneur = new QPieSeries(this);
+            detailPlaneur->setName("Planeur");
+            auto detailHelicoptere = new QPieSeries(this);
+            detailHelicoptere->setName("Hélicoptère");
+
+            for (int i = 0; i < subventionParActivite.size(); i++)
+            {
+                if (subventionParActivite.at(i).subventionVolAvion != 0)
+                {
+                    *detailAvion << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolAvion,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
+                        donneesTypeDeVolParPilote, 
+                        AeroDmsTypes::Unites_EUROS);
+                }
+                if (subventionParActivite.at(i).subventionVolAvionElectrique != 0)
+                {
+                    *detailAvionElectrique << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolAvionElectrique,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
+                        donneesTypeDeVolParPilote, 
+                        AeroDmsTypes::Unites_EUROS);
+                }
+                if (subventionParActivite.at(i).subventionVolUlm != 0)
+                {
+                    *detailUlm << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolUlm,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
+                        donneesTypeDeVolParPilote, 
+                        AeroDmsTypes::Unites_EUROS);
+                }
+                if (subventionParActivite.at(i).subventionVolPlaneur != 0)
+                {
+                    *detailPlaneur << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolPlaneur,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
+                        donneesTypeDeVolParPilote,
+                        AeroDmsTypes::Unites_EUROS);
+                }
+                if (subventionParActivite.at(i).subventionVolHelicoptere != 0)
+                {
+                    *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolHelicoptere,
+                        subventionParActivite.at(i).nomPrenomPilote,
+                        p_parametres.tailleDePolice,
+                        detailHelicoptere, 
+                        AeroDmsTypes::Unites_EUROS);
+                }
+            }
+            if (detailAvion->sum() != 0)
+            {
+                QObject::connect(detailAvion, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvion->sum(), 
+                    "Avion", p_parametres.tailleDePolice, detailAvion, AeroDmsTypes::Unites_EUROS);
+            }
+            if (detailAvionElectrique->sum() != 0)
+            {
+                QObject::connect(detailAvionElectrique, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailAvionElectrique->sum(), 
+                    "Avion électrique", p_parametres.tailleDePolice, detailAvionElectrique, AeroDmsTypes::Unites_EUROS);
+            }
+            if (detailUlm->sum() != 0)
+            {
+                QObject::connect(detailUlm, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailUlm->sum(), 
+                    "ULM", p_parametres.tailleDePolice, detailUlm, AeroDmsTypes::Unites_EUROS);
+            }
+            if (detailPlaneur->sum() != 0)
+            {
+                QObject::connect(detailPlaneur, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailPlaneur->sum(), 
+                    "Planeur", p_parametres.tailleDePolice, detailPlaneur, AeroDmsTypes::Unites_EUROS);
+            }
+            if (detailHelicoptere->sum() != 0)
+            {
+                QObject::connect(detailHelicoptere, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+                *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailHelicoptere->sum(), 
+                    "Hélicoptère", p_parametres.tailleDePolice, detailHelicoptere, AeroDmsTypes::Unites_EUROS);
+            }
+
+            QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+
+            chart->changeSeries(donneesTypeDeVolParPilote);
+        }
+        break;
+
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
-        default:
         {
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db,
                                                                                                               p_annee);
@@ -202,6 +347,51 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailSortie->sum(), "Sortie", p_parametres.tailleDePolice, detailSortie);
             QObject::connect(detailBalade, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
             *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailBalade->sum(), "Balades", p_parametres.tailleDePolice, detailBalade);
+
+            QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+
+            chart->changeSeries(donneesTypeDeVolParPilote);
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL:
+        default:
+        {
+            const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes(p_db,
+                p_annee);
+
+            auto donneesTypeDeVolParPilote = new QPieSeries(this);
+            if (p_animation != QChart::NoAnimation)
+            {
+                donneesTypeDeVolParPilote->setName("Subventions par type de vol (cliquez pour le détail des subventions par pilote dans la catégorie)");
+            }
+            else
+            {
+                donneesTypeDeVolParPilote->setName("Subventions par type de vol");
+            }
+
+            auto detailEntrainement = new QPieSeries(this);
+            detailEntrainement->setName("Vols d'entrainement");
+            auto detailSortie = new QPieSeries(this);
+            detailSortie->setName("Sorties");
+            auto detailBalade = new QPieSeries(this);
+            detailBalade->setName("Balades");
+
+            for (int i = 0; i < subventionParPilote.size(); i++)
+            {
+                *detailEntrainement << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.montantRembourse, 
+                    subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+                *detailSortie << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.montantRembourse, 
+                    subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+                *detailBalade << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).balade.montantRembourse, 
+                    subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom, p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
+            }
+            QObject::connect(detailEntrainement, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailEntrainement->sum(), "Vols d'entrainement", p_parametres.tailleDePolice, detailEntrainement, AeroDmsTypes::Unites_EUROS);
+            QObject::connect(detailSortie, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailSortie->sum(), "Sortie", p_parametres.tailleDePolice, detailSortie, AeroDmsTypes::Unites_EUROS);
+            QObject::connect(detailBalade, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
+            *donneesTypeDeVolParPilote << new StatistiqueDiagrammeCirculairePartie(detailBalade->sum(), "Balades", p_parametres.tailleDePolice, detailBalade, AeroDmsTypes::Unites_EUROS);
 
             QObject::connect(donneesTypeDeVolParPilote, &QPieSeries::clicked, chart, &StatistiqueDiagrammeCirculaire::handleSliceClicked);
 

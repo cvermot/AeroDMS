@@ -208,8 +208,11 @@ private:
     QAction* boutonOptionRecapAnnuelBaladesSorties;
     QAction* boutonGraphRecapAnnuelHeuresAnnuelles;
     QAction* boutonGraphRecapAnnuelHeuresParPilote;
+    QAction* boutonGraphRecapAnnuelEurosParPilote;
     QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol;
+    QAction* boutonGraphRecapAnnuelEurosParTypeDeVol;
     QAction* boutonGraphRecapAnnuelHeuresParActivite;
+    QAction* boutonGraphRecapAnnuelEurosParActivite;
     QAction* boutonGraphRecapAnnuelStatutsDesPilotes;
     QAction* boutonGraphRecapAnnuelAeronefs;
     QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs;

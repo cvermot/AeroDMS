@@ -92,6 +92,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
+
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -849,14 +850,23 @@ void AeroDms::initialiserBarreDeFiltres()
         tr("Statistiques mensuelles"),
         AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par pilote"),
+        tr("Statistiques par pilote (heures)"),
         AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par type de vol"),
+        tr("Statistiques par pilote (subventions)"),
+        AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Statistiques par type de vol (heures)"),
         AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par activité"),
+        tr("Statistiques par type de vol (subventions)"),
+        AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Statistiques par activité (heures)"),
         AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Statistiques par activité (subventions)"),
+        AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT),
         tr("Statuts des pilotes"),
         AeroDmsTypes::Statistiques_STATUTS_PILOTES);
@@ -1022,17 +1032,35 @@ void AeroDms::initialiserMenuOptions()
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParPilote);
     boutonGraphRecapAnnuelHeuresParPilote->setCheckable(true);
 
+    boutonGraphRecapAnnuelEurosParPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Subventions par pilote"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParPilote);
+    boutonGraphRecapAnnuelEurosParPilote->setCheckable(true);
+
     boutonGraphRecapAnnuelHeuresParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
         tr("Heures par type de &vol"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParTypeDeVol);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setCheckable(true);
 
+    boutonGraphRecapAnnuelEurosParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Subventions par type de vol"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParTypeDeVol);
+    boutonGraphRecapAnnuelEurosParTypeDeVol->setCheckable(true);
+
     boutonGraphRecapAnnuelHeuresParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
         tr("Heures par &activite"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParActivite);
     boutonGraphRecapAnnuelHeuresParActivite->setCheckable(true);
+
+    boutonGraphRecapAnnuelEurosParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+        tr("Subventions par activite"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParActivite);
+    boutonGraphRecapAnnuelEurosParActivite->setCheckable(true);
 
     boutonGraphRecapAnnuelStatutsDesPilotes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT), 
         tr("&Statuts des pilotes"), 
@@ -1371,8 +1399,11 @@ void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
 
     boutonGraphRecapAnnuelHeuresAnnuelles->setChecked(true);
     boutonGraphRecapAnnuelHeuresParPilote->setChecked(true);
+    boutonGraphRecapAnnuelEurosParPilote->setChecked(true);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setChecked(true);
+    boutonGraphRecapAnnuelEurosParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelHeuresParActivite->setChecked(true);
+    boutonGraphRecapAnnuelEurosParActivite->setChecked(true);
     boutonGraphRecapAnnuelStatutsDesPilotes->setChecked(true);
     boutonGraphRecapAnnuelAeronefs->setChecked(true);
 }
@@ -1455,12 +1486,28 @@ void AeroDms::peuplerStatistiques()
                                                                        m_contentArea);
             break;
         }
+        case AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
+                listeDeroulanteAnnee->currentData().toInt(),
+                AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
+                m_contentArea);
+            break;
+        }
         case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
                                                                        listeDeroulanteAnnee->currentData().toInt(), 
                                                                        AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
                                                                        m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
+                listeDeroulanteAnnee->currentData().toInt(),
+                AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
+                m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
@@ -1479,12 +1526,20 @@ void AeroDms::peuplerStatistiques()
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
-        default:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
                                                                        listeDeroulanteAnnee->currentData().toInt(), 
                                                                        AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, 
                                                                        m_contentArea);
+            break;
+        }
+        case AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL:
+        default:
+        {
+            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
+                listeDeroulanteAnnee->currentData().toInt(),
+                AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL,
+                m_contentArea);
             break;
         }
     }
@@ -3734,13 +3789,25 @@ int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE;
     }
+    if (boutonGraphRecapAnnuelEurosParPilote->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE;
+    }
     if (boutonGraphRecapAnnuelHeuresParTypeDeVol->isChecked())
     {
         valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL;
     }
+    if (boutonGraphRecapAnnuelEurosParTypeDeVol->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL;
+    }
     if (boutonGraphRecapAnnuelHeuresParActivite->isChecked())
     {
         valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE;
+    }
+    if (boutonGraphRecapAnnuelEurosParActivite->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE;
     }
     if (boutonGraphRecapAnnuelStatutsDesPilotes->isChecked())
     {

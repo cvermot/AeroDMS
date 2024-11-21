@@ -124,21 +124,31 @@ public:
         PdfTypeDeDemande_FACTURE
     };
 
+    enum Unites {
+        Unites_HEURES,
+        Unites_EUROS
+    };
+
     enum Statistiques {
         Statistiques_HEURES_ANNUELLES       = 0x1,
         Statistiques_HEURES_PAR_PILOTE      = 0x2,
         Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,
         Statistiques_HEURES_PAR_ACTIVITE    = 0x8,
         Statistiques_STATUTS_PILOTES        = 0x10,
-        Statistiques_AERONEFS               = 0x20
+        Statistiques_AERONEFS               = 0x20,
+        Statistiques_EUROS_PAR_PILOTE       = 0x40,
+        Statistiques_EUROS_PAR_TYPE_DE_VOL  = 0x80,
+        Statistiques_EUROS_PAR_ACTIVITE     = 0x100
     };
 
                                      //Encodage vers PdrRenderer : 4 bits pour la résolution puis 12 bits pour la stats
-    enum Resolution {                //               RESO|STATS
-        Resolution_Full_HD = 0x4000, //1920x1080      0100|XXXX XXXX XXXX
-        Resolution_QHD     = 0x8000, //2560x1440      1000|XXXX XXXX XXXX
-        Resolution_4K      = 0xC000, //3840x2160      1100|XXXX XXXX XXXX
-        Resolution_MASQUE  = 0xF000  //               1111|0000 0000 0000
+    enum Resolution {                //                     RESO|STATS
+        Resolution_Full_HD           = 0x4000, //1920x1080  0100|XXXX XXXX XXXX
+        Resolution_QHD               = 0x8000, //2560x1440  1000|XXXX XXXX XXXX
+        Resolution_4K                = 0xC000, //3840x2160  1100|XXXX XXXX XXXX
+        Resolution_RATIO_16_9        = 0x2000, //           0010|XXXX XXXX XXXX
+        Resolution_MASQUE_RESOLUTION = 0xC000, //           1100|0000 0000 0000
+        Resolution_MASQUE_RATIO      = 0x2000  //           0010|0000 0000 0000
     };
 
     enum ElementSoumis {
@@ -402,12 +412,26 @@ public:
     struct StatsHeuresDeVolParActivite {
         QString piloteId;
         QString nomPrenomPilote;
+
         int minutesVolAvion;
         int minutesVolAvionElectrique;
         int minutesVolUlm;
         int minutesVolPlaneur;
         int minutesVolHelicoptere;
+
+        float subventionVolAvion;
+        float subventionVolAvionElectrique;
+        float subventionVolUlm;
+        float subventionVolPlaneur;
+        float subventionVolHelicoptere;
+
+        float coutVolAvion;
+        float coutVolAvionElectrique;
+        float coutVolUlm;
+        float coutVolPlaneur;
+        float coutVolHelicoptere;
     };
+    static const StatsHeuresDeVolParActivite K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES;
     typedef QList< StatsHeuresDeVolParActivite> ListeStatsHeuresDeVolParActivite;
 
     struct ParametresMetier {
