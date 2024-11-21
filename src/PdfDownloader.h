@@ -1,6 +1,6 @@
 /******************************************************************************\
-<AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+<AeroDms : logiciel de gestion compta section aÃ©ronautique>
+Copyright (C) 2023-2024 ClÃ©ment VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -36,9 +36,20 @@ private:
 
 	QNetworkAccessManager mgr;
 
+	enum Etape
+	{
+		Etape_INITIALISATION = 0,
+		Etape_CONNEXION = 1,
+		Etape_ATTENTE_TELECHARGEMENT = 2,
+		Etape_FINALISER_TELECHARGEMENT = 3,
+		Etape_TERMINE = 4
+	};
+
+	Etape phaseTraitement = Etape_INITIALISATION;
+
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
-	void saveFile(QNetworkReply* rep);
+	//void saveFile(QNetworkReply* rep);
 };
 
 #endif PDFDOWNLOADER_H

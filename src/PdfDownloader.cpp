@@ -1,6 +1,6 @@
 /******************************************************************************\
-<AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+<AeroDms : logiciel de gestion compta section aÃ©ronautique>
+Copyright (C) 2023-2024 ClÃ©ment VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -42,49 +42,99 @@ PdfDownloader::PdfDownloader()
 
     QEventLoop eventLoop;
 
-    
-    //mgr.setCookieJar(cookies);
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(quit()));
-
+    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(serviceRequestFinished(QNetworkReply*)));
+    phaseTraitement = Etape_CONNEXION;
     QNetworkRequest req(QUrl("https://daca.fr"));
-    QNetworkReply* reply = mgr.get(req);
+    QNetworkReply* reply = networkManager->get(req);
+ 
     eventLoop.exec();
 
-    qDebug() << "réponse" << reply->error() << reply->size();
-    if (reply->error() == QNetworkReply::NoError)
-    {
-        mgr.setCookieJar(cookies);
-        QMessageBox::information(this, "Result", "Result");
-        qDebug() << "reponse get" << reply->readAll();
-    }
-    else
-    {
-        QMessageBox::critical(this, "Erreur", "Erreur");
-    }
+
+    
 
 }
 
 void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
 {
-    qDebug() << "reply" << rep->error();
-    qDebug() << rep->readAll();
+    qDebug() << "reply" << rep->error() << rep->size()  <<  phaseTraitement;
+    //qDebug() << rep->readAll();
 
-    //QEventLoop eventLoop;
+    if (phaseTraitement == Etape_CONNEXION)
+    {
+        qDebug() << "rÃ©ponse" << rep->error() << rep->size();
+        if (rep->error() == QNetworkReply::NoError)
+        {
+            //mgr.setCookieJar(cookies);
+            //QMessageBox::information(this, "Result", "Result");
+            qDebug() << "reponse get" << rep->readAll();
+
+            QThread::sleep(2);
+            phaseTraitement = Etape_ATTENTE_TELECHARGEMENT;
+            QNetworkRequest req(QUrl("https://daca.fr/site5/plugins/daca/html2pdf/releve_mensuel.php?compte_id=411.pilote.infopilote&mois=09&annee=2024"));
+            QNetworkReply* reply = networkManager->get(req);
+            //eventLoop.exec();
+            qDebug() << "demande download";
+        }
+        else
+        {
+            //QMessageBox::critical(this, "Erreur", "Erreur");
+            qDebug() << "erruer connexion" << rep->readAll();
+            phaseTraitement = Etape_TERMINE;
+        }
+        
+
+    }
+    else if (phaseTraitement == Etape_ATTENTE_TELECHARGEMENT)
+    {
+        qDebug() << "rÃ©ponse download" << rep->size();
+
+        if (rep->size() != 0)
+        {
+            QFile localFile("downloadedfile.pdf");
+            if (!localFile.open(QIODevice::WriteOnly))
+                return;
+            const QByteArray sdata = rep->readAll();
+            localFile.write(sdata);
+            qDebug() << sdata;
+            localFile.close();
+
+            phaseTraitement = Etape_FINALISER_TELECHARGEMENT;
+        }
+    }
+    else if (phaseTraitement == Etape_FINALISER_TELECHARGEMENT)
+    {
+        qDebug() << "rÃ©ponse download" << rep->size();
+
+        if (rep->size() != 0)
+        {
+            QFile localFile("downloadedfile2.pdf");
+            if (!localFile.open(QIODevice::WriteOnly))
+                return;
+            const QByteArray sdata = rep->readAll();
+            localFile.write(sdata);
+            qDebug() << sdata;
+            localFile.close();
+
+            phaseTraitement = Etape_TERMINE;
+        }
+
+    }
+    else
+    {
+        qDebug() << "terminÃ©";
+    }
 
 
     
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(saveFile(QNetworkReply*)));
+    //QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(saveFile(QNetworkReply*)));
 
-    QNetworkRequest req(QUrl("https://daca.fr/fakeUrl"));
-    QNetworkReply* reply = mgr.get(req);
-    //eventLoop.exec();
-    qDebug() << "demande download";
+    
 
 }
 
-void PdfDownloader::saveFile(QNetworkReply* rep)
+/*void PdfDownloader::saveFile(QNetworkReply* rep)
 {
-    qDebug() << "réponse download" << rep->size();
+    qDebug() << "rÃ©ponse download" << rep->size();
 
     QFile localFile("downloadedfile.pdf");
     if (!localFile.open(QIODevice::WriteOnly))
@@ -93,4 +143,4 @@ void PdfDownloader::saveFile(QNetworkReply* rep)
     localFile.write(sdata);
     qDebug() << sdata;
     localFile.close();
-}
+}*/
