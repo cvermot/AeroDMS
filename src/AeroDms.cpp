@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfRenderer.h"
 #include "PdfExtractor.h"
 #include "PdfPrinter.h"
+#include "PdfDownloader.h"
 
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
@@ -92,6 +93,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
+
+    PdfDownloader pdfDownload;
 }
 
 void AeroDms::initialiserBaseApplication()
