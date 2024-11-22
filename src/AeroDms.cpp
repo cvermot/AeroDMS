@@ -1084,7 +1084,6 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphRecapAnnuelStatutsDesPilotes, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelAeronefs, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
         
-
     //Résolutions
     resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Résolution des graphiques"));

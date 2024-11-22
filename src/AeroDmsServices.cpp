@@ -48,7 +48,7 @@ const QTime AeroDmsServices::convertirHeuresDecimalesEnQTime(const double p_heur
     return heureHhmm;
 }
 
-QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
+const QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
 {  
     if (p_icone == "ULM")
     {
@@ -96,12 +96,12 @@ QIcon AeroDmsServices::recupererIcone(const QString& p_icone)
     }
 }
 
-QIcon AeroDmsServices::recupererIcone(const QChar p_caractere)
+const QIcon AeroDmsServices::recupererIcone(const QChar p_caractere)
 {
     return recupererIcone(AeroDmsServices::Icone(p_caractere.toLatin1()));
 }
 
-QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
+const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
 {
     switch (p_icone)
     {

@@ -218,21 +218,21 @@ public:
     };
 
     struct DemandeEnCoursDeTraitement {
-        PdfTypeDeDemande typeDeDemande;
-        QString idPilote;
-        QString typeDeVol;
-        QString nomBeneficiaire;
-        float montant;
-        int annee;
-        QString nomTresorier;
-        QString nomFichier;
-        QStringList listeFactures;
-        AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee;
-        AeroDmsTypes::Signature typeDeSignatureDemandee;
-        bool mergerTousLesPdf;
-        bool recapHdVAvecRecettes;
-        bool recapHdVAvecBaladesEtSorties;
-        int recapHdvGraphAGenerer;
+        PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
+        QString idPilote = "";
+        QString typeDeVol = "";
+        QString nomBeneficiaire = "";
+        float montant = 0.0;
+        int annee = -1;
+        QString nomTresorier = "";
+        QString nomFichier = "";
+        QStringList listeFactures = QStringList();
+        AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee = AeroDmsTypes::TypeGenerationPdf_TOUTES;
+        AeroDmsTypes::Signature typeDeSignatureDemandee = AeroDmsTypes::Signature_SANS;
+        bool mergerTousLesPdf = false;
+        bool recapHdVAvecRecettes = false;
+        bool recapHdVAvecBaladesEtSorties = false;
+        int recapHdvGraphAGenerer = 0;
         //int idFacture;
     };
 
@@ -529,9 +529,9 @@ public:
 
     struct BaladesEtSortiesParId
     {
-        int idSortie;
-        int nombreDeLignes;
-        QVector<GroupeBaladesEtSortiesAssociees> baladesEtSortiesAssociees;
+        int idSortie = 0;
+        int nombreDeLignes = 0;
+        QVector<GroupeBaladesEtSortiesAssociees> baladesEtSortiesAssociees = QVector<GroupeBaladesEtSortiesAssociees>();
     };
     typedef QVector<BaladesEtSortiesParId> ListeBaladesEtSortiesParIdSortie;
 

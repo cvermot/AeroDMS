@@ -30,7 +30,7 @@ public:
     ManageDb(const QString& database, const int p_delaisDeGardeBdd);
 
     void sauvegarderLaBdd(const QString p_repertoireDeSauvegarde);
-    const bool laBddEstALaVersionAttendue();
+    const bool laBddEstALaVersionAttendue() const;
 
     QString getLastError();
     AeroDmsTypes::ListePilotes recupererPilotes();
@@ -124,7 +124,7 @@ public:
     AeroDmsTypes::ResultatCreationPilote creerPilote( const AeroDmsTypes::Pilote p_pilote);
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
-    void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
+    void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const;
 
     AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
     QString recupererMailPilotes( const int p_annee,

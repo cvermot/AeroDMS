@@ -834,7 +834,7 @@ QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTy
     return listeFactures;
 }
 
-void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande)
+void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const 
 {
     //On créé l'entrée dans demandeRemboursementSoumises
     QSqlQuery query;
@@ -1647,7 +1647,7 @@ QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
 //   -on souhaite empecher l'utilisation d'une version du logiciel avec laquelle
 //       un défaut peut avoir un impact sur la BDD (cela imposera de mette à jour
 //       AeroDMS avant de pouvoir utiliser le logiciel en ecriture sur la BDD)
-const bool ManageDb::laBddEstALaVersionAttendue()
+const bool ManageDb::laBddEstALaVersionAttendue() const
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM parametres WHERE nom = 'versionBdd'");

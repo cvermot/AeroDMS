@@ -681,7 +681,7 @@ const QString PdfRenderer::produireFichierPdfGlobal()
     return nomFichier;
 }
 
-void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)
+void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant) const
 {
     QString montantARembourser = QString::number(p_montant, 'f', 2);
     QString partieEntiere;
@@ -753,7 +753,7 @@ void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant)
     }
 }
 
-void PdfRenderer::remplirLeChampSignature(QString& p_html)
+void PdfRenderer::remplirLeChampSignature(QString& p_html) const
 {
     //Signature => 
     switch (demandeEnCours.typeDeSignatureDemandee)
@@ -1252,7 +1252,6 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
             p_marges));
         const float ratio = pageLayout.paintRect().height() / pageLayout.paintRect().width();
         resolutionEtParametres.tailleMiniImage.setHeight(resolutionEtParametres.tailleMiniImage.width()*ratio - p_marges.top() - p_marges.bottom());
-        qDebug() << "ratio" << ratio << resolutionEtParametres.tailleMiniImage;
     }
 
     return resolutionEtParametres;

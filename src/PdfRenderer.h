@@ -69,8 +69,8 @@ private :
 
 	AeroDmsTypes::EtatGeneration imprimerLaProchaineDemandeDeSubvention();
 	void remplirLeChampMontant( QString& p_html, 
-		                        const float p_montant);
-	void remplirLeChampSignature(QString& p_html);
+		                        const float p_montant) const;
+	void remplirLeChampSignature(QString& p_html) const;
 
 	AeroDmsTypes::EtatGeneration imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
 		                                                            const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
