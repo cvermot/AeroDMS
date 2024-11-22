@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on jeu. nov. 21 22:55:16 2024
+-- File generated with SQLiteStudio v3.4.4 on ven. nov. 22 13:46:11 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -223,12 +223,13 @@ GROUP BY recettes.recetteId;
 CREATE VIEW IF NOT EXISTS stats_aeronefs AS SELECT 
     vol.immatriculation,
     aeronef.type,
+    vol.activite,
     strftime('%Y', vol.date) AS annee,
     SUM(vol.duree) AS tempsDeVol
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 GROUP BY vol.immatriculation, annee
-ORDER BY annee, type, vol.immatriculation;
+ORDER BY annee, activite, type, vol.immatriculation;
 
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 

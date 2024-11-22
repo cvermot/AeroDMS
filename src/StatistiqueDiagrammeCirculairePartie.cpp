@@ -34,7 +34,7 @@ void StatistiqueDiagrammeCirculairePartie::updateLabel()
     }
     else
     {
-        valeur = QString::number(value()) + " €";
+        valeur = QString::number(value(), 'f', 2) + " €";
     }
 
     setLabel(QStringLiteral("%1 : %2, %3%").arg(m_prefix,

@@ -1698,11 +1698,12 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
         query.prepare("SELECT "
             "immatriculation,"
             "type,"
+            "activite, "
             "SUM(tempsDeVol) AS tempsDeVol "
             "FROM stats_aeronefs "
             "WHERE annee = :annee "
             "GROUP BY immatriculation "
-            "ORDER BY type, immatriculation");
+            "ORDER BY activite, type, immatriculation");
         query.bindValue(":annee", QString::number(p_annee));
     }
     else
@@ -1710,10 +1711,11 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
         query.prepare("SELECT "
             "immatriculation,"
             "type,"
+            "activite, "
             "SUM(tempsDeVol) AS tempsDeVol "
             "FROM stats_aeronefs "
             "GROUP BY immatriculation "
-            "ORDER BY type, immatriculation");
+            "ORDER BY activite, type, immatriculation");
     }
     
     query.exec();

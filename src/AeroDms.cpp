@@ -850,22 +850,22 @@ void AeroDms::initialiserBarreDeFiltres()
         tr("Statistiques mensuelles"),
         AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par pilote (heures)"),
+        tr("Heures par pilote"),
         AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par pilote (subventions)"),
+        tr("Subventions par pilote"),
         AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par type de vol (heures)"),
+        tr("Heures par type de vol"),
         AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par type de vol (subventions)"),
+        tr("Subventions par type de vol"),
         AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par activité (heures)"),
+        tr("Heures par activité"),
         AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Statistiques par activité (subventions)"),
+        tr("Subventions par activité"),
         AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT),
         tr("Statuts des pilotes"),
