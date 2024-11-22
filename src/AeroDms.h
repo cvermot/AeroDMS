@@ -223,6 +223,11 @@ private:
     QAction* boutonGraphRatioIso216;
     QAction* boutonGraphRatio16x9;
 
+    QMenu* menuOption;
+    QMenu* menuOptionsRecapAnnuel;
+    QMenu* graphiquesDuRecapAnnuel;
+    QMenu* resolutionGraphiques;
+
     //Menu outils
     QAction* mailingPilotesAyantCotiseCetteAnnee;
     QAction* mailingPilotesActifs;
@@ -318,6 +323,7 @@ public slots:
     void changerFusionPdf();
     void changerResolutionExportGraphiques();
     void changerRatioExportGraphiques();
+    void maintenirMenuSelectionGraphsOuvert();
     void selectionnerTousLesGraphsPourRecapAnnuel();
     void verifierSignatureNumerisee();
     void envoyerMail();

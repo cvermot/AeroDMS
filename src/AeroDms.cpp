@@ -92,7 +92,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
-
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -945,7 +944,7 @@ void AeroDms::initialiserMenuFichier()
 void AeroDms::initialiserMenuOptions()
 {
     //========================Menu Options
-    QMenu* menuOption = menuBar()->addMenu(tr("&Options"));
+    menuOption = menuBar()->addMenu(tr("&Options"));
 
     QMenu* menuSignature = menuOption->addMenu(tr("&Signature"));
     menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
@@ -1002,7 +1001,7 @@ void AeroDms::initialiserMenuOptions()
     boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
-    QMenu* menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
+    menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
     boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), 
         tr("Récapitulatif des &recettes"), 
         this);
@@ -1016,7 +1015,7 @@ void AeroDms::initialiserMenuOptions()
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
     boutonOptionRecapAnnuelBaladesSorties->setStatusTip(tr("Permet d'ajouter le récapitulatif des balades et sorties (dates, durées, noms des passagers, couts et recettes...) dans le récap des heures de vol"));
     //Génération des graphiques
-    QMenu* graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
+    graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Graphiques"));
     graphiquesDuRecapAnnuel->setStatusTip(tr("Séléctionne les graphiques à ajouter au récapitulatif annuel des heures de vol"));
 
@@ -1074,8 +1073,20 @@ void AeroDms::initialiserMenuOptions()
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelAeronefs);
     boutonGraphRecapAnnuelAeronefs->setCheckable(true);
 
+    connect(boutonGraphRecapAnnuelHeuresAnnuelles, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelHeuresParPilote, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelEurosParPilote, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelEurosParPilote, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelHeuresParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelEurosParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelHeuresParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelEurosParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelStatutsDesPilotes, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelAeronefs, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+        
+
     //Résolutions
-    QMenu* resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
+    resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Résolution des graphiques"));
 
     boutonGraphResolutionFullHd = new QAction(QIcon("./ressources/standard-definition.svg"), 
@@ -1408,6 +1419,24 @@ void AeroDms::changerResolutionExportGraphiques()
         boutonGraphResolution4k->setChecked(true);
         boutonGraphResolution4k->setFont(font);
     }
+
+    //Si splash vaut nullptr c'est qu'on est hors phase de démarrage
+    //=> on demande la réouverture du menu pour permettre la séléction de plusieurs options
+    //sans refaire tout le chemin
+    if (splash == nullptr)
+    {
+        menuOption->show();
+        menuOptionsRecapAnnuel->show();
+        graphiquesDuRecapAnnuel->show();
+        resolutionGraphiques->show();
+    }
+}
+
+void AeroDms::maintenirMenuSelectionGraphsOuvert()
+{
+    menuOption->show();
+    menuOptionsRecapAnnuel->show();
+    graphiquesDuRecapAnnuel->show();
 }
 
 void AeroDms::changerRatioExportGraphiques()
@@ -1431,6 +1460,17 @@ void AeroDms::changerRatioExportGraphiques()
     {
         boutonGraphRatio16x9->setChecked(true);
         boutonGraphRatio16x9->setFont(font);
+    }
+
+    //Si splash vaut nullptr c'est qu'on est hors phase de démarrage
+    //=> on demande la réouverture du menu pour permettre la séléction de plusieurs options
+    //sans refaire tout le chemin
+    if (splash == nullptr)
+    {
+        menuOption->show();
+        menuOptionsRecapAnnuel->show();
+        graphiquesDuRecapAnnuel->show();
+        resolutionGraphiques->show();
     }
 }
 
