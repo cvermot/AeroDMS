@@ -29,8 +29,8 @@ class PdfDownloader : public QWidget {
 public:
 	PdfDownloader();
 
+	void telechargerDonneesDaca(const QString p_identifiant, const QString p_motDePasse);
 	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const QString p_nomFacture);
-	void telechargerFichier();
 
 private:
 	QNetworkAccessManager* networkManager;
@@ -41,7 +41,7 @@ private:
 
 	int nombreEssais = 0;
 
-	void connecter();
+	AeroDmsTypes::DonneesFacturesDaca donneesDaca;
 
 	enum Etape
 	{
@@ -54,7 +54,19 @@ private:
 		Etape_ECHEC_TELECHARGEMENT
 	};
 
+	enum Demande
+	{
+		Demande_RECUPERE_INFOS_COMPTES,
+		Demande_TELECHARGE_FACTURE
+	};
+
 	Etape phaseTraitement = Etape_INITIALISATION;
+	Demande demandeEnCours = Demande_TELECHARGE_FACTURE;
+
+
+	void telechargerFichier();
+	void connecter();
+	void recupererDonneesDaca(const QByteArray& p_donnees);
 
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
