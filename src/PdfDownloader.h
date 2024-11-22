@@ -31,18 +31,16 @@ public:
 
 private:
 	QNetworkAccessManager* networkManager;
-	QNetworkCookieJar* cookies2;
-	QNetworkAccessManager mgr2;
 
-	QNetworkAccessManager mgr;
 
 	enum Etape
 	{
 		Etape_INITIALISATION = 0,
 		Etape_CONNEXION = 1,
 		Etape_ATTENTE_TELECHARGEMENT = 2,
-		Etape_FINALISER_TELECHARGEMENT = 3,
-		Etape_TERMINE = 4
+		Etape_TERMINE = 4,
+		Etape_ECHEC_CONNEXION = 5,
+		Etape_ECHEC_ENREGISTREMENT_FICHIER
 	};
 
 	Etape phaseTraitement = Etape_INITIALISATION;

@@ -36,86 +36,58 @@ PdfDownloader::PdfDownloader()
 
     qDebug() << "connexion" << cnxReply->error() << cnxReply->readAll();
 
-    qDebug() << postData.toString(QUrl::FullyEncoded).toUtf8();
-
-    QNetworkCookieJar* cookies = networkManager->cookieJar();
-
-    QEventLoop eventLoop;
-
-    QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), &eventLoop, SLOT(serviceRequestFinished(QNetworkReply*)));
     phaseTraitement = Etape_CONNEXION;
-    QNetworkRequest req(QUrl("https://daca.fr"));
-    QNetworkReply* reply = networkManager->get(req);
- 
-    eventLoop.exec();
-
-
-    
 
 }
 
 void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
 {
-    qDebug() << "reply" << rep->error() << rep->size()  <<  phaseTraitement;
-    //qDebug() << rep->readAll();
+    qDebug() << "reply" << rep->error() << rep->size() << phaseTraitement;
 
     if (phaseTraitement == Etape_CONNEXION)
     {
         qDebug() << "réponse" << rep->error() << rep->size();
         if (rep->error() == QNetworkReply::NoError)
         {
-            //mgr.setCookieJar(cookies);
-            //QMessageBox::information(this, "Result", "Result");
             qDebug() << "reponse get" << rep->readAll();
 
-            QThread::sleep(2);
             phaseTraitement = Etape_ATTENTE_TELECHARGEMENT;
             QNetworkRequest req(QUrl("https://daca.fr/site5/plugins/daca/html2pdf/releve_mensuel.php?compte_id=411.pilote.infopilote&mois=09&annee=2024"));
             QNetworkReply* reply = networkManager->get(req);
-            //eventLoop.exec();
             qDebug() << "demande download";
         }
         else
         {
             //QMessageBox::critical(this, "Erreur", "Erreur");
-            qDebug() << "erruer connexion" << rep->readAll();
-            phaseTraitement = Etape_TERMINE;
-        }
-        
-
+            qDebug() << "erreur connexion" << rep->readAll();
+            phaseTraitement = Etape_ECHEC_CONNEXION;
+        }  
     }
-    else if (phaseTraitement == Etape_ATTENTE_TELECHARGEMENT)
+    else if ( phaseTraitement == Etape_ATTENTE_TELECHARGEMENT)
     {
         qDebug() << "réponse download" << rep->size();
 
         if (rep->size() != 0)
         {
-            QFile localFile("downloadedfile.pdf");
-            if (!localFile.open(QIODevice::WriteOnly))
-                return;
             const QByteArray sdata = rep->readAll();
-            localFile.write(sdata);
-            qDebug() << sdata;
-            localFile.close();
-
-            phaseTraitement = Etape_FINALISER_TELECHARGEMENT;
-        }
-    }
-    else if (phaseTraitement == Etape_FINALISER_TELECHARGEMENT)
-    {
-        qDebug() << "réponse download" << rep->size();
-
-        if (rep->size() != 0)
-        {
-            QFile localFile("downloadedfile2.pdf");
-            if (!localFile.open(QIODevice::WriteOnly))
-                return;
-            const QByteArray sdata = rep->readAll();
-            localFile.write(sdata);
-            qDebug() << sdata;
-            localFile.close();
-
-            phaseTraitement = Etape_TERMINE;
+            if (sdata.contains("%PDF-1.7"))
+            {
+                qDebug() << "OK fichier PDF";
+                QFile localFile("downloadedfile2.pdf");
+                if (!localFile.open(QIODevice::WriteOnly))
+                {
+                    phaseTraitement = Etape_ECHEC_ENREGISTREMENT_FICHIER;
+                }
+                else
+                {
+                    localFile.write(sdata);
+                    qDebug() << sdata;
+                    localFile.close();
+                    phaseTraitement = Etape_TERMINE;
+                }
+                
+            }
+            networkManager->disconnect();
         }
 
     }
