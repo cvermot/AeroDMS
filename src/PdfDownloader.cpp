@@ -20,53 +20,77 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PdfDownloader::PdfDownloader()
 {
-    QUrl serviceUrl = QUrl("https://daca.fr/site5/adm_register.php");
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, SIGNAL(finished(QNetworkReply*)),
         this, SLOT(serviceRequestFinished(QNetworkReply*)));
+}
 
-    QUrlQuery postData;
-    postData.addQueryItem("upseudo", "fakelogin");
-    postData.addQueryItem("ppass", "fakepasswd");
-    postData.addQueryItem("lng", "fr");
+void PdfDownloader::telechargerFactureDaca(const QString p_identifiant, 
+    const QString p_motDePasse, 
+    const QString p_nomFacture)
+{
+    identifiantConnexion = p_identifiant;
+    motDePasse = p_motDePasse;
+    factureATelecharger = p_nomFacture;
 
-    QNetworkRequest request(serviceUrl);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-    QNetworkReply* cnxReply = networkManager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+    nombreEssais = 0;
 
-    qDebug() << "connexion" << cnxReply->error() << cnxReply->readAll();
+    connecter();
+}
 
-    phaseTraitement = Etape_CONNEXION;
+void PdfDownloader::connecter()
+{
+    QUrl serviceUrl = QUrl("https://daca.fr/site5/adm_register.php");
 
+    if (nombreEssais < 3)
+    {
+        nombreEssais = nombreEssais + 1;
+
+        QUrlQuery postData;
+        postData.addQueryItem("upseudo", identifiantConnexion);
+        postData.addQueryItem("ppass", motDePasse);
+        postData.addQueryItem("lng", "fr");
+
+        QNetworkRequest request(serviceUrl);
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+        QNetworkReply* cnxReply = networkManager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
+        qDebug() << postData.toString(QUrl::FullyEncoded).toUtf8();
+        phaseTraitement = Etape_CONNEXION;
+    }
+    else
+    {
+        phaseTraitement = Etape_ECHEC_CONNEXION;
+    }
+    
+}
+
+void PdfDownloader::telechargerFichier()
+{
+    nombreEssais = nombreEssais + 1;
+    phaseTraitement = Etape_ATTENTE_TELECHARGEMENT;
+    QNetworkRequest req(QUrl(QString("https://daca.fr/site5/plugins/daca/html2pdf/releve_mensuel.php?compte_id=%1&mois=%2&annee=%3")
+        .arg(factureATelecharger, "09", "2024")));
+
+    QNetworkReply* reply = networkManager->get(req);
 }
 
 void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
 {
-    qDebug() << "reply" << rep->error() << rep->size() << phaseTraitement;
-
     if (phaseTraitement == Etape_CONNEXION)
     {
-        qDebug() << "réponse" << rep->error() << rep->size();
         if (rep->error() == QNetworkReply::NoError)
         {
-            qDebug() << "reponse get" << rep->readAll();
+            nombreEssais = 0;
 
-            phaseTraitement = Etape_ATTENTE_TELECHARGEMENT;
-            QNetworkRequest req(QUrl("https://daca.fr/site5/plugins/daca/html2pdf/releve_mensuel.php?compte_id=411.pilote.infopilote&mois=09&annee=2024"));
-            QNetworkReply* reply = networkManager->get(req);
-            qDebug() << "demande download";
+            telechargerFichier();
         }
         else
         {
-            //QMessageBox::critical(this, "Erreur", "Erreur");
-            qDebug() << "erreur connexion" << rep->readAll();
-            phaseTraitement = Etape_ECHEC_CONNEXION;
+            connecter();
         }  
     }
     else if ( phaseTraitement == Etape_ATTENTE_TELECHARGEMENT)
     {
-        qDebug() << "réponse download" << rep->size();
-
         if (rep->size() != 0)
         {
             const QByteArray sdata = rep->readAll();
@@ -81,38 +105,29 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 else
                 {
                     localFile.write(sdata);
-                    qDebug() << sdata;
                     localFile.close();
                     phaseTraitement = Etape_TERMINE;
                 }
-                
+                networkManager->disconnect();
             }
-            networkManager->disconnect();
-        }
+            else
+            {
+                qDebug() << "Fichier non PDF. Redemande telech";
 
+                if (nombreEssais < 3)
+                {
+                    telechargerFichier();
+                }
+                else
+                {
+                    networkManager->disconnect();
+                    phaseTraitement = Etape_ECHEC_TELECHARGEMENT;
+                }          
+            }            
+        }
     }
     else
     {
         qDebug() << "terminé";
     }
-
-
-    
-    //QObject::connect(&mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(saveFile(QNetworkReply*)));
-
-    
-
 }
-
-/*void PdfDownloader::saveFile(QNetworkReply* rep)
-{
-    qDebug() << "réponse download" << rep->size();
-
-    QFile localFile("downloadedfile.pdf");
-    if (!localFile.open(QIODevice::WriteOnly))
-        return;
-    const QByteArray sdata = rep->readAll();
-    localFile.write(sdata);
-    qDebug() << sdata;
-    localFile.close();
-}*/

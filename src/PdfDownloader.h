@@ -29,18 +29,29 @@ class PdfDownloader : public QWidget {
 public:
 	PdfDownloader();
 
+	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const QString p_nomFacture);
+	void telechargerFichier();
+
 private:
 	QNetworkAccessManager* networkManager;
 
+	QString identifiantConnexion = "";
+	QString motDePasse = "";
+	QString factureATelecharger = "";
+
+	int nombreEssais = 0;
+
+	void connecter();
 
 	enum Etape
 	{
-		Etape_INITIALISATION = 0,
-		Etape_CONNEXION = 1,
-		Etape_ATTENTE_TELECHARGEMENT = 2,
-		Etape_TERMINE = 4,
-		Etape_ECHEC_CONNEXION = 5,
-		Etape_ECHEC_ENREGISTREMENT_FICHIER
+		Etape_INITIALISATION,
+		Etape_CONNEXION,
+		Etape_ATTENTE_TELECHARGEMENT,
+		Etape_TERMINE,
+		Etape_ECHEC_CONNEXION,
+		Etape_ECHEC_ENREGISTREMENT_FICHIER,
+		Etape_ECHEC_TELECHARGEMENT
 	};
 
 	Etape phaseTraitement = Etape_INITIALISATION;
