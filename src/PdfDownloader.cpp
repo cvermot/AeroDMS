@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PdfDownloader::PdfDownloader()
 {
+    // On demande a utiliser le proxy système, si défini
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
+
     networkManager = new QNetworkAccessManager(this);
     connect(networkManager, SIGNAL(finished(QNetworkReply*)),
         this, SLOT(serviceRequestFinished(QNetworkReply*)));

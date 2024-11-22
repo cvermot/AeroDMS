@@ -521,6 +521,18 @@ public:
     static const DetailsBaladesEtSorties K_INIT_DETAILS_BALADES_ET_SORTIES;
     typedef QList<DetailsBaladesEtSorties> ListeDetailsBaladesEtSorties;
 
+    struct CleStringValeur
+    {
+        QString cle;
+        QString texte;
+    };
+    typedef QList<CleStringValeur> ListeCleStringValeur;
+    struct DonneesFacturesDaca
+    {
+        ListeCleStringValeur listePilotes;
+        ListeCleStringValeur listeMois;
+    };
+
     struct GroupeBaladesEtSortiesAssociees
     {
         QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
