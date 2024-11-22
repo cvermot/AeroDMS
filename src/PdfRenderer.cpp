@@ -1006,7 +1006,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
     QWidget* m_contentArea = nullptr;
 
-    const AeroDmsTypes::ResolutionEtParametresStatistiques tailleImage = convertirResolution(demandeEnCours.recapHdvGraphAGenerer);
+    const AeroDmsTypes::ResolutionEtParametresStatistiques tailleImage = convertirResolution(demandeEnCours.recapHdvGraphAGenerer, marges);
 
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
     {
@@ -1220,7 +1220,7 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
     p_widget.render(&generator);
 }
 
-AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution)
+AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution, const QMarginsF p_marges)
 {
     QSize size(1920,1080);
     AeroDmsTypes::ResolutionEtParametresStatistiques resolutionEtParametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
@@ -1247,9 +1247,12 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
 
     if (ratio != AeroDmsTypes::Resolution_RATIO_16_9)
     {
-        //on met en ratio 1.414
-        //On met 1.43 pour que ça rentre dans les pages des fichiers générés
-        resolutionEtParametres.tailleMiniImage.setHeight(resolutionEtParametres.tailleMiniImage.width()/1.43);
+        QPageLayout pageLayout(QPageLayout(QPageSize(QPageSize::A4),
+            QPageLayout::Landscape,
+            p_marges));
+        const float ratio = pageLayout.paintRect().height() / pageLayout.paintRect().width();
+        resolutionEtParametres.tailleMiniImage.setHeight(resolutionEtParametres.tailleMiniImage.width()*ratio - p_marges.top() - p_marges.bottom());
+        qDebug() << "ratio" << ratio << resolutionEtParametres.tailleMiniImage;
     }
 
     return resolutionEtParametres;

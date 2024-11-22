@@ -88,7 +88,7 @@ private :
 
 	static int calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer);
 
-	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution);
+	static AeroDmsTypes::ResolutionEtParametresStatistiques convertirResolution(const int p_resolution, const QMarginsF p_marges);
 
 	static void enregistrerImage( QWidget &p_widget,
 						          const QString p_urlImage,
