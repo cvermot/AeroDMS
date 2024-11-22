@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.8.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets;printsupport;sql;webenginecore;charts;webenginewidgets;pdf;pdfwidgets;svg</QtModules>
+    <QtModules>core;gui;network;widgets;printsupport;sql;svg;webenginecore;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
@@ -107,6 +107,7 @@
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
     <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="DialogueProgressionImpression.cpp" />
+    <ClCompile Include="PdfDownloader.cpp" />
     <ClCompile Include="PdfExtractor.cpp" />
     <ClCompile Include="PdfPrinter.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
@@ -139,6 +140,7 @@
     <QtMoc Include="DialogueEditionParametres.h" />
     <QtMoc Include="DialogueProgressionImpression.h" />
     <QtMoc Include="PdfPrinter.h" />
+    <QtMoc Include="PdfDownloader.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />
