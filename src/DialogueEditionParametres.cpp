@@ -313,6 +313,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     ligneActuelle = systemeLayout->rowCount();
     motDePasseDaca = new QLineEdit(this);
     motDePasseDaca->setToolTip(tr("Mot de passe de connexion au site DACA pour la récupération des factures"));
+    motDePasseDaca->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     systemeLayout->addWidget(new QLabel(tr("Mot de passe site DACA : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(motDePasseDaca, ligneActuelle, K_COLONNE_CHAMP);
 

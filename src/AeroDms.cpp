@@ -216,7 +216,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
-    parametresSysteme.motDePasseSiteDaca = settings.value("siteDaca/password", "").toString();
+    QString valeur = settings.value("siteDaca/password", "").toString();
+    parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
+
+    qDebug() << parametresSysteme.loginSiteDaca << parametresSysteme.motDePasseSiteDaca;
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -1258,9 +1261,12 @@ void AeroDms::initialiserMenuOutils()
     boutonChargerFacturesDaca = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_CLOUD), 
         tr("Charger la liste des factures"), 
         this);
+    facturesDaca->setToolTipsVisible(true);
     boutonChargerFacturesDaca->setStatusTip(tr("Charge la liste des factures disponibles sur le site du DACA"));
     facturesDaca->addAction(boutonChargerFacturesDaca);
     connect(boutonChargerFacturesDaca, SIGNAL(triggered()), this, SLOT(chargerListeFacturesDaca()));
+
+    verifierDispoIdentifiantsDaca();
 
     menuOutils->addSeparator();
 
@@ -3339,7 +3345,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
 
     settings.beginGroup("siteDaca");
     settings.setValue("login", parametresSysteme.loginSiteDaca);
-    settings.setValue("password", parametresSysteme.motDePasseSiteDaca);
+    settings.setValue("password", AeroDmsServices::chiffrerDonnees(parametresSysteme.motDePasseSiteDaca));
     settings.endGroup();
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
@@ -3368,6 +3374,8 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
             parametresSysteme.margesHautBas,
             parametresSysteme.margesGaucheDroite,
             parametresSysteme.margesHautBas));
+
+    verifierDispoIdentifiantsDaca();
 }
 
 void AeroDms::convertirHeureDecimalesVersHhMm()
@@ -4000,7 +4008,11 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                 && donneesDaca.listePilotes.size() > 0)
             {
                 boutonChargerFacturesDaca->setVisible(false);
-                statusBar()->showMessage(tr("Liste des factures disponibles récuperée sur le site du DACA. Factures téléchargeables via le menu Outils/") + texteTitreQMenuFacturesDaca);
+                statusBar()->showMessage(tr("Liste des factures disponibles récuperée sur le site du DACA. Factures téléchargeables via le menu \"Outils/") 
+                    + texteTitreQMenuFacturesDaca
+                    + "\". Facture la plus récente disponible : "
+                    + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")
+                    + ".");
 
                 for (QDate mois : donneesDaca.listeMoisAnnees)
                 {
@@ -4082,4 +4094,19 @@ void AeroDms::demanderTelechargementFactureDaca()
 void AeroDms::chargerListeFacturesDaca()
 {
     pdfdl->telechargerDonneesDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca);
+}
+
+void AeroDms::verifierDispoIdentifiantsDaca()
+{
+    if (parametresSysteme.loginSiteDaca == ""
+        || parametresSysteme.motDePasseSiteDaca == "")
+    {
+        facturesDaca->setEnabled(false);
+        facturesDaca->setStatusTip(tr("Fonction désactivée : identifiants et/ou mot de passe non fournis"));
+    }
+    else
+    {
+        facturesDaca->setEnabled(true);
+        facturesDaca->setStatusTip(tr("Chargement des factures du DACA"));
+    }
 }

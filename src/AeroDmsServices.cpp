@@ -18,6 +18,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "AeroDmsServices.h"
 
+#ifdef Q_OS_WIN
+#pragma comment(lib, "crypt32.lib")
+#include <windows.h>
+#include <wincrypt.h>
+#endif
+
 const QString AeroDmsServices::convertirMinutesEnHeuresMinutes(const int p_minutes)
 {
     const int heures = p_minutes / 60;
@@ -563,13 +569,49 @@ void AeroDmsServices::normaliser(QString & p_texte)
     p_texte.replace(QRegularExpression("[Œ]"), "OE");
 }
 
-QString AeroDmsServices::nomUtilisateur() 
+QString AeroDmsServices::chiffrerDonnees(QString& p_string) 
 {
-    QString username;
 #ifdef Q_OS_WIN
-    return qEnvironmentVariable("USERNAME");
+    QByteArray data = p_string.toUtf8(); // Conversion en QByteArray
+    DATA_BLOB inputBlob;
+    DATA_BLOB outputBlob;
+    inputBlob.pbData = reinterpret_cast<BYTE*>(data.data());
+    inputBlob.cbData = data.size();
+
+    if (CryptProtectData(&inputBlob, nullptr, nullptr, nullptr, nullptr, 0, &outputBlob)) {
+        QByteArray encrypted(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
+        LocalFree(outputBlob.pbData); // Libérer la mémoire allouée
+        qDebug() << encrypted;
+        return QString::fromUtf8(encrypted.toBase64()); // Encodage en base64 pour le stockage
+    }
 #else
-    return qEnvironmentVariable("USER");
+    #warning Attention : chiffrement des mots de passe non défini.Implémenter la méthode nécessaire dans AeroDmsServices::chiffrerDonnees
 #endif
 
+    // En cas d'échec
+    return "";
 }
+
+QString AeroDmsServices::dechiffrerDonnees(QString& encryptedText)
+{
+#ifdef Q_OS_WIN
+    QByteArray encryptedData = QByteArray::fromBase64(encryptedText.toUtf8());
+    DATA_BLOB inputBlob;
+    DATA_BLOB outputBlob;
+    inputBlob.pbData = reinterpret_cast<BYTE*>(encryptedData.data());
+    inputBlob.cbData = encryptedData.size();
+
+    if (CryptUnprotectData(&inputBlob, nullptr, nullptr, nullptr, nullptr, 0, &outputBlob)) {
+        QByteArray decrypted(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
+        LocalFree(outputBlob.pbData); // Libérer la mémoire allouée
+        qDebug() << decrypted;
+        return QString::fromUtf8(decrypted); // Conversion en QString
+    }
+#else
+#warning Attention : chiffrement des mots de passe non défini. Implémenter la méthode nécessaire dans AeroDmsServices::dechiffrerDonnees
+#endif
+
+    // En cas d'échec
+    return "";
+}
+

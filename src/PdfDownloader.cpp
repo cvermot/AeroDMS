@@ -61,7 +61,6 @@ void PdfDownloader::telechargerFactureDaca( const QString p_identifiant,
     else
     {
         //Etat indéterminé : on redémarre depuis le début
-        qDebug() << "réinit";
         phaseTraitement = Etape_INITIALISATION;
         //networkManager->disconnect();
         connecter();
@@ -126,7 +125,20 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
         {
             nombreEssais = 0;
 
-            telechargerFichier();
+            if (rep->readAll().contains("Responsable CE"))
+            {
+                telechargerFichier();
+            }
+            else
+            {
+                QMessageBox::critical(this, 
+                    QApplication::applicationName() + " - " + tr("Erreur de connexion au site du DACA"),
+                    tr("La connexion au site du DACA est impossible.\n\nPlusieurs causes sont possibles :\n")
+                    + tr("    -l'identifiant est invalide\n")
+                    + tr("    -l'identifiant utilisé n'est pas celui d'un responsable CE (pas d'item \"Responsable CE\" dans la colonne \"Menu DACA\" du site)\n")
+                    + tr("    -site du DACA hors ligne ou indisponible\n"));
+                emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION);
+            }    
         }
         else
         {
@@ -142,7 +154,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 const QByteArray sdata = rep->readAll();
                 if (sdata.contains("%PDF-1.7"))
                 {
-                    qDebug() << "OK fichier PDF";
+                    //qDebug() << "OK fichier PDF";
                     QString nomFichier = repertoireFacturesATraiter
                         + "/" 
                         + facture.pilote
@@ -172,7 +184,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 }
                 else
                 {
-                    qDebug() << "Fichier non PDF. Redemande telech";
+                    //qDebug() << "Fichier non PDF. Redemande telech";
 
                     if (nombreEssais < 3)
                     {
@@ -196,7 +208,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
     }
     else
     {
-        qDebug() << "terminé";
+        //Rien à faire dans ces états...
     }
 }
 
@@ -218,8 +230,6 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
         item.cle = (match.captured(1));
         item.texte = (match.captured(2));
         donneesDaca.listePilotes.append(item);
-
-        qDebug() << item.cle << item.texte;
     }
 
     //On récupère les dates disponibles
@@ -237,7 +247,6 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
 
         listeItem.append(item);
         listeDates.append(QDate(match.captured(2).toInt(), match.captured(1).toInt(), 1));
-        qDebug() << "date" << match.captured(1).toInt() << match.captured(2).toInt() << match.captured(1) << match.captured(2);
     }
 
     QListIterator<QDate> dateIt(listeDates);

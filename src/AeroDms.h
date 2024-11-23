@@ -102,6 +102,8 @@ private:
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();
 
+    void verifierDispoIdentifiantsDaca();
+
     bool eventFilter(QObject* object, QEvent* event);
 
     ManageDb* db;
