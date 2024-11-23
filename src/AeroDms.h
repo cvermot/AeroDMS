@@ -350,6 +350,7 @@ public slots:
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
     void verifierPresenceDeMiseAjour();
+    void initialiserGestionnaireTelechargement();
     void switchOnglet();
     void imprimerLaDemande();
     void imprimerLaDemandeAgrafage();

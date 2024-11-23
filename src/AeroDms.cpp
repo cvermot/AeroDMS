@@ -89,13 +89,11 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     terminerMiseAJourApplication();
     verifierPresenceDeMiseAjour();
-
+    initialiserGestionnaireTelechargement();
+   
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
-
-    pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter);
-    connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -217,6 +215,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
+    parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
+    parametresSysteme.motDePasseSiteDaca = settings.value("siteDaca/password", "").toString();
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -664,6 +664,13 @@ Consultez le développeur / responsable de l'application pour plus d'information
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
         dialogueErreurVersionBdd.exec();
     }
+}
+
+void AeroDms::initialiserGestionnaireTelechargement()
+{
+    pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter);
+    connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
+
 }
 
 void AeroDms::passerLeLogicielEnLectureSeule()
@@ -3330,6 +3337,11 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.setValue("forcageImpressionRecto", parametresSysteme.parametresImpression.forcageImpressionRecto);
     settings.endGroup();
 
+    settings.beginGroup("siteDaca");
+    settings.setValue("login", parametresSysteme.loginSiteDaca);
+    settings.setValue("password", parametresSysteme.motDePasseSiteDaca);
+    settings.endGroup();
+
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
     parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
 
@@ -4058,10 +4070,8 @@ void AeroDms::demanderTelechargementFactureDaca()
     if (action->data().canConvert<AeroDmsTypes::IdentifiantFacture>()) 
     {
         AeroDmsTypes::IdentifiantFacture identifiant = action->data().value<AeroDmsTypes::IdentifiantFacture>();
-        qDebug() << "Mois/Année:" << identifiant.moisAnnee.toString("MMMM yyyy");
-        qDebug() << "Pilote:" << identifiant.pilote;
 
-        pdfdl->telechargerFactureDaca("fakelogin", "fakepassword", identifiant);
+        pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
     }
     else 
     {
@@ -4071,5 +4081,5 @@ void AeroDms::demanderTelechargementFactureDaca()
 
 void AeroDms::chargerListeFacturesDaca()
 {
-    pdfdl->telechargerDonneesDaca("fakelogin", "fakepassword");
+    pdfdl->telechargerDonneesDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca);
 }
