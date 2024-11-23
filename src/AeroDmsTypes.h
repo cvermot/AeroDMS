@@ -217,6 +217,21 @@ public:
         EtatImpression_ANNULEE_PAR_UTILISATEUR
     };
 
+    enum EtatRecuperationDonneesFactures
+    {
+        EtatRecuperationDonneesFactures_AUCUN,
+        EtatRecuperationDonneesFactures_CONNEXION_EN_COURS,
+        EtatRecuperationDonneesFactures_CONNECTE,
+        EtatRecuperationDonnnesFactures_ECHEC_CONNEXION,
+        EtatRecuperationDonneesFactures_RECUPERATION_DONNEES_EN_COURS,
+        EtatRecuperationDonneesFactures_DONNEES_RECUPEREES,
+        EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_DONNEES,
+        EtatRecuperationDonneesFactures_RECUPERATION_FACTURE_EN_COURS,
+        EtatRecuperationDonneesFactures_FACTURE_RECUPEREE,
+        EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE
+
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
         QString idPilote = "";
@@ -463,6 +478,8 @@ public:
         QString cheminStockageFacturesATraiter;
         QString cheminSortieFichiersGeneres;
         QString nomBdd;
+        QString loginSiteDaca;
+        QString motDePasseSiteDaca;
         int margesHautBas;
         int margesGaucheDroite;
         ParametresImpression parametresImpression;
@@ -530,7 +547,13 @@ public:
     struct DonneesFacturesDaca
     {
         ListeCleStringValeur listePilotes;
-        ListeCleStringValeur listeMois;
+        QList<QDate> listeMoisAnnees;
+    };
+
+    struct IdentifiantFacture
+    {
+        QDate moisAnnee;
+        QString pilote;
     };
 
     struct GroupeBaladesEtSortiesAssociees
@@ -556,5 +579,7 @@ public:
 
     static const int K_DPI_PAR_DEFAUT = 72;
 };
+
+Q_DECLARE_METATYPE(AeroDmsTypes::IdentifiantFacture)
 
 #endif // AERODMSTYPES_H

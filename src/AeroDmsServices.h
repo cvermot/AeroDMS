@@ -147,6 +147,7 @@ public:
     static const QIcon recupererIcone(const Icone p_icone);
     static void ajouterIconesComboBox(QComboBox &p_activite);
     static void normaliser(QString &p_texte);
+    static QString nomUtilisateur();
 };
 
 #endif // AERODMSSERVICES_H

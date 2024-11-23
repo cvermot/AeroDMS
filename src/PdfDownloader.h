@@ -27,17 +27,20 @@ class PdfDownloader : public QWidget {
 	Q_OBJECT
 
 public:
-	PdfDownloader();
+	PdfDownloader(const QString p_cheminFacturesATraiter);
 
 	void telechargerDonneesDaca(const QString p_identifiant, const QString p_motDePasse);
-	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const QString p_nomFacture);
+	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const AeroDmsTypes::IdentifiantFacture p_identifiantFacture);
+	AeroDmsTypes::DonneesFacturesDaca recupererDonneesDaca();
 
 private:
 	QNetworkAccessManager* networkManager;
 
 	QString identifiantConnexion = "";
 	QString motDePasse = "";
-	QString factureATelecharger = "";
+	AeroDmsTypes::IdentifiantFacture facture;
+
+	QString repertoireFacturesATraiter = "";
 
 	int nombreEssais = 0;
 
@@ -66,11 +69,14 @@ private:
 
 	void telechargerFichier();
 	void connecter();
-	void recupererDonneesDaca(const QByteArray& p_donnees);
+	void parserDonneesDaca(const QByteArray& p_donnees);
 
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
 	//void saveFile(QNetworkReply* rep);
+
+signals:
+	void etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures);
 };
 
 #endif PDFDOWNLOADER_H

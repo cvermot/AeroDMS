@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ManageDb.h"
 #include "PdfRenderer.h"
+#include "PdfDownloader.h"
 #include "DialogueGestionPilote.h"
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
@@ -223,6 +224,7 @@ private:
     QAction* boutonGraphRatioIso216;
     QAction* boutonGraphRatio16x9;
 
+    QMenu* facturesDaca;
     QMenu* menuOption;
     QMenu* menuOptionsRecapAnnuel;
     QMenu* graphiquesDuRecapAnnuel;
@@ -270,6 +272,8 @@ private:
     QHBoxLayout* graphiques;
 
     QSplashScreen* splash;
+
+    PdfDownloader *pdfdl;
 
 signals:
     void toucheEchapEstAppuyee();
@@ -350,6 +354,10 @@ public slots:
     void enregistrerParametresApplication( const AeroDmsTypes::ParametresMetier p_parametresMetiers,
                                            const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionGenerationPdf();
+
+    //Téléchargement de factures
+    void gererChargementDonnees(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
+    void demanderTelechargementFactureDaca();
 
 };
 #endif // AERODMS_H

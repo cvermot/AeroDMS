@@ -302,6 +302,22 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     sortieFichiersGeneres->setText(p_parametresSysteme.cheminSortieFichiersGeneres);
 
+    ligneActuelle = systemeLayout->rowCount();
+    loginDaca = new QLineEdit(this);
+    loginDaca->setToolTip(tr("Identifiant de connexion au site DACA pour la récupération des factures"));
+    systemeLayout->addWidget(new QLabel(tr("Login site DACA : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(loginDaca, ligneActuelle, K_COLONNE_CHAMP);
+
+    loginDaca->setText(p_parametresSysteme.loginSiteDaca);
+
+    ligneActuelle = systemeLayout->rowCount();
+    motDePasseDaca = new QLineEdit(this);
+    motDePasseDaca->setToolTip(tr("Mot de passe de connexion au site DACA pour la récupération des factures"));
+    systemeLayout->addWidget(new QLabel(tr("Mot de passe site DACA : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(motDePasseDaca, ligneActuelle, K_COLONNE_CHAMP);
+
+    motDePasseDaca->setText(p_parametresSysteme.motDePasseSiteDaca);
+
     QPushButton *cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -443,6 +459,9 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesTraitees = facturesSaisies->text();
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
+    parametresSysteme.loginSiteDaca = loginDaca->text();
+    parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();
+
     parametresSysteme.parametresImpression.imprimante = imprimante->text();
     parametresSysteme.parametresImpression.resolutionImpression = resolutionImpression->currentData().toInt();
     parametresSysteme.parametresImpression.modeCouleurImpression = static_cast<QPrinter::ColorMode>(impressionCouleur->currentData().toInt());

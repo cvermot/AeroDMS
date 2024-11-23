@@ -55,6 +55,9 @@ private:
     QLineEdit* facturesSaisies = nullptr;
     QLineEdit* factureATraiter = nullptr;
     QLineEdit* sortieFichiersGeneres = nullptr;
+    QLineEdit* loginDaca = nullptr;
+    QLineEdit* motDePasseDaca = nullptr;
+
     QComboBox* impressionCouleur = nullptr;
     QComboBox* resolutionImpression = nullptr;
     QCheckBox* forcageImpressionRectoSimple = nullptr;

@@ -94,7 +94,6 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     demanderFermetureSplashscreen();
 
-    PdfDownloader pdfDownload;
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -1244,6 +1243,8 @@ void AeroDms::initialiserMenuOutils()
     connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
+
+    facturesDaca = menuOutils->addMenu(tr("Récupération des factures DACA"));
 
     menuOutils->addSeparator();
 
@@ -3940,4 +3941,104 @@ bool AeroDms::eventFilter(QObject* object, QEvent* event)
     }
     else
         return false;
+}
+
+void AeroDms::gererChargementDonnees(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation)
+{
+    switch(p_etatRecuperation)
+    {
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_CONNEXION_EN_COURS:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_CONNECTE:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_RECUPERATION_DONNEES_EN_COURS:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_DONNEES_RECUPEREES:
+        {
+            statusBar()->showMessage(tr("Données récuperées"));
+            //QLocale::setDefault(QLocale::French);
+            AeroDmsTypes::DonneesFacturesDaca donneesDaca = pdfdl->recupererDonneesDaca();
+            for (QDate mois : donneesDaca.listeMoisAnnees)
+            {
+                if (mois.isValid()) 
+                {
+                    QString date = QLocale::system().toString(mois, "MMMM yyyy");
+                    date[0] = date[0].toUpper();
+                    QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER),
+                        date);
+
+                    for (AeroDmsTypes::CleStringValeur pilote : donneesDaca.listePilotes)
+                    {
+                        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER),
+                            pilote.texte,
+                            this);
+                        AeroDmsTypes::IdentifiantFacture identifiant;
+                        identifiant.moisAnnee = mois;
+                        identifiant.pilote = pilote.cle;
+                        action->setData(QVariant::fromValue(identifiant));
+                        menu->addAction(action);
+
+                        connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
+                    }
+                }
+            }
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_DONNEES:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_RECUPERATION_FACTURE_EN_COURS:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE :
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE:
+        {
+
+        }
+        break;
+        case AeroDmsTypes::EtatRecuperationDonneesFactures_AUCUN: 
+        default:
+        {
+
+        }
+        break;
+    }     
+}
+
+void AeroDms::demanderTelechargementFactureDaca()
+{
+    QAction* action = static_cast<QAction*>(sender());
+
+    if (action->data().canConvert<AeroDmsTypes::IdentifiantFacture>()) 
+    {
+        AeroDmsTypes::IdentifiantFacture identifiant = action->data().value<AeroDmsTypes::IdentifiantFacture>();
+        qDebug() << "Mois/Année:" << identifiant.moisAnnee.toString("MMMM yyyy");
+        qDebug() << "Pilote:" << identifiant.pilote;
+    }
+    else 
+    {
+        qDebug() << "Conversion impossible.";
+    }
 }

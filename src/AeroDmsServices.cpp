@@ -547,3 +547,14 @@ void AeroDmsServices::normaliser(QString & p_texte)
     p_texte.replace(QRegularExpression("[œ]"), "oe");
     p_texte.replace(QRegularExpression("[Œ]"), "OE");
 }
+
+QString AeroDmsServices::nomUtilisateur() 
+{
+    QString username;
+#ifdef Q_OS_WIN
+    return qEnvironmentVariable("USERNAME");
+#else
+    return qEnvironmentVariable("USER");
+#endif
+
+}
