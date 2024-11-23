@@ -119,6 +119,9 @@ public:
         Icone_SCAN_AUTO_FACTURE,
         Icone_SCAN_AUTO_FACTURE_GENERIQUE,
         Icone_SCAN_AUTO_VOL,
+        Icone_TELECHARGER_CLOUD,
+        Icone_TELECHARGER_DOSSIER,
+        Icone_TELECHARGER_FICHIER,
         Icone_DEBUG,
 
         Icone_RATIO,

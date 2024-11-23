@@ -250,6 +250,21 @@ const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon("./ressources/airplane-search.svg");
     }
     break;
+    case AeroDmsServices::Icone_TELECHARGER_CLOUD:
+    {
+        return QIcon("./ressources/cloud-download.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_TELECHARGER_DOSSIER:
+    {
+        return QIcon("./ressources/folder-download.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_TELECHARGER_FICHIER:
+    {
+        return QIcon("./ressources/file-download.svg");
+    }
+    break;
     case AeroDmsServices::Icone_DEBUG:
     {
         return QIcon("./ressources/bug.svg");

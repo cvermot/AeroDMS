@@ -49,11 +49,24 @@ void PdfDownloader::telechargerFactureDaca( const QString p_identifiant,
     identifiantConnexion = p_identifiant;
     motDePasse = p_motDePasse;
     facture = p_identifiantFacture;
+    derniereFactureTelechargee = "";
 
     nombreEssais = 0;
     demandeEnCours = Demande_TELECHARGE_FACTURE;
 
-    connecter();
+    if (phaseTraitement == Etape_CONNECTE)
+    {
+        telechargerFichier();
+    }
+    else
+    {
+        //Etat indéterminé : on redémarre depuis le début
+        qDebug() << "réinit";
+        phaseTraitement = Etape_INITIALISATION;
+        //networkManager->disconnect();
+        connecter();
+    }
+    
 }
 
 void PdfDownloader::connecter()
@@ -130,19 +143,32 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 if (sdata.contains("%PDF-1.7"))
                 {
                     qDebug() << "OK fichier PDF";
-                    QFile localFile(repertoireFacturesATraiter + "/" + "downloadedfile2.pdf");
+                    QString nomFichier = repertoireFacturesATraiter
+                        + "/" 
+                        + facture.pilote
+                        + "_"
+                        + QString::number(facture.moisAnnee.year())
+                        + "_"
+                        + QString::number(facture.moisAnnee.month()).rightJustified(2, '0')
+                        + "_"
+                        + QApplication::applicationName()
+                        + ".pdf";
+
+                    QFile localFile(nomFichier);
                     if (!localFile.open(QIODevice::WriteOnly))
                     {
                         phaseTraitement = Etape_ECHEC_ENREGISTREMENT_FICHIER;
+                        emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE);
                     }
                     else
                     {
                         localFile.write(sdata);
                         localFile.close();
-                        phaseTraitement = Etape_TERMINE;
+                        derniereFactureTelechargee = nomFichier;
+                        phaseTraitement = Etape_CONNECTE;
+                        emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE);
                     }
-                    emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE);
-                    networkManager->disconnect();
+                    //networkManager->disconnect();
                 }
                 else
                 {
@@ -154,7 +180,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                     }
                     else
                     {
-                        networkManager->disconnect();
+                        //networkManager->disconnect();
                         phaseTraitement = Etape_ECHEC_TELECHARGEMENT;
                         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE);
                     }
@@ -163,6 +189,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
             else if (demandeEnCours == Demande_RECUPERE_INFOS_COMPTES)
             {
                 const QByteArray sdata = rep->readAll();
+                phaseTraitement = Etape_CONNECTE;
                 parserDonneesDaca(sdata);
             }
         }
@@ -228,4 +255,9 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
 AeroDmsTypes::DonneesFacturesDaca PdfDownloader::recupererDonneesDaca()
 {
     return donneesDaca;
+}
+
+const QString PdfDownloader::recupererCheminDernierFichierTelecharge()
+{
+    return derniereFactureTelechargee;
 }

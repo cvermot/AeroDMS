@@ -32,6 +32,7 @@ public:
 	void telechargerDonneesDaca(const QString p_identifiant, const QString p_motDePasse);
 	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const AeroDmsTypes::IdentifiantFacture p_identifiantFacture);
 	AeroDmsTypes::DonneesFacturesDaca recupererDonneesDaca();
+	const QString recupererCheminDernierFichierTelecharge();
 
 private:
 	QNetworkAccessManager* networkManager;
@@ -41,6 +42,7 @@ private:
 	AeroDmsTypes::IdentifiantFacture facture;
 
 	QString repertoireFacturesATraiter = "";
+	QString derniereFactureTelechargee = "";
 
 	int nombreEssais = 0;
 
@@ -50,6 +52,7 @@ private:
 	{
 		Etape_INITIALISATION,
 		Etape_CONNEXION,
+		Etape_CONNECTE,
 		Etape_ATTENTE_TELECHARGEMENT,
 		Etape_TERMINE,
 		Etape_ECHEC_CONNEXION,

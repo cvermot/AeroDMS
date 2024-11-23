@@ -69,6 +69,7 @@ private:
     void initialiserMenuAide();
     void initialiserRaccourcisClavierSansActionIhm();
 
+    void chargerUneFactureAvecScan(const QString p_fichier);
     void chargerUneFacture(const QString p_fichier);
 
     void peuplerListesPilotes();
@@ -225,6 +226,7 @@ private:
     QAction* boutonGraphRatio16x9;
 
     QMenu* facturesDaca;
+    QAction* boutonChargerFacturesDaca;
     QMenu* menuOption;
     QMenu* menuOptionsRecapAnnuel;
     QMenu* graphiquesDuRecapAnnuel;
@@ -274,6 +276,9 @@ private:
     QSplashScreen* splash;
 
     PdfDownloader *pdfdl;
+
+    //Textes de certains éléments d'IHM
+    const QString texteTitreQMenuFacturesDaca = tr("Récupération des factures DACA");
 
 signals:
     void toucheEchapEstAppuyee();
@@ -356,8 +361,9 @@ public slots:
     void detruireFenetreProgressionGenerationPdf();
 
     //Téléchargement de factures
-    void gererChargementDonnees(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
+    void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
     void demanderTelechargementFactureDaca();
+    void chargerListeFacturesDaca();
 
 };
 #endif // AERODMS_H

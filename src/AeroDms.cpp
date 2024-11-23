@@ -94,6 +94,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     demanderFermetureSplashscreen();
 
+    pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter);
+    connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -1244,7 +1246,14 @@ void AeroDms::initialiserMenuOutils()
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
 
-    facturesDaca = menuOutils->addMenu(tr("Récupération des factures DACA"));
+    facturesDaca = menuOutils->addMenu(texteTitreQMenuFacturesDaca);
+    facturesDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_CLOUD));
+    boutonChargerFacturesDaca = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_CLOUD), 
+        tr("Charger la liste des factures"), 
+        this);
+    boutonChargerFacturesDaca->setStatusTip(tr("Charge la liste des factures disponibles sur le site du DACA"));
+    facturesDaca->addAction(boutonChargerFacturesDaca);
+    connect(boutonChargerFacturesDaca, SIGNAL(triggered()), this, SLOT(chargerListeFacturesDaca()));
 
     menuOutils->addSeparator();
 
@@ -2110,14 +2119,19 @@ void AeroDms::ajouterUneSortieEnBdd()
 void AeroDms::selectionnerUneFacture()
 {
     QString fichier = QFileDialog::getOpenFileName(
-        this,
-        QApplication::applicationName() + " - " + tr("Ouvrir une facture"),
-        parametresSysteme.cheminStockageFacturesATraiter,
-        tr("Fichier PDF (*.pdf)"));
+            this,
+            QApplication::applicationName() + " - " + tr("Ouvrir une facture"),
+            parametresSysteme.cheminStockageFacturesATraiter,
+            tr("Fichier PDF (*.pdf)"));
+    
+    chargerUneFactureAvecScan(fichier);
+}
 
-    if (!fichier.isNull())
+void AeroDms::chargerUneFactureAvecScan(const QString p_fichier)
+{
+    if (!p_fichier.isNull())
     {
-        chargerUneFacture(fichier);
+        chargerUneFacture(p_fichier);
         idFactureDetectee = -1;
 
         //On masque par défaut... on reaffiche si le scan est effectué
@@ -2127,7 +2141,7 @@ void AeroDms::selectionnerUneFacture()
         supprimerLeVolSelectionne->setHidden(true);
         if (scanAutomatiqueDesFacturesEstActif)
         {
-            factures = PdfExtractor::recupererLesDonneesDuPdf(fichier);
+            factures = PdfExtractor::recupererLesDonneesDuPdf(p_fichier);
             if (factures.size() != 0)
             {
                 peuplerTableVolsDetectes(factures);
@@ -3943,13 +3957,13 @@ bool AeroDms::eventFilter(QObject* object, QEvent* event)
         return false;
 }
 
-void AeroDms::gererChargementDonnees(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation)
+void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation)
 {
     switch(p_etatRecuperation)
     {
         case AeroDmsTypes::EtatRecuperationDonneesFactures_CONNEXION_EN_COURS:
         {
-
+            statusBar()->showMessage(tr("Connexion en cours au site du DACA"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_CONNECTE:
@@ -3959,63 +3973,73 @@ void AeroDms::gererChargementDonnees(const AeroDmsTypes::EtatRecuperationDonnees
         break;
         case AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION:
         {
-
+            statusBar()->showMessage(tr("Connexion impossible au site du DACA"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_RECUPERATION_DONNEES_EN_COURS:
         {
-
+            statusBar()->showMessage(tr("Récupération de la liste des factures disponibles sur le site du DACA en cours"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_DONNEES_RECUPEREES:
         {
-            statusBar()->showMessage(tr("Données récuperées"));
-            //QLocale::setDefault(QLocale::French);
             AeroDmsTypes::DonneesFacturesDaca donneesDaca = pdfdl->recupererDonneesDaca();
-            for (QDate mois : donneesDaca.listeMoisAnnees)
+            if (donneesDaca.listeMoisAnnees.size() > 0
+                && donneesDaca.listePilotes.size() > 0)
             {
-                if (mois.isValid()) 
+                boutonChargerFacturesDaca->setVisible(false);
+                statusBar()->showMessage(tr("Liste des factures disponibles récuperée sur le site du DACA. Factures téléchargeables via le menu Outils/") + texteTitreQMenuFacturesDaca);
+
+                for (QDate mois : donneesDaca.listeMoisAnnees)
                 {
-                    QString date = QLocale::system().toString(mois, "MMMM yyyy");
-                    date[0] = date[0].toUpper();
-                    QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER),
-                        date);
-
-                    for (AeroDmsTypes::CleStringValeur pilote : donneesDaca.listePilotes)
+                    if (mois.isValid())
                     {
-                        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER),
-                            pilote.texte,
-                            this);
-                        AeroDmsTypes::IdentifiantFacture identifiant;
-                        identifiant.moisAnnee = mois;
-                        identifiant.pilote = pilote.cle;
-                        action->setData(QVariant::fromValue(identifiant));
-                        menu->addAction(action);
+                        QString date = QLocale::system().toString(mois, "MMMM yyyy");
+                        date[0] = date[0].toUpper();
+                        QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_DOSSIER),
+                            date);
 
-                        connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
+                        for (AeroDmsTypes::CleStringValeur pilote : donneesDaca.listePilotes)
+                        {
+                            QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_FICHIER),
+                                pilote.texte,
+                                this);
+                            AeroDmsTypes::IdentifiantFacture identifiant;
+                            identifiant.moisAnnee = mois;
+                            identifiant.pilote = pilote.cle;
+                            action->setData(QVariant::fromValue(identifiant));
+                            menu->addAction(action);
+
+                            connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
+                        }
                     }
                 }
+            }
+            else
+            {
+                statusBar()->showMessage(tr("La liste des pilotes ou la liste des dates récuperées sur le site du DACA est vide. Impossible d'afficher la liste des factures disponibles."));
             }
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_DONNEES:
         {
-
+            statusBar()->showMessage(tr("Impossible de récupérer les données depuis le site du DACA"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_RECUPERATION_FACTURE_EN_COURS:
         {
-
+            statusBar()->showMessage(tr("Téléchargement en cours de la facture"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE :
         {
-
+            chargerUneFactureAvecScan(pdfdl->recupererCheminDernierFichierTelecharge());
+            statusBar()->showMessage(tr("Facture téléchargée avec succès."));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE:
         {
-
+            statusBar()->showMessage(tr("Impossible de récupérer la facture"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_AUCUN: 
@@ -4036,9 +4060,16 @@ void AeroDms::demanderTelechargementFactureDaca()
         AeroDmsTypes::IdentifiantFacture identifiant = action->data().value<AeroDmsTypes::IdentifiantFacture>();
         qDebug() << "Mois/Année:" << identifiant.moisAnnee.toString("MMMM yyyy");
         qDebug() << "Pilote:" << identifiant.pilote;
+
+        pdfdl->telechargerFactureDaca("fakelogin", "fakepassword", identifiant);
     }
     else 
     {
-        qDebug() << "Conversion impossible.";
+        statusBar()->showMessage(tr("Identifiant invalide. Impossible de télécharger la facture"));
     }
+}
+
+void AeroDms::chargerListeFacturesDaca()
+{
+    pdfdl->telechargerDonneesDaca("fakelogin", "fakepassword");
 }
