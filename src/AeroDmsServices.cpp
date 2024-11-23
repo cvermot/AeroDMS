@@ -579,10 +579,9 @@ QString AeroDmsServices::chiffrerDonnees(QString& p_string)
     inputBlob.cbData = data.size();
 
     if (CryptProtectData(&inputBlob, nullptr, nullptr, nullptr, nullptr, 0, &outputBlob)) {
-        QByteArray encrypted(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
+        QByteArray donneesChiffrees(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
         LocalFree(outputBlob.pbData); // Libérer la mémoire allouée
-        qDebug() << encrypted;
-        return QString::fromUtf8(encrypted.toBase64()); // Encodage en base64 pour le stockage
+        return QString::fromUtf8(donneesChiffrees.toBase64()); // Encodage en base64 pour le stockage
     }
 #else
     #warning Attention : chiffrement des mots de passe non défini.Implémenter la méthode nécessaire dans AeroDmsServices::chiffrerDonnees
@@ -595,17 +594,16 @@ QString AeroDmsServices::chiffrerDonnees(QString& p_string)
 QString AeroDmsServices::dechiffrerDonnees(QString& encryptedText)
 {
 #ifdef Q_OS_WIN
-    QByteArray encryptedData = QByteArray::fromBase64(encryptedText.toUtf8());
+    QByteArray donneesChiffrees = QByteArray::fromBase64(encryptedText.toUtf8());
     DATA_BLOB inputBlob;
     DATA_BLOB outputBlob;
-    inputBlob.pbData = reinterpret_cast<BYTE*>(encryptedData.data());
-    inputBlob.cbData = encryptedData.size();
+    inputBlob.pbData = reinterpret_cast<BYTE*>(donneesChiffrees.data());
+    inputBlob.cbData = donneesChiffrees.size();
 
     if (CryptUnprotectData(&inputBlob, nullptr, nullptr, nullptr, nullptr, 0, &outputBlob)) {
-        QByteArray decrypted(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
+        QByteArray donneesDechiffrees(reinterpret_cast<char*>(outputBlob.pbData), outputBlob.cbData);
         LocalFree(outputBlob.pbData); // Libérer la mémoire allouée
-        qDebug() << decrypted;
-        return QString::fromUtf8(decrypted); // Conversion en QString
+        return QString::fromUtf8(donneesDechiffrees); // Conversion en QString
     }
 #else
 #warning Attention : chiffrement des mots de passe non défini. Implémenter la méthode nécessaire dans AeroDmsServices::dechiffrerDonnees
