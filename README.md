@@ -22,7 +22,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Impression (Qt Print Support)
   - Chargement de données de sites Web (Qt Network)
 - Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
-- Utilisation de la librairie Dpapi (Win32/crypt32.lib) pour le chiffrement des mots de passe stockés en local, à défaut de support d'un mécanisme générique par Qt. Si on souhaite compiler pour Mac OS ou Linux, il sera nécessaire d'implémenter les mécanismes spécifiques à ces systèmes d'exploitation.
+- Librairie Dpapi (Win32/crypt32.lib) pour le chiffrement des mots de passe stockés en local, à défaut de support d'un mécanisme générique par Qt. Si on souhaite compiler pour Mac OS ou Linux, il sera nécessaire d'implémenter les mécanismes spécifiques à ces systèmes d'exploitation.
 
 ## Mise en place de l’environnement de développement
 Le développement est effectué sous Visual Studio 2022 (MSVC). Cette contrainte découle du fait que QtWebEngine n’est pas disponible lorsque Qt est compilé avec MinGw, cela interdit donc la compilation de l’application avec QtCreator sous Windows.
