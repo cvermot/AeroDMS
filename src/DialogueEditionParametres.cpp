@@ -165,7 +165,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     ligneActuelle = impressionLayout->rowCount();
     imprimante = new QLineEdit(this);
     imprimante->setEnabled(false);
-    imprimante->setToolTip(tr("Imprimante par défaut qui sera séléctionnée par le logiciel lors des demandes d'impression."));
+    imprimante->setToolTip(tr("Imprimante par défaut qui sera sélectionnée par le logiciel lors des demandes d'impression."));
     impressionLayout->addWidget(new QLabel(tr("Imprimante : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(imprimante, ligneActuelle, K_COLONNE_CHAMP);
     QPushButton* boutonSelectionImprimante = new QPushButton("Sélectionner l'imprimante", this);
@@ -208,8 +208,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = impressionLayout->rowCount();
     forcageImpressionRectoSimple = new QCheckBox(this);
-    forcageImpressionRectoSimple->setToolTip(tr("Force l'imprimante à imprimer en recto simple même en cas de configuration recto-verso par défaut.\n\nAttention : sur une imprimante non compatible recto-verso automatique ou si l'option recto-verso\nautomatique n'est pas activée sur une imprimante compatible, l'activation de la présente fonction\nde forcage de recto simple provoquera l'insertion d'un page blanche entre chaque page."));
-    impressionLayout->addWidget(new QLabel(tr("Forcage de l'impression recto simple : "), this), ligneActuelle, K_COLONNE_LABEL);
+    forcageImpressionRectoSimple->setToolTip(tr("Force l'imprimante à imprimer en recto simple même en cas de configuration recto-verso par défaut.\n\nAttention : sur une imprimante non compatible recto-verso automatique ou si l'option recto-verso\nautomatique n'est pas activée sur une imprimante compatible, l'activation de la présente fonction\nde forçage de recto simple provoquera l'insertion d'un page blanche entre chaque page."));
+    impressionLayout->addWidget(new QLabel(tr("Forçage de l'impression recto simple : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(forcageImpressionRectoSimple, ligneActuelle, K_COLONNE_CHAMP);
 
     forcageImpressionRectoSimple->setChecked(p_parametresSysteme.parametresImpression.forcageImpressionRecto);
@@ -235,7 +235,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     margesGaucheDroite->setValue(p_parametresSysteme.margesGaucheDroite);
 
     //Paramètres système
-    const QString texteToolTipChampSecurise = "Ce champ n'est pas éditable par sécurité.\nPour le rendre éditable, passer en mode débug (menu Aide/Activer le mode debug).";
+    const QString texteToolTipChampSecurise = "Ce champ n'est pas éditable par sécurité.\nPour le rendre éditable, passer en mode débogage (menu Aide/Activer le mode débogage).";
 
     QGridLayout* systemeLayout = new QGridLayout();
     QWidget* systemeWidget = new QWidget(this);
@@ -257,7 +257,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     ligneActuelle = systemeLayout->rowCount();
     delaisGardeBdd = new QSpinBox(this);
     delaisGardeBdd->setSuffix(" ms");
-    delaisGardeBdd->setToolTip(tr("Délais entre 2 insertions en BDD, en millisecondes : ce délais permet de régler des soucis de double génération PDF liés au fait\nque le fichier SQLite est stocké sur un lecteur réseau.\nUne valeur de 50 ms semble suffisante. En cas d'occurence de mauvaise insertion, augmenter cette valeur.\n\n") + texteToolTipChampSecurise);
+    delaisGardeBdd->setToolTip(tr("Délais entre 2 insertions en BDD, en millisecondes : ce délais permet de régler des soucis de double génération PDF liés au fait\nque le fichier SQLite est stocké sur un lecteur réseau.\nUne valeur de 50 ms semble suffisante. En cas d'occurrence de mauvaise insertion, augmenter cette valeur.\n\n") + texteToolTipChampSecurise);
     QLabel* delaisGardeBddLabel = new QLabel(tr("Délais de garde BDD : "), this);
     systemeLayout->addWidget(delaisGardeBddLabel, ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(delaisGardeBdd, ligneActuelle, K_COLONNE_CHAMP);
@@ -291,7 +291,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = systemeLayout->rowCount();
     sortieFichiersGeneres = new QLineEdit(this);
-    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockées les formulaires de demandes de subventions génerées.\nDans le cadre d'une installation utilisée par plusieurs utilisateurs, ce repertoire doit être accessible par tous les utilisateurs.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
+    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockées les formulaires de demandes de subventions générées.\nDans le cadre d'une installation utilisée par plusieurs utilisateurs, ce répertoire doit être accessible par tous les utilisateurs.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
     systemeLayout->addWidget(new QLabel(tr("Dossier de sortie des fichiers générés : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(sortieFichiersGeneres, ligneActuelle, K_COLONNE_CHAMP);
     boutonSelectionSortieFichiersGeneres = new QPushButton("Sélectionner", this);
@@ -336,8 +336,6 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
 
     mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
-
-    connect(onglets, &QTabWidget::currentChanged, this, &DialogueEditionParametres::gererChangementOnglet);
 
     resize(800, onglets->widget(0)->sizeHint().height());
 }
@@ -428,13 +426,6 @@ void DialogueEditionParametres::selectionnerRepertoire()
             sortieFichiersGeneres->setText(dialog.selectedFiles().at(0));
         }
     }
-}
-
-void DialogueEditionParametres::gererChangementOnglet()
-{
-    //qDebug() << onglets->widget(onglets->currentIndex())->sizeHint();
-    //onglets->setFixedHeight(onglets->widget(onglets->currentIndex())->sizeHint().height());
-    //resize(800, onglets->widget(onglets->currentIndex())->sizeHint().height());
 }
 
 void DialogueEditionParametres::enregistrerParametres()

@@ -22,7 +22,7 @@ void StatistiqueWidget::load()
     if (!doLoad()) {
         auto errorLabel = new QLabel(this);
         auto errorLayout = new QVBoxLayout(this);
-        errorLabel->setText(tr("Error loading the example:\n%1").arg(m_loadError));
+        errorLabel->setText(tr("Erreur de chargement :\n%1").arg(m_loadError));
         QFont font = errorLabel->font();
         font.setPointSize(20);
         errorLabel->setFont(font);

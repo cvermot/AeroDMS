@@ -398,9 +398,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             chart->changeSeries(donneesTypeDeVolParPilote);
         }
         break;
-
-    }
-    
+    }   
     createDefaultChartView(chart);
 }
 
@@ -435,6 +433,5 @@ AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::r
             subventionParPiloteSansDoublon.replace(pos, subvention);
         }
     }
-    
     return subventionParPiloteSansDoublon;
 }

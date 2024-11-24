@@ -75,7 +75,6 @@ public slots:
     void selectionnerBdd();
     void selectionnerRepertoire();
     void enregistrerParametres();
-    void gererChangementOnglet();
     void afficherMotDePasse();
     void masquerMotDePasse();
 

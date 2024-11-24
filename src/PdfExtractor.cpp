@@ -326,7 +326,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
             if (donneesFactures.coutDuVol == 0)
             {
                 index = index + 2;
-                //Cas du vol avec FI... ça décalle d'un index
+                //Cas du vol avec FI... ça décale d'un index
                 if (!QString(p_entries.at(index).Text.data()).contains("€"))
                 {
                     index++;
@@ -381,7 +381,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vec
 
             if (index + 3 < p_entries.size())
             {
-                //Duree du vol, index +2
+                //Durée du vol, index +2
                 index = index + 2;
                 str = p_entries.at(index).Text.data();
                 donneesFactures.dureeDuVol = AeroDmsServices::convertirHeuresDecimalesEnQTime(str.replace(",",".").toDouble());
@@ -392,8 +392,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vec
                 if (str.contains("€")
                     && donneesFactures.coutDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol)
                 {
-                    //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
-                    //(certaines factures indiquent un credit nul en dernière ligne)
+                    //La condition évite d'écraser un éventuel montant déjà trouvé par un montant nul
+                    //(certaines factures indiquent un crédit nul en dernière ligne)
                     if (str.replace("€","").toFloat() != 0)
                     {
                         donneesFactures.coutDuVol = str.replace("€", "").toFloat();
@@ -503,8 +503,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
             if (str.contains(euroRe))
             {
                 QRegularExpressionMatch match = euroRe.match(str);
-                //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
-                //(certaines factures indiquent un credit nul en dernière ligne)
+                //La condition évite d'écraser un éventuel montant déjà trouvé par un montant nul
+                //(certaines factures indiquent un crédit nul en dernière ligne)
                 if (match.captured("montant").toFloat() != 0)
                 {
                     donneesFactures.coutDuVol = match.captured("montant").toFloat();

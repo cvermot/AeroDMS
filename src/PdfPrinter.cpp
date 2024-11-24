@@ -125,7 +125,7 @@ bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer,
         return false;
     }
     p_printer.setResolution(p_parametresImpression.resolutionImpression);
-    //En mode forcage recto on force le mode à recto-verso : on inserera ensuite
+    //En mode forçage recto on force le mode à recto-verso : on insèrera ensuite
     //un page blanche entre chaque page qui fera que le rendu sera un recto simple
     if (p_parametresImpression.forcageImpressionRecto)
     {
@@ -185,7 +185,7 @@ void PdfPrinter::imprimer(QPrinter& p_printer, const bool p_forcerImpressionRect
             {
                 p_printer.newPage();
 
-                //Et si on est en mode forcage Recto, on ajoute une page blanche
+                //Et si on est en mode forçage Recto, on ajoute une page blanche
                 if (p_forcerImpressionRecto)
                 {
                     p_printer.newPage();
