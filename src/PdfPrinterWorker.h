@@ -15,36 +15,37 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
+#ifndef PDFPRINTERWORKER_H
+#define PDFPRINTERWORKER_H
 
-#ifndef DIALOGUEPROGRESSIONIMPRESSION_H
-#define DIALOGUEPROGRESSIONIMPRESSION_H
-#include <QDialog>
-#include <QtGui>
-#include <QtWidgets>
+#include <QThread>
+#include <QPdfDocument>
+#include <QPrinter>
+#include <QImage>
+#include <QPainter>
 
-class DialogueProgressionImpression : public QDialog
+class PdfPrinterWorker : public QThread
 {
     Q_OBJECT
 
 public:
-    DialogueProgressionImpression(QWidget* parent = nullptr);
-
-    void setMaximumFichier(const int p_nbFichier);
-    void traitementFichierSuivant();
-    void traitementPageSuivante(int currentPage, int totalPages);
-
-private:
-    QPushButton* boutonFermer = nullptr;
-    QProgressBar* barreDeProgressionFichier = nullptr;
-    QLabel* labelFichier = nullptr;
-    QProgressBar* barreDeProgressionPage = nullptr;
-    QLabel* labelPage = nullptr;
-    QLabel* label = nullptr;
-
-public slots:
+    PdfPrinterWorker(const QString& filePath, QPrinter *printer, bool forceRecto, QObject* parent = nullptr)
+        : QThread(parent), m_filePath(filePath), m_printer(printer), m_forceRecto(forceRecto) {
+       
+    }
 
 signals:
+    void progress(int currentPage, int totalPages);
+    void finished();
+    void error(const QString& message);
 
+protected:
+    void run() override;
+
+private:
+    QString m_filePath;
+    QPrinter *m_printer;
+    bool m_forceRecto;
 };
 
-#endif // DIALOGUEPROGRESSIONIMPRESSION_H
+#endif // PDFPRINTERWORKER_H

@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 
 #include "PdfPrinter.h"
+#include "PdfPrinterWorker.h"
 
 #include <QtPdf>
 
@@ -59,13 +60,11 @@ AeroDmsTypes::EtatImpression PdfPrinter::imprimerFichier(const QString p_fichier
 
 void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
-    QPrinter imprimante;
+    
     if (selectionnerImprimante(imprimante, p_parametresImpression))
     {
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(1);
-
-        QThread::usleep(500);
 
         imprimer(imprimante, p_parametresImpression.forcageImpressionRecto);
 
@@ -75,13 +74,14 @@ void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_pa
 
 void PdfPrinter::imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
-    QPrinter imprimante;
+    qDebug() << "dde impression";
     if (selectionnerImprimante(imprimante, p_parametresImpression))
     {
+        AeroDmsTypes::ParametresImpression parametresImpression = p_parametresImpression;
         //On compte les fichiers
         QDir repertoire(dossierAImprimer, "*.pdf", QDir::QDir::Name, QDir::Files);
 
-        QFileInfoList liste = repertoire.entryInfoList();
+        liste = repertoire.entryInfoList();
         //Le fichier assemblé est forcément le dernier de la liste car tous les fichiers sont suffixés
         //par un chiffre dans l'ordre de génération. Si la fichier assemblé est présent, on le supprime 
         //de la liste
@@ -92,17 +92,20 @@ void PdfPrinter::imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpress
 
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(liste.size());
+        imprimerFichierSuivant();
 
-        QThread::usleep(500);
-
-        for (QFileInfo fichier : liste)
-        {
-            //On imprime tout 
-            fichierAImprimer = fichier.filePath();
-            imprimer(imprimante, p_parametresImpression.forcageImpressionRecto);
-        }
-        progressionImpression->traitementFichierSuivant();
     }
+}
+
+void PdfPrinter::imprimerFichierSuivant()
+{
+    if (liste.size() > 0)
+    {
+        QFileInfo fichier = liste.takeFirst();
+        fichierAImprimer = fichier.filePath();
+        imprimer(imprimante, parametresImpression.forcageImpressionRecto);        
+    }
+    progressionImpression->traitementFichierSuivant();
 }
 
 bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer, 
@@ -136,67 +139,25 @@ bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer,
     return true;
 }
 
-void PdfPrinter::imprimer(QPrinter& p_printer, const bool p_forcerImpressionRecto)
+void PdfPrinter::imprimer(QPrinter &printer, const bool forcerImpressionRecto)
 {
-    progressionImpression->traitementFichierSuivant();
+    auto* worker = new PdfPrinterWorker(fichierAImprimer, &printer, forcerImpressionRecto, this);
 
-    QPdfDocument* doc = new QPdfDocument(this);
-    doc->load(fichierAImprimer);
+    connect(worker, &PdfPrinterWorker::progress, this, [this](int currentPage, int totalPages) {
+        progressionImpression->traitementPageSuivante(currentPage, totalPages);
+        });
 
-    int attenteChargementFichier = 0;
-    while (doc->status() != QPdfDocument::Status::Ready
-        || attenteChargementFichier > 500)
-    {
-        attenteChargementFichier++;
-        QThread::usleep(10);
-    }
+    connect(worker, &PdfPrinterWorker::finished, this, [this, worker]() {
+        imprimerFichierSuivant();
+        worker->deleteLater();
+        });
 
-    if (doc->status() == QPdfDocument::Status::Ready)
-    {
-        progressionImpression->setMaximumPage(doc->pageCount());
+    connect(worker, &PdfPrinterWorker::error, this, [this](const QString& message) {
+        QMessageBox::critical(nullptr, tr("Erreur d'impression"), message);
+        });
 
-        QPainter painter;
-        painter.begin(&p_printer);
-
-        for (int i = 0; i < doc->pageCount(); i++)
-        {
-            progressionImpression->traitementPageSuivante();
-            QSizeF size = doc->pagePointSize(i);
-            QImage image = doc->render(i,
-                QSize(size.width() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT,
-                    size.height() * p_printer.resolution() / AeroDmsTypes::K_DPI_PAR_DEFAUT));
-
-            //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
-            //pour l'impression
-            if (size.width() > size.height())
-            {
-                QTransform transformation;
-                transformation.rotate(270);
-                image = image.transformed(transformation);
-                painter.drawImage(0, 0, image);
-            }
-            else
-            {
-                painter.drawImage(0, 0, image);
-            }
-
-            //S'il reste des pages derrière... on démarre une nouvelle page
-            if (i + 1 < doc->pageCount())
-            {
-                p_printer.newPage();
-
-                //Et si on est en mode forçage Recto, on ajoute une page blanche
-                if (p_forcerImpressionRecto)
-                {
-                    p_printer.newPage();
-                }
-            }
-        }
-        progressionImpression->traitementPageSuivante();
-
-        painter.end();
-    }
-    delete doc;
+    // Lance le thread
+    worker->start();
 }
 
 void PdfPrinter::ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer)

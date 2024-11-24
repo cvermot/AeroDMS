@@ -58,6 +58,7 @@ DialogueProgressionImpression::DialogueProgressionImpression(QWidget* parent) : 
 	setLayout(mainLayout);
 	setWindowTitle(QApplication::applicationName() + " - " + tr("Impression"));
 	setWindowModality(Qt::ApplicationModal);
+	setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
 	resize(450, size().height());
 }
 
@@ -69,18 +70,6 @@ void DialogueProgressionImpression::setMaximumFichier(const int p_nbFichier)
 	barreDeProgressionFichier->setValue(0);
 
 	boutonFermer->setEnabled(false);
-
-	grab();
-	repaint();
-	show();
-}
-
-void DialogueProgressionImpression::setMaximumPage(const int p_nbPage)
-{
-	labelPage->setText(tr("Initialisation..."));
-	barreDeProgressionPage->reset();
-	barreDeProgressionPage->setMaximum(p_nbPage+1);
-	barreDeProgressionPage->setValue(0);
 }
 
 void DialogueProgressionImpression::traitementFichierSuivant()
@@ -101,12 +90,23 @@ void DialogueProgressionImpression::traitementFichierSuivant()
 	}
 }
 
-void DialogueProgressionImpression::traitementPageSuivante()
+void DialogueProgressionImpression::traitementPageSuivante(int currentPage, int totalPages)
 {
-	barreDeProgressionPage->setValue(barreDeProgressionPage->value() + 1);
+	barreDeProgressionPage->setMaximum(totalPages);
+	barreDeProgressionPage->setValue(currentPage);
 
-	if (barreDeProgressionPage->value() < barreDeProgressionPage->maximum())
+	labelPage->setText(tr("Page ") + QString::number(barreDeProgressionPage->value()) + "/" + QString::number(barreDeProgressionPage->maximum()));
+
+	if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
+		&& barreDeProgressionFichier->value() == barreDeProgressionFichier->maximum()-1)
 	{
-		labelPage->setText(tr("Page ") + QString::number(barreDeProgressionPage->value()) + "/" + QString::number(barreDeProgressionPage->maximum() - 1));
-	}	
+		label->setText(tr("Finalisation en cours, veuillez patientier..."));
+	}
+
+	else if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
+		&& barreDeProgressionFichier->value() >= barreDeProgressionFichier->maximum())
+	{
+		boutonFermer->setEnabled(true);
+		label->setText(tr("Impression terminée"));
+	}
 }

@@ -110,6 +110,7 @@
     <ClCompile Include="PdfDownloader.cpp" />
     <ClCompile Include="PdfExtractor.cpp" />
     <ClCompile Include="PdfPrinter.cpp" />
+    <ClCompile Include="PdfPrinterWorker.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaireWidget.cpp" />
@@ -141,6 +142,7 @@
     <QtMoc Include="DialogueProgressionImpression.h" />
     <QtMoc Include="PdfPrinter.h" />
     <QtMoc Include="PdfDownloader.h" />
+    <QtMoc Include="PdfPrinterWorker.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />

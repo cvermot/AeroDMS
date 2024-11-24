@@ -39,7 +39,7 @@ private:
 	void imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpression p_parametresImpression);
 	bool selectionnerImprimante(QPrinter& p_printer, 
 		const AeroDmsTypes::ParametresImpression p_parametresImpression);
-	void imprimer(QPrinter& p_printer, 
+	void imprimer(QPrinter &p_printer, 
 		const bool p_forcerImpressionRecto);
 	void ouvrirFenetreProgressionImpression(const int p_nombreDeFichiersAImprimer);
 
@@ -48,7 +48,12 @@ private:
 	QString dossierAImprimer = "";
 	bool demandeImpressionEstConfirmee = false;
 
+	QPrinter imprimante;
+	QFileInfoList liste;
+	AeroDmsTypes::ParametresImpression parametresImpression;
+
 private slots:
+	void imprimerFichierSuivant();
 	void detruireFenetreProgressionImpression();
 	
 };
