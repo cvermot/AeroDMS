@@ -94,6 +94,10 @@ private :
 						          const QString p_urlImage,
 							      const QString p_titre);
 
+	static void convertirEnPng(const QString p_fichierSvg,
+		const QString p_fichierPng,
+		const QSize targetSize);
+
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);

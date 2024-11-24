@@ -28,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPrinter>
 #include <QChart>
 #include <QSvgGenerator>
+#include <QSvgRenderer>
+#include <QtConcurrent>
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
                           const QString p_cheminTemplatesHtml, 
@@ -1209,8 +1211,6 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
                                     const QString p_urlImage,
                                     const QString p_titre)
 {
-    p_widget.grab().save(p_urlImage + ".png");
-
     QSvgGenerator generator;
     generator.setFileName(p_urlImage + ".svg");
     generator.setSize(p_widget.size());
@@ -1218,6 +1218,29 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
     generator.setTitle(p_titre);
     generator.setDescription(tr("Image générée avec ")+ QApplication::applicationName() +" v" + QApplication::applicationVersion());
     p_widget.render(&generator);
+
+    QSize taille = p_widget.size();
+    auto future = QtConcurrent::run([=]() {
+        convertirEnPng(p_urlImage + ".svg", 
+            p_urlImage + ".png", 
+            taille);
+        });
+}
+
+void PdfRenderer::convertirEnPng(const QString p_fichierSvg, 
+    const QString p_fichierPng, 
+    const QSize targetSize) 
+{
+    QSvgRenderer renderer(p_fichierSvg);
+
+    QImage image(targetSize, QImage::Format_ARGB32);
+    image.fill(Qt::transparent);
+
+    QPainter painter(&image);
+    renderer.render(&painter);
+    painter.end();
+
+    image.save(p_fichierPng, "PNG");
 }
 
 AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution, const QMarginsF p_marges)
