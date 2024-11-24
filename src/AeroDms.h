@@ -265,6 +265,7 @@ private:
     QString fichierAImprimer = "";
     QString dossierSortieGeneration = "";
     QString cheminDeLaFactureCourante = "";
+    bool estEnVerificationAutomatiqueDeNouvelleFacture = false;
 
     //Parametres
     AeroDmsTypes::ParametresMetier parametresMetiers;

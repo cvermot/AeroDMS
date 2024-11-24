@@ -173,7 +173,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
-
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
     QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, QApplication::applicationName());
@@ -218,8 +217,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
     QString valeur = settings.value("siteDaca/password", "").toString();
     parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
-
-    qDebug() << parametresSysteme.loginSiteDaca << parametresSysteme.motDePasseSiteDaca;
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
@@ -674,6 +671,15 @@ void AeroDms::initialiserGestionnaireTelechargement()
     pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter, db);
     connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
 
+    QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "DACA");
+    QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
+    QDate valeurDernierVerificationDaca = settingsDaca.value("DACA/valeurDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
+
+    if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= 3)
+    {
+        estEnVerificationAutomatiqueDeNouvelleFacture = true;
+        chargerListeFacturesDaca();
+    }
 }
 
 void AeroDms::passerLeLogicielEnLectureSeule()
@@ -3310,7 +3316,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     parametresSysteme = p_parametresSysteme;
 
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "AeroDMS", "AeroDMS");
+    QSettings settings(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationName(), QCoreApplication::applicationName());
 
     settings.beginGroup("baseDeDonnees");
     settings.setValue("chemin", parametresSysteme.cheminStockageBdd);
@@ -4034,6 +4040,27 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                             donneesDaca.listePilotesNonConnus, 
                             mois);
                     }
+                }
+
+                QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationName(), "DACA");
+
+                settingsDaca.beginGroup("DACA");
+                settingsDaca.setValue("dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd"));
+                settingsDaca.setValue("valeurDerniereVerification", donneesDaca.listeMoisAnnees.at(0).toString("yyyy-MM-dd"));
+                settingsDaca.endGroup();
+
+                if (estEnVerificationAutomatiqueDeNouvelleFacture)
+                {
+                    QMessageBox::information(this, 
+                        QApplication::applicationName() + " - " + tr("Nouvelles factures DACA disponibles"),
+                        tr("De nouvelles factures pour le DACA sont disponibles pour le mois de ")
+                        + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")
+                        + ".\n\n"
+                        + tr("Vous pouvez les télécharger via le menu \"Outils/")
+                        + texteTitreQMenuFacturesDaca
+                        + "\".\n\n"
+                        + tr("Cette notification ne sera plus affichée tant que de nouvelles factures ne seront pas disponibles."));
+                    estEnVerificationAutomatiqueDeNouvelleFacture = false;
                 }
             }
             else
