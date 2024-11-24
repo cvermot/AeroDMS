@@ -316,6 +316,10 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     motDePasseDaca->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     systemeLayout->addWidget(new QLabel(tr("Mot de passe site DACA : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(motDePasseDaca, ligneActuelle, K_COLONNE_CHAMP);
+    QPushButton* boutonAffichageMotDePasse = new QPushButton(tr("Afficher le mot de passe"), this);
+    systemeLayout->addWidget(boutonAffichageMotDePasse, ligneActuelle, K_COLONNE_BOUTON);
+    connect(boutonAffichageMotDePasse, SIGNAL(pressed()), this, SLOT(afficherMotDePasse()));
+    connect(boutonAffichageMotDePasse, SIGNAL(released()), this, SLOT(masquerMotDePasse()));
 
     motDePasseDaca->setText(p_parametresSysteme.motDePasseSiteDaca);
 
@@ -473,4 +477,14 @@ void DialogueEditionParametres::enregistrerParametres()
 
     emit envoyerParametres(parametresMetiers, parametresSysteme);
     accept();
+}
+
+void DialogueEditionParametres::afficherMotDePasse()
+{
+    motDePasseDaca->setEchoMode(QLineEdit::Normal);
+}
+
+void DialogueEditionParametres::masquerMotDePasse()
+{
+    motDePasseDaca->setEchoMode(QLineEdit::PasswordEchoOnEdit);
 }

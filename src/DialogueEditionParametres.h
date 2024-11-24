@@ -76,6 +76,8 @@ public slots:
     void selectionnerRepertoire();
     void enregistrerParametres();
     void gererChangementOnglet();
+    void afficherMotDePasse();
+    void masquerMotDePasse();
 
 signals:
     void envoyerParametres( const AeroDmsTypes::ParametresMetier parametresMetiers, 
