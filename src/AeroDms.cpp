@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("6.9");
+    QApplication::setApplicationVersion("6.9.1");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -4051,9 +4051,16 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
 
                 if (estEnVerificationAutomatiqueDeNouvelleFacture)
                 {
+                    QString article = "de ";
+                    if (QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy").at(0) == "a"
+                        || QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy").at(0) == "o")
+                    {
+                        article = "d'";
+                    }
                     QMessageBox::information(this, 
                         QApplication::applicationName() + " - " + tr("Nouvelles factures DACA disponibles"),
-                        tr("De nouvelles factures pour le DACA sont disponibles pour le mois de ")
+                        tr("De nouvelles factures pour le DACA sont disponibles pour le mois ")
+                        + article
                         + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")
                         + ".\n\n"
                         + tr("Vous pouvez les télécharger via le menu \"Outils/")
@@ -4065,7 +4072,7 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
             }
             else
             {
-                statusBar()->showMessage(tr("La liste des pilotes ou la liste des dates récuperées sur le site du DACA est vide. Impossible d'afficher la liste des factures disponibles."));
+                statusBar()->showMessage(tr("La liste des pilotes ou la liste des dates récupérées sur le site du DACA est vide. Impossible d'afficher la liste des factures disponibles."));
             }
         }
         break;
