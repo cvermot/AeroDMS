@@ -21,6 +21,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Export des graphiques en SVG (Qt Svg)
   - Impression (Qt Print Support)
   - Chargement de données de sites Web (Qt Network)
+  - Gestion multithread (Qt Concurrent)
 - Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3)
 - Librairie Dpapi (Win32/crypt32.lib) pour le chiffrement des mots de passe stockés en local, à défaut de support d'un mécanisme générique par Qt. Si on souhaite compiler pour Mac OS ou Linux, il sera nécessaire d'implémenter les mécanismes spécifiques à ces systèmes d'exploitation.
 
