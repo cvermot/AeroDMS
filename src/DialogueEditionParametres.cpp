@@ -87,7 +87,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     objetAutresMailings->setText(p_parametresMetiers.objetMailAutresMailings);
 
-    //Elements financiers
+    //Eléments financiers
     QGridLayout* financeLayout = new QGridLayout();
     QWidget* financeWidget = new QWidget(this);
     financeWidget->setLayout(financeLayout);
@@ -156,7 +156,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     nomTresorier->setText(p_parametresMetiers.nomTresorier);
 
-    //Elements impression
+    //Eléments impression
     QGridLayout* impressionLayout = new QGridLayout();
     QWidget* impressionWidget = new QWidget(this);
     impressionWidget->setLayout(impressionLayout);
@@ -234,7 +234,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     margesGaucheDroite->setValue(p_parametresSysteme.margesGaucheDroite);
 
-    //Parametres système
+    //Paramètres système
     const QString texteToolTipChampSecurise = "Ce champ n'est pas éditable par sécurité.\nPour le rendre éditable, passer en mode débug (menu Aide/Activer le mode debug).";
 
     QGridLayout* systemeLayout = new QGridLayout();

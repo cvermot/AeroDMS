@@ -633,7 +633,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
                 dialogueErreurVersionBdd.setText(tr("Une mise à jour de l'application est disponible et doit être réalisée\n\
 car la base de données a évoluée.\n\n\
 L'application va passer en mode lecture seule.\
-\n\nPour mettre à jour l'application, séléctionnez l'option \"Verifier la présence\n"
+\n\nPour mettre à jour l'application, sélectionnez l'option \"Vérifier la présence\n"
 "de mise à jour\" du menu Aide."));
                 dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Version de base données incompatible"));
                 dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
@@ -808,7 +808,7 @@ void AeroDms::initialiserBarreDOutils()
     bouttonGenerePdfRecapHdv = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_RECAP_HDV), 
         tr("Générer les PDF de récapitulatif &HdV de l'année sélectionnée"), 
         this);
-    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de recap HdV de l'année sélectionnée"));
+    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de récapitulatif des HdV de l'année sélectionnée"));
     bouttonGenerePdfRecapHdv->setShortcut(Qt::CTRL + Qt::Key_R);
     connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
     toolBar->addAction(bouttonGenerePdfRecapHdv);
@@ -1037,7 +1037,7 @@ void AeroDms::initialiserMenuOptions()
     //Génération des graphiques
     graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Graphiques"));
-    graphiquesDuRecapAnnuel->setStatusTip(tr("Séléctionne les graphiques à ajouter au récapitulatif annuel des heures de vol"));
+    graphiquesDuRecapAnnuel->setStatusTip(tr("Sélectionne les graphiques à ajouter au récapitulatif annuel des heures de vol"));
 
     boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_BARRES_EMPILEES), 
         tr("&Heures annuelles"), 
@@ -1070,13 +1070,13 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphRecapAnnuelEurosParTypeDeVol->setCheckable(true);
 
     boutonGraphRecapAnnuelHeuresParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
-        tr("Heures par &activite"), 
+        tr("Heures par &activité"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParActivite);
     boutonGraphRecapAnnuelHeuresParActivite->setCheckable(true);
 
     boutonGraphRecapAnnuelEurosParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
-        tr("Subventions par activite"),
+        tr("Subventions par activité"),
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParActivite);
     boutonGraphRecapAnnuelEurosParActivite->setCheckable(true);
@@ -1358,9 +1358,9 @@ void AeroDms::initialiserMenuAide()
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
     boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_DEBUG), 
-        tr("Activer le mode &debug"), 
+        tr("Activer le mode &débogage"), 
         this);
-    boutonModeDebug->setStatusTip(tr("Active/désactive le mode débug. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
+    boutonModeDebug->setStatusTip(tr("Active/désactive le mode débogage. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
     boutonModeDebug->setCheckable(true);
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
@@ -1452,7 +1452,7 @@ void AeroDms::changerResolutionExportGraphiques()
     }
 
     //Si splash vaut nullptr c'est qu'on est hors phase de démarrage
-    //=> on demande la réouverture du menu pour permettre la séléction de plusieurs options
+    //=> on demande la réouverture du menu pour permettre la sélection de plusieurs options
     //sans refaire tout le chemin
     if (splash == nullptr)
     {
@@ -1494,7 +1494,7 @@ void AeroDms::changerRatioExportGraphiques()
     }
 
     //Si splash vaut nullptr c'est qu'on est hors phase de démarrage
-    //=> on demande la réouverture du menu pour permettre la séléction de plusieurs options
+    //=> on demande la réouverture du menu pour permettre la sélection de plusieurs options
     //sans refaire tout le chemin
     if (splash == nullptr)
     {
@@ -1769,7 +1769,7 @@ void AeroDms::peuplerTablePilotes()
 
 void AeroDms::gererBoutonEditionPilote()
 {
-    //On mette à jour l'info pilote a editer en cas de demande d'édition du pilote via le menu outils,
+    //On mette à jour l'info pilote a éditer en cas de demande d'édition du pilote via le menu outils,
     //si on a sélectionné un pilote donné et pas "Tous les pilotes"
     boutonEditerLePiloteSelectionne->setEnabled(false);
     if (mainTabWidget->currentWidget() == widgetAjoutVol)
@@ -1829,7 +1829,7 @@ void AeroDms::peuplerTableVols()
 
     bouttonGenerePdfRecapHdv->setEnabled(true);
     mailingPilotesAyantCotiseCetteAnnee->setEnabled(true);
-    //On desactive la génération du récap annuel si on est sur la sélection "Toutes les années"
+    //On désactive la génération du récap annuel si on est sur la sélection "Toutes les années"
     //et également le bouton d'envoi des mails aux pilotes de l'année
     if (listeDeroulanteAnnee->currentData().toInt() == -1)
     {
@@ -2036,13 +2036,13 @@ void AeroDms::ajouterUneCotisationEnBdd()
                 QApplication::applicationName() + " - " + tr("Cotisation déja reglée"), 
                 tr("Le pilote indiqué est déjà à jour de\nsa cotisation pour l'année saisie."));
         }
-        //Si le pilote n'a pas deja une cotisation pour cette année la, on ajoute la cotisation en BDD
+        //Si le pilote n'a pas déjà une cotisation pour cette année la, on ajoute la cotisation en BDD
         else
         {
             db->ajouterCotisation(infosCotisation);
             //On met à jour la table des pilotes
             peuplerTablePilotes();
-            //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considerée
+            //On met a jour la liste des années => permet de traiter le cas ou on ajoute un premier pilote sur l'année considérée
             peuplerListeDeroulanteAnnee();
             
             peuplerTableRecettes();
@@ -2076,14 +2076,14 @@ void AeroDms::ajouterUnPiloteEnBdd()
     peuplerListesPilotes();
     dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
 
-    //Si on est sur une mise à jour, on met à jour les élements d'IHM susceptibles d'être impacté par des changements
+    //Si on est sur une mise à jour, on met à jour les éléments d'IHM susceptibles d'être impacté par des changements
     if (pilote.idPilote != "")
     {
         peuplerListeBaladesEtSorties();
         peuplerTablePilotes();
         peuplerTableVols();
 
-        //Si on est en ajout de vol, on reséléctionne le pilote...
+        //Si on est en ajout de vol, on resélectionne le pilote...
         if (mainTabWidget->currentWidget() == widgetAjoutVol)
         {
             choixPilote->setCurrentIndex(choixPilote->findData(pilote.idPilote));
@@ -2153,7 +2153,7 @@ void AeroDms::chargerUneFactureAvecScan(const QString p_fichier)
         chargerUneFacture(p_fichier);
         idFactureDetectee = -1;
 
-        //On masque par défaut... on reaffiche si le scan est effectué
+        //On masque par défaut... on réaffiche si le scan est effectué
         //et qu'il ne retourne par une liste vide
         validerLesVols->setHidden(true);
         vueVolsDetectes->setHidden(true);
@@ -2218,7 +2218,7 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     {
         factures = PdfExtractor::recupererLesDonneesDuPdf( cheminDeLaFactureCourante,
                                                            aeroclub);
-        //On masque par défaut... on reaffiche si le scan est effectué
+        //On masque par défaut... on réaffiche si le scan est effectué
         //et qu'il ne retourne par une liste vide
         validerLesVols->setHidden(true);
         vueVolsDetectes->setHidden(true);
@@ -2243,7 +2243,7 @@ void AeroDms::recupererVolDepuisCsv()
 
     if (!fichier.isNull())
     {
-        //On masque par défaut... on reaffiche si le scan est effectué
+        //On masque par défaut... on réaffiche si le scan est effectué
         //et qu'il ne retourne par une liste vide
         validerLesVols->setHidden(true);
         vueVolsDetectes->setHidden(true);
@@ -2381,7 +2381,7 @@ void AeroDms::genererPdf()
          + db->recupererLesCotisationsAEmettre().size()
          + db->recupererLesRecettesBaladesEtSortiesAEmettre().size()) == 0)
     {
-        demandeConfirmationGeneration.setInformativeText(tr("Rien à génerer. Génération indisponible."));
+        demandeConfirmationGeneration.setInformativeText(tr("Rien à générer. Génération indisponible."));
         demandeConfirmationGeneration.setStandardButtons( QMessageBox::Close);
     }
 
@@ -2430,7 +2430,7 @@ void AeroDms::enregistrerUneFacture()
     const QString idPilote = choixPayeur->currentData().toString();
     const int idSortie = choixBaladeFacture->currentData().toInt();
 
-    //On verifie si le pilote est a jour de sa cotisation pour l'année de la facture
+    //On vérifie si le pilote est a jour de sa cotisation pour l'année de la facture
     if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
     {
         estEnEchec = true;
@@ -2442,7 +2442,7 @@ void AeroDms::enregistrerUneFacture()
     //On effectue d'abord quelques contrôles pour savoir si la facture est enregistrable :
     //1) on a une facture chargée
     //2) les données (pilote, date du vol, durée, cout) sont renseignées
-    //3) on est pas en echec sur une des étapes précédentes
+    //3) on est pas en échec sur une des étapes précédentes
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec)
     {
@@ -2477,11 +2477,11 @@ void AeroDms::enregistrerUneFacture()
                 estEnEchec = true;
             }
         }
-        //On desactive le choix du payeur (la facture ne concerne qu'un seul et unique payeur)
+        //On désactive le choix du payeur (la facture ne concerne qu'un seul et unique payeur)
         choixPayeur->setEnabled(false);
 
         //Ensuite :
-        //3) on enregistre la paiement en BDD, si on est pas en echec
+        //3) on enregistre la paiement en BDD, si on est pas en échec
         if (!estEnEchec)
         {
             db->enregistrerUneFacture(idPilote,
@@ -2513,13 +2513,13 @@ void AeroDms::enregistrerUneFacture()
 
 void AeroDms::enregistrerUnVol()
 {
-    //Si le pilote n'est pas à jour de sa cotisation => echec immediat
+    //Si le pilote n'est pas à jour de sa cotisation => échec immédiat
     bool estEnEchec = !lePiloteEstAJourDeCotisation();
 
     //On effectue d'abord quelques contrôles pour savoir si le vol est enregistrable :
     //1) on a une facture chargée
     //2) les données (pilote, date du vol, durée, cout) sont renseignées (OK si le bouton est actif)
-    //3) on est pas en echec sur une des étapes précédentes
+    //3) on est pas en échec sur une des étapes précédentes
     if (pdfDocument->status() == QPdfDocument::Status::Ready
         && !estEnEchec )
     {
@@ -2557,10 +2557,10 @@ void AeroDms::enregistrerUnVol()
                 estEnEchec = true;
             }
         }
-        //On desactive le choix du pilote (la facture ne concerne qu'un seul et unique pilote)
+        //On désactive le choix du pilote (la facture ne concerne qu'un seul et unique pilote)
         choixPilote->setEnabled(false);
 
-        //Ensuite, si on est pas en echec :
+        //Ensuite, si on est pas en échec :
         //1) on récupère la subvention restante pour le pilote
         //2) on calcul la subvention allouable pour le vol
         //3) on enregistre le vol en BDD    
@@ -2617,8 +2617,8 @@ void AeroDms::enregistrerUnVol()
 
                 //On supprime la vol de la liste des vols détectés si on en avait chargé un
                 //On fait ceci avant la mise à jour de la statusBar car supprimerLeVolDeLaVueVolsDetectes()
-                //en fait également une. De cette façon on masque le status de suppression et on affiche
-                //que le status d'ajout du vol
+                //en fait également une. De cette façon on masque le statu de suppression et on affiche
+                //que le statu d'ajout du vol
                 supprimerLeVolDeLaVueVolsDetectes();
 
             statusBar()->showMessage(QString(tr("Vol "))
@@ -2646,7 +2646,7 @@ void AeroDms::enregistrerUnVol()
             immat->clear();
             //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation
 
-            //on réactive les éventuels élements d'IHM désactivés par une mise à jour de vol
+            //on réactive les éventuels éléments d'IHM désactivés par une mise à jour de vol
             typeDeVol->setEnabled(true);
             dureeDuVol->setEnabled(true);
             prixDuVol->setEnabled(true);
@@ -2672,8 +2672,8 @@ void AeroDms::enregistrerUnVol()
 void AeroDms::enregistrerLesVols()
 {
     //On ne peut enregistrer les vols que si le pilote est à jour de cotisation
-    //Cela sera verifie dans la methode enregistrerUnVol() cependant on le prévérifie
-    //ici pour éviter d'avoir N fois la notification d'echec si le pilote n'est 
+    //Cela sera vérifie dans la méthode enregistrerUnVol() cependant on le prévérifie
+    //ici pour éviter d'avoir N fois la notification d'échec si le pilote n'est 
     //pas à jour de sa cotisation
     chargerUnVolDetecte(0, 0);
     if (lePiloteEstAJourDeCotisation())
@@ -2686,7 +2686,7 @@ void AeroDms::enregistrerLesVols()
             //On demande l'enregistrement
             enregistrerUnVol();
         }
-        //La liste sera vide => on desactive le bouton d'enregistrement du vol
+        //La liste sera vide => on désactive le bouton d'enregistrement du vol
         validerLesVols->setEnabled(false);
         supprimerLeVolSelectionne->setEnabled(false);
     }
@@ -2703,14 +2703,14 @@ void AeroDms::supprimerLeVolDeLaVueVolsDetectes()
         vueVolsDetectes->clearSelection();
         supprimerLeVolSelectionne->setEnabled(false);
 
-        statusBar()->showMessage(tr("Vol supprimé avec succès de la liste des vols detectés"));
+        statusBar()->showMessage(tr("Vol supprimé avec succès de la liste des vols détectés"));
     }
 }
 
 void AeroDms::enregistrerUneRecette()
 {
     QStringList volsCoches;
-    //On verifie si au moins un vol est coché
+    //On vérifie si au moins un vol est coché
     for (int i = 0; i < listeBaladesEtSorties->count(); i++)
     {
         if (listeBaladesEtSorties->item(i)->checkState() == Qt::Checked)
@@ -2781,7 +2781,7 @@ void AeroDms::peuplerListesPilotes()
         }
     }
 
-    //Si le pilote précédément sélectionné existe toujours, on le restaure
+    //Si le pilote précédemment sélectionné existe toujours, on le restaure
     const int index = listeDeroulantePilote->findData(piloteSelectionne);
     if (index != -1)
     {
@@ -2976,8 +2976,8 @@ void AeroDms::aPropos()
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
         "Ce programme utilise la libraire <a href=\"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
         "Les icones sont issues de <a href=\"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
-        "L'image de démarrage est génerée avec <a href=\"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
-        "Ce programme inclu du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>"
+        "L'image de démarrage est générée avec <a href=\"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
+        "Ce programme inclus du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>"
         "Mentions légales : <br />"
         " This program is free software: you can redistribute it and/or modify"
         " it under the terms of the GNU General Public License as published by"
@@ -3141,7 +3141,7 @@ void AeroDms::editerVol()
 
     //On indique que c'est une facture déjà en BDD
 
-    //On récupère les infos du vol pour les réintegrer dans l'IHM
+    //On récupère les infos du vol pour les réintégrer dans l'IHM
     const AeroDmsTypes::Vol vol = db->recupererVol(volAEditer);
 
     //On remet les pilotes inactifs dans la listes des pilotes, pour le cas ou on édite un vol
@@ -3182,7 +3182,7 @@ void AeroDms::editerVol()
 
     validerLeVol->setText("Modifier le vol"); 
 
-    //On masque l'éventuelle table des infos de vol récupéré automatiquement de la facture précédement chargée
+    //On masque l'éventuelle table des infos de vol récupéré automatiquement de la facture précédemment chargée
     validerLesVols->setHidden(true);
     vueVolsDetectes->setHidden(true);
     supprimerLeVolSelectionne->setHidden(true);
@@ -3237,7 +3237,7 @@ void AeroDms::switchModeDebug()
         boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
         masquageEstDemande = false;
     }
-    //Sinon, le mode est actif, on desactive
+    //Sinon, le mode est actif, on désactive
     else
     {
         boutonModeDebug->setText("Activer le mode &debug");
@@ -3463,7 +3463,7 @@ bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichie
             }
             hash.reset();
 
-            //Calcul de la somme de controle du fichier courant
+            //Calcul de la somme de contrôle du fichier courant
             QFile fichierCourant(QCoreApplication::applicationDirPath()+"/"+p_fichier);
 
             if (fichierCourant.open(QFile::ReadOnly))
@@ -3498,7 +3498,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
     connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
 
-    //Pour chaque élement présente dans p_chemin, on vérifie s'il existe dans l'aborescence locale
+    //Pour chaque élément présente dans p_chemin, on vérifie s'il existe dans l'arborescence locale
     //Si c'est le cas on renomme le fichier local en suffixant par xxx_
     //Ensuite dans tous les cas on recopie le fichier distant vers le dossier local
 
@@ -3517,7 +3517,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
 
     QThread::sleep(2);
 
-    //Pas de fonction reset de l'iterateur dans QDirIterator... on redémarre via un nouveau scope
+    //Pas de fonction reset de l'itérateur dans QDirIterator... on redémarre via un nouveau scope
     {
         int etapeMiseAJour = 0;
 
@@ -3556,7 +3556,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
 
 void AeroDms::terminerMiseAJourApplication()
 {
-    //Cette méthode termine une mise à jour précédement démarrée : elle supprime l'ensemble des fichiers xxx_*
+    //Cette méthode termine une mise à jour précédemment démarrée : elle supprime l'ensemble des fichiers xxx_*
     QString dossierCourantApplication = QFileInfo(QCoreApplication::applicationFilePath()).absolutePath();
 
     QDirIterator it(dossierCourantApplication, QStringList() << "xxx_*", QDir::Files, QDirIterator::Subdirectories);
@@ -3690,7 +3690,7 @@ void AeroDms::peuplerMenuAutreDemande()
     if (fichiers.size() >= 2)
     {
         int i = 0;
-        //les 2 dernières cases ontiennent . et ..
+        //les 2 dernières cases contiennent . et ..
         while (i < fichiers.size() - 2 && i < 10)
         {
             QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon("./ressources/folder.svg"), fichiers.at(i));
@@ -3754,7 +3754,7 @@ void AeroDms::deselectionnerVolDetecte()
         remarqueVol->clear();
         immat->clear();
         //La mise à jour de ces données provoque la réélaboration de l'état des boutons de validation => a faire
-        //imperativement après le rincage de idFactureDetectee car cette donnée ne redeclenche pas ce traitement
+        //impérativement après le rinçage de idFactureDetectee car cette donnée ne redéclenche pas ce traitement
 
         vueVolsDetectes->clearSelection();
         supprimerLeVolSelectionne->setEnabled(false);
@@ -3768,7 +3768,7 @@ bool AeroDms::lePiloteEstAJourDeCotisation()
     const int anneeRenseignee = dateDuVol->date().year();
     const QString idPilote = choixPilote->currentData().toString();
 
-    //On verifie si le pilote est a jour de sa cotisation pour l'année du vol
+    //On vérifie si le pilote est a jour de sa cotisation pour l'année du vol
     if (!db->piloteEstAJourDeCotisation(idPilote, anneeRenseignee))
     {
         QMessageBox::critical(this, QApplication::applicationName() + " - " + tr("Pilote non à jour de cotisation"),
@@ -4015,7 +4015,7 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                     || donneesDaca.listePilotesNonConnus.size() > 0))
             {
                 boutonChargerFacturesDaca->setVisible(false);
-                statusBar()->showMessage(tr("Liste des factures disponibles récuperée sur le site du DACA. Factures téléchargeables via le menu \"Outils/") 
+                statusBar()->showMessage(tr("Liste des factures disponibles récupérée sur le site du DACA. Factures téléchargeables via le menu \"Outils/") 
                     + texteTitreQMenuFacturesDaca
                     + "\". Facture la plus récente disponible : "
                     + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")

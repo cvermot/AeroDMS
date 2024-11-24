@@ -202,7 +202,7 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
 
 void DialogueGestionPilote::annulationOuFinSaisie()
 {
-    //On rince en vue de l'eventuel ajout du pilote suivant
+    //On rince en vue de l'éventuel ajout du pilote suivant
     idPilote = "";
     nom->clear();
     prenom->clear();

@@ -137,7 +137,7 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     {
         imprimerLaProchaineDemandeDeSubvention();
     }
-    //Sinon on emet directement la fin d'impression
+    //Sinon on émet directement la fin d'impression
     else
     {
         emit generationTerminee(cheminSortieFichiersGeneres, fichier);
@@ -196,7 +196,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     {
         QMessageBox::critical(this, 
             QApplication::applicationName() + " - " + tr("Création de répertoire impossible"), 
-            tr("Impossible de créer le repertoire de sortie sous :\n") +
+            tr("Impossible de créer le répertoire de sortie sous :\n") +
             p_cheminSortieFichiersGeneres +
             tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
 
@@ -269,7 +269,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     {
         QMessageBox::critical(this, 
             QApplication::applicationName() + " - " + tr("Création de répertoire impossible"), 
-            tr("Impossible de créer le repertoire de sortie sous :\n") +
+            tr("Impossible de créer le répertoire de sortie sous :\n") +
             p_cheminSortieFichiersGeneres +
             tr("\nImpossible de générer les demandes de subventions.\n\n Arrêt"));
         
@@ -307,7 +307,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     //Signataire => toujours celui qui exécute le logiciel
     templateCeTmp.replace("xxSignataire", demandeEnCours.nomTresorier);
 
-    //On genere un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
+    //On génère un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)
     {
         const int annee = listeAnnees.takeFirst();
@@ -323,7 +323,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
     {    
         const AeroDmsTypes::DemandeRemboursement demande = db->recupererLesSubventionsAEmettre().at(0);
-        //Depense
+        //Dépense
         templateCeTmp.replace("xxD", "X");
         //Recette
         templateCeTmp.replace("xxR", "");
@@ -336,7 +336,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //Cheque a retirer au CE par le demandeur => a cocher
         templateCeTmp.replace("zzC", "X");
 
-        //Bénéficaire
+        //Bénéficiaire
         //L'aéroclub du pilote :
         templateCeTmp.replace("xxBeneficiaire", db->recupererAeroclub(demande.piloteId));
 
@@ -380,13 +380,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
         const AeroDmsTypes::Recette recette = db->recupererLesCotisationsAEmettre().at(0);
-        //Depense
+        //Dépense
         templateCeTmp.replace("xxD", "");
         //Recette
         templateCeTmp.replace("xxR", "X");
         //Cheque a retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
-        //Bénéficaire : le CSE
+        //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
@@ -419,13 +419,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
         const AeroDmsTypes::Recette recette = db->recupererLesRecettesBaladesEtSortiesAEmettre().at(0);
-        //Depense
+        //Dépense
         templateCeTmp.replace("xxD", "");
         //Recette
         templateCeTmp.replace("xxR", "X");
         //Cheque a retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
-        //Bénéficaire : le CSE
+        //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
 
         //Montant
@@ -437,7 +437,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
 
         QString observation = QString("Participations ").append(recette.intitule).append(" <font size='1'>(");
 
-        //55 catactères sur la première ligne
+        //55 caractères sur la première ligne
         int nbCaracteresRestants = 55;
         for (int i = 0; i < listeRecettes.size(); i++)
         {
@@ -488,13 +488,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT )
     {
         const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = db->recupererLesDemandesDeRembousementAEmettre().at(0);
-        //Depense
+        //Dépense
         templateCeTmp.replace("xxD", "X");
         //Recette
         templateCeTmp.replace("xxR", "");
         //Cheque a retirer au CE par le demandeur => coché
         templateCeTmp.replace("zzC", "X");
-        //Bénéficaire : le CSE
+        //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", demandeRembousement.payeur);
 
         //Montant
@@ -517,7 +517,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_FACTURE;
-        //L'annee n'est pas utile pour la facture => on fourni directement l'ID facture
+        //L'année n'est pas utile pour la facture => on fourni directement l'ID facture
         demandeEnCours.annee = demandeRembousement.id;
         demandeEnCours.typeDeVol = demandeRembousement.intitule;
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
@@ -813,7 +813,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
 
     AeroDmsTypes::ListeBaladesEtSortiesParIdSortie listesParIdSortie;
 
-    //On ajoute le premier item, si la liste retournée par la requete n'est pas vide...
+    //On ajoute le premier item, si la liste retournée par la requête n'est pas vide...
     if (listeDetails.size() > 0)
     {
         AeroDmsTypes::BaladesEtSortiesParId baladeParId;
