@@ -103,6 +103,7 @@ private:
     void ouvrirSplashscreen();
 
     void verifierDispoIdentifiantsDaca();
+    void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, const AeroDmsTypes::ListeCleStringValeur p_listePilote, const QDate p_mois);
 
     bool eventFilter(QObject* object, QEvent* event);
 

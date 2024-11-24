@@ -18,8 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PdfDownloader.h"
 
-PdfDownloader::PdfDownloader(const QString p_cheminFacturesATraiter)
+PdfDownloader::PdfDownloader(const QString p_cheminFacturesATraiter, ManageDb* p_db)
 {
+    db = p_db;
+
     // On demande a utiliser le proxy système, si défini
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
@@ -224,16 +226,34 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
     QRegularExpression regexCompte("<option value='(411\\..*?)'>Compte pilote de (.*?)</option>");
     QRegularExpressionMatchIterator iterateurCompte = regexCompte.globalMatch(donnees);
 
-    while (iterateurCompte.hasNext()) {
+    while (iterateurCompte.hasNext()) 
+    {
         QRegularExpressionMatch match = iterateurCompte.next();
         AeroDmsTypes::CleStringValeur item;
         item.cle = (match.captured(1));
         item.texte = (match.captured(2));
-        donneesDaca.listePilotes.append(item);
+
+        QStringList nomPrenomPilote = item.texte.split(" ");
+        if (nomPrenomPilote.size() == 2)
+        {
+            if (db->piloteExiste(nomPrenomPilote.at(0), nomPrenomPilote.at(1)))
+            {
+                donneesDaca.listePilotes.append(item);
+            }
+            else
+            {
+                donneesDaca.listePilotesNonConnus.append(item);
+            }
+        }
+        else
+        {
+            donneesDaca.listePilotesNonConnus.append(item);
+        }
+        
     }
 
     //On récupère les dates disponibles
-    QRegularExpression regexDate("<option value='(\\d{2})-(\\d{4})'>(.*?)</option>");
+    QRegularExpression regexDate("<option value='(\\d{2})-(\\d{4})'[^>]*>(.*?)</option>");
     QRegularExpressionMatchIterator iterateurDate = regexDate.globalMatch(donnees);
 
     AeroDmsTypes::ListeCleStringValeur listeItem;

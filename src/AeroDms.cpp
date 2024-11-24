@@ -671,7 +671,7 @@ Consultez le développeur / responsable de l'application pour plus d'information
 
 void AeroDms::initialiserGestionnaireTelechargement()
 {
-    pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter);
+    pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter, db);
     connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
 
 }
@@ -4005,7 +4005,8 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
         {
             AeroDmsTypes::DonneesFacturesDaca donneesDaca = pdfdl->recupererDonneesDaca();
             if (donneesDaca.listeMoisAnnees.size() > 0
-                && donneesDaca.listePilotes.size() > 0)
+                && (donneesDaca.listePilotes.size() > 0
+                    || donneesDaca.listePilotesNonConnus.size() > 0))
             {
                 boutonChargerFacturesDaca->setVisible(false);
                 statusBar()->showMessage(tr("Liste des factures disponibles récuperée sur le site du DACA. Factures téléchargeables via le menu \"Outils/") 
@@ -4023,19 +4024,15 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                         QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_DOSSIER),
                             date);
 
-                        for (AeroDmsTypes::CleStringValeur pilote : donneesDaca.listePilotes)
-                        {
-                            QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_FICHIER),
-                                pilote.texte,
-                                this);
-                            AeroDmsTypes::IdentifiantFacture identifiant;
-                            identifiant.moisAnnee = mois;
-                            identifiant.pilote = pilote.cle;
-                            action->setData(QVariant::fromValue(identifiant));
-                            menu->addAction(action);
+                        ajouterPilotesDansMenuFacturesDaca(menu, 
+                            donneesDaca.listePilotes,
+                            mois);
 
-                            connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
-                        }
+                        menu->addSeparator();
+
+                        ajouterPilotesDansMenuFacturesDaca(menu, 
+                            donneesDaca.listePilotesNonConnus, 
+                            mois);
                     }
                 }
             }
@@ -4073,6 +4070,25 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
         }
         break;
     }     
+}
+
+void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu, 
+    const AeroDmsTypes::ListeCleStringValeur p_listePilote, 
+    const QDate p_mois)
+{
+    for (AeroDmsTypes::CleStringValeur pilote : p_listePilote)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_FICHIER),
+            pilote.texte,
+            this);
+        AeroDmsTypes::IdentifiantFacture identifiant;
+        identifiant.moisAnnee = p_mois;
+        identifiant.pilote = pilote.cle;
+        action->setData(QVariant::fromValue(identifiant));
+        p_menu->addAction(action);
+
+        connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
+    }
 }
 
 void AeroDms::demanderTelechargementFactureDaca()

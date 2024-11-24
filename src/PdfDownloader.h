@@ -22,12 +22,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtNetwork>
 
 #include "AeroDmsTypes.h"
+#include "ManageDb.h"
 
 class PdfDownloader : public QWidget {
 	Q_OBJECT
 
 public:
-	PdfDownloader(const QString p_cheminFacturesATraiter);
+	PdfDownloader(const QString p_cheminFacturesATraiter, ManageDb *p_db);
 
 	void telechargerDonneesDaca(const QString p_identifiant, const QString p_motDePasse);
 	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const AeroDmsTypes::IdentifiantFacture p_identifiantFacture);
@@ -36,6 +37,7 @@ public:
 
 private:
 	QNetworkAccessManager* networkManager;
+	ManageDb* db;
 
 	QString identifiantConnexion = "";
 	QString motDePasse = "";

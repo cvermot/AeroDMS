@@ -547,6 +547,7 @@ public:
     struct DonneesFacturesDaca
     {
         ListeCleStringValeur listePilotes;
+        ListeCleStringValeur listePilotesNonConnus;
         QList<QDate> listeMoisAnnees;
     };
 
