@@ -2969,8 +2969,11 @@ void AeroDms::ouvrirGestionAeronefs()
 
 void AeroDms::aPropos()
 {
-    QMessageBox::about(this, tr("À propos de ")+ QApplication::applicationName(),
-        "<b>"+ QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> < br />< br /> "
+    const QDate date = QDate::fromString(__DATE__, "MMM dd yyyy");
+    const QTime heure = QTime::fromString(__TIME__);
+
+    QMessageBox::about(this, tr("À propos de ") + QApplication::applicationName(),
+        "<b>" + QApplication::applicationName() + " v" + QApplication::applicationVersion() + " compilée le " + date.toString("dd/MM/yyyy") + " à " + heure.toString("hh'h'mm") + "</b> < br />< br /> "
         "Logiciel de gestion de compta d'une section aéronautique. <br /><br />"
         "Le code source de ce programme est disponible sous"
         " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
