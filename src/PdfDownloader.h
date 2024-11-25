@@ -73,8 +73,9 @@ private:
 
 
 	void telechargerFichier();
-	void connecter();
+	bool connecter();
 	void parserDonneesDaca(const QByteArray& p_donnees);
+	void afficherErreur(const QNetworkReply::NetworkError p_erreur);
 
 private slots:
 	void serviceRequestFinished(QNetworkReply*);

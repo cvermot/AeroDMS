@@ -70,7 +70,7 @@ void PdfDownloader::telechargerFactureDaca( const QString p_identifiant,
     
 }
 
-void PdfDownloader::connecter()
+bool PdfDownloader::connecter()
 {
     QUrl serviceUrl = QUrl("https://daca.fr/site5/adm_register.php");
 
@@ -88,11 +88,15 @@ void PdfDownloader::connecter()
         QNetworkReply* cnxReply = networkManager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
         phaseTraitement = Etape_CONNEXION;
         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_CONNEXION_EN_COURS);
+
+        return true;
     }
     else
     {
         phaseTraitement = Etape_ECHEC_CONNEXION;
         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION);
+
+        return false;
     }  
 }
 
@@ -144,7 +148,10 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
         }
         else
         {
-            connecter();
+            if (!connecter())
+            {
+                afficherErreur(rep->error());
+            }
         }  
     }
     else if ( phaseTraitement == Etape_ATTENTE_TELECHARGEMENT)
@@ -197,6 +204,7 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                         //networkManager->disconnect();
                         phaseTraitement = Etape_ECHEC_TELECHARGEMENT;
                         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE);
+                        afficherErreur(rep->error());
                     }
                 }
             }
@@ -289,4 +297,345 @@ AeroDmsTypes::DonneesFacturesDaca PdfDownloader::recupererDonneesDaca()
 const QString PdfDownloader::recupererCheminDernierFichierTelecharge()
 {
     return derniereFactureTelechargee;
+}
+
+void PdfDownloader::afficherErreur(const QNetworkReply::NetworkError p_erreur)
+{
+   
+    switch (p_erreur)
+    {
+        case QNetworkReply::ConnectionRefusedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The remote server refused the connection (the server is not accepting "
+                "requests)\n Erreur remontée : QNetworkReply::ConnectionRefusedError ("
+                + QString::number(QNetworkReply::ConnectionRefusedError) + ")");
+        }
+        break;
+        case QNetworkReply::RemoteHostClosedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The remote server closed the connection prematurely, before the entire "
+                "reply was received and processed\n Erreur remontée : "
+                "QNetworkReply::RemoteHostClosedError ("
+                + QString::number(QNetworkReply::RemoteHostClosedError) + ")");
+        }
+        break;
+        case QNetworkReply::HostNotFoundError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The remote host name was not found (invalid hostname)\n Erreur remontée "
+                ": QNetworkReply::HostNotFoundError ("
+                + QString::number(QNetworkReply::HostNotFoundError) + ")");
+        }
+        break;
+        case QNetworkReply::TimeoutError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The connection to the remote server timed out\n Erreur remontée : "
+                "QNetworkReply::TimeoutError ("
+                + QString::number(QNetworkReply::TimeoutError) + ")");
+        }
+        break;
+        case QNetworkReply::OperationCanceledError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The operation was canceled via calls to abort() or close() before it "
+                "was finished.\n Erreur remontée : QNetworkReply::OperationCanceledError ("
+                + QString::number(QNetworkReply::OperationCanceledError) + ")");
+        }
+        break;
+        case QNetworkReply::SslHandshakeFailedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The SSL/TLS handshake failed and the encrypted channel could not be "
+                "established. The sslErrors() signal should have been emitted.\n Erreur "
+                "remontée : QNetworkReply::SslHandshakeFailedError ("
+                + QString::number(QNetworkReply::SslHandshakeFailedError) + ")");
+        }
+        break;
+        case QNetworkReply::TemporaryNetworkFailureError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The connection was broken due to disconnection from the network, "
+                "however the system has initiated roaming to another access point. The "
+                "request should be resubmitted and will be processed as soon as the "
+                "connection is re-established.\n Erreur remontée : "
+                "QNetworkReply::TemporaryNetworkFailureError ("
+                + QString::number(QNetworkReply::TemporaryNetworkFailureError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::NetworkSessionFailedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The connection was broken due to disconnection from the network or "
+                "failure to start the network.\n Erreur remontée : "
+                "QNetworkReply::NetworkSessionFailedError ("
+                + QString::number(QNetworkReply::NetworkSessionFailedError) + ")");
+        }
+        break;
+        case QNetworkReply::BackgroundRequestNotAllowedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The background request is not currently allowed due to platform "
+                "policy.\n Erreur remontée : "
+                "QNetworkReply::BackgroundRequestNotAllowedError ("
+                + QString::number(QNetworkReply::BackgroundRequestNotAllowedError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::TooManyRedirectsError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "While following redirects, the maximum limit was reached. The limit is "
+                "by default set to 50 or as set by "
+                "QNetworkRequest::setMaxRedirectsAllowed(). (This value was introduced "
+                "in 5.6.)\n Erreur remontée : QNetworkReply::TooManyRedirectsError ("
+                + QString::number(QNetworkReply::TooManyRedirectsError) + ")");
+        }
+        break;
+        case QNetworkReply::InsecureRedirectError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "While following redirects, the network access API detected a redirect "
+                "from a encrypted protocol (https) to an unencrypted one (http). (This "
+                "value was introduced in 5.6.)\n Erreur remontée : "
+                "QNetworkReply::InsecureRedirectError ("
+                + QString::number(QNetworkReply::InsecureRedirectError) + ")");
+        }
+        break;
+        case QNetworkReply::ProxyConnectionRefusedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The connection to the proxy server was refused (the proxy server is not "
+                "accepting requests)\n Erreur remontée : "
+                "QNetworkReply::ProxyConnectionRefusedError ("
+                + QString::number(QNetworkReply::ProxyConnectionRefusedError) + ")");
+        }
+        break;
+        case QNetworkReply::ProxyConnectionClosedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The proxy server closed the connection prematurely, before the entire "
+                "reply was received and processed\n Erreur remontée : "
+                "QNetworkReply::ProxyConnectionClosedError ("
+                + QString::number(QNetworkReply::ProxyConnectionClosedError) + ")");
+        }
+        break;
+        case QNetworkReply::ProxyNotFoundError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The proxy host name was not found (invalid proxy hostname)\n Erreur "
+                "remontée : QNetworkReply::ProxyNotFoundError ("
+                + QString::number(QNetworkReply::ProxyNotFoundError) + ")");
+        }
+        break;
+        case QNetworkReply::ProxyTimeoutError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The connection to the proxy timed out or the proxy did not reply in "
+                "time to the request sent\n Erreur remontée : "
+                "QNetworkReply::ProxyTimeoutError ("
+                + QString::number(QNetworkReply::ProxyTimeoutError) + ")");
+        }
+        break;
+        case QNetworkReply::ProxyAuthenticationRequiredError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The proxy requires authentication in order to honour the request but "
+                "did not accept any credentials offered (if any)\n Erreur remontée : "
+                "QNetworkReply::ProxyAuthenticationRequiredError ("
+                + QString::number(QNetworkReply::ProxyAuthenticationRequiredError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::ContentAccessDenied:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The access to the remote content was denied (similar to HTTP error "
+                "403)\n Erreur remontée : QNetworkReply::ContentAccessDenied ("
+                + QString::number(QNetworkReply::ContentAccessDenied) + ")");
+        }
+        break;
+        case QNetworkReply::ContentOperationNotPermittedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The operation requested on the remote content is not permitted\n Erreur "
+                "remontée : QNetworkReply::ContentOperationNotPermittedError ("
+                + QString::number(QNetworkReply::ContentOperationNotPermittedError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::ContentNotFoundError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The remote content was not found at the server (similar to HTTP error "
+                "404)\n Erreur remontée : QNetworkReply::ContentNotFoundError ("
+                + QString::number(QNetworkReply::ContentNotFoundError) + ")");
+        }
+        break;
+        case QNetworkReply::AuthenticationRequiredError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The remote server requires authentication to serve the content but the "
+                "credentials provided were not accepted (if any)\n Erreur remontée : "
+                "QNetworkReply::AuthenticationRequiredError ("
+                + QString::number(QNetworkReply::AuthenticationRequiredError) + ")");
+        }
+        break;
+        case QNetworkReply::ContentReSendError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The request needed to be sent again, but this failed for example "
+                "because the upload data could not be read a second time.\n Erreur "
+                "remontée : QNetworkReply::ContentReSendError ("
+                + QString::number(QNetworkReply::ContentReSendError) + ")");
+        }
+        break;
+        case QNetworkReply::ContentConflictError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The request could not be completed due to a conflict with the current "
+                "state of the resource.\n Erreur remontée : "
+                "QNetworkReply::ContentConflictError ("
+                + QString::number(QNetworkReply::ContentConflictError) + ")");
+        }
+        break;
+        case QNetworkReply::ContentGoneError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The requested resource is no longer available at the server.\n Erreur "
+                "remontée : QNetworkReply::ContentGoneError ("
+                + QString::number(QNetworkReply::ContentGoneError) + ")");
+        }
+        break;
+        case QNetworkReply::InternalServerError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The server encountered an unexpected condition which prevented it from "
+                "fulfilling the request.\n Erreur remontée : "
+                "QNetworkReply::InternalServerError ("
+                + QString::number(QNetworkReply::InternalServerError) + ")");
+        }
+        break;
+        case QNetworkReply::OperationNotImplementedError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The server does not support the functionality required to fulfill the "
+                "request.\n Erreur remontée : "
+                "QNetworkReply::OperationNotImplementedError ("
+                + QString::number(QNetworkReply::OperationNotImplementedError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::ServiceUnavailableError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The server is unable to handle the request at this time.\n Erreur "
+                "remontée : QNetworkReply::ServiceUnavailableError ("
+                + QString::number(QNetworkReply::ServiceUnavailableError) + ")");
+        }
+        break;
+        case QNetworkReply::ProtocolUnknownError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The Network Access API cannot honor the request because the protocol is "
+                "not known\n Erreur remontée : QNetworkReply::ProtocolUnknownError ("
+                + QString::number(QNetworkReply::ProtocolUnknownError) + ")");
+        }
+        break;
+        case QNetworkReply::ProtocolInvalidOperationError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "The requested operation is invalid for this protocol\n Erreur remontée "
+                ": QNetworkReply::ProtocolInvalidOperationError ("
+                + QString::number(QNetworkReply::ProtocolInvalidOperationError)
+                + ")");
+        }
+        break;
+        case QNetworkReply::UnknownNetworkError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "An unknown network-related error was detected\n Erreur remontée : "
+                "QNetworkReply::UnknownNetworkError ("
+                + QString::number(QNetworkReply::UnknownNetworkError) + ")");
+        }
+        break;
+        case QNetworkReply::UnknownProxyError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "An unknown proxy-related error was detected\n Erreur remontée : "
+                "QNetworkReply::UnknownProxyError ("
+                + QString::number(QNetworkReply::UnknownProxyError) + ")");
+        }
+        break;
+        case QNetworkReply::UnknownContentError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "An unknown error related to the remote content was detected\n Erreur "
+                "remontée : QNetworkReply::UnknownContentError ("
+                + QString::number(QNetworkReply::UnknownContentError) + ")");
+        }
+        break;
+        case QNetworkReply::ProtocolFailure:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "A breakdown in protocol was detected (parsing error, invalid or "
+                "unexpected responses, etc.)\n Erreur remontée : "
+                "QNetworkReply::ProtocolFailure ("
+                + QString::number(QNetworkReply::ProtocolFailure) + ")");
+        }
+        break;
+        case QNetworkReply::UnknownServerError:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "An unknown error related to the server response was detected\n Erreur "
+                "remontée : QNetworkReply::UnknownServerError ("
+                + QString::number(QNetworkReply::UnknownServerError) + ")");
+        }
+        break;
+        default:
+        {
+            QMessageBox::information(
+                this, QApplication::applicationName() + " - " + tr("Erreur réseau"),
+                "Erreur indéterminée\n"
+                "Code d'erreur remonté : "
+                + QString::number(p_erreur));
+        }
+        break;
+    }
 }
