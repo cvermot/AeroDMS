@@ -60,7 +60,7 @@ AeroDmsTypes::EtatImpression PdfPrinter::imprimerFichier(const QString p_fichier
 
 void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
-    
+    liste.clear();
     if (selectionnerImprimante(imprimante, p_parametresImpression))
     {
         //On demande l'affichage de la fenêtre de génération
@@ -74,7 +74,7 @@ void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_pa
 
 void PdfPrinter::imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
-    qDebug() << "dde impression";
+    liste.clear();
     if (selectionnerImprimante(imprimante, p_parametresImpression))
     {
         AeroDmsTypes::ParametresImpression parametresImpression = p_parametresImpression;
