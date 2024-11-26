@@ -105,7 +105,9 @@ void PdfPrinter::imprimerFichierSuivant()
         fichierAImprimer = fichier.filePath();
         imprimer(imprimante, parametresImpression.forcageImpressionRecto);        
     }
+    QThread::usleep(100);
     progressionImpression->traitementFichierSuivant();
+    QThread::usleep(100);
 }
 
 bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer, 

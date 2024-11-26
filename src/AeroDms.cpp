@@ -3876,6 +3876,8 @@ void AeroDms::imprimerLaDemande()
     PdfPrinter impression;
     const AeroDmsTypes::EtatImpression etatImpression = impression.imprimerFichier(fichierAImprimer, parametresSysteme.parametresImpression);
     afficherEtatImpression(etatImpression);
+
+    detruireFenetreProgressionGenerationPdf();
 }
 
 void AeroDms::imprimerLaDerniereDemandeAgrafage()

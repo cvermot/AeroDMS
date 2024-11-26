@@ -75,10 +75,11 @@ private:
 	void telechargerFichier();
 	bool connecter();
 	void parserDonneesDaca(const QByteArray& p_donnees);
-	void afficherErreur(const QNetworkReply::NetworkError p_erreur);
+	void afficherErreur(const QNetworkReply *p_reponse);
 
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
+	void demandeAuthentificationProxy(const QNetworkProxy& p_proxy, QAuthenticator* p_authenticator);
 	//void saveFile(QNetworkReply* rep);
 
 signals:
