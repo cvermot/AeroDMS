@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.0");
+    QApplication::setApplicationVersion("7.0.2");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -3628,6 +3628,7 @@ void AeroDms::ouvrirDossierDemandesSubventions()
 void AeroDms::ouvrirDossierFichierVenantDEtreGenere()
 {
     QDesktopServices::openUrl(QUrl(dossierSortieGeneration, QUrl::TolerantMode));
+
     detruireFenetreProgressionGenerationPdf();
 }
 
@@ -3888,6 +3889,8 @@ void AeroDms::imprimerLaDemandeAgrafage()
     PdfPrinter impression;
     const AeroDmsTypes::EtatImpression etatImpression = impression.imprimerDossier(dossierSortieGeneration, parametresSysteme.parametresImpression);
     afficherEtatImpression(etatImpression);
+
+    detruireFenetreProgressionGenerationPdf();
 }
 
 void AeroDms::afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression)

@@ -68,6 +68,8 @@ DialogueProgressionGenerationPdf::DialogueProgressionGenerationPdf(QWidget* pare
 	setLayout(mainLayout);
 	setWindowTitle(QApplication::applicationName() + " - " + tr("Génération PDF"));
 	setWindowModality(Qt::WindowModal);
+
+	show();
 }
 
 void DialogueProgressionGenerationPdf::setMaximum(const int p_maximum)
