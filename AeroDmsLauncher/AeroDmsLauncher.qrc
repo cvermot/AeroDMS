@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/AeroDmsLauncher">
+        <file>ressources/shield-airplane.ico</file>
+    </qresource>
+</RCC>
