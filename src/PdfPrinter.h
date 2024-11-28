@@ -35,8 +35,8 @@ public:
 		const AeroDmsTypes::ParametresImpression p_parametresImpression);
 
 private:
-	void imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_parametresImpression);
-	void imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpression p_parametresImpression);
+	void imprimerLaDemande();
+	void imprimerLaDemandeAgrafage();
 	bool selectionnerImprimante(QPrinter& p_printer, 
 		const AeroDmsTypes::ParametresImpression p_parametresImpression);
 	void imprimer(QPrinter &p_printer, 

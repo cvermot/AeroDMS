@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.0.2");
+    QApplication::setApplicationVersion("7.0.4");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -3889,6 +3889,7 @@ void AeroDms::imprimerLaDerniereDemandeAgrafage()
 void AeroDms::imprimerLaDemandeAgrafage()
 {
     PdfPrinter impression;
+
     const AeroDmsTypes::EtatImpression etatImpression = impression.imprimerDossier(dossierSortieGeneration, parametresSysteme.parametresImpression);
     afficherEtatImpression(etatImpression);
 
@@ -4151,6 +4152,11 @@ void AeroDms::demanderTelechargementFactureDaca()
 
 void AeroDms::chargerListeFacturesDaca()
 {
+
+    QMessageBox::information(this, "Support SSL/TLS activé :", " " + QSslSocket::supportsSsl() ? "Oui":"Non");
+    QMessageBox::information(this, "Version SSL/TLS utilisée par Qt :", " " + QSslSocket::sslLibraryVersionString());
+    QMessageBox::information(this, "Version SSL/TLS des bibliothèques système :", " " + QSslSocket::sslLibraryBuildVersionString());
+
     pdfdl->telechargerDonneesDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca);
 }
 

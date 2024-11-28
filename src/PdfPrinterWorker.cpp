@@ -42,8 +42,22 @@ void PdfPrinterWorker::run()
     {
         QSizeF pageSize = doc.pagePointSize(i);
         QImage image = doc.render(i,
-            QSize(pageSize.width() * m_printer->resolution() / 72,
-                pageSize.height() * m_printer->resolution() / 72));
+            QSize( pageSize.width() * m_printer->resolution() / 72,
+                   pageSize.height() * m_printer->resolution() / 72));
+
+        //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
+        //pour l'impression
+        if (pageSize.width() > pageSize.height())
+        {
+            QTransform transformation;
+            transformation.rotate(270);
+            image = image.transformed(transformation);
+            painter.drawImage(0, 0, image);
+        }
+        else
+        {
+            painter.drawImage(0, 0, image);
+        }
 
         if (!image.isNull())
         {

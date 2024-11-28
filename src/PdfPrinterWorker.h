@@ -31,7 +31,6 @@ class PdfPrinterWorker : public QThread
 public:
     PdfPrinterWorker(const QString& filePath, QPrinter *printer, bool forceRecto, QObject* parent = nullptr)
         : QThread(parent), m_filePath(filePath), m_printer(printer), m_forceRecto(forceRecto) {
-       
     }
 
 signals:

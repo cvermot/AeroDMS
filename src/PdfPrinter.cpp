@@ -30,7 +30,8 @@ AeroDmsTypes::EtatImpression PdfPrinter::imprimerDossier(const QString p_dossier
     const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
     dossierAImprimer = p_dossier;
-    imprimerLaDemandeAgrafage(p_parametresImpression);
+    parametresImpression = p_parametresImpression;
+    imprimerLaDemandeAgrafage();
 
     if (demandeImpressionEstConfirmee)
     {
@@ -46,7 +47,8 @@ AeroDmsTypes::EtatImpression PdfPrinter::imprimerFichier(const QString p_fichier
     const AeroDmsTypes::ParametresImpression p_parametresImpression)
 {
     fichierAImprimer = p_fichier;
-    imprimerLaDemande(p_parametresImpression);
+    parametresImpression = p_parametresImpression;
+    imprimerLaDemande();
 
     if (demandeImpressionEstConfirmee)
     {
@@ -58,26 +60,25 @@ AeroDmsTypes::EtatImpression PdfPrinter::imprimerFichier(const QString p_fichier
     return AeroDmsTypes::EtatImpression_ANNULEE_PAR_UTILISATEUR;
 }
 
-void PdfPrinter::imprimerLaDemande(const AeroDmsTypes::ParametresImpression p_parametresImpression)
+void PdfPrinter::imprimerLaDemande()
 {
     liste.clear();
-    if (selectionnerImprimante(imprimante, p_parametresImpression))
+    if (selectionnerImprimante(imprimante, parametresImpression))
     {
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(1);
 
-        imprimer(imprimante, p_parametresImpression.forcageImpressionRecto);
+        imprimer(imprimante, parametresImpression.forcageImpressionRecto);
 
         progressionImpression->traitementFichierSuivant();
     }
 }
 
-void PdfPrinter::imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpression p_parametresImpression)
+void PdfPrinter::imprimerLaDemandeAgrafage()
 {
     liste.clear();
-    if (selectionnerImprimante(imprimante, p_parametresImpression))
+    if (selectionnerImprimante(imprimante, parametresImpression))
     {
-        AeroDmsTypes::ParametresImpression parametresImpression = p_parametresImpression;
         //On compte les fichiers
         QDir repertoire(dossierAImprimer, "*.pdf", QDir::QDir::Name, QDir::Files);
 
@@ -93,7 +94,6 @@ void PdfPrinter::imprimerLaDemandeAgrafage(const AeroDmsTypes::ParametresImpress
         //On demande l'affichage de la fenêtre de génération
         ouvrirFenetreProgressionImpression(liste.size());
         imprimerFichierSuivant();
-
     }
 }
 
