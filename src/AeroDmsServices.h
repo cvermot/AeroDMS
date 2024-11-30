@@ -116,6 +116,8 @@ public:
         Icone_IMPRIMER,
         Icone_OUVRIR_DOSSIER,
         Icone_FICHIER,
+        Icone_FICHIER_SUIVANT,
+        Icone_FICHIER_PRECEDENT,
         Icone_SCAN_AUTO_FACTURE,
         Icone_SCAN_AUTO_FACTURE_GENERIQUE,
         Icone_SCAN_AUTO_VOL,

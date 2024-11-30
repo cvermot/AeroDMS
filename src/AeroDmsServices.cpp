@@ -241,6 +241,16 @@ const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon("./ressources/file.svg");
     }
     break;
+    case AeroDmsServices::Icone_FICHIER_SUIVANT:
+    {
+        return QIcon("./ressources/skip-next.svg");
+    }
+    break;
+    case AeroDmsServices::Icone_FICHIER_PRECEDENT:
+    {
+        return QIcon("./ressources/skip-previous.svg");
+    }
+    break;
     case AeroDmsServices::Icone_SCAN_AUTO_FACTURE:
     {
         return QIcon("./ressources/file-search.svg");

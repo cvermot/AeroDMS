@@ -71,6 +71,7 @@ private:
 
     void chargerUneFactureAvecScan(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
     void chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
+    void mettreAJourBoutonsFichierSuivantPrecedent();
 
     void peuplerListesPilotes();
     void peuplerListeSorties();
@@ -191,6 +192,8 @@ private:
     QAction* bouttonAjouterCotisation;
     QAction* bouttonAjouterPilote;
     QAction* bouttonAjouterSortie;
+    QAction* fichierPrecedent;
+    QAction* fichierSuivant;
 
     //QAction pour raccourcis claviers sans item d'IHM
     QShortcut* ongletSuivantRaccourciClavier;
@@ -268,6 +271,7 @@ private:
     QString cheminDeLaFactureCourante = "";
     bool factureRecupereeEnLigneEstNonTraitee = false;
     bool estEnVerificationAutomatiqueDeNouvelleFacture = false;
+    QAction* actionFactureDacaEnCours = nullptr;
 
     //Parametres
     AeroDmsTypes::ParametresMetier parametresMetiers;
@@ -370,6 +374,7 @@ public slots:
     //Téléchargement de factures
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
     void demanderTelechargementFactureDaca();
+    void demanderTelechagementFactureSuivanteOuPrecedente();
     void chargerListeFacturesDaca();
 
 };

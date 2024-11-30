@@ -689,6 +689,7 @@ void AeroDms::passerLeLogicielEnLectureSeule()
     bouttonAjouterPilote->setEnabled(false);
     bouttonAjouterSortie->setEnabled(false);
     bouttonGenerePdf->setEnabled(false);
+    facturesDaca->setEnabled(false);
 
     logicielEnModeLectureSeule = true;
 }
@@ -795,6 +796,25 @@ void AeroDms::initialiserBarreDOutils()
     connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(bouttonAjouterSortie);
 
+    fichierPrecedent = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_PRECEDENT),
+        tr("Télécharger la facture précédente sur le site du DACA"),
+        this);
+    fichierPrecedent->setStatusTip(tr("Charger la facture précédente sur le site du DACA"));
+    fichierPrecedent->setShortcut(Qt::Key_F5);
+    connect(fichierPrecedent, &QAction::triggered, this, &AeroDms::demanderTelechagementFactureSuivanteOuPrecedente);
+    toolBar->addAction(fichierPrecedent);
+
+    fichierSuivant = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_SUIVANT),
+        tr("Télécharger la facture suivante sur le site du DACA"),
+        this);
+    fichierSuivant->setStatusTip(tr("Charger la facture suivante sur le site du DACA"));
+    fichierSuivant->setShortcut(Qt::Key_F5);
+    connect(fichierSuivant, &QAction::triggered, this, &AeroDms::demanderTelechagementFactureSuivanteOuPrecedente);
+    toolBar->addAction(fichierSuivant);
+
+    fichierPrecedent->setVisible(false);
+    fichierSuivant->setVisible(false);
+    
     toolBar->addSeparator();
 
     bouttonGenerePdf = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_DEMANDE_SUBVENTIONS),
@@ -2145,6 +2165,9 @@ void AeroDms::selectionnerUneFacture()
 
     if (!fichier.isNull())
     {
+        fichierPrecedent->setVisible(false);
+        fichierSuivant->setVisible(false);
+
         chargerUneFactureAvecScan(fichier);
     }    
 }
@@ -4145,7 +4168,7 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
     {
         QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_FICHIER),
             pilote.texte,
-            this);
+            p_menu);
         AeroDmsTypes::IdentifiantFacture identifiant;
         identifiant.moisAnnee = p_mois;
         identifiant.pilote = pilote.cle;
@@ -4166,6 +4189,7 @@ void AeroDms::demanderTelechargementFactureDaca()
 
     if (action->data().canConvert<AeroDmsTypes::IdentifiantFacture>()) 
     {
+        actionFactureDacaEnCours = action;
         AeroDmsTypes::IdentifiantFacture identifiant = action->data().value<AeroDmsTypes::IdentifiantFacture>();
 
         pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
@@ -4174,11 +4198,87 @@ void AeroDms::demanderTelechargementFactureDaca()
     {
         statusBar()->showMessage(tr("Identifiant invalide. Impossible de télécharger la facture"));
     }
+
+    mettreAJourBoutonsFichierSuivantPrecedent();
+}
+
+void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
+{
+    QList<QAction*> actions = static_cast<QMenu*>((actionFactureDacaEnCours->parent()))->actions();
+    int actionCourante = 0;
+    bool actionTrouvee = false;
+    //for (actionCourante = 0 ; actionCourante < actions->size() ; actionCourante++)
+    while(actionCourante < actions.size() 
+        && !actionTrouvee)
+    {
+        if (actions.at(actionCourante) != actionFactureDacaEnCours)
+        {
+            actionCourante = actionCourante + 1;
+        }
+        else
+        {
+            actionTrouvee = true;
+        }
+    }
+
+    int actionACharger = -1;
+    if (sender() == fichierSuivant)
+    {
+        if (actions.at(actionCourante+1)->data().canConvert<AeroDmsTypes::IdentifiantFacture>())
+        {
+            actionACharger = actionCourante + 1;
+        }
+        else if ((actionCourante + 2) < actions.size()-1) // On est sur un séparateur, on fait + 2, si c'est possible
+        {
+            actionACharger = actionCourante + 2;
+        }
+        //Sinon -1, valeur d'init
+    }
+    else //sender == fichierPrecedent
+    {
+        if (actions.at(actionCourante - 1)->data().canConvert<AeroDmsTypes::IdentifiantFacture>())
+        {
+            actionACharger = actionCourante - 1;
+        }
+        else if ((actionCourante - 2) > 0) // On est sur un séparateur, on fait - 2, si c'est possible
+        {
+            actionACharger = actionCourante - 2;
+        }
+        //Sinon -1, valeur d'init
+    }
+    
+    if (actionACharger != -1)
+    {
+        actionFactureDacaEnCours = actions.at(actionACharger);
+        AeroDmsTypes::IdentifiantFacture identifiant = actions.at(actionACharger)->data().value<AeroDmsTypes::IdentifiantFacture>();
+        actions.at(actionACharger)->setChecked(true);
+
+        pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
+    }
+
+    mettreAJourBoutonsFichierSuivantPrecedent();
 }
 
 void AeroDms::chargerListeFacturesDaca()
 {
     pdfdl->telechargerDonneesDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca);
+}
+
+void AeroDms::mettreAJourBoutonsFichierSuivantPrecedent()
+{
+    QList<QAction*> actions = static_cast<QMenu*>((actionFactureDacaEnCours->parent()))->actions();
+    fichierPrecedent->setVisible(true);
+    fichierSuivant->setVisible(true);
+    fichierPrecedent->setDisabled(false);
+    fichierSuivant->setDisabled(false);
+    if (actionFactureDacaEnCours == actions.at(0))
+    {
+        fichierPrecedent->setDisabled(true);
+    }
+    else if (actionFactureDacaEnCours == actions.at((actions.size() - 1)))
+    {
+        fichierSuivant->setDisabled(true);
+    }
 }
 
 void AeroDms::verifierDispoIdentifiantsDaca()
