@@ -4118,6 +4118,8 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
         case AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE :
         {
             chargerUneFactureAvecScan(pdfdl->recupererCheminDernierFichierTelecharge(), true);
+
+            choixPilote->setCurrentIndex(choixPilote->findData(pdfdl->recupererIdentifiantFactureTelechargee().idPilote));
             statusBar()->showMessage(tr("Facture téléchargée avec succès"));
         }
         break;
@@ -4147,7 +4149,9 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
         AeroDmsTypes::IdentifiantFacture identifiant;
         identifiant.moisAnnee = p_mois;
         identifiant.pilote = pilote.cle;
+        identifiant.idPilote = pilote.idPilote;
         action->setData(QVariant::fromValue(identifiant));
+        action->setCheckable(true);
         p_menu->addAction(action);
 
         connect(action, SIGNAL(triggered()), this, SLOT(demanderTelechargementFactureDaca()));
@@ -4157,6 +4161,8 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
 void AeroDms::demanderTelechargementFactureDaca()
 {
     QAction* action = static_cast<QAction*>(sender());
+    action->setChecked(true);
+    action->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
 
     if (action->data().canConvert<AeroDmsTypes::IdentifiantFacture>()) 
     {

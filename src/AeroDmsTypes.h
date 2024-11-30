@@ -541,8 +541,9 @@ public:
 
     struct CleStringValeur
     {
-        QString cle;
-        QString texte;
+        QString cle = "";
+        QString texte = "";
+        QString idPilote = "";
     };
     typedef QList<CleStringValeur> ListeCleStringValeur;
     struct DonneesFacturesDaca
@@ -556,6 +557,7 @@ public:
     {
         QDate moisAnnee;
         QString pilote;
+        QString idPilote;
     };
 
     struct GroupeBaladesEtSortiesAssociees

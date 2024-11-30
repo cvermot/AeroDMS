@@ -89,6 +89,11 @@ void PdfDownloader::telechargerFactureDaca( const QString p_identifiant,
     
 }
 
+const AeroDmsTypes::IdentifiantFacture PdfDownloader::recupererIdentifiantFactureTelechargee()
+{
+    return facture;
+}
+
 bool PdfDownloader::connecter()
 {
     QUrl serviceUrl = QUrl("https://daca.fr/site5/adm_register.php");
@@ -263,7 +268,8 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
         QStringList nomPrenomPilote = item.texte.split(" ");
         if (nomPrenomPilote.size() == 2)
         {
-            if (db->piloteExiste(nomPrenomPilote.at(0), nomPrenomPilote.at(1)))
+            item.idPilote = db->piloteExiste(nomPrenomPilote.at(0), nomPrenomPilote.at(1));
+            if (item.idPilote != "")
             {
                 donneesDaca.listePilotes.append(item);
             }

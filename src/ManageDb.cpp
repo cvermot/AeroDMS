@@ -1123,7 +1123,7 @@ QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
     return query.value("prenom").toString().append(" ").append(query.value("nom").toString());
 }
 
-const bool ManageDb::piloteExiste(const QString p_nom, const QString p_prenom)
+const QString ManageDb::piloteExiste(const QString p_nom, const QString p_prenom)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM pilote WHERE prenom = :prenom AND nom = :nom");
@@ -1133,9 +1133,9 @@ const bool ManageDb::piloteExiste(const QString p_nom, const QString p_prenom)
     query.exec();
     if (query.next())
     {
-        return true;
+        return query.value("piloteId").toString();
     }
-    return false;
+    return "";
 }
 
 QString ManageDb::recupererActivitePrincipale(const QString p_piloteId)

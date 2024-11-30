@@ -119,7 +119,7 @@ public:
     QString recupererActivitePrincipale(const QString p_piloteId);
     QString recupererNomFacture(const int p_volId);
 
-    const bool piloteExiste(const QString p_nom, const QString p_prenom);
+    const QString piloteExiste(const QString p_nom, const QString p_prenom);
 
     int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);
     

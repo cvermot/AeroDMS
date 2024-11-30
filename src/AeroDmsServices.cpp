@@ -271,6 +271,11 @@ const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon("./ressources/file-download.svg");
     }
     break;
+    case AeroDmsServices::Icone_FICHIER_TELECHARGE:
+    {
+        return QIcon("./ressources/file-check.svg");
+    }
+    break;
     case AeroDmsServices::Icone_DEBUG:
     {
         return QIcon("./ressources/bug.svg");
