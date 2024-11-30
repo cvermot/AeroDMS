@@ -151,6 +151,8 @@ public:
     static void ajouterIconesComboBox(QComboBox &p_activite);
     static void normaliser(QString &p_texte);
 
+    static QString recupererCheminFichierImageSignature();
+
     static QString chiffrerDonnees(QString& data);
     static QString dechiffrerDonnees(QString& encryptedData);
 };

@@ -762,9 +762,7 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html) const
     {
         case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
         {
-            //Le chemin vers le fichier
-            QString cheminSignature = QCoreApplication::applicationDirPath() + "/ressources/signature.jpg";
-            p_html.replace("xxSignature", "<img src=\""+ cheminSignature +"\" width=\"140\" />");
+            p_html.replace("xxSignature", "<img src=\""+ AeroDmsServices::recupererCheminFichierImageSignature() +"\" width=\"140\" />");
         }
         break;
 
@@ -774,10 +772,9 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html) const
             {
                 //Si on est sur un PDF mergé, la signature "visible" réalisée par Lex Community
                 //se trouvera sur la première page   
-                if (QFile("./ressources/signature.jpg").exists())
+                if (AeroDmsServices::recupererCheminFichierImageSignature() != "")
                 {
-                    QString cheminSignature = QCoreApplication::applicationDirPath() + "/ressources/signature.jpg";
-                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + cheminSignature + "\" width=\"140\" />");
+                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + AeroDmsServices::recupererCheminFichierImageSignature() + "\" width=\"140\" />");
                 }
                 else
                 {

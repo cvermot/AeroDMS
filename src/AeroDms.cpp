@@ -720,7 +720,7 @@ void AeroDms::fermerSplashscreen()
 
 void AeroDms::verifierSignatureNumerisee()
 {
-    if (!QFile("./ressources/signature.jpg").exists())
+    if (AeroDmsServices::recupererCheminFichierImageSignature() == "")
     {
         boutonSignatureManuelle->setEnabled(false);
     }

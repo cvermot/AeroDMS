@@ -613,3 +613,24 @@ QString AeroDmsServices::dechiffrerDonnees(QString& encryptedText)
     return "";
 }
 
+QString AeroDmsServices::recupererCheminFichierImageSignature()
+{
+    if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.svg").exists())
+    {
+        return QCoreApplication::applicationDirPath() + "./ressources/signature.svg";
+    }
+    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.png").exists())
+    {
+        return QCoreApplication::applicationDirPath() + "./ressources/signature.png";
+    }
+    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.jpg").exists())
+    {
+        return QCoreApplication::applicationDirPath() + "./ressources/signature.jpg";
+    }
+    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.jpeg").exists())
+    {
+        return QCoreApplication::applicationDirPath() + "./ressources/signature.jpeg";
+    }
+    return "";
+}
+
