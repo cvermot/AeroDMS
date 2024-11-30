@@ -223,6 +223,7 @@ public:
         EtatRecuperationDonneesFactures_CONNEXION_EN_COURS,
         EtatRecuperationDonneesFactures_CONNECTE,
         EtatRecuperationDonnnesFactures_ECHEC_CONNEXION,
+        EtatRecuperationDonnnesFactures_ECHEC_CONNEXION_SSL_TLS_INDISPONIBLE,
         EtatRecuperationDonneesFactures_RECUPERATION_DONNEES_EN_COURS,
         EtatRecuperationDonneesFactures_DONNEES_RECUPEREES,
         EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_DONNEES,

@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.0.4");
+    QApplication::setApplicationVersion("7.1");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -2973,16 +2973,20 @@ void AeroDms::aPropos()
     const QTime heure = QTime::fromString(__TIME__);
 
     QMessageBox::about(this, tr("À propos de ") + QApplication::applicationName(),
-        "<b>" + QApplication::applicationName() + " v" + QApplication::applicationVersion() + " compilée le " + date.toString("dd/MM/yyyy") + " à " + heure.toString("hh'h'mm") + "</b> < br />< br /> "
-        "Logiciel de gestion de compta d'une section aéronautique. <br /><br />"
-        "Le code source de ce programme est disponible sous"
-        " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br />< br/>"
-        "Ce programme utilise la libraire <a href=\"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
-        "Les icones sont issues de <a href=\"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
-        "L'image de démarrage est générée avec <a href=\"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
-        "Ce programme inclus du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>"
-        "Mentions légales : <br />"
-        " This program is free software: you can redistribute it and/or modify"
+        "<b>" + QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> <br/>" 
+        + "Version compilée le " + date.toString("dd/MM/yyyy") + " à " + heure.toString("hh'h'mm") + " <br/><br/> "
+        + tr("Logiciel de gestion de compta d'une section aéronautique.") + "<br/><br/>"
+        + tr("Le code source de ce programme est disponible sous")
+        + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
+        + tr("Ce programme utilise la libraire")
+        + " <a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
+        + tr("Les icones sont issues de")
+        + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
+        + tr("L'image de démarrage est générée avec")
+        + " <a href = \"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
+        + tr("Ce programme inclus du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>")
+        + tr("Mentions légales : <br />")
+        + " This program is free software: you can redistribute it and/or modify"
         " it under the terms of the GNU General Public License as published by"
         " the Free Software Foundation, either version 3 of the License, or"
         " (at your option) any later version."
@@ -4011,6 +4015,11 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
             statusBar()->showMessage(tr("Connexion impossible au site du DACA"));
         }
         break;
+        case AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION_SSL_TLS_INDISPONIBLE:
+        {
+            statusBar()->showMessage(tr("Connexion impossible au site du DACA. La connexion SSL/TLS n'est pas disponible avec votre version de Qt."));
+        }
+        break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_RECUPERATION_DONNEES_EN_COURS:
         {
             statusBar()->showMessage(tr("Récupération de la liste des factures disponibles sur le site du DACA en cours"));
@@ -4152,11 +4161,6 @@ void AeroDms::demanderTelechargementFactureDaca()
 
 void AeroDms::chargerListeFacturesDaca()
 {
-
-    QMessageBox::information(this, "Support SSL/TLS activé :", " " + QSslSocket::supportsSsl() ? "Oui":"Non");
-    QMessageBox::information(this, "Version SSL/TLS utilisée par Qt :", " " + QSslSocket::sslLibraryVersionString());
-    QMessageBox::information(this, "Version SSL/TLS des bibliothèques système :", " " + QSslSocket::sslLibraryBuildVersionString());
-
     pdfdl->telechargerDonneesDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca);
 }
 
