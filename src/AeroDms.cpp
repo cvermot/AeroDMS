@@ -684,11 +684,11 @@ void AeroDms::initialiserGestionnaireTelechargement()
 
 void AeroDms::passerLeLogicielEnLectureSeule()
 {
-    bouttonAjouterUnVol->setEnabled(false);
-    bouttonAjouterCotisation->setEnabled(false);
-    bouttonAjouterPilote->setEnabled(false);
-    bouttonAjouterSortie->setEnabled(false);
-    bouttonGenerePdf->setEnabled(false);
+    boutonAjouterUnVol->setEnabled(false);
+    boutonAjouterCotisation->setEnabled(false);
+    boutonAjouterPilote->setEnabled(false);
+    boutonAjouterSortie->setEnabled(false);
+    boutonGenerePdf->setEnabled(false);
     facturesDaca->setEnabled(false);
 
     logicielEnModeLectureSeule = true;
@@ -764,37 +764,37 @@ void AeroDms::initialiserBarreDOutils()
 {
     QToolBar* toolBar = addToolBar(tr("Outils"));
 
-    bouttonAjouterUnVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_AJOUTER_VOL),
+    boutonAjouterUnVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_AJOUTER_VOL),
         tr("Ajouter un &vol/une dépense"), 
         this);
-    bouttonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
-    bouttonAjouterUnVol->setShortcut(Qt::Key_F2);
-    connect(bouttonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
-    toolBar->addAction(bouttonAjouterUnVol);
+    boutonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
+    boutonAjouterUnVol->setShortcut(Qt::Key_F2);
+    connect(boutonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
+    toolBar->addAction(boutonAjouterUnVol);
 
-    bouttonAjouterPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE), 
+    boutonAjouterPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE), 
         tr("Ajouter un &pilote"), 
         this);
-    bouttonAjouterPilote->setStatusTip(tr("Ajout d'un pilote"));
-    bouttonAjouterPilote->setShortcut(Qt::Key_F3);
-    connect(bouttonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
-    toolBar->addAction(bouttonAjouterPilote);
+    boutonAjouterPilote->setStatusTip(tr("Ajout d'un pilote"));
+    boutonAjouterPilote->setShortcut(Qt::Key_F3);
+    connect(boutonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
+    toolBar->addAction(boutonAjouterPilote);
 
-    bouttonAjouterCotisation = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_COTISATION), 
+    boutonAjouterCotisation = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_COTISATION), 
         tr("Ajouter une &cotisation pour un pilote"), 
         this);
-    bouttonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
-    bouttonAjouterCotisation->setShortcut(Qt::Key_F4);
-    connect(bouttonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
-    toolBar->addAction(bouttonAjouterCotisation);
+    boutonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
+    boutonAjouterCotisation->setShortcut(Qt::Key_F4);
+    connect(boutonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
+    toolBar->addAction(boutonAjouterCotisation);
 
-    bouttonAjouterSortie = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SORTIE), 
+    boutonAjouterSortie = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SORTIE), 
         tr("Ajouter une &sortie"), 
         this);
-    bouttonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
-    bouttonAjouterSortie->setShortcut(Qt::Key_F5);
-    connect(bouttonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
-    toolBar->addAction(bouttonAjouterSortie);
+    boutonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
+    boutonAjouterSortie->setShortcut(Qt::Key_F5);
+    connect(boutonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
+    toolBar->addAction(boutonAjouterSortie);
 
     fichierPrecedent = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_PRECEDENT),
         tr("Télécharger la facture précédente sur le site du DACA"),
@@ -817,21 +817,21 @@ void AeroDms::initialiserBarreDOutils()
     
     toolBar->addSeparator();
 
-    bouttonGenerePdf = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_DEMANDE_SUBVENTIONS),
+    boutonGenerePdf = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_DEMANDE_SUBVENTIONS),
         tr("&Générer les PDF de demande de subvention"), 
         this);
-    bouttonGenerePdf->setStatusTip(tr("Génère les fichiers de demandes : remplissage des formulaires et génération de PDF associant les factures"));
-    bouttonGenerePdf->setShortcut(Qt::CTRL + Qt::Key_G);
-    connect(bouttonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
-    toolBar->addAction(bouttonGenerePdf);
+    boutonGenerePdf->setStatusTip(tr("Génère les fichiers de demandes : remplissage des formulaires et génération de PDF associant les factures"));
+    boutonGenerePdf->setShortcut(Qt::CTRL + Qt::Key_G);
+    connect(boutonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
+    toolBar->addAction(boutonGenerePdf);
 
-    bouttonGenerePdfRecapHdv = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_RECAP_HDV), 
+    boutonGenerePdfRecapHdv = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_RECAP_HDV), 
         tr("Générer les PDF de récapitulatif &HdV de l'année sélectionnée"), 
         this);
-    bouttonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de récapitulatif des HdV de l'année sélectionnée"));
-    bouttonGenerePdfRecapHdv->setShortcut(Qt::CTRL + Qt::Key_R);
-    connect(bouttonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
-    toolBar->addAction(bouttonGenerePdfRecapHdv);
+    boutonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de récapitulatif des HdV de l'année sélectionnée"));
+    boutonGenerePdfRecapHdv->setShortcut(Qt::CTRL + Qt::Key_R);
+    connect(boutonGenerePdfRecapHdv, &QAction::triggered, this, &AeroDms::genererPdfRecapHdV);
+    toolBar->addAction(boutonGenerePdfRecapHdv);
 }
 
 void AeroDms::initialiserBarreDeFiltres()
@@ -1226,13 +1226,13 @@ void AeroDms::initialiserMenuOutils()
     QMenu* menuOutils = menuBar()->addMenu(tr("Ou&tils"));
     menuOutils->setToolTipsVisible(true);
 
-    menuOutils->addAction(bouttonAjouterUnVol);
-    menuOutils->addAction(bouttonAjouterPilote);
-    menuOutils->addAction(bouttonAjouterCotisation);
-    menuOutils->addAction(bouttonAjouterSortie);
+    menuOutils->addAction(boutonAjouterUnVol);
+    menuOutils->addAction(boutonAjouterPilote);
+    menuOutils->addAction(boutonAjouterCotisation);
+    menuOutils->addAction(boutonAjouterSortie);
     menuOutils->addSeparator();
-    menuOutils->addAction(bouttonGenerePdf);
-    menuOutils->addAction(bouttonGenerePdfRecapHdv);
+    menuOutils->addAction(boutonGenerePdf);
+    menuOutils->addAction(boutonGenerePdfRecapHdv);
 
     menuOutils->addSeparator();
 
@@ -1847,13 +1847,13 @@ void AeroDms::peuplerTableVols()
     }
     vueVols->resizeColumnsToContents();
 
-    bouttonGenerePdfRecapHdv->setEnabled(true);
+    boutonGenerePdfRecapHdv->setEnabled(true);
     mailingPilotesAyantCotiseCetteAnnee->setEnabled(true);
     //On désactive la génération du récap annuel si on est sur la sélection "Toutes les années"
     //et également le bouton d'envoi des mails aux pilotes de l'année
     if (listeDeroulanteAnnee->currentData().toInt() == -1)
     {
-        bouttonGenerePdfRecapHdv->setEnabled(false);
+        boutonGenerePdfRecapHdv->setEnabled(false);
         mailingPilotesAyantCotiseCetteAnnee->setEnabled(false);
     }
 }

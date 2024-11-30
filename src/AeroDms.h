@@ -183,15 +183,15 @@ private:
     //Barre de progression
     DialogueProgressionGenerationPdf* progressionGenerationPdf = nullptr;
 
-    //Bouttons
-    QAction* bouttonGenerePdf;
-    QAction* bouttonGenerePdfRecapHdv;
+    //Boutons
+    QAction* boutonGenerePdf;
+    QAction* boutonGenerePdfRecapHdv;
     QAction* miseAJourAction;
     QAction* boutonModeDebug;
-    QAction* bouttonAjouterUnVol;
-    QAction* bouttonAjouterCotisation;
-    QAction* bouttonAjouterPilote;
-    QAction* bouttonAjouterSortie;
+    QAction* boutonAjouterUnVol;
+    QAction* boutonAjouterCotisation;
+    QAction* boutonAjouterPilote;
+    QAction* boutonAjouterSortie;
     QAction* fichierPrecedent;
     QAction* fichierSuivant;
 

@@ -42,7 +42,8 @@ void PdfDownloader::telechargerDonneesDaca(const QString p_identifiant,
         || QSslSocket::sslLibraryBuildVersionString() == "")
     {
         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION_SSL_TLS_INDISPONIBLE);
-        QMessageBox::critical(this, tr("Absence de support SSL/TLS"), 
+        QMessageBox::critical(this, 
+            QApplication::applicationName() + " - " + tr("Absence de support SSL/TLS"),
             tr("<b>Le support SSL/TLS est inactif pour votre version de Qt.</b>")
             + "<br /><br />"
             + tr("Les DLL nécessaires sont introuvables.")
