@@ -779,16 +779,13 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html) const
                 else
                 {
                     p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font>");
-
-                }
-                
+                }        
             }
             else
             {
                 //Le tag réservé pour Lex Community
                 p_html.replace("xxSignature", "[SignatureField#1]");
-            }
-            
+            }       
         }
         break;
 

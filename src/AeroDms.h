@@ -69,8 +69,8 @@ private:
     void initialiserMenuAide();
     void initialiserRaccourcisClavierSansActionIhm();
 
-    void chargerUneFactureAvecScan(const QString p_fichier);
-    void chargerUneFacture(const QString p_fichier);
+    void chargerUneFactureAvecScan(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
+    void chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
 
     void peuplerListesPilotes();
     void peuplerListeSorties();
@@ -106,6 +106,7 @@ private:
     void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, const AeroDmsTypes::ListeCleStringValeur p_listePilote, const QDate p_mois);
 
     bool eventFilter(QObject* object, QEvent* event);
+    void closeEvent(QCloseEvent* event);
 
     ManageDb* db;
     PdfRenderer* pdf;
@@ -265,6 +266,7 @@ private:
     QString fichierAImprimer = "";
     QString dossierSortieGeneration = "";
     QString cheminDeLaFactureCourante = "";
+    bool factureRecupereeEnLigneEstNonTraitee = false;
     bool estEnVerificationAutomatiqueDeNouvelleFacture = false;
 
     //Parametres

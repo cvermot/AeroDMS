@@ -2142,15 +2142,18 @@ void AeroDms::selectionnerUneFacture()
             QApplication::applicationName() + " - " + tr("Ouvrir une facture"),
             parametresSysteme.cheminStockageFacturesATraiter,
             tr("Fichier PDF (*.pdf)"));
-    
-    chargerUneFactureAvecScan(fichier);
+
+    if (!fichier.isNull())
+    {
+        chargerUneFactureAvecScan(fichier);
+    }    
 }
 
-void AeroDms::chargerUneFactureAvecScan(const QString p_fichier)
+void AeroDms::chargerUneFactureAvecScan(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet)
 {
     if (!p_fichier.isNull())
     {
-        chargerUneFacture(p_fichier);
+        chargerUneFacture(p_fichier, p_laFactureAChargerEstTelechargeeDInternet);
         idFactureDetectee = -1;
 
         //On masque par défaut... on réaffiche si le scan est effectué
@@ -2261,12 +2264,18 @@ void AeroDms::recupererVolDepuisCsv()
 
 }
 
-
-void AeroDms::chargerUneFacture(const QString p_fichier)
+void AeroDms::chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet)
 {
-    cheminDeLaFactureCourante = p_fichier;
+    
     factureIdEnBdd = -1;
     pdfDocument->load(p_fichier);
+    if (factureRecupereeEnLigneEstNonTraitee == true)
+    {
+        factureRecupereeEnLigneEstNonTraitee = false;
+        QFile::remove(cheminDeLaFactureCourante);
+    }
+    factureRecupereeEnLigneEstNonTraitee = p_laFactureAChargerEstTelechargeeDInternet;
+    cheminDeLaFactureCourante = p_fichier;
 
     choixPilote->setEnabled(true);
     dureeDuVol->setEnabled(true);
@@ -2470,6 +2479,8 @@ void AeroDms::enregistrerUneFacture()
                 pdfDocument->load(cheminComplet);
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
                 cheminDeLaFactureCourante = cheminComplet;
+
+                factureRecupereeEnLigneEstNonTraitee = false;
             }
             else
             {
@@ -4106,8 +4117,8 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_FACTURE_RECUPEREE :
         {
-            chargerUneFactureAvecScan(pdfdl->recupererCheminDernierFichierTelecharge());
-            statusBar()->showMessage(tr("Facture téléchargée avec succès."));
+            chargerUneFactureAvecScan(pdfdl->recupererCheminDernierFichierTelecharge(), true);
+            statusBar()->showMessage(tr("Facture téléchargée avec succès"));
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE:
@@ -4176,5 +4187,15 @@ void AeroDms::verifierDispoIdentifiantsDaca()
     {
         facturesDaca->setEnabled(true);
         facturesDaca->setStatusTip(tr("Chargement des factures du DACA"));
+    }
+}
+
+void AeroDms::closeEvent(QCloseEvent* event)
+{
+    delete pdfDocument;
+    if (factureRecupereeEnLigneEstNonTraitee == true)
+    {
+        factureRecupereeEnLigneEstNonTraitee = false;
+        QFile::remove(cheminDeLaFactureCourante);
     }
 }

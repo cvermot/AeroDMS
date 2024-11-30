@@ -275,8 +275,7 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
         else
         {
             donneesDaca.listePilotesNonConnus.append(item);
-        }
-        
+        }      
     }
 
     //On récupère les dates disponibles
