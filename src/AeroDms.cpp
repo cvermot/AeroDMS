@@ -3021,7 +3021,11 @@ void AeroDms::ouvrirGestionAeronefs()
 
 void AeroDms::aPropos()
 {
-    const QDate date = QDate::fromString(__DATE__, "MMM dd yyyy");
+    QDate date = QDate::fromString(__DATE__, "MMM dd yyyy");
+    if (!date.isValid())
+    {
+        date = QDate::fromString(__DATE__, "MMM  d yyyy");
+    }
     const QTime heure = QTime::fromString(__TIME__);
 
     QMessageBox::about(this, tr("À propos de ") + QApplication::applicationName(),
