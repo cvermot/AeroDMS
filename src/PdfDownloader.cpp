@@ -42,13 +42,23 @@ void PdfDownloader::telechargerDonneesDaca(const QString p_identifiant,
         || QSslSocket::sslLibraryBuildVersionString() == "")
     {
         emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonnnesFactures_ECHEC_CONNEXION_SSL_TLS_INDISPONIBLE);
-        QMessageBox::critical(this, 
+        QMessageBox::critical(this,
             QApplication::applicationName() + " - " + tr("Absence de support SSL/TLS"),
             tr("<b>Le support SSL/TLS est inactif pour votre version de Qt.</b>")
             + "<br /><br />"
-            + tr("Les DLL nécessaires sont introuvables.")
+            + tr("Les DLL nécessaires sont introuvables ou le support SSL est désactivé.")
             + "<br />"
             + tr("Les DLL <code>qopensslbackend.dll</code> ou <code>qschannelbackend.dll</code> doivent se trouver dans le répetoire <code>tls</code> au côté de l'application.")
+            + "<br /><br />"
+            + tr("Support OpenSSL : ")
+            + (QSslSocket::supportsSsl() ? "Oui" : "Non")
+            + "<br />"
+            + tr("Version librairie SSL : ")
+            + QSslSocket::sslLibraryVersionString()
+            + "<br />"
+            + tr("Build librairie SSL : ")
+            + QSslSocket::sslLibraryBuildVersionString()
+            + "<br />"
             + "<br /><br />"
             + tr("Impossible de se connecter au site du DACA. Arret."));
     }

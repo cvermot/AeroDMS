@@ -1385,6 +1385,24 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
 
+    QAction *afficherInfosSsl = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_CHIFFREMENT),
+        tr("Afficher les informations de support SSL/TLS"),
+        this);
+    afficherInfosSsl->setStatusTip(tr("Active/désactive le mode débogage. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
+    helpMenu->addAction(afficherInfosSsl);
+    QObject::connect(afficherInfosSsl, &QAction::triggered, this, []() {
+        QMessageBox::information(0,
+            QApplication::applicationName() + " - " + tr("Informations de débogage SSL/TLS"),
+            tr("Support OpenSSL : ")
+            + (QSslSocket::supportsSsl() ? "Oui" : "Non")
+            + "<br />"
+            + tr("Version librairie SSL : ")
+            + QSslSocket::sslLibraryVersionString()
+            + "<br />"
+            + tr("Build librairie SSL : ")
+            + QSslSocket::sslLibraryBuildVersionString());
+        });
+
     helpMenu->addSeparator();
 
     QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);

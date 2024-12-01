@@ -125,6 +125,7 @@ public:
         Icone_TELECHARGER_DOSSIER,
         Icone_TELECHARGER_FICHIER,
         Icone_FICHIER_TELECHARGE,
+        Icone_CHIFFREMENT,
         Icone_DEBUG,
 
         Icone_RATIO,
