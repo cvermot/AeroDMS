@@ -558,6 +558,7 @@ public:
         QDate moisAnnee;
         QString pilote;
         QString idPilote;
+        QString nomPrenomPilote;
     };
 
     struct GroupeBaladesEtSortiesAssociees

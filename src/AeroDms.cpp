@@ -4202,6 +4202,7 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
         identifiant.moisAnnee = p_mois;
         identifiant.pilote = pilote.cle;
         identifiant.idPilote = pilote.idPilote;
+        identifiant.nomPrenomPilote = pilote.texte;
         action->setData(QVariant::fromValue(identifiant));
         action->setCheckable(true);
         p_menu->addAction(action);
@@ -4248,7 +4249,7 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
     QList<QAction*> actions = static_cast<QMenu*>((actionFactureDacaEnCours->parent()))->actions();
     int actionCourante = 0;
     bool actionTrouvee = false;
-    //for (actionCourante = 0 ; actionCourante < actions->size() ; actionCourante++)
+    
     while(actionCourante < actions.size() 
         && !actionTrouvee)
     {
@@ -4306,6 +4307,7 @@ void AeroDms::chargerListeFacturesDaca()
 void AeroDms::mettreAJourBoutonsFichierSuivantPrecedent()
 {
     QList<QAction*> actions = static_cast<QMenu*>((actionFactureDacaEnCours->parent()))->actions();
+
     fichierPrecedent->setVisible(true);
     fichierSuivant->setVisible(true);
     fichierPrecedent->setDisabled(false);
@@ -4317,6 +4319,69 @@ void AeroDms::mettreAJourBoutonsFichierSuivantPrecedent()
     else if (actionFactureDacaEnCours == actions.at((actions.size() - 1)))
     {
         fichierSuivant->setDisabled(true);
+    }
+
+    int actionCourante = 0;
+    bool actionTrouvee = false;
+
+    while (actionCourante < actions.size()
+        && !actionTrouvee)
+    {
+        if (actions.at(actionCourante) != actionFactureDacaEnCours)
+        {
+            actionCourante = actionCourante + 1;
+        }
+        else
+        {
+            actionTrouvee = true;
+        }
+    }
+
+    const QString factureDe = tr("Facture de ");
+    const QString pasDeFacturePrec = tr("Pas de facture précédente");
+    const QString pasDeFactureSuiv = tr("Pas de facture suivante");
+    if (actionCourante + 1 < actions.size() - 1)
+    {
+        if (!actions.at(actionCourante + 1)->isSeparator())
+        {
+            fichierSuivant->setToolTip(factureDe
+                + actions.at(actionCourante + 1)->data().value<AeroDmsTypes::IdentifiantFacture>().nomPrenomPilote);
+        }
+        else if (actionCourante + 2 < actions.size() - 1)
+        {
+            fichierSuivant->setToolTip(factureDe
+                + actions.at(actionCourante + 2)->data().value<AeroDmsTypes::IdentifiantFacture>().nomPrenomPilote);
+        }
+        else
+        {
+            fichierSuivant->setToolTip(pasDeFactureSuiv);
+        }     
+    }
+    else
+    {
+        fichierSuivant->setToolTip(pasDeFactureSuiv);
+    }
+
+    if (actionCourante - 1 >= 0)
+    {
+        if (!actions.at(actionCourante - 1)->isSeparator())
+        {
+            fichierPrecedent->setToolTip(factureDe
+                + actions.at(actionCourante - 1)->data().value<AeroDmsTypes::IdentifiantFacture>().nomPrenomPilote);
+        }
+        else if (actionCourante - 2 >= 0)
+        {
+            fichierPrecedent->setToolTip(factureDe
+                + actions.at(actionCourante - 2)->data().value<AeroDmsTypes::IdentifiantFacture>().nomPrenomPilote);
+        }
+        else
+        {
+            fichierPrecedent->setToolTip(pasDeFacturePrec);
+        }     
+    }
+    else
+    {
+        fichierPrecedent->setToolTip(pasDeFacturePrec);
     }
 }
 
