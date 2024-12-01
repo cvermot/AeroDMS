@@ -29,21 +29,36 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
 
     // Chemin vers le répertoire contenant "legacy.dll"
-    QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable
+    const QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable
 
     // Définir la variable d'environnement OPENSSL_MODULES
     qputenv("OPENSSL_MODULES", opensslModulesPath.toUtf8());
-    qDebug() << "OPENSSL_MODULES set to:" << opensslModulesPath;
 
     // Chemin vers l'application principale
-    QString program = QDir::currentPath() + QDir::separator() + "AeroDms.exe";
+    const QString program = QDir::currentPath() + QDir::separator() + "AeroDms.exe";
+    // Chemin vers DLL legacy
+    const QString legacyDll = QDir::currentPath() + QDir::separator() + "legacy.dll";
 
     // Arguments supplémentaires (si besoin)
-    QStringList arguments; // Exemple : arguments << "--debug" << "--config=config.ini";
+    const QStringList arguments; // Exemple : arguments << "--debug" << "--config=config.ini";
+
+    // Vérifie si la DLL critique existe avant de le lancer
+    if (!QFile::exists(legacyDll)) {
+        QMessageBox::critical(nullptr, 
+            QApplication::applicationName() + " - Erreur", 
+            "La DLL legacy.dll est introuvable dans : "
+            + program
+            + ". <br /><br />"
+            + " Cette DLL est indispensable au fonctionnement d'AeroDms.<br />Impossible d'exécuter AeroDms.");
+        return -1;
+    }
 
     // Vérifie si le fichier existe avant de le lancer
     if (!QFile::exists(program)) {
-        QMessageBox::critical(nullptr, "Erreur", "L'exécutable principal AeroDms.exe est introuvable dans : " + program);
+        QMessageBox::critical(nullptr, 
+            QApplication::applicationName() + " - Erreur",
+            "L'exécutable principal AeroDms.exe est introuvable dans : " 
+            + program);
         return -1;
     }
 
@@ -58,6 +73,5 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    //QMessageBox::information(nullptr, "Succès", "L'application principale a été lancée avec succès.");
     return 0; // Le launcher se termine ici
 }
