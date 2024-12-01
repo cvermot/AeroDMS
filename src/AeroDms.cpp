@@ -4294,6 +4294,7 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
         actionFactureDacaEnCours = actions.at(actionACharger);
         AeroDmsTypes::IdentifiantFacture identifiant = actions.at(actionACharger)->data().value<AeroDmsTypes::IdentifiantFacture>();
         actions.at(actionACharger)->setChecked(true);
+        actions.at(actionACharger)->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
 
         pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
     }
