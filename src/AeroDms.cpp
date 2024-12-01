@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.1");
+    QApplication::setApplicationVersion("7.1.1");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -4131,9 +4131,9 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                     {
                         article = "d'";
                     }
-                    QMessageBox::information(this, 
-                        QApplication::applicationName() + " - " + tr("Nouvelles factures DACA disponibles"),
-                        tr("De nouvelles factures pour le DACA sont disponibles pour le mois ")
+                    QMessageBox info(QMessageBox::Information, "", "", QMessageBox::Ok);
+                    info.setWindowTitle(QApplication::applicationName() + " - " + tr("Nouvelles factures DACA disponibles"));
+                    info.setText(tr("De nouvelles factures pour le DACA sont disponibles pour le mois ")
                         + article
                         + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")
                         + ".\n\n"
@@ -4141,6 +4141,12 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                         + texteTitreQMenuFacturesDaca
                         + "\".\n\n"
                         + tr("Cette notification ne sera plus affichée tant que de nouvelles factures ne seront pas disponibles."));
+                    info.setStandardButtons(QMessageBox::NoButton);
+                    QAbstractButton *chargerFacture = info.addButton(" Ouvrir la première facture " + article + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy "), QMessageBox::YesRole);
+                    QAbstractButton* neRienFaire = info.addButton(" Ne rien faire pour le moment ", QMessageBox::NoRole);
+                    connect(chargerFacture, SIGNAL(pressed()), this, SLOT(demanderTelechargementPremiereFactureDaca()));
+                    info.exec();
+      
                     estEnVerificationAutomatiqueDeNouvelleFacture = false;
                 }
             }
@@ -4165,6 +4171,7 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
             chargerUneFactureAvecScan(pdfdl->recupererCheminDernierFichierTelecharge(), true);
 
             choixPilote->setCurrentIndex(choixPilote->findData(pdfdl->recupererIdentifiantFactureTelechargee().idPilote));
+            mettreAJourBoutonsFichierSuivantPrecedent();
             statusBar()->showMessage(tr("Facture téléchargée avec succès"));
         }
         break;
@@ -4203,6 +4210,14 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
     }
 }
 
+void AeroDms::demanderTelechargementPremiereFactureDaca()
+{
+    actionFactureDacaEnCours = facturesDaca->actions().at(1)->menu()->actions().at(0);
+    AeroDmsTypes::IdentifiantFacture identifiant = actionFactureDacaEnCours->data().value<AeroDmsTypes::IdentifiantFacture>();
+
+    pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
+}
+
 void AeroDms::demanderTelechargementFactureDaca()
 {
     QAction* action = static_cast<QAction*>(sender());
@@ -4226,6 +4241,10 @@ void AeroDms::demanderTelechargementFactureDaca()
 
 void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
 {
+    //On desactive les boutons pendant le téléchargement
+    fichierPrecedent->setDisabled(true);
+    fichierSuivant->setDisabled(true);
+
     QList<QAction*> actions = static_cast<QMenu*>((actionFactureDacaEnCours->parent()))->actions();
     int actionCourante = 0;
     bool actionTrouvee = false;
@@ -4277,8 +4296,6 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
 
         pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
     }
-
-    mettreAJourBoutonsFichierSuivantPrecedent();
 }
 
 void AeroDms::chargerListeFacturesDaca()

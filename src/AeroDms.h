@@ -374,6 +374,7 @@ public slots:
     //Téléchargement de factures
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
     void demanderTelechargementFactureDaca();
+    void demanderTelechargementPremiereFactureDaca();
     void demanderTelechagementFactureSuivanteOuPrecedente();
     void chargerListeFacturesDaca();
 
