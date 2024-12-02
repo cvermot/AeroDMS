@@ -323,6 +323,17 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     motDePasseDaca->setText(p_parametresSysteme.motDePasseSiteDaca);
 
+    ligneActuelle = systemeLayout->rowCount();
+    periodiciteVerificationNouvellesFactures = new QSpinBox(this);
+    periodiciteVerificationNouvellesFactures->setSuffix(" jours");
+    periodiciteVerificationNouvellesFactures->setToolTip(tr("Nombre de jours entre 2 vérifications automatiques de présence de nouvelles factures"));
+    periodiciteVerificationNouvellesFactures->setMinimum(1);
+    periodiciteVerificationNouvellesFactures->setMaximum(30);
+    systemeLayout->addWidget(new QLabel(tr("Périodicité recherche nouvelles factures : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(periodiciteVerificationNouvellesFactures, ligneActuelle, K_COLONNE_CHAMP);
+
+    periodiciteVerificationNouvellesFactures->setValue(p_parametresSysteme.periodiciteVerificationPresenceFactures);
+
     QPushButton *cancelButton = new QPushButton(tr("&Annuler"), this);
     cancelButton->setDefault(false);
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
@@ -457,6 +468,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
     parametresSysteme.loginSiteDaca = loginDaca->text();
     parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();
+    parametresSysteme.periodiciteVerificationPresenceFactures = periodiciteVerificationNouvellesFactures->value();
 
     parametresSysteme.parametresImpression.imprimante = imprimante->text();
     parametresSysteme.parametresImpression.resolutionImpression = resolutionImpression->currentData().toInt();

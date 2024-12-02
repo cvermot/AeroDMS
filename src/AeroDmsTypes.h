@@ -481,6 +481,7 @@ public:
         QString nomBdd;
         QString loginSiteDaca;
         QString motDePasseSiteDaca;
+        int periodiciteVerificationPresenceFactures;
         int margesHautBas;
         int margesGaucheDroite;
         ParametresImpression parametresImpression;

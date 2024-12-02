@@ -57,6 +57,7 @@ private:
     QLineEdit* sortieFichiersGeneres = nullptr;
     QLineEdit* loginDaca = nullptr;
     QLineEdit* motDePasseDaca = nullptr;
+    QSpinBox* periodiciteVerificationNouvellesFactures = nullptr;
 
     QComboBox* impressionCouleur = nullptr;
     QComboBox* resolutionImpression = nullptr;

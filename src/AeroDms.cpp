@@ -99,7 +99,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.1.1");
+    QApplication::setApplicationVersion("7.1.2");
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
@@ -215,6 +215,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
+    parametresSysteme.periodiciteVerificationPresenceFactures = settings.value("siteDaca/periodiciteVerification", 3).toInt();
+    
     QString valeur = settings.value("siteDaca/password", "").toString();
     parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
 
@@ -675,7 +677,7 @@ void AeroDms::initialiserGestionnaireTelechargement()
     QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
     QDate valeurDernierVerificationDaca = settingsDaca.value("DACA/valeurDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
 
-    if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= 3)
+    if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= parametresSysteme.periodiciteVerificationPresenceFactures)
     {
         estEnVerificationAutomatiqueDeNouvelleFacture = true;
         chargerListeFacturesDaca();
@@ -3415,6 +3417,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.beginGroup("siteDaca");
     settings.setValue("login", parametresSysteme.loginSiteDaca);
     settings.setValue("password", AeroDmsServices::chiffrerDonnees(parametresSysteme.motDePasseSiteDaca));
+    settings.setValue("periodiciteVerification", parametresSysteme.periodiciteVerificationPresenceFactures);
     settings.endGroup();
 
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
@@ -4213,6 +4216,9 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
 
 void AeroDms::demanderTelechargementPremiereFactureDaca()
 {
+    fichierPrecedent->setDisabled(true);
+    fichierSuivant->setDisabled(true);
+
     actionFactureDacaEnCours = facturesDaca->actions().at(1)->menu()->actions().at(0);
     AeroDmsTypes::IdentifiantFacture identifiant = actionFactureDacaEnCours->data().value<AeroDmsTypes::IdentifiantFacture>();
 
@@ -4221,6 +4227,9 @@ void AeroDms::demanderTelechargementPremiereFactureDaca()
 
 void AeroDms::demanderTelechargementFactureDaca()
 {
+    fichierPrecedent->setDisabled(true);
+    fichierSuivant->setDisabled(true);
+
     QAction* action = static_cast<QAction*>(sender());
     action->setChecked(true);
     action->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
