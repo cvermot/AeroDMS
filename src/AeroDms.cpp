@@ -4220,6 +4220,8 @@ void AeroDms::demanderTelechargementPremiereFactureDaca()
     fichierSuivant->setDisabled(true);
 
     actionFactureDacaEnCours = facturesDaca->actions().at(1)->menu()->actions().at(0);
+    actionFactureDacaEnCours->setChecked(true);
+    actionFactureDacaEnCours->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
     AeroDmsTypes::IdentifiantFacture identifiant = actionFactureDacaEnCours->data().value<AeroDmsTypes::IdentifiantFacture>();
 
     pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
