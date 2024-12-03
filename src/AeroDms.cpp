@@ -30,6 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "DialogueEditionParametres.h"
 
+#include "resource.h"
+
 #include <QtWidgets>
 #include <QToolBar>
 #include <QPdfPageNavigator>
@@ -98,8 +100,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
 void AeroDms::initialiserBaseApplication()
 {
-    QApplication::setApplicationName("AeroDMS");
-    QApplication::setApplicationVersion("7.1.2");
+    QApplication::setApplicationName(VER_PRODUCTNAME_STR);
+    QApplication::setApplicationVersion(VER_PRODUCTVERSION);
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
