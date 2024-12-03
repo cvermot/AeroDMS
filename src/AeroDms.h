@@ -89,6 +89,7 @@ private:
     void initialiserTableauVolsDetectes(QGridLayout* p_infosVol);
 
     void afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression);
+    const QString texteSubventionRestante();
 
     float calculerCoutHoraire();
     int calculerValeurGraphAGenererPdf();

@@ -2213,6 +2213,12 @@ void AeroDms::chargerUneFactureAvecScan(const QString p_fichier, const bool p_la
                 validerLesVols->setHidden(false);
                 vueVolsDetectes->setHidden(false);
                 supprimerLeVolSelectionne->setHidden(false);
+
+                //On met la date à la première date de la facture
+                //(permet d'avoir l'année correspondante à la facture
+                //lors de la séléction du pilote, et donc d'afficher
+                //l'état de la cotisation pour l'année concernée par la facture)
+                dateDuVol->setDate(factures.at(0).dateDuVol);
             }
         }
         
@@ -2942,21 +2948,8 @@ void AeroDms::mettreAJourInfosSurSelectionPilote()
     if (choixPilote->currentIndex() != 0)
     {
         aeroclubPiloteSelectionne->setText(db->recupererAeroclub(choixPilote->currentData().toString()));
-        QString cotisation = tr("(Cotisation payée pour l'année ")
-            + QString::number(dateDuVol->date().year())
-            + ")";
-        if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
-        {
-            cotisation = tr("(Cotisation non payée pour l'année ")
-                + QString::number(dateDuVol->date().year())
-                + ")";
-        }
-        statusBar()->showMessage(tr("Subvention restante pour ce pilote, pour l'année ")
-            + QString::number(dateDuVol->date().year())
-            + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year()))
-            + " € "
-            + cotisation
-            + ".");
+        
+        statusBar()->showMessage(texteSubventionRestante());
         activite->setCurrentIndex(activite->findText(db->recupererActivitePrincipale(choixPilote->currentData().toString())));
     }
     else
@@ -2966,6 +2959,26 @@ void AeroDms::mettreAJourInfosSurSelectionPilote()
     }
 
     gererBoutonEditionPilote();
+}
+
+const QString AeroDms::texteSubventionRestante()
+{
+    QString cotisation = tr("(Cotisation payée pour l'année ")
+        + QString::number(dateDuVol->date().year())
+        + ")";
+    if (!db->piloteEstAJourDeCotisation(choixPilote->currentData().toString(), dateDuVol->date().year()))
+    {
+        cotisation = tr("(Cotisation non payée pour l'année ")
+            + QString::number(dateDuVol->date().year())
+            + ")";
+    }
+
+    return tr("Subvention restante pour ce pilote, pour l'année ")
+        + QString::number(dateDuVol->date().year())
+        + " : " + QString::number(db->recupererSubventionRestante(choixPilote->currentData().toString(), dateDuVol->date().year()))
+        + " € "
+        + cotisation
+        + ".";
 }
 
 void AeroDms::prevaliderDonnneesSaisiesRecette()
@@ -3595,7 +3608,6 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
         while (it.hasNext())
         {
             QString fichier = it.next();
-            qDebug() << it.filePath() << it.fileName();
             //On ne replace pas les éventuels fichiers .ini ou .sqlite qui seraient présents dans le répertoire d'update
             if (!fichier.contains(ini)
                 && !fichier.contains(sqlite))
@@ -3612,7 +3624,6 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
                     if (!QDir(fichierLocal).exists())
                     {
                         QDir().mkdir(fichierLocal);
-                        qDebug() << fichierLocal << "n'existe pas";
                     }
                 }
                 //Sinon, si c'est un fichier, on renomme le précédent et on copy le nouveau
@@ -4190,7 +4201,7 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
 
             choixPilote->setCurrentIndex(choixPilote->findData(pdfdl->recupererIdentifiantFactureTelechargee().idPilote));
             mettreAJourBoutonsFichierSuivantPrecedent();
-            statusBar()->showMessage(tr("Facture téléchargée avec succès"));
+            statusBar()->showMessage(tr("Facture téléchargée avec succès. ") + texteSubventionRestante());
         }
         break;
         case AeroDmsTypes::EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE:
