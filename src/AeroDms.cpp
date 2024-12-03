@@ -2595,6 +2595,7 @@ void AeroDms::enregistrerUnVol()
             //1) on sauvegarde la facture avec les autres, en le renommant
             //2) on la référence en BDD
             pdfDocument->close();
+
             //On forme le nom du fichier sous forme annee.idPilote.idFactureBdd.pdf
             int idFactureBdd = db->recupererProchainNumeroFacture();
             nomDeLaFacture.append(QString::number(anneeRenseignee));
@@ -2612,6 +2613,8 @@ void AeroDms::enregistrerUnVol()
                 pdfDocument->load(cheminComplet);
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
                 cheminDeLaFactureCourante = cheminComplet;
+
+                factureRecupereeEnLigneEstNonTraitee = false;
             }
             else
             {
