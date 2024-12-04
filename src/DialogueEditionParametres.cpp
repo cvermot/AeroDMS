@@ -160,7 +160,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* impressionLayout = new QGridLayout();
     QWidget* impressionWidget = new QWidget(this);
     impressionWidget->setLayout(impressionLayout);
-    onglets->addTab(impressionWidget, QIcon("./ressources/printer-pos-cog.svg"), "Impression");
+    onglets->addTab(impressionWidget, QIcon(":/AeroDms/ressources/printer-pos-cog.svg"), "Impression");
 
     ligneActuelle = impressionLayout->rowCount();
     imprimante = new QLineEdit(this);
@@ -201,8 +201,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     impressionCouleur = new QComboBox(this);
     impressionLayout->addWidget(new QLabel(tr("Couleur : "), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(impressionCouleur, ligneActuelle, K_COLONNE_CHAMP);
-    impressionCouleur->addItem(QIcon("./ressources/invert-colors-off.svg"), tr("Noir et blanc"), QPrinter::GrayScale);
-    impressionCouleur->addItem(QIcon("./ressources/invert-colors.svg"), tr("Couleur"), QPrinter::Color);
+    impressionCouleur->addItem(QIcon(":/AeroDms/ressources/invert-colors-off.svg"), tr("Noir et blanc"), QPrinter::GrayScale);
+    impressionCouleur->addItem(QIcon(":/AeroDms/ressources/invert-colors.svg"), tr("Couleur"), QPrinter::Color);
 
     impressionCouleur->setCurrentIndex(p_parametresSysteme.parametresImpression.modeCouleurImpression);
 
@@ -240,7 +240,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* systemeLayout = new QGridLayout();
     QWidget* systemeWidget = new QWidget(this);
     systemeWidget->setLayout(systemeLayout);
-    onglets->addTab(systemeWidget, QIcon("./ressources/database-cog.svg"), "Système");
+    onglets->addTab(systemeWidget, QIcon(":/AeroDms/ressources/database-cog.svg"), "Système");
 
     cheminBdd = new QLineEdit(this);
     cheminBdd->setToolTip(tr("Localisation de la base de données SQLite utilisée par le logiciel.\n\n") + texteToolTipChampSecurise);

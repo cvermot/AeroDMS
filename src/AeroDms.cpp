@@ -456,7 +456,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
     QGridLayout* infosVol = new QGridLayout();
     QWidget* widgetDepenseVol = new QWidget(this);
     widgetDepenseVol->setLayout(infosVol);
-    depenseTabWidget->addTab(widgetDepenseVol, QIcon("./ressources/airplane-clock.svg"), "Heures de vol");
+    depenseTabWidget->addTab(widgetDepenseVol, QIcon(":/AeroDms/ressources/airplane-clock.svg"), "Heures de vol");
     infosVol->addWidget(typeDeVolLabel, 0, 0);
     infosVol->addWidget(typeDeVol, 0, 1);
     infosVol->addWidget(choixPiloteLabel, 1, 0);
@@ -700,9 +700,9 @@ void AeroDms::passerLeLogicielEnLectureSeule()
 
 void AeroDms::ouvrirSplashscreen()
 {
-    splash = new QSplashScreen(QPixmap("./ressources/splash.png"), Qt::WindowStaysOnTopHint);
+    splash = new QSplashScreen(QPixmap(":/AeroDms/ressources/splash.png"), Qt::WindowStaysOnTopHint);
     splash->show();
-    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+    splash->showMessage(tr("Chargement en cours..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 }
 
 void AeroDms::demanderFermetureSplashscreen()
@@ -761,7 +761,7 @@ void AeroDms::initialiserOngletSubventionsDemandees()
     vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vueSubventions, QIcon("./ressources/checkbook.svg"), "Subventions demandées");
+    mainTabWidget->addTab(vueSubventions, QIcon(":/AeroDms/ressources/checkbook.svg"), "Subventions demandées");
 }
 
 void AeroDms::initialiserBarreDOutils()
@@ -958,14 +958,14 @@ void AeroDms::initialiserMenuFichier()
     connect(boutonOuvrirDossierDemandes, SIGNAL(triggered()), this, SLOT(ouvrirDossierDemandesSubventions()));
 
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de &demande de subventions"));
-    menuOuvrirPdfDemandeSubvention->setIcon(QIcon("./ressources/file-pdf-box.svg"));
+    menuOuvrirPdfDemandeSubvention->setIcon(QIcon(":/AeroDms/ressources/file-pdf-box.svg"));
 
-    QAction* boutonOuvrirDerniereDemande = new QAction(QIcon("./ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
+    QAction* boutonOuvrirDerniereDemande = new QAction(QIcon(":/AeroDms/ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
     connect(boutonOuvrirDerniereDemande, SIGNAL(triggered()), this, SLOT(ouvrirPdfDemandeSuvbvention()));
 
     menuOuvrirAutreDemande = menuOuvrirPdfDemandeSubvention->addMenu(tr("Ouvrir un &autre fichier de demande de subventions"));
-    menuOuvrirAutreDemande->setIcon(QIcon("./ressources/file-pdf-box.svg"));
+    menuOuvrirAutreDemande->setIcon(QIcon(":/AeroDms/ressources/file-pdf-box.svg"));
 
     peuplerMenuAutreDemande();
 
@@ -991,19 +991,19 @@ void AeroDms::initialiserMenuOptions()
     menuOption = menuBar()->addMenu(tr("&Options"));
 
     QMenu* menuSignature = menuOption->addMenu(tr("&Signature"));
-    menuSignature->setIcon(QIcon("./ressources/file-sign.svg"));
+    menuSignature->setIcon(QIcon(":/AeroDms/ressources/file-sign.svg"));
 
-    boutonAucuneSignature = new QAction(QIcon("./ressources/file-outline.svg"), tr("Signature &manuelle"), this);
+    boutonAucuneSignature = new QAction(QIcon(":/AeroDms/ressources/file-outline.svg"), tr("Signature &manuelle"), this);
     boutonAucuneSignature->setStatusTip(tr("Ne pas remplir le champ signature. Chaque document sera signé au stylo par le trésorier."));
     boutonAucuneSignature->setCheckable(true);
     menuSignature->addAction(boutonAucuneSignature);
 
-    boutonSignatureManuelle = new QAction(QIcon("./ressources/draw-pen.svg"), tr("Utiliser l'&image d'une signature"), this);
+    boutonSignatureManuelle = new QAction(QIcon(":/AeroDms/ressources/draw-pen.svg"), tr("Utiliser l'&image d'une signature"), this);
     boutonSignatureManuelle->setStatusTip(tr("Utiliser une image de signature pour remplir le champ signature."));
     boutonSignatureManuelle->setCheckable(true);
     menuSignature->addAction(boutonSignatureManuelle);
 
-    boutonSignatureNumerique = new QAction(QIcon("./ressources/lock-check-outline.svg"), tr("Signature &numérique avec Lex Community"), this);
+    boutonSignatureNumerique = new QAction(QIcon(":/AeroDms/ressources/lock-check-outline.svg"), tr("Signature &numérique avec Lex Community"), this);
     boutonSignatureNumerique->setStatusTip(tr("Préparer le document pour une signature numérique via Lex Community."));
     boutonSignatureNumerique->setCheckable(true);
     menuSignature->addAction(boutonSignatureNumerique);
@@ -1013,12 +1013,12 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonSignatureManuelle, SIGNAL(triggered()), this, SLOT(changerModeSignature()));
 
     QMenu* menuFusionnerLesPdf = menuOption->addMenu(tr("&Fusion des PDF"));
-    menuFusionnerLesPdf->setIcon(QIcon("./ressources/paperclip.svg"));
-    boutonFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-check.svg"), tr("&Fusionner les PDF"), this);
+    menuFusionnerLesPdf->setIcon(QIcon(":/AeroDms/ressources/paperclip.svg"));
+    boutonFusionnerLesPdf = new QAction(QIcon(":/AeroDms/ressources/paperclip-check.svg"), tr("&Fusionner les PDF"), this);
     boutonFusionnerLesPdf->setStatusTip(tr("Fusionne tous les PDF générés en un seul fichier PDF (les PDF \"unitaires\" restent disponibles dans le dossier de génération)"));
     boutonFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonFusionnerLesPdf);
-    boutonNePasFusionnerLesPdf = new QAction(QIcon("./ressources/paperclip-off.svg"), tr("&Ne pas fusionner les PDF"), this);
+    boutonNePasFusionnerLesPdf = new QAction(QIcon(":/AeroDms/ressources/paperclip-off.svg"), tr("&Ne pas fusionner les PDF"), this);
     boutonNePasFusionnerLesPdf->setStatusTip(tr("Ne pas générer le PDF fusionné"));
     boutonNePasFusionnerLesPdf->setCheckable(true);
     menuFusionnerLesPdf->addAction(boutonNePasFusionnerLesPdf);
@@ -1027,8 +1027,8 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonNePasFusionnerLesPdf, SIGNAL(triggered()), this, SLOT(changerFusionPdf()));
 
     QMenu* menuDemandesAGenerer = menuOption->addMenu(tr("&Demandes à générer"));
-    menuDemandesAGenerer->setIcon(QIcon("./ressources/file-cog.svg"));
-    boutonDemandesAGenererToutes = new QAction(QIcon("./ressources/file-document-multiple.svg"), tr("&Toutes"), this);
+    menuDemandesAGenerer->setIcon(QIcon(":/AeroDms/ressources/file-cog.svg"));
+    boutonDemandesAGenererToutes = new QAction(QIcon(":/AeroDms/ressources/file-document-multiple.svg"), tr("&Toutes"), this);
     boutonDemandesAGenererToutes->setStatusTip(tr("Générer tout (recette et dépenses)"));
     boutonDemandesAGenererToutes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
@@ -1045,8 +1045,8 @@ void AeroDms::initialiserMenuOptions()
     boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 
-    menuOptionsRecapAnnuel = menuOption->addMenu(QIcon("./ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
-    boutonOptionRecapAnnuelRecettes = new QAction(QIcon("./ressources/table-plus.svg"), 
+    menuOptionsRecapAnnuel = menuOption->addMenu(QIcon(":/AeroDms/ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
+    boutonOptionRecapAnnuelRecettes = new QAction(QIcon(":/AeroDms/ressources/table-plus.svg"), 
         tr("Récapitulatif des &recettes"), 
         this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
@@ -1132,19 +1132,19 @@ void AeroDms::initialiserMenuOptions()
     resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
         tr("&Résolution des graphiques"));
 
-    boutonGraphResolutionFullHd = new QAction(QIcon("./ressources/standard-definition.svg"), 
+    boutonGraphResolutionFullHd = new QAction(QIcon(":/AeroDms/ressources/standard-definition.svg"), 
         tr("&Full HD (1920 × 1080)"), 
         this);
     resolutionGraphiques->addAction(boutonGraphResolutionFullHd);
     boutonGraphResolutionFullHd->setCheckable(true);
 
-    boutonGraphResolutionQhd = new QAction(QIcon("./ressources/high-definition.svg"), 
+    boutonGraphResolutionQhd = new QAction(QIcon(":/AeroDms/ressources/high-definition.svg"), 
         tr("&QHD (2560 × 1440)"), 
         this);
     resolutionGraphiques->addAction(boutonGraphResolutionQhd);
     boutonGraphResolutionQhd->setCheckable(true);
 
-    boutonGraphResolution4k = new QAction(QIcon("./ressources/ultra-high-definition.svg"), 
+    boutonGraphResolution4k = new QAction(QIcon(":/AeroDms/ressources/ultra-high-definition.svg"), 
         tr("&UHD (3840 × 2160)"),
         this);
     resolutionGraphiques->addAction(boutonGraphResolution4k);
@@ -1207,7 +1207,7 @@ void AeroDms::initialiserMenuOptions()
 
     menuOption->addSeparator();
 
-    boutonParametresDuLogiciel = new QAction(QIcon("./ressources/cog.svg"), tr("&Paramètres du logiciel"), this);
+    boutonParametresDuLogiciel = new QAction(QIcon(":/AeroDms/ressources/cog.svg"), tr("&Paramètres du logiciel"), this);
     boutonParametresDuLogiciel->setStatusTip(tr("Ouvrir le panneau de configuration du logiciel"));
     menuOption->addAction(boutonParametresDuLogiciel);
     connect(boutonParametresDuLogiciel, SIGNAL(triggered()), this, SLOT(ouvrirDialogueParametresApplication()));
@@ -1271,7 +1271,7 @@ void AeroDms::initialiserMenuOutils()
     scanFacture->addAction(scanAutoGenerique);
     scanFacture->addSeparator();
     scanAutoCsv = new QAction(tr("&Importer les vols depuis un fichier CSV"), this);
-    scanAutoCsv->setIcon(QIcon("./ressources/file-delimited-outline.svg"));
+    scanAutoCsv->setIcon(QIcon(":/AeroDms/ressources/file-delimited-outline.svg"));
     scanAutoCsv->setDisabled(true);
     scanAutoCsv->setStatusTip(tr("Importe les données associées à une facture depuis un fichier CSV. Nécessite de charger au préalable la facture qui servira de justificatif."));
     scanAutoCsv->setToolTip(tr("Format du CSV attendu :\nDate;Durée;Immat;Cout\n01/01/2000;1:30;F-ABCD;100,99 €"));
@@ -1344,12 +1344,12 @@ void AeroDms::initialiserMenuOutils()
     connect(mailingPilotesActifs, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
-    QAction* boutonGestionAeronefs = new QAction(QIcon("./ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
+    QAction* boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
     boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
     menuOutils->addAction(boutonGestionAeronefs);
     connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
-    boutonEditerLePiloteSelectionne = new QAction(QIcon("./ressources/account-edit.svg"), tr("É&diter le pilote sélectionné"), this);
+    boutonEditerLePiloteSelectionne = new QAction(QIcon(":/AeroDms/ressources/account-edit.svg"), tr("É&diter le pilote sélectionné"), this);
     boutonEditerLePiloteSelectionne->setStatusTip(tr("Permet d'éditer le pilote actuellement sélectionné. Fonction disponible uniquement si un pilote est sélectionné dans la vue courante."));
     boutonEditerLePiloteSelectionne->setEnabled(false);
     menuOutils->addAction(boutonEditerLePiloteSelectionne);
@@ -1357,7 +1357,7 @@ void AeroDms::initialiserMenuOutils()
 
     menuOutils->addSeparator();
 
-    QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon("./ressources/clock-star-four-points.svg"), tr("Convertir &une heure en décimal"), this);
+    QAction* boutonConversionHeureDecimalesVersHhMm = new QAction(QIcon(":/AeroDms/ressources/clock-star-four-points.svg"), tr("Convertir &une heure en décimal"), this);
     boutonConversionHeureDecimalesVersHhMm->setStatusTip(tr("Convertir une heure sous forme décimale (X,y heures) en HH:mm"));
     menuOutils->addAction(boutonConversionHeureDecimalesVersHhMm);
     connect(boutonConversionHeureDecimalesVersHhMm, SIGNAL(triggered()), this, SLOT(convertirHeureDecimalesVersHhMm()));
@@ -1368,7 +1368,7 @@ void AeroDms::initialiserMenuAide()
     //========================Menu Aide
     QMenu* helpMenu = menuBar()->addMenu(tr("&Aide"));
 
-    QAction* aideQtAction = new QAction(QIcon("./ressources/lifebuoy.svg"), tr("Aide en &ligne"), this);
+    QAction* aideQtAction = new QAction(QIcon(":/AeroDms/ressources/lifebuoy.svg"), tr("Aide en &ligne"), this);
     aideQtAction->setShortcut(Qt::Key_F1);
     aideQtAction->setStatusTip(tr("Ouvrir l'aide en ligne"));
     helpMenu->addAction(aideQtAction);
@@ -1376,7 +1376,7 @@ void AeroDms::initialiserMenuAide()
 
     helpMenu->addSeparator();
 
-    miseAJourAction = new QAction(QIcon("./ressources/download-box.svg"), tr("&Vérifier la présence de mise à jour"), this);
+    miseAJourAction = new QAction(QIcon(":/AeroDms/ressources/download-box.svg"), tr("&Vérifier la présence de mise à jour"), this);
     miseAJourAction->setStatusTip(tr("Vérifie la présence de mise à jour et permet d'effectuer la mise à jour le cas échéant"));
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
@@ -1409,7 +1409,7 @@ void AeroDms::initialiserMenuAide()
 
     helpMenu->addSeparator();
 
-    QAction* aboutQtAction = new QAction(QIcon("./ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
+    QAction* aboutQtAction = new QAction(QIcon(":/AeroDms/ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
@@ -3192,13 +3192,13 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         const bool leVolEstSupprimable = (vueVols->item(ligneSelectionnee, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text() == "Non");
         volPartiellementEditable = !leVolEstSupprimable;
 
-        QAction editerLeVol(QIcon("./ressources/airplane-edit.svg"), 
+        QAction editerLeVol(QIcon(":/AeroDms/ressources/airplane-edit.svg"), 
             tr("Éditer le vol"), 
             this);
         connect(&editerLeVol, SIGNAL(triggered()), this, SLOT(editerVol()));
         menuClicDroitVol.addAction(&editerLeVol);
 
-        QAction supprimerLeVol(QIcon("./ressources/airplane-remove.svg"), 
+        QAction supprimerLeVol(QIcon(":/AeroDms/ressources/airplane-remove.svg"), 
             tr("Supprimer le vol"), 
             this);
         connect(&supprimerLeVol, SIGNAL(triggered()), this, SLOT(supprimerVol()));
@@ -3317,7 +3317,7 @@ void AeroDms::switchModeDebug()
     if (boutonModeDebug->text() == "Activer le mode &debug")
     {
         boutonModeDebug->setText("Désactiver le mode &debug");
-        boutonModeDebug->setIcon(QIcon("./ressources/bug-stop.svg"));
+        boutonModeDebug->setIcon(QIcon(":/AeroDms/ressources/bug-stop.svg"));
         masquageEstDemande = false;
     }
     //Sinon, le mode est actif, on désactive
@@ -3791,7 +3791,7 @@ void AeroDms::peuplerMenuAutreDemande()
         //les 2 dernières cases contiennent . et ..
         while (i < fichiers.size() - 2 && i < 10)
         {
-            QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon("./ressources/folder.svg"), fichiers.at(i));
+            QMenu *menuFichier = menuOuvrirAutreDemande->addMenu(QIcon(":/AeroDms/ressources/folder.svg"), fichiers.at(i));
             const QString dossier = parametresSysteme.cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
             const QDir dirCourant(dossier);
             const QStringList listeFichiers = dirCourant.entryList(QStringList("*.pdf"));
