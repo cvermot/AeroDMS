@@ -93,6 +93,8 @@ private :
 	static void enregistrerImage( QWidget &p_widget,
 						          const QString p_urlImage,
 							      const QString p_titre);
+	static void copierFichierSvgDansHtml( const QString p_fichier,
+									      QString& p_html);
 
 	static void convertirEnPng(const QString p_fichierSvg,
 		const QString p_fichierPng,

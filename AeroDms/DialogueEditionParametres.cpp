@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 
 #include "DialogueEditionParametres.h"
+#include "AeroDmsServices.h"
 
 #include <QtWidgets>
 #include <QPrintDialog>

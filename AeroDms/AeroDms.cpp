@@ -96,6 +96,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     statusBar()->showMessage(tr("Prêt"));
 
     demanderFermetureSplashscreen();
+
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -202,8 +203,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/") +
         settings.value("baseDeDonnees/nom", "").toString();
-    const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() +
-        QString("/ressources/HTML");
+    //const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() + QString("/ressources/HTML");
+    const QString ressourcesHtml = ":/AeroDms/ressources/HTML/"; 
 
     parametresSysteme.cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     parametresSysteme.cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
@@ -1394,7 +1395,7 @@ void AeroDms::initialiserMenuAide()
     QAction *afficherInfosSsl = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_CHIFFREMENT),
         tr("Afficher les informations de support SSL/TLS"),
         this);
-    afficherInfosSsl->setStatusTip(tr("Active/désactive le mode débogage. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
+    afficherInfosSsl->setStatusTip(tr("Afficher les informations sur le support SSL/TLS par cette application. Informations utiles pour déboguer les soucis de connexion aux sites des aéroclubs."));
     helpMenu->addAction(afficherInfosSsl);
     QObject::connect(afficherInfosSsl, &QAction::triggered, this, []() {
         QMessageBox::information(0,
@@ -1407,6 +1408,28 @@ void AeroDms::initialiserMenuAide()
             + "<br />"
             + tr("Build librairie SSL : ")
             + QSslSocket::sslLibraryBuildVersionString());
+        });
+
+    QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_CHIFFREMENT),
+        tr("Afficher les informations sur les ressources internes"),
+        this);
+    afficherInfosRessourcesInternes->setStatusTip(tr("Affiche l'espace occupé par les ressources internes de l'application (icones, images...)"));
+    helpMenu->addAction(afficherInfosRessourcesInternes);
+    QObject::connect(afficherInfosRessourcesInternes, &QAction::triggered, this, []() {
+        AeroDmsTypes::TailleFichiers tailleFichiers;
+        AeroDmsServices::calculerTailleQResources(tailleFichiers);
+
+        QMessageBox::information(0, QApplication::applicationName() + " - " + tr("Ressources internes"),
+            tr("<br/><br/><b>Information sur les ressources internes à l'application</b><br/>")
+            + tr("Cette fenêtre fournit des informations sur les ressources occupées par les données internes à l'application.")
+            + "<table border='1' cellspacing='0' cellpadding='3'>"
+            + "<tr><th>Element</th><th>Taille compressée</th><th>Taille non compressée</th><th>Taux</th></tr>"
+            + "<tr><td>SVG</td><td>" + QString::number((float)tailleFichiers.svg.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.svg.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.svg.nonCompresse - tailleFichiers.svg.compresse) / tailleFichiers.svg.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>PNG</td><td>" + QString::number((float)tailleFichiers.png.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.png.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.png.nonCompresse - tailleFichiers.png.compresse) / tailleFichiers.png.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>HTML</td><td>" + QString::number((float)tailleFichiers.html.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.html.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.html.nonCompresse - tailleFichiers.html.compresse) / tailleFichiers.html.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>Autres</td><td>" + QString::number((float)tailleFichiers.autres.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.autres.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.autres.nonCompresse - tailleFichiers.autres.compresse) / tailleFichiers.autres.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td><b>Total</b></td><td>" + QString::number((float)tailleFichiers.total.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.total.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.total.nonCompresse - tailleFichiers.total.compresse) / tailleFichiers.total.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "</table>");
         });
 
     helpMenu->addSeparator();
@@ -3049,6 +3072,8 @@ void AeroDms::aPropos()
         date = QDate::fromString(__DATE__, "MMM  d yyyy");
     }
     const QTime heure = QTime::fromString(__TIME__);
+
+    
 
     QMessageBox::about(this, tr("À propos de ") + QApplication::applicationName(),
         "<b>" + QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> <br/>" 

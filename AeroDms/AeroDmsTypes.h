@@ -22,8 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtWidgets>
 #include <QPrinter>
 
-#include "AeroDmsServices.h"
-
 class AeroDmsTypes
 {
 public:
@@ -280,7 +278,14 @@ public:
             montantRembourse = montantRembourse + a.montantRembourse;
             coutTotal = coutTotal + a.coutTotal;
             tempsDeVolEnMinutes = tempsDeVolEnMinutes + a.tempsDeVolEnMinutes;
-            heuresDeVol = AeroDmsServices::convertirMinutesEnHeuresMinutes(tempsDeVolEnMinutes);
+            const int heures = tempsDeVolEnMinutes / 60;
+            const int minutes = tempsDeVolEnMinutes % 60;
+            QString minutesString = QString::number(minutes);
+            if (minutesString.size() == 1)
+            {
+                minutesString = QString("0").append(minutesString);
+            }
+            heuresDeVol = QString::number(heures).append("h").append(minutesString);
             return *this;
         }
     };
@@ -582,6 +587,20 @@ public:
         int tailleDePolice;
     };
     static const ResolutionEtParametresStatistiques K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
+
+    struct TailleFichier
+    {
+        quint64 compresse = 0;
+        quint64 nonCompresse = 0;
+    };
+    struct TailleFichiers
+    {
+        TailleFichier total;
+        TailleFichier svg;
+        TailleFichier png;
+        TailleFichier autres;
+        TailleFichier html;
+    };
 
     static const int K_DPI_PAR_DEFAUT = 72;
 };

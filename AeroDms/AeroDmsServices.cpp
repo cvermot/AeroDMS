@@ -656,3 +656,79 @@ QString AeroDmsServices::recupererCheminFichierImageSignature()
     return "";
 }
 
+void AeroDmsServices::calculerTailleQResources(AeroDmsTypes::TailleFichiers& p_tailleFichiers, const QString& prefix) 
+{
+    // Récupérer la liste des fichiers et répertoires dans le préfixe donné
+    QDir resourceDir(":" + prefix);
+    QFileInfoList entries = resourceDir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+
+    for (const QFileInfo& entry : entries)
+    {
+        QString resourcePath = prefix + entry.fileName();
+
+        if (entry.isDir())
+        {
+            // Appeler récursivement les sous-répertoires
+            calculerTailleQResources(p_tailleFichiers, resourcePath + "/");
+        }
+        else if (entry.isFile())
+        {
+            const QString extension = entry.fileName().split(".").last();
+            // Créer un objet QResource pour accéder aux tailles
+            QResource resource(resourcePath);
+
+            const quint64 compresse = resource.size();
+            const quint64 nonCompresse = resource.uncompressedSize();
+
+            // Ajouter les tailles au total
+            p_tailleFichiers.total.compresse += compresse;
+            p_tailleFichiers.total.nonCompresse += nonCompresse;
+
+            if (extension == "svg")
+            {
+                p_tailleFichiers.svg.compresse += compresse;
+                p_tailleFichiers.svg.nonCompresse += nonCompresse;
+            }
+            else if (extension == "png")
+            {
+                p_tailleFichiers.png.compresse += compresse;
+                p_tailleFichiers.png.nonCompresse += nonCompresse;
+            }
+            else if (extension == "html"
+                || extension == "htm")
+            {
+                p_tailleFichiers.html.compresse += compresse;
+                p_tailleFichiers.html.nonCompresse += nonCompresse;
+            }
+            else
+            {
+                p_tailleFichiers.autres.compresse += compresse;
+                p_tailleFichiers.autres.nonCompresse += nonCompresse;
+            }
+        }
+    }
+}
+
+QFile AeroDmsServices::fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier)
+{
+    QString filePath;
+    if (p_url.scheme() == "qrc") 
+    {
+        filePath = ":" + p_url.path(); // Récupère ":/resources/example.txt"
+        qDebug() << p_url;
+        qDebug() << filePath;
+    }
+    else 
+    {
+        filePath = p_url.toLocalFile(); // Utilisé pour d'autres schémas (file:, etc.)
+    }
+
+    if (filePath.last(1) != "/")
+    {
+        filePath = filePath + "/";
+    }
+    filePath = filePath + p_nomFichier;
+
+    return QFile(filePath);
+}
+

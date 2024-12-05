@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 
 #include "PdfExtractor.h"
+#include "AeroDmsServices.h"
 
 QRegularExpression dateRe("(?<jour>\\d\\d)/(?<mois>\\d\\d)/(?<annee>\\d\\d\\d\\d)");
 QRegularExpression dateReTiretsUs("(?<jour>\\d{1,2})-(?<mois>\\d{1,2})-(?<annee>\\d{4})");

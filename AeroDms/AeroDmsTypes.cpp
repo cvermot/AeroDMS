@@ -21,7 +21,7 @@ const AeroDmsTypes::TotauxRecettes AeroDmsTypes::K_INIT_TOTAUX_RECETTE = { 0.0, 
 
 const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT = { 0.0, 
                                                                                                 0.0, 
-                                                                                                AeroDmsServices::convertirMinutesEnHeuresMinutes(0), 
+                                                                                                "0h00",
                                                                                                 0 };
 
 const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", "", 0.0,
@@ -33,7 +33,7 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
                                                      QDate() ,//QDate date;
                                                      "",//QString nomPilote;
                                                      "",//QString prenomPilote;
-                                                     AeroDmsServices::convertirMinutesEnHeuresMinutes(0),//QString typeDeVol;
+                                                     "0h00",//QString typeDeVol;
                                                      "",//QString duree;
                                                      "",//QString remarque;
                                                      "",//QString immat;

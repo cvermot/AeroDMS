@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AERODMSSERVICES_H
 
 #include <QtWidgets>
+#include "AeroDmsTypes.h"
 
 class AeroDmsServices
 {
@@ -156,6 +157,9 @@ public:
     static void normaliser(QString &p_texte);
 
     static QString recupererCheminFichierImageSignature();
+
+    static QFile fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier);
+    static void calculerTailleQResources(AeroDmsTypes::TailleFichiers& p_tailleFichiers, const QString& prefix = "/AeroDms/");
 
     static QString chiffrerDonnees(QString& data);
     static QString dechiffrerDonnees(QString& encryptedData);

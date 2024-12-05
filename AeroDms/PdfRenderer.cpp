@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonutCombineWidget.h"
 #include "StatistiqueDonuts.h"
 #include "StatistiqueHistogrammeEmpile.h"
+#include "AeroDmsServices.h"
 
 #include <podofo/podofo.h>
 
@@ -43,7 +44,15 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
 
-    ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
+    if (p_cheminTemplatesHtml.at(0) != ":")
+    {
+        ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
+    }
+    else
+    {
+        ressourcesHtml = QUrl(QString("qrc%1").arg(p_cheminTemplatesHtml));;
+    }
+    qDebug() << p_cheminTemplatesHtml << ressourcesHtml;
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
@@ -284,7 +293,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
 
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
-    QFile f(QString(ressourcesHtml.toLocalFile()).append("COMPTA_2023.htm"));
+    QFile f = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("COMPTA_2023.htm"));
     QString templateCeTmp = "";
     if (f.open(QFile::ReadOnly | QFile::Text))
     {
@@ -548,9 +557,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
 {
     AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
 
-    QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
-    QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
-    QFile tableRecettes(QString(ressourcesHtml.toLocalFile()).append("TableauRecapRecettes.html"));
+    //QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
+    //QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
+    //QFile tableRecettes(QString(ressourcesHtml.toLocalFile()).append("TableauRecapRecettes.html"));
+    QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecap.html"));
+    QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecapItem.html"));
+    QFile tableRecettes = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecapRecettes.html"));
+
     QString templateTable = "";
     QString templateTableItem = "";
     QString templateTableRecettes = "";
@@ -644,6 +657,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
     {
         view->setHtml(templateTable,
             ressourcesHtml);
+        qDebug() << templateTable;
     }  
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
@@ -899,7 +913,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
 
         //Phase de génération HTML
 
-        QFile tableBaladesSorties(QString(ressourcesHtml.toLocalFile()).append("TableauRecapBaladesSorties.html"));
+        QFile tableBaladesSorties = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecapBaladesSorties.html"));
         if (tableBaladesSorties.open(QFile::ReadOnly | QFile::Text))
         {
             QTextStream inTableBaladesSorties(&tableBaladesSorties);
@@ -1018,7 +1032,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures annuelles ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1039,7 +1053,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1060,7 +1074,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1082,7 +1096,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1104,7 +1118,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1126,7 +1140,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1148,7 +1162,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1170,7 +1184,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1190,7 +1204,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Aéronefs ") + QString::number(p_annee));
 
-        html = html + "<center><img width=\"1120\" src=\"" + urlImage + ".svg" + "\"></center><br/>\n";
+        copierFichierSvgDansHtml(urlImage + ".svg", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1199,6 +1213,14 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     delete m_contentArea;
 
     return html;
+}
+
+void PdfRenderer::copierFichierSvgDansHtml(const QString p_fichier, QString &p_html)
+{
+    QFile fichier(p_fichier);
+    fichier.open(QFile::ReadOnly);
+    p_html = p_html + "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">\n" + fichier.readAll() + "</div></center><br/>\n";
+    fichier.close();
 }
 
 void PdfRenderer::enregistrerImage( QWidget &p_widget,
