@@ -635,21 +635,23 @@ QString AeroDmsServices::dechiffrerDonnees(QString& encryptedText)
 
 QString AeroDmsServices::recupererCheminFichierImageSignature()
 {
-    if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.svg").exists())
+    const QString cheminEtNomBaseSignature = QCoreApplication::applicationDirPath() + "/" + QCoreApplication::applicationName() + "/signature.";
+
+    if (QFile(cheminEtNomBaseSignature + "svg").exists())
     {
-        return QCoreApplication::applicationDirPath() + "./ressources/signature.svg";
+        return cheminEtNomBaseSignature + "svg";
     }
-    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.png").exists())
+    else if (QFile(cheminEtNomBaseSignature + "png").exists())
     {
-        return QCoreApplication::applicationDirPath() + "./ressources/signature.png";
+        return cheminEtNomBaseSignature + "png";
     }
-    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.jpg").exists())
+    else if (QFile(cheminEtNomBaseSignature + "jpg").exists())
     {
-        return QCoreApplication::applicationDirPath() + "./ressources/signature.jpg";
+        return cheminEtNomBaseSignature + "jpg";
     }
-    else if (QFile(QCoreApplication::applicationDirPath() + "./ressources/signature.jpeg").exists())
+    else if (QFile(cheminEtNomBaseSignature + "jpeg").exists())
     {
-        return QCoreApplication::applicationDirPath() + "./ressources/signature.jpeg";
+        return cheminEtNomBaseSignature + "jpeg";
     }
     return "";
 }

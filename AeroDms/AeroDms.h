@@ -104,6 +104,7 @@ private:
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();
 
+    void verifierSignatureNumerisee();
     void verifierDispoIdentifiantsDaca();
     void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, const AeroDmsTypes::ListeCleStringValeur p_listePilote, const QDate p_mois);
 
@@ -351,7 +352,6 @@ public slots:
     void changerRatioExportGraphiques();
     void maintenirMenuSelectionGraphsOuvert();
     void selectionnerTousLesGraphsPourRecapAnnuel();
-    void verifierSignatureNumerisee();
     void envoyerMail();
     void mettreAJourInfosSurSelectionPilote();
     void volsSelectionnes();
