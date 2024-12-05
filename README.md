@@ -65,7 +65,7 @@ Les images du dossier ressources sont des icones "Material Design" issues du sit
 
 Le splashscreen est généré via IA avec [Microsoft Designer](https://designer.microsoft.com/).
 
-![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.svg)
+![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.png)
 
 ## Licence
 Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
