@@ -694,7 +694,8 @@ void AeroDmsServices::calculerTailleQResources(AeroDmsTypes::TailleFichiers& p_t
                 p_tailleFichiers.svg.compresse += compresse;
                 p_tailleFichiers.svg.nonCompresse += nonCompresse;
             }
-            else if (extension == "png")
+            else if (extension == "png"
+                     || extension == "webp")
             {
                 p_tailleFichiers.png.compresse += compresse;
                 p_tailleFichiers.png.nonCompresse += nonCompresse;

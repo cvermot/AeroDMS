@@ -117,7 +117,6 @@
         <file>ressources/ticket.svg</file>
         <file>ressources/transit-connection-variant.svg</file>
         <file>ressources/ultra-high-definition.svg</file>
-        <file>ressources/splash.png</file>
         <file>ressources/HTML/COMPTA_2023.htm</file>
         <file>ressources/HTML/TableauRecap.html</file>
         <file>ressources/HTML/TableauRecapBaladesSorties.html</file>
@@ -125,5 +124,6 @@
         <file>ressources/HTML/TableauRecapRecettes.html</file>
         <file>ressources/HTML/COMPTA_2023_fichiers/COMPTA_2023_22136_image003.png</file>
         <file>ressources/package-variant.svg</file>
+        <file>ressources/splash.webp</file>
     </qresource>
 </RCC>

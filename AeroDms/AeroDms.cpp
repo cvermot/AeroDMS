@@ -703,7 +703,7 @@ void AeroDms::passerLeLogicielEnLectureSeule()
 
 void AeroDms::ouvrirSplashscreen()
 {
-    splash = new QSplashScreen(QPixmap(":/AeroDms/ressources/splash.png"), Qt::WindowStaysOnTopHint);
+    splash = new QSplashScreen(QPixmap(":/AeroDms/ressources/splash.webp"), Qt::WindowStaysOnTopHint);
     splash->show();
     splash->showMessage(tr("Chargement en cours..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 }
@@ -1425,7 +1425,7 @@ void AeroDms::initialiserMenuAide()
             + "<table border='1' cellspacing='0' cellpadding='3'>"
             + "<tr><th>Element</th><th>Taille compressée</th><th>Taille non compressée</th><th>Taux</th></tr>"
             + "<tr><td>SVG</td><td>" + QString::number((float)tailleFichiers.svg.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.svg.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.svg.nonCompresse - tailleFichiers.svg.compresse) / tailleFichiers.svg.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
-            + "<tr><td>PNG</td><td>" + QString::number((float)tailleFichiers.png.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.png.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.png.nonCompresse - tailleFichiers.png.compresse) / tailleFichiers.png.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>PNG/WEBP</td><td>" + QString::number((float)tailleFichiers.png.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.png.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.png.nonCompresse - tailleFichiers.png.compresse) / tailleFichiers.png.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
             + "<tr><td>HTML</td><td>" + QString::number((float)tailleFichiers.html.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.html.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.html.nonCompresse - tailleFichiers.html.compresse) / tailleFichiers.html.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
             + "<tr><td>Autres</td><td>" + QString::number((float)tailleFichiers.autres.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.autres.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.autres.nonCompresse - tailleFichiers.autres.compresse) / tailleFichiers.autres.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
             + "<tr><td><b>Total</b></td><td>" + QString::number((float)tailleFichiers.total.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.total.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.total.nonCompresse - tailleFichiers.total.compresse) / tailleFichiers.total.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
