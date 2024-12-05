@@ -1410,7 +1410,7 @@ void AeroDms::initialiserMenuAide()
             + QSslSocket::sslLibraryBuildVersionString());
         });
 
-    QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_CHIFFREMENT),
+    QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE),
         tr("Afficher les informations sur les ressources internes"),
         this);
     afficherInfosRessourcesInternes->setStatusTip(tr("Affiche l'espace occupé par les ressources internes de l'application (icones, images...)"));

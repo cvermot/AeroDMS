@@ -291,6 +291,11 @@ const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon(":/AeroDms/ressources/lock.svg");
     }
     break;
+    case AeroDmsServices::Icone_RESSOURCE:
+    {
+        return QIcon(":/AeroDms/ressources/package-variant.svg");
+    }
+    break;
     case AeroDmsServices::Icone_DEBUG:
     {
         return QIcon(":/AeroDms/ressources/bug.svg");
@@ -715,8 +720,6 @@ QFile AeroDmsServices::fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier)
     if (p_url.scheme() == "qrc") 
     {
         filePath = ":" + p_url.path(); // Récupère ":/resources/example.txt"
-        qDebug() << p_url;
-        qDebug() << filePath;
     }
     else 
     {

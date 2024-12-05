@@ -87,7 +87,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             else if (QString(entries.at(index).Text.data()).contains("Aérodrome de CANNES-MANDELIEU"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_UACA;
-                qDebug() << "Aéroclub trouvé : UACA";
+                //qDebug() << "Aéroclub trouvé : UACA";
             }
             index++;
         }

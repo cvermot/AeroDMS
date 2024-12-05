@@ -52,7 +52,6 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     {
         ressourcesHtml = QUrl(QString("qrc%1").arg(p_cheminTemplatesHtml));;
     }
-    qDebug() << p_cheminTemplatesHtml << ressourcesHtml;
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
@@ -657,7 +656,6 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
     {
         view->setHtml(templateTable,
             ressourcesHtml);
-        qDebug() << templateTable;
     }  
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
