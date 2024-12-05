@@ -76,7 +76,7 @@
       <MapExports>false</MapExports>
     </Link>
     <QtRcc>
-      <Compression>level9</Compression>
+      <Compression>default</Compression>
     </QtRcc>
     <QtRcc>
       <NoCompression>false</NoCompression>

@@ -1410,6 +1410,7 @@ void AeroDms::initialiserMenuAide()
             + QSslSocket::sslLibraryBuildVersionString());
         });
 
+
     QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE),
         tr("Afficher les informations sur les ressources internes"),
         this);
@@ -1912,16 +1913,23 @@ void AeroDms::peuplerTableVolsDetectes(const AeroDmsTypes::ListeDonneesFacture p
     for (int i = 0; i < p_factures.size(); i++)
     {
         AeroDmsTypes::DonneesFacture facture = p_factures.at(i);
-        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy")));
-        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm")));
-        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.coutDuVol, 'f', 2).append(" €")));
-        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT, new QTableWidgetItem(facture.immat));
+        QTableWidgetItem *date = new QTableWidgetItem(facture.dateDuVol.toString("dd/MM/yyyy"));
+        date->setData(Qt::UserRole, facture.dateDuVol.toString("yyyy-MM-dd"));
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DATE, date);
+        QTableWidgetItem* duree = new QTableWidgetItem(facture.dureeDuVol.toString("hh:mm"));
+        duree->setData(Qt::UserRole, facture.dureeDuVol.hour() * 60 + facture.dureeDuVol.minute());
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_DUREE, duree);
+        QTableWidgetItem* montant = new QTableWidgetItem(QString::number(facture.coutDuVol, 'f', 2).append(" €"));
+        montant->setData(Qt::UserRole, facture.coutDuVol);
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT, montant);
+        QTableWidgetItem* immat = new QTableWidgetItem(facture.immat);
+        immat->setData(Qt::UserRole, facture.immat);
+        vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT, immat);
         //Par défaut => vol entrainement
         vueVolsDetectes->setItem(i, AeroDmsTypes::VolsDetectesTableElement_TYPE, new QTableWidgetItem(typeDeVol->itemText(2)));
     }
 
     vueVolsDetectes->resizeColumnsToContents();
-    
 }
 
 void AeroDms::peuplerTableFactures()
@@ -2970,7 +2978,48 @@ void AeroDms::prevaliderDonnnesSaisies()
          || logicielEnModeLectureSeule)
     {
         validerLaFacture->setEnabled(false);
-    }    
+    } 
+
+    if (choixPilote->currentIndex() != 0 
+        && !vueVolsDetectes->isHidden())
+    {
+        const QString texteVolSembleExisterEnDb = tr("Ce vol semble déjà exister en base de données");
+
+        for (int i = 0; i < vueVolsDetectes->rowCount(); i++)
+        {
+            const int dureeDuVol = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->data(Qt::UserRole).toInt();
+            const float coutDuVol = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->data(Qt::UserRole).toFloat();
+            const QString date = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->data(Qt::UserRole).toString();
+            const bool volSembleExisterEnDb = db->volSembleExistantEnBdd(choixPilote->currentData().toString(), dureeDuVol, date, coutDuVol);
+            
+            if (volSembleExisterEnDb)
+            {
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->setToolTip(texteVolSembleExisterEnDb);
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->setToolTip(texteVolSembleExisterEnDb);
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT)->setToolTip(texteVolSembleExisterEnDb);
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->setToolTip(texteVolSembleExisterEnDb);
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_TYPE)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_TYPE)->setToolTip(texteVolSembleExisterEnDb);
+            }
+            else
+            {
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->setBackground(QBrush(QColor(255, 255, 255, 255)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->setToolTip("");
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->setBackground(QBrush(QColor(255, 255, 255, 255)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->setToolTip("");
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT)->setBackground(QBrush(QColor(255, 255, 255, 255)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_IMMAT)->setToolTip("");
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->setBackground(QBrush(QColor(255, 255, 255, 255)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->setToolTip("");
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_TYPE)->setBackground(QBrush(QColor(255, 255, 255, 255)));
+                vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_TYPE)->setToolTip("");
+            }
+        }
+    }
 }
 
 void AeroDms::mettreAJourInfosSurSelectionPilote()

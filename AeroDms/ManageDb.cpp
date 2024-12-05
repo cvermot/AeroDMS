@@ -1813,3 +1813,16 @@ AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBalade
 
     return listeDetails;
 }
+
+bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote, const int p_duree, const QString p_date, const float p_coutDuVol)
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM vol WHERE pilote = :pilote AND date = :date AND duree = :duree");
+    query.bindValue(":pilote", p_idPilote);
+    query.bindValue(":duree", p_duree);
+    query.bindValue(":date", p_date);
+    query.bindValue(":cout", p_coutDuVol);
+    query.exec();
+
+    return query.next();
+}

@@ -143,6 +143,8 @@ public:
                                      const QString p_nouvelleValeur,
                                      const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour);
 
+    bool volSembleExistantEnBdd(const QString p_idPilote, const int p_duree, const QString p_date, const float p_coutDuVol);
+
 public slots:
 
 private:
