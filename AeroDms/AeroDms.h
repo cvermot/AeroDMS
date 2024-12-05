@@ -110,14 +110,14 @@ private:
     bool eventFilter(QObject* object, QEvent* event);
     void closeEvent(QCloseEvent* event);
 
+    //Classes gestionnaires et actionnaires
     ManageDb* db;
     PdfRenderer* pdf;
+    PdfDownloader* pdfdl;
+
     AeroDmsTypes::Signature signature = AeroDmsTypes::Signature_SANS;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     AeroDmsTypes::ListeDonneesFacture factures;
-    int idFactureDetectee = -1;
-    bool scanAutomatiqueDesFacturesEstActif = true;
-    bool logicielEnModeLectureSeule = false;
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
@@ -261,6 +261,7 @@ private:
     QAction* boutonEditerLePiloteSelectionne;
 
     //Données internes
+    //Gestion des actions métier
     QString piloteAEditer = "";
     float montantSubventionDejaAlloue = 0.0;
     int anneeAEditer = 0;
@@ -270,8 +271,15 @@ private:
     QString fichierAImprimer = "";
     QString dossierSortieGeneration = "";
     QString cheminDeLaFactureCourante = "";
+    int idFactureDetectee = -1;
+    bool scanAutomatiqueDesFacturesEstActif = true;
+
+    //Etats internes application
+    bool logicielEnModeLectureSeule = false;
+    bool miseAJourApplicationEstEnCours = false;
+
+    //Gestion chargement factures DACA
     bool factureRecupereeEnLigneEstNonTraitee = false;
-    bool estEnVerificationAutomatiqueDeNouvelleFacture = false;
     QAction* actionFactureDacaEnCours = nullptr;
 
     //Parametres
@@ -285,8 +293,6 @@ private:
     QHBoxLayout* graphiques;
 
     QSplashScreen* splash;
-
-    PdfDownloader *pdfdl;
 
     //Textes de certains éléments d'IHM
     const QString texteTitreQMenuFacturesDaca = tr("Récupération des factures DACA");

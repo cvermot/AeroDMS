@@ -75,6 +75,17 @@
       <GenerateMapFile>false</GenerateMapFile>
       <MapExports>false</MapExports>
     </Link>
+    <QtRcc>
+      <Compression>level9</Compression>
+    </QtRcc>
+    <QtRcc>
+      <NoCompression>false</NoCompression>
+    </QtRcc>
+    <QtRcc>
+      <CompressThreshold>1</CompressThreshold>
+      <CompressionAlgorithm>
+      </CompressionAlgorithm>
+    </QtRcc>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>

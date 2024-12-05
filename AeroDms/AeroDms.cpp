@@ -622,6 +622,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         case QMessageBox::Yes:
         {
             mettreAJourApplication(parametresSysteme.cheminStockageBdd + "/update/");
+            miseAJourApplicationEstEnCours = true;
         }
         break;
 
@@ -675,13 +676,14 @@ void AeroDms::initialiserGestionnaireTelechargement()
     pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter, db);
     connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
 
-    QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "DACA");
-    QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
-    QDate valeurDernierVerificationDaca = settingsDaca.value("DACA/valeurDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
+    const QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "DACA");
+    const QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
 
-    if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= parametresSysteme.periodiciteVerificationPresenceFactures)
+    //Si on a dépassé le délais entre 2 vérifications, et que l'application n'est pas en mode mise à jour,
+    //on vérifie si présence de nouvelle facture sur le site du DACA.
+    if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= parametresSysteme.periodiciteVerificationPresenceFactures
+        && !miseAJourApplicationEstEnCours)
     {
-        estEnVerificationAutomatiqueDeNouvelleFacture = true;
         chargerListeFacturesDaca();
     }
 }
@@ -4151,13 +4153,12 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                 }
 
                 QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationName(), "DACA");
+                const QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
+                const bool estEnVerificationAutomatiqueDeNouvelleFacture = derniereVerificationDaca.daysTo(QDate::currentDate()) >= parametresSysteme.periodiciteVerificationPresenceFactures;
+                const QDate dateDernierFactureDaca = settingsDaca.value("DACA/valeurDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
 
-                settingsDaca.beginGroup("DACA");
-                settingsDaca.setValue("dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd"));
-                settingsDaca.setValue("valeurDerniereVerification", donneesDaca.listeMoisAnnees.at(0).toString("yyyy-MM-dd"));
-                settingsDaca.endGroup();
-
-                if (estEnVerificationAutomatiqueDeNouvelleFacture)
+                if (estEnVerificationAutomatiqueDeNouvelleFacture
+                    && donneesDaca.listeMoisAnnees.at(0) > dateDernierFactureDaca)
                 {
                     QString article = "de ";
                     if (QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy").at(0) == "a"
@@ -4180,9 +4181,21 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                     QAbstractButton* neRienFaire = info.addButton(" Ne rien faire pour le moment ", QMessageBox::NoRole);
                     connect(chargerFacture, SIGNAL(pressed()), this, SLOT(demanderTelechargementPremiereFactureDaca()));
                     info.exec();
-      
-                    estEnVerificationAutomatiqueDeNouvelleFacture = false;
                 }
+                else if (estEnVerificationAutomatiqueDeNouvelleFacture)
+                {
+                    statusBar()->showMessage(tr("Vérification automatique de nouvelles factures DACA effectuée. Pas de nouvelle facture. Factures téléchargeables via le menu \"Outils/")
+                        + texteTitreQMenuFacturesDaca
+                        + "\". Facture la plus récente disponible : "
+                        + QLocale::system().toString(donneesDaca.listeMoisAnnees.at(0), "MMMM yyyy")
+                        + ".");
+                }
+
+                //Systématiquement, on met à jour les données de dernière vérification
+                settingsDaca.beginGroup("DACA");
+                settingsDaca.setValue("dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd"));
+                settingsDaca.setValue("valeurDerniereVerification", donneesDaca.listeMoisAnnees.at(0).toString("yyyy-MM-dd"));
+                settingsDaca.endGroup();
             }
             else
             {
