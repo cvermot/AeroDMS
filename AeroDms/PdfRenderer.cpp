@@ -1217,7 +1217,7 @@ void PdfRenderer::copierFichierSvgDansHtml(const QString p_fichier, QString &p_h
 {
     QFile fichier(p_fichier);
     fichier.open(QFile::ReadOnly);
-    p_html = p_html + "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">\n" + fichier.readAll() + "</div></center><br/>\n";
+    p_html = p_html + "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">\n" + fichier.readAll() + "</div></center>\n";
     fichier.close();
 }
 
