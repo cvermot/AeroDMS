@@ -197,14 +197,9 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settingsMetier.setValue("delaisDeGardeDbEnMs", "50");
         settingsMetier.setValue("margesHautBas", "20");
         settingsMetier.setValue("margesGaucheDroite", "20");
+        settingsMetier.setValue("utiliserRessourcesHtmlInternes", true);
         settingsMetier.endGroup();
     }
-
-    const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
-        QString("/") +
-        settings.value("baseDeDonnees/nom", "").toString();
-    //const QString ressourcesHtml = settings.value("baseDeDonnees/chemin", "").toString() + QString("/ressources/HTML");
-    const QString ressourcesHtml = ":/AeroDms/ressources/HTML/"; 
 
     parametresSysteme.cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     parametresSysteme.cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
@@ -217,6 +212,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
+    parametresSysteme.utiliserRessourcesHtmlInternes = settingsMetier.value("parametresSysteme/utiliserRessourcesHtmlInternes", true).toBool();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
     parametresSysteme.periodiciteVerificationPresenceFactures = settings.value("siteDaca/periodiciteVerification", 3).toInt();
     
@@ -232,9 +228,13 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
+    const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
+        QString("/") +
+        settings.value("baseDeDonnees/nom", "").toString();
+
     db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
     pdf = new PdfRenderer(db,
-        ressourcesHtml,
+        elaborerCheminRessourcesHtml(),
         QMarginsF(parametresSysteme.margesGaucheDroite,
             parametresSysteme.margesHautBas,
             parametresSysteme.margesGaucheDroite,
@@ -736,6 +736,13 @@ void AeroDms::verifierSignatureNumerisee()
     {
         boutonSignatureManuelle->activate(QAction::Trigger);
     }
+}
+
+const QString AeroDms::elaborerCheminRessourcesHtml()
+{
+    return parametresSysteme.utiliserRessourcesHtmlInternes ?
+        ":/AeroDms/ressources/HTML/" :
+        parametresSysteme.cheminStockageBdd + QString("/ressources/HTML/");
 }
 
 void AeroDms::initialiserOngletGraphiques()
@@ -3533,6 +3540,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settingsMetier.setValue("delaisDeGardeDbEnMs", parametresMetiers.delaisDeGardeBdd);
     settingsMetier.setValue("margesHautBas", parametresSysteme.margesHautBas);
     settingsMetier.setValue("margesGaucheDroite", parametresSysteme.margesGaucheDroite);
+    settingsMetier.setValue("utiliserRessourcesHtmlInternes", parametresSysteme.utiliserRessourcesHtmlInternes);
     settingsMetier.endGroup();
 
     //On met à jour les marges...
@@ -3540,6 +3548,8 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
             parametresSysteme.margesHautBas,
             parametresSysteme.margesGaucheDroite,
             parametresSysteme.margesHautBas));
+    //... et le chemin des templates
+    pdf->mettreAJourCheminRessourcesHtml(elaborerCheminRessourcesHtml());
 
     verifierDispoIdentifiantsDaca();
 }

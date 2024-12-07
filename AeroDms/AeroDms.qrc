@@ -125,5 +125,6 @@
         <file>ressources/package-variant.svg</file>
         <file>ressources/splash.webp</file>
         <file>ressources/HTML/COMPTA_2023_fichiers/logo.svg</file>
+        <file>ressources/code-block-tags.svg</file>
     </qresource>
 </RCC>

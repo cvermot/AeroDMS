@@ -490,6 +490,7 @@ public:
         int margesHautBas;
         int margesGaucheDroite;
         ParametresImpression parametresImpression;
+        bool utiliserRessourcesHtmlInternes;
     };
 
     struct TotauxRecettes {

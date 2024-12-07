@@ -55,6 +55,7 @@ private:
     QLineEdit* facturesSaisies = nullptr;
     QLineEdit* factureATraiter = nullptr;
     QLineEdit* sortieFichiersGeneres = nullptr;
+    QComboBox* utiliserRessourcesHtmlInternes = nullptr;
     QLineEdit* loginDaca = nullptr;
     QLineEdit* motDePasseDaca = nullptr;
     QSpinBox* periodiciteVerificationNouvellesFactures = nullptr;

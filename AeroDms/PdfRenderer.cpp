@@ -44,14 +44,7 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
 
-    if (p_cheminTemplatesHtml.at(0) != ":")
-    {
-        ressourcesHtml = QUrl(QString("file:///%1/").arg(p_cheminTemplatesHtml));
-    }
-    else
-    {
-        ressourcesHtml = QUrl(QString("qrc%1").arg(p_cheminTemplatesHtml));;
-    }
+    mettreAJourCheminRessourcesHtml(p_cheminTemplatesHtml);
 
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(chargementTermine(bool)));
     connect(view, SIGNAL(pdfPrintingFinished(const QString&, bool)), this, SLOT(impressionTerminee(const QString&, bool)));
@@ -60,6 +53,18 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
 void PdfRenderer::mettreAJourMarges(QMarginsF p_marges)
 {
     marges = p_marges;
+}
+
+void PdfRenderer::mettreAJourCheminRessourcesHtml(const QString p_ressources)
+{
+    if (p_ressources.at(0) != ":")
+    {
+        ressourcesHtml = QUrl(QString("file:///%1/").arg(p_ressources));
+    }
+    else
+    {
+        ressourcesHtml = QUrl(QString("qrc%1").arg(p_ressources));;
+    }
 }
 
 QString PdfRenderer::mergerPdf()

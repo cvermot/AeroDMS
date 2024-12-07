@@ -296,6 +296,11 @@ const QIcon AeroDmsServices::recupererIcone(const Icone p_icone)
         return QIcon(":/AeroDms/ressources/package-variant.svg");
     }
     break;
+    case AeroDmsServices::Icone_RESSOURCE_EXTERNE:
+    {
+        return QIcon(":/AeroDms/ressources/code-block-tags.svg");
+    }
+    break;
     case AeroDmsServices::Icone_DEBUG:
     {
         return QIcon(":/AeroDms/ressources/bug.svg");

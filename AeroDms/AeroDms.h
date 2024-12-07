@@ -108,6 +108,8 @@ private:
     void verifierDispoIdentifiantsDaca();
     void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, const AeroDmsTypes::ListeCleStringValeur p_listePilote, const QDate p_mois);
 
+    const QString elaborerCheminRessourcesHtml();
+
     bool eventFilter(QObject* object, QEvent* event);
     void closeEvent(QCloseEvent* event);
 

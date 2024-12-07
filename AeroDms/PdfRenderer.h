@@ -33,6 +33,7 @@ public:
 		         QWidget* parent = nullptr);
 
 	void mettreAJourMarges(QMarginsF p_marges);
+	void mettreAJourCheminRessourcesHtml(const QString p_ressources);
 
 	void imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
 		                                  const QString p_cheminSortieFichiersGeneres,

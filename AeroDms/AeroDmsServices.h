@@ -128,6 +128,7 @@ public:
         Icone_FICHIER_TELECHARGE,
         Icone_CHIFFREMENT,
         Icone_RESSOURCE,
+        Icone_RESSOURCE_EXTERNE,
         Icone_DEBUG,
 
         Icone_RATIO,

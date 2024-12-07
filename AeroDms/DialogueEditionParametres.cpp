@@ -304,6 +304,16 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     sortieFichiersGeneres->setText(p_parametresSysteme.cheminSortieFichiersGeneres);
 
     ligneActuelle = systemeLayout->rowCount();
+    utiliserRessourcesHtmlInternes = new QComboBox(this);
+    utiliserRessourcesHtmlInternes->setToolTip(tr("Ce paramètre permet de changer la source des templates HTML utilisés. Le mode ressources externes permet de modifier les templates HTML à des fins de mise au point ou s'il est nécessaire d'utiliser un nouveau template compatible avec l'ancien et que l'on ne souhaite pas recompiler le logiciel. En cas d'utilisation en mode ressource externe, les fichiers HTML sont attendus dans : ") + QFileInfo(cheminBdd->text()).absolutePath() + "/ressources/HTML/.");
+    systemeLayout->addWidget(new QLabel(tr("Ressources HTML : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(utiliserRessourcesHtmlInternes, ligneActuelle, K_COLONNE_CHAMP);
+    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE_EXTERNE), tr("Ressources HTML externes"), false);
+    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE), tr("Ressources HTML internes"), true);
+
+    utiliserRessourcesHtmlInternes->setCurrentIndex(p_parametresSysteme.utiliserRessourcesHtmlInternes);
+
+    ligneActuelle = systemeLayout->rowCount();
     loginDaca = new QLineEdit(this);
     loginDaca->setToolTip(tr("Identifiant de connexion au site DACA pour la récupération des factures"));
     systemeLayout->addWidget(new QLabel(tr("Login site DACA : "), this), ligneActuelle, K_COLONNE_LABEL);
@@ -467,6 +477,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesTraitees = facturesSaisies->text();
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
+    parametresSysteme.utiliserRessourcesHtmlInternes = utiliserRessourcesHtmlInternes->currentData().toBool();
     parametresSysteme.loginSiteDaca = loginDaca->text();
     parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();
     parametresSysteme.periodiciteVerificationPresenceFactures = periodiciteVerificationNouvellesFactures->value();
