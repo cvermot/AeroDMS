@@ -561,9 +561,6 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
 {
     AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
 
-    //QFile table(QString(ressourcesHtml.toLocalFile()).append("TableauRecap.html"));
-    //QFile tableItem(QString(ressourcesHtml.toLocalFile()).append("TableauRecapItem.html"));
-    //QFile tableRecettes(QString(ressourcesHtml.toLocalFile()).append("TableauRecapRecettes.html"));
     QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecap.html"));
     QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecapItem.html"));
     QFile tableRecettes = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauRecapRecettes.html"));
