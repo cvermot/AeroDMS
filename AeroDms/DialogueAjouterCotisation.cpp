@@ -53,9 +53,9 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     annee->addItem(QString::number(anneeCourante - 1));
     annee->addItem(QString::number(anneeCourante));
     annee->addItem(QString::number(anneeCourante + 1));
-    annee->setItemIcon(0, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MOINS_1));
-    annee->setItemIcon(1, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_0));
-    annee->setItemIcon(2, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_1));
+    annee->setItemIcon(0, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MOINS_1));
+    annee->setItemIcon(1, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_0));
+    annee->setItemIcon(2, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_1));
 
     montant = new QDoubleSpinBox(this);
     QLabel* montantLabel = new QLabel(tr("Montant : "), this);

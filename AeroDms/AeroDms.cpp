@@ -103,7 +103,7 @@ void AeroDms::initialiserBaseApplication()
 {
     QApplication::setApplicationName(VER_PRODUCTNAME_STR);
     QApplication::setApplicationVersion(VER_PRODUCTVERSION);
-    QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION));
+    QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ICONE_APPLICATION));
     mainTabWidget = new QTabWidget(this);
     setCentralWidget(mainTabWidget);
 
@@ -250,38 +250,38 @@ void AeroDms::initialiserOngletPilotes()
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem(tr("Année")));
 
     QTableWidgetItem* headerHdVEntrainement = new QTableWidgetItem(tr("HdV"));
-    headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ENTRAINEMENT));
+    headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT));
     headerHdVEntrainement->setToolTip("Heures de vol d'entrainement");
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES, headerHdVEntrainement);
     QTableWidgetItem* headerSubventionEntrainement = new QTableWidgetItem(tr("Subvention"));
-    headerSubventionEntrainement->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ENTRAINEMENT));
+    headerSubventionEntrainement->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT));
     headerSubventionEntrainement->setToolTip(tr("Montant de la subvention d'entrainement déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE, headerSubventionEntrainement);
 
     QTableWidgetItem* headerHdVBalade = new QTableWidgetItem(tr("HdV"));
-    headerHdVBalade->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_BALADE));
+    headerHdVBalade->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_BALADE));
     headerHdVBalade->setToolTip((tr("Heures de vol de balade")));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES, headerHdVBalade);
     QTableWidgetItem* headerSubventionBalade = new QTableWidgetItem(tr("Subvention"));
-    headerSubventionBalade->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_BALADE));
+    headerSubventionBalade->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_BALADE));
     headerSubventionBalade->setToolTip(tr("Montant de la subvention balade déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE, headerSubventionBalade);
 
     QTableWidgetItem* headerHdVSortie = new QTableWidgetItem((tr("HdV")));
-    headerHdVSortie->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SORTIE));
+    headerHdVSortie->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SORTIE));
     headerHdVSortie->setToolTip(tr("Heures de vol de sortie"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES, headerHdVSortie);
     QTableWidgetItem* headerSubventionSortie = new QTableWidgetItem(tr("Subvention"));
-    headerSubventionSortie->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SORTIE));
+    headerSubventionSortie->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SORTIE));
     headerSubventionSortie->setToolTip(tr("Montant de la subvention sortie déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE, headerSubventionSortie);
 
     QTableWidgetItem* headerHdVTotales = new QTableWidgetItem(tr("HdV"));
-    headerHdVTotales->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOTAL));
+    headerHdVTotales->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOTAL));
     headerHdVTotales->setToolTip(tr("Heures de vol totales"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, headerHdVTotales);
     QTableWidgetItem* headerSubventionTotale = new QTableWidgetItem(tr("Subvention"));
-    headerSubventionTotale->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOTAL));
+    headerSubventionTotale->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOTAL));
     headerSubventionTotale->setToolTip(tr("Montant total de la subvention déjà allouée"));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, headerSubventionTotale);
 
@@ -290,7 +290,7 @@ void AeroDms::initialiserOngletPilotes()
     vuePilotes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vuePilotes->setSelectionBehavior(QAbstractItemView::SelectRows);
     vuePilotes->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vuePilotes, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE), tr("Pilotes"));
+    mainTabWidget->addTab(vuePilotes, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_PILOTE), tr("Pilotes"));
     connect(vuePilotes, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelPilotes);
 }
 
@@ -316,7 +316,7 @@ void AeroDms::initialiserOngletVols()
     vueVols->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueVols->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueVols, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_AVION), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AVION), 
         tr("Vols"));
     connect(vueVols, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelVols);
     connect(vueVols, &QTableWidget::cellClicked, this, &AeroDms::volsSelectionnes);
@@ -343,7 +343,7 @@ void AeroDms::initialiserOngletFactures()
     vueFactures->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueFactures->setContextMenuPolicy(Qt::CustomContextMenu);
     mainTabWidget->addTab(vueFactures, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FACTURE), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FACTURE), 
         tr("Factures"));
 }
 
@@ -361,7 +361,7 @@ void AeroDms::initialiserOngletRecettes()
     vueRecettes->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueRecettes->setSelectionBehavior(QAbstractItemView::SelectRows);
     mainTabWidget->addTab(vueRecettes, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FINANCIER), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER), 
         tr("Recettes"));
 }
 
@@ -372,7 +372,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
     widgetAjoutVol = new QWidget(this);
     widgetAjoutVol->setLayout(ajoutVol);
     mainTabWidget->addTab(widgetAjoutVol, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_DEPENSE), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEPENSE), 
         tr("Ajout dépense"));
 
     pdfDocument = new QPdfDocument(this);
@@ -521,7 +521,7 @@ void AeroDms::initialiserOngletAjoutDepenses()
     QWidget* widgetDepenseFacture = new QWidget(this);
     widgetDepenseFacture->setLayout(infosFacture);
     depenseTabWidget->addTab(widgetDepenseFacture, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FACTURE), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FACTURE), 
         tr("Facture"));
     infosFacture->addWidget(choixPayeurLabel, 1, 0);
     infosFacture->addWidget(choixPayeur, 1, 1);
@@ -543,7 +543,7 @@ void AeroDms::initialiserOngletAjoutRecettes()
     widgetAjoutRecette = new QWidget(this);
     widgetAjoutRecette->setLayout(ajoutRecette);
     mainTabWidget->addTab(widgetAjoutRecette, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RECETTE), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RECETTE), 
         tr("Ajout recette"));
 
     listeBaladesEtSorties = new QListWidget(this);
@@ -752,7 +752,7 @@ void AeroDms::initialiserOngletGraphiques()
     widgetGraphiques = new QWidget(this);
     widgetGraphiques->setLayout(graphiques);
     mainTabWidget->addTab(widgetGraphiques, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
         tr("Graphiques"));
 }
 
@@ -778,7 +778,7 @@ void AeroDms::initialiserBarreDOutils()
 {
     QToolBar* toolBar = addToolBar(tr("Outils"));
 
-    boutonAjouterUnVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_AJOUTER_VOL),
+    boutonAjouterUnVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AJOUTER_VOL),
         tr("Ajouter un &vol/une dépense"), 
         this);
     boutonAjouterUnVol->setStatusTip(tr("Ajouter un vol/une dépense"));
@@ -786,7 +786,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonAjouterUnVol, &QAction::triggered, this, &AeroDms::selectionnerUneFacture);
     toolBar->addAction(boutonAjouterUnVol);
 
-    boutonAjouterPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE), 
+    boutonAjouterPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_PILOTE), 
         tr("Ajouter un &pilote"), 
         this);
     boutonAjouterPilote->setStatusTip(tr("Ajout d'un pilote"));
@@ -794,7 +794,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(boutonAjouterPilote);
 
-    boutonAjouterCotisation = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_COTISATION), 
+    boutonAjouterCotisation = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), 
         tr("Ajouter une &cotisation pour un pilote"), 
         this);
     boutonAjouterCotisation->setStatusTip(tr("Ajouter une cotisation pour un pilote"));
@@ -802,7 +802,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonAjouterCotisation, &QAction::triggered, this, &AeroDms::ajouterUneCotisation);
     toolBar->addAction(boutonAjouterCotisation);
 
-    boutonAjouterSortie = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SORTIE), 
+    boutonAjouterSortie = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SORTIE), 
         tr("Ajouter une &sortie"), 
         this);
     boutonAjouterSortie->setStatusTip(tr("Ajouter une sortie"));
@@ -810,7 +810,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonAjouterSortie, &QAction::triggered, this, &AeroDms::ajouterUneSortie);
     toolBar->addAction(boutonAjouterSortie);
 
-    fichierPrecedent = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_PRECEDENT),
+    fichierPrecedent = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER_PRECEDENT),
         tr("Télécharger la facture précédente sur le site du DACA"),
         this);
     fichierPrecedent->setStatusTip(tr("Charger la facture précédente sur le site du DACA"));
@@ -818,7 +818,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(fichierPrecedent, &QAction::triggered, this, &AeroDms::demanderTelechagementFactureSuivanteOuPrecedente);
     toolBar->addAction(fichierPrecedent);
 
-    fichierSuivant = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_SUIVANT),
+    fichierSuivant = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER_SUIVANT),
         tr("Télécharger la facture suivante sur le site du DACA"),
         this);
     fichierSuivant->setStatusTip(tr("Charger la facture suivante sur le site du DACA"));
@@ -831,7 +831,7 @@ void AeroDms::initialiserBarreDOutils()
     
     toolBar->addSeparator();
 
-    boutonGenerePdf = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_DEMANDE_SUBVENTIONS),
+    boutonGenerePdf = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_GENERE_DEMANDE_SUBVENTIONS),
         tr("&Générer les PDF de demande de subvention"), 
         this);
     boutonGenerePdf->setStatusTip(tr("Génère les fichiers de demandes : remplissage des formulaires et génération de PDF associant les factures"));
@@ -839,7 +839,7 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonGenerePdf, &QAction::triggered, this, &AeroDms::genererPdf);
     toolBar->addAction(boutonGenerePdf);
 
-    boutonGenerePdfRecapHdv = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_GENERE_RECAP_HDV), 
+    boutonGenerePdfRecapHdv = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_GENERE_RECAP_HDV), 
         tr("Générer les PDF de récapitulatif &HdV de l'année sélectionnée"), 
         this);
     boutonGenerePdfRecapHdv->setStatusTip(tr("Générer les PDF de récapitulatif des HdV de l'année sélectionnée"));
@@ -870,8 +870,8 @@ void AeroDms::initialiserBarreDeFiltres()
     listeDeroulanteType = new QComboBox(this);
     listeDeroulanteType->addItems(db->recupererTypesDesVol());
     AeroDmsServices::ajouterIconesComboBox(*listeDeroulanteType);
-    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_COTISATION), tr("Cotisation"), "Cotisation");
-    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUS), tr("Tous les types de vol"), "*");
+    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), tr("Cotisation"), "Cotisation");
+    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS), tr("Tous les types de vol"), "*");
     listeDeroulanteType->setCurrentIndex(4);
 
     connect(listeDeroulanteType, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
@@ -883,15 +883,15 @@ void AeroDms::initialiserBarreDeFiltres()
     listeDeroulanteElementsSoumis->addItem(tr("Éléments soumis et non soumis au CSE"), 
         AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUS));
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS));
     listeDeroulanteElementsSoumis->addItem(tr("Éléments soumis au CSE"),
         AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_SOUMIS, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUI));
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUI));
     listeDeroulanteElementsSoumis->addItem(tr("Éléments non soumis au CSE"),
         AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_ELEMENTS_NON_SOUMIS, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_NON));
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_NON));
 
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteElementsSoumis, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
@@ -899,31 +899,31 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteElementsSoumis = selectionToolBar->addWidget(listeDeroulanteElementsSoumis);
 
     listeDeroulanteStatistique = new QComboBox(this);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_BARRES_EMPILEES),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_BARRES_EMPILEES),
         tr("Statistiques mensuelles"),
         AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Heures par pilote"),
         AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par pilote"),
         AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Heures par type de vol"),
         AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par type de vol"),
         AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Heures par activité"),
         AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par activité"),
         AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT),
         tr("Statuts des pilotes"),
         AeroDmsTypes::Statistiques_STATUTS_PILOTES);
-    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT),
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT),
         tr("Types d'aéronefs"),
         AeroDmsTypes::Statistiques_AERONEFS);
 
@@ -960,7 +960,7 @@ void AeroDms::initialiserMenuFichier()
     //========================Menu Fichier
     QMenu* menuFichier = menuBar()->addMenu(tr("&Fichier"));
 
-    QAction* boutonOuvrirDossierDemandes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUVRIR_DOSSIER), 
+    QAction* boutonOuvrirDossierDemandes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUVRIR_DOSSIER), 
         tr("&Ouvrir le dossier contenant les demandes de subventions"), 
         this);
     menuFichier->addAction(boutonOuvrirDossierDemandes);
@@ -979,14 +979,14 @@ void AeroDms::initialiserMenuFichier()
 
     peuplerMenuAutreDemande();
 
-    QAction* boutonImprimer = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_IMPRIMER),
+    QAction* boutonImprimer = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_IMPRIMER),
         tr("&Imprimer la dernière demande"), 
         this);
     boutonImprimer->setStatusTip(tr("Imprime la dernière demande de subvention en une seule fois (pas d'agrafage séparé)"));
     menuFichier->addAction(boutonImprimer);
     connect(boutonImprimer, SIGNAL(triggered()), this, SLOT(imprimerLaDerniereDemande()));
 
-    QAction* boutonImprimerAgrafage = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_IMPRIMER),
+    QAction* boutonImprimerAgrafage = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_IMPRIMER),
         tr("Imprimer la dernière demande (avec &agrafage)"), 
         this);
     boutonImprimerAgrafage->setStatusTip(tr("Permet d'imprimer chaque fichier séparément. Pour l'agrafage automatique par l'imprimante, pensez à\nsélectionner l'option adéquate dans les paramètres de l'imprimante."));
@@ -1042,14 +1042,14 @@ void AeroDms::initialiserMenuOptions()
     boutonDemandesAGenererToutes->setStatusTip(tr("Générer tout (recette et dépenses)"));
     boutonDemandesAGenererToutes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererToutes);
-    boutonDemandesAGenererRecettes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RECETTE), 
+    boutonDemandesAGenererRecettes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RECETTE), 
         tr("&Recettes uniquement"), 
         this);
     boutonDemandesAGenererRecettes->setStatusTip(tr("Générer uniquement les documents de remises de recettes"));
     boutonDemandesAGenererRecettes->setCheckable(true);
     menuDemandesAGenerer->addAction(boutonDemandesAGenererRecettes);
     boutonDemandesAGenererRecettes->setCheckable(true);
-    boutonDemandesAGenererDepenses = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_DEPENSE), 
+    boutonDemandesAGenererDepenses = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEPENSE), 
         tr("&Dépenses uniquement"), 
         this);
     boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
@@ -1062,66 +1062,66 @@ void AeroDms::initialiserMenuOptions()
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
     boutonOptionRecapAnnuelRecettes->setCheckable(true);
     boutonOptionRecapAnnuelRecettes->setStatusTip(tr("Permet d'ajouter le récapitulatif des recettes dans le récap des heures de vol"));
-    boutonOptionRecapAnnuelBaladesSorties = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL),
+    boutonOptionRecapAnnuelBaladesSorties = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL),
         tr("Récapitulatif des &balades et sorties"), 
         this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
     boutonOptionRecapAnnuelBaladesSorties->setStatusTip(tr("Permet d'ajouter le récapitulatif des balades et sorties (dates, durées, noms des passagers, couts et recettes...) dans le récap des heures de vol"));
     //Génération des graphiques
-    graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
+    graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
         tr("&Graphiques"));
     graphiquesDuRecapAnnuel->setStatusTip(tr("Sélectionne les graphiques à ajouter au récapitulatif annuel des heures de vol"));
 
-    boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_BARRES_EMPILEES), 
+    boutonGraphRecapAnnuelHeuresAnnuelles = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_BARRES_EMPILEES), 
         tr("&Heures annuelles"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresAnnuelles);
     boutonGraphRecapAnnuelHeuresAnnuelles->setCheckable(true);
 
-    boutonGraphRecapAnnuelHeuresParPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
+    boutonGraphRecapAnnuelHeuresParPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT), 
         tr("Heures par &pilote"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParPilote);
     boutonGraphRecapAnnuelHeuresParPilote->setCheckable(true);
 
-    boutonGraphRecapAnnuelEurosParPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    boutonGraphRecapAnnuelEurosParPilote = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par pilote"),
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParPilote);
     boutonGraphRecapAnnuelEurosParPilote->setCheckable(true);
 
-    boutonGraphRecapAnnuelHeuresParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
+    boutonGraphRecapAnnuelHeuresParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT), 
         tr("Heures par type de &vol"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParTypeDeVol);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setCheckable(true);
 
-    boutonGraphRecapAnnuelEurosParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    boutonGraphRecapAnnuelEurosParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par type de vol"),
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParTypeDeVol);
     boutonGraphRecapAnnuelEurosParTypeDeVol->setCheckable(true);
 
-    boutonGraphRecapAnnuelHeuresParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT), 
+    boutonGraphRecapAnnuelHeuresParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT), 
         tr("Heures par &activité"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelHeuresParActivite);
     boutonGraphRecapAnnuelHeuresParActivite->setCheckable(true);
 
-    boutonGraphRecapAnnuelEurosParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_CAMEMBERT),
+    boutonGraphRecapAnnuelEurosParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT),
         tr("Subventions par activité"),
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParActivite);
     boutonGraphRecapAnnuelEurosParActivite->setCheckable(true);
 
-    boutonGraphRecapAnnuelStatutsDesPilotes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT), 
+    boutonGraphRecapAnnuelStatutsDesPilotes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT), 
         tr("&Statuts des pilotes"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelStatutsDesPilotes);
     boutonGraphRecapAnnuelStatutsDesPilotes->setCheckable(true);
 
-    boutonGraphRecapAnnuelAeronefs = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS_DONUT), 
+    boutonGraphRecapAnnuelAeronefs = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT), 
         tr("Aérone&fs"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelAeronefs);
@@ -1139,7 +1139,7 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphRecapAnnuelAeronefs, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
         
     //Résolutions
-    resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_STATS), 
+    resolutionGraphiques = graphiquesDuRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
         tr("&Résolution des graphiques"));
 
     boutonGraphResolutionFullHd = new QAction(QIcon(":/AeroDms/ressources/standard-definition.svg"), 
@@ -1166,14 +1166,14 @@ void AeroDms::initialiserMenuOptions()
 
     resolutionGraphiques->addSeparator();
 
-    boutonGraphRatioIso216 = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RATIO),
+    boutonGraphRatioIso216 = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
         tr("Ratio ISO 216"),
         this);
     boutonGraphRatioIso216->setToolTip(tr("Ratio d'une page A4"));
     resolutionGraphiques->addAction(boutonGraphRatioIso216);
     boutonGraphRatioIso216->setCheckable(true);
 
-    boutonGraphRatio16x9 = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RATIO),
+    boutonGraphRatio16x9 = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
         tr("Ratio 16/9"),
         this);
     boutonGraphRatio16x9->setToolTip(tr("Ratio d'une écran"));
@@ -1187,7 +1187,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphRatioIso216->activate(QAction::Trigger);
 
     graphiquesDuRecapAnnuel->addSeparator();
-    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUT_COCHER),
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphs = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUT_COCHER),
         tr("&Sélectionner tous les graphs"), 
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphs);
@@ -1195,7 +1195,7 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphRecapAnnuelSelectionnerTousLesGraphs, SIGNAL(triggered()), this, SLOT(selectionnerTousLesGraphsPourRecapAnnuel()));
 
     menuOptionsRecapAnnuel->addSeparator();
-    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUT_COCHER),
+    boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUT_COCHER),
         tr("&Sélectionner tous les graphs et tous les récaps"), 
         this);
     menuOptionsRecapAnnuel->addAction(boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap);
@@ -1208,7 +1208,7 @@ void AeroDms::initialiserMenuOptions()
 
     menuOption->addSeparator();
 
-    boutonActivationScanAutoFactures = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE), 
+    boutonActivationScanAutoFactures = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_FACTURE), 
         tr("Désactiver le scan &automatique des factures"), 
         this);
     boutonActivationScanAutoFactures->setStatusTip(tr("Active/désactive le scan à l'ouverture des factures PDF. Cette option permet de désactiver le scan automatique si une facture fait planter le logiciel par exemple."));
@@ -1253,31 +1253,31 @@ void AeroDms::initialiserMenuOutils()
     QMenu* scanFacture = menuOutils->addMenu(tr("Scan automatique des &factures"));
     scanFacture->setToolTipsVisible(true);
     scanFacture->setStatusTip(tr("Scan une facture en se basant sur une des méthode utilisée par le logiciel pour un type de facture déjà connu."));
-    scanFacture->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE));
+    scanFacture->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_FACTURE));
     scanAutoOpenFlyer = new QAction(tr("&OpenFlyer (CAPAM, ACB)"), this);
-    scanAutoOpenFlyer->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoOpenFlyer->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoOpenFlyer);
     scanAutoAerogest = new QAction(tr("&Aerogest (ACBA)"), this);
-    scanAutoAerogest->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoAerogest->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAerogest);
     scanAutoAca = new QAction(tr("Aér&oclub d'Andernos"), this);
-    scanAutoAca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoAca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAca);
     scanAutoDaca = new QAction(tr("&DACA"), this);
-    scanAutoDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoDaca);
     scanAutoSepavia = new QAction(tr("&SEPAVIA"), this);
-    scanAutoSepavia->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoSepavia->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoSepavia);
     scanAutoUaca = new QAction(tr("&UACA"), this);
-    scanAutoUaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_VOL));
+    scanAutoUaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoUaca);
     scanFacture->addSeparator();
     scanAutoGenerique1Passe = new QAction(tr("&Générique (une passe)"), this);
-    scanAutoGenerique1Passe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
+    scanAutoGenerique1Passe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
     scanFacture->addAction(scanAutoGenerique1Passe);
     scanAutoGenerique = new QAction(tr("Générique (&multi-passe)"), this);
-    scanAutoGenerique->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
+    scanAutoGenerique->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
     scanFacture->addAction(scanAutoGenerique);
     scanFacture->addSeparator();
     scanAutoCsv = new QAction(tr("&Importer les vols depuis un fichier CSV"), this);
@@ -1297,8 +1297,8 @@ void AeroDms::initialiserMenuOutils()
     connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
 
     facturesDaca = menuOutils->addMenu(texteTitreQMenuFacturesDaca);
-    facturesDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_CLOUD));
-    boutonChargerFacturesDaca = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_CLOUD), 
+    facturesDaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TELECHARGER_CLOUD));
+    boutonChargerFacturesDaca = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TELECHARGER_CLOUD), 
         tr("Charger la liste des factures"), 
         this);
     facturesDaca->setToolTipsVisible(true);
@@ -1311,35 +1311,35 @@ void AeroDms::initialiserMenuOutils()
     menuOutils->addSeparator();
 
     QMenu* mailing = menuOutils->addMenu(tr("&Mailing"));
-    mailing->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING));
-    mailingPilotesAyantCotiseCetteAnnee = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING), tr("Envoyer un mail aux pilotes ayant &cotisé cette année"), this);
+    mailing->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING));
+    mailingPilotesAyantCotiseCetteAnnee = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING), tr("Envoyer un mail aux pilotes ayant &cotisé cette année"), this);
     mailing->addAction(mailingPilotesAyantCotiseCetteAnnee);
-    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+    mailingPilotesActifsAyantCotiseCetteAnnee = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un &mail aux pilotes ayant cotisé cette année (pilotes actifs seulement)"), 
         this);
     mailing->addAction(mailingPilotesActifsAyantCotiseCetteAnnee);
-    mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING), 
+    mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING), 
         tr("Envoyer un mail aux pilotes n'ayant pas épuisé leur subvention &entrainement"), 
         this);
     mailing->addAction(mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement);
-    mailingPilotesActifs = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+    mailingPilotesActifs = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes &actifs"), 
         this);
     mailing->addAction(mailingPilotesActifs);
-    mailingPilotesActifsBrevetes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+    mailingPilotesActifsBrevetes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes actifs &brevetés"), 
         this);
     mailing->addAction(mailingPilotesActifsBrevetes);
-    mailingPilotesDerniereDemandeSubvention = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+    mailingPilotesDerniereDemandeSubvention = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), 
         this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
-    QMenu* menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+    QMenu* menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par une demande de &subvention"));
     QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
     for (int i = 0; i < datesDemandes.size(); i++)
     {
-        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING),
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
             tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), 
             this);
         action->setData(datesDemandes.at(i).toString("yyyy-MM-dd"));
@@ -1391,7 +1391,7 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
-    boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_DEBUG), 
+    boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG), 
         tr("Activer le mode &débogage"), 
         this);
     boutonModeDebug->setStatusTip(tr("Active/désactive le mode débogage. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
@@ -1399,7 +1399,7 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addAction(boutonModeDebug);
     connect(boutonModeDebug, SIGNAL(triggered()), this, SLOT(switchModeDebug()));
 
-    QAction *afficherInfosSsl = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_CHIFFREMENT),
+    QAction *afficherInfosSsl = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CHIFFREMENT),
         tr("Afficher les informations de support SSL/TLS"),
         this);
     afficherInfosSsl->setStatusTip(tr("Afficher les informations sur le support SSL/TLS par cette application. Informations utiles pour déboguer les soucis de connexion aux sites des aéroclubs."));
@@ -1418,7 +1418,7 @@ void AeroDms::initialiserMenuAide()
         });
 
 
-    QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE),
+    QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE),
         tr("Afficher les informations sur les ressources internes"),
         this);
     afficherInfosRessourcesInternes->setStatusTip(tr("Affiche l'espace occupé par les ressources internes de l'application (icones, images...)"));
@@ -1447,7 +1447,7 @@ void AeroDms::initialiserMenuAide()
     helpMenu->addAction(aboutQtAction);
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
-    QAction* aboutAction = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_ICONE_APPLICATION), 
+    QAction* aboutAction = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ICONE_APPLICATION), 
         tr("À propos de &AeroDMS"), 
         this);
     aboutAction->setStatusTip(tr("Voir la fenêtre à propos de cette application"));
@@ -1966,13 +1966,13 @@ void AeroDms::peuplerTableFactures()
             if (facture.soumisCe)
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Oui");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUI));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUI));
                 vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_SOUMIS_CE, twSoumisCe);
             }
             else
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Non");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_NON));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_NON));
                 vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_SOUMIS_CE, twSoumisCe);
             }
             vueFactures->setItem(i, AeroDmsTypes::FactureTableElement_FACTURE_ID, new QTableWidgetItem(QString::number(facture.id)));
@@ -2044,13 +2044,13 @@ void AeroDms::peuplerTableRecettes()
             if (recette.estSoumisCe)
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Oui");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUI));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUI));
                 vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }
             else
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Non");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_NON));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_NON));
                 vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }   
         }      
@@ -2077,13 +2077,13 @@ void AeroDms::peuplerTableRecettes()
             if (recette.estSoumisCe)
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Oui");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUI));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUI));
                 vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }
             else
             {
                 QTableWidgetItem* twSoumisCe = new QTableWidgetItem("Non");
-                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_NON));
+                twSoumisCe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_NON));
                 vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_SOUMIS_CE, twSoumisCe);
             }
         }   
@@ -2865,7 +2865,7 @@ void AeroDms::peuplerListesPilotes()
     choixPilote->clear();
     choixPayeur->clear();
 
-    listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TOUS), "Tous les pilotes", "*");
+    listeDeroulantePilote->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS), "Tous les pilotes", "*");
     choixPilote->addItem("", "aucun");
     choixPayeur->addItem("", "aucun");
     for (int i = 0; i < pilotes.size(); i++)
@@ -3177,13 +3177,13 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         anneeAEditer = vuePilotes->item( ligneSelectionnee,
                                          AeroDmsTypes::PiloteTableElement_ANNEE)->text().toInt();
 
-        QAction editer(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_PILOTE),
+        QAction editer(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_PILOTE),
             tr("Éditer le pilote"), 
             this);
         connect(&editer, SIGNAL(triggered()), this, SLOT(editerPilote()));
         menuClicDroitPilote.addAction(&editer);
 
-        QAction editerCotisation(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_COTISATION), tr("Modifier la cotisation"), this);
+        QAction editerCotisation(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), tr("Modifier la cotisation"), this);
         connect(&editerCotisation, SIGNAL(triggered()), this, SLOT(editerCotisation()));
         menuClicDroitPilote.addAction(&editerCotisation);
 
@@ -3407,7 +3407,7 @@ void AeroDms::switchModeDebug()
     else
     {
         boutonModeDebug->setText("Activer le mode &debug");
-        boutonModeDebug->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_DEBUG));
+        boutonModeDebug->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG));
         masquageEstDemande = true;
     }
 
@@ -3883,7 +3883,7 @@ void AeroDms::peuplerMenuAutreDemande()
             const QStringList listeFichiers = dirCourant.entryList(QStringList("*.pdf"));
             if (listeFichiers.size() > 0)
             {
-                QAction* actionDossier = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_OUVRIR_DOSSIER), 
+                QAction* actionDossier = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_OUVRIR_DOSSIER), 
                     tr("Ouvrir le dossier"), 
                     this);
                 actionDossier->setData(dossier);
@@ -3895,7 +3895,7 @@ void AeroDms::peuplerMenuAutreDemande()
                 int idFichier = 0;
                 while (idFichier < listeFichiers.size())
                 {
-                    QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER), 
+                    QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER), 
                         listeFichiers.at(idFichier), 
                         this);
                     action->setData(dossier+listeFichiers.at(idFichier));
@@ -4221,7 +4221,7 @@ void AeroDms::gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecupe
                     {
                         QString date = QLocale::system().toString(mois, "MMMM yyyy");
                         date[0] = date[0].toUpper();
-                        QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_DOSSIER),
+                        QMenu* menu = facturesDaca->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TELECHARGER_DOSSIER),
                             date);
 
                         ajouterPilotesDansMenuFacturesDaca(menu, 
@@ -4326,7 +4326,7 @@ void AeroDms::ajouterPilotesDansMenuFacturesDaca(QMenu *p_menu,
 {
     for (AeroDmsTypes::CleStringValeur pilote : p_listePilote)
     {
-        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_TELECHARGER_FICHIER),
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TELECHARGER_FICHIER),
             pilote.texte,
             p_menu);
         AeroDmsTypes::IdentifiantFacture identifiant;
@@ -4349,7 +4349,7 @@ void AeroDms::demanderTelechargementPremiereFactureDaca()
 
     actionFactureDacaEnCours = facturesDaca->actions().at(1)->menu()->actions().at(0);
     actionFactureDacaEnCours->setChecked(true);
-    actionFactureDacaEnCours->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
+    actionFactureDacaEnCours->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER_TELECHARGE));
     AeroDmsTypes::IdentifiantFacture identifiant = actionFactureDacaEnCours->data().value<AeroDmsTypes::IdentifiantFacture>();
 
     pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
@@ -4362,7 +4362,7 @@ void AeroDms::demanderTelechargementFactureDaca()
 
     QAction* action = static_cast<QAction*>(sender());
     action->setChecked(true);
-    action->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
+    action->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER_TELECHARGE));
 
     if (action->data().canConvert<AeroDmsTypes::IdentifiantFacture>()) 
     {
@@ -4433,7 +4433,7 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
         actionFactureDacaEnCours = actions.at(actionACharger);
         AeroDmsTypes::IdentifiantFacture identifiant = actions.at(actionACharger)->data().value<AeroDmsTypes::IdentifiantFacture>();
         actions.at(actionACharger)->setChecked(true);
-        actions.at(actionACharger)->setIcon(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FICHIER_TELECHARGE));
+        actions.at(actionACharger)->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FICHIER_TELECHARGE));
 
         pdfdl->telechargerFactureDaca(parametresSysteme.loginSiteDaca, parametresSysteme.motDePasseSiteDaca, identifiant);
     }

@@ -45,7 +45,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QWidget* mailingWidget = new QWidget(this);
     mailingWidget->setLayout(mailingLayout);
     onglets->addTab(mailingWidget, 
-        AeroDmsServices::recupererIcone(AeroDmsServices::Icone_MAILING), 
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING), 
         tr("Mailing"));
 
     int ligneActuelle = mailingLayout->rowCount();
@@ -92,7 +92,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QGridLayout* financeLayout = new QGridLayout();
     QWidget* financeWidget = new QWidget(this);
     financeWidget->setLayout(financeLayout);
-    onglets->addTab(financeWidget, AeroDmsServices::recupererIcone(AeroDmsServices::Icone_FINANCIER), "Financiers");
+    onglets->addTab(financeWidget, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER), "Financiers");
 
     ligneActuelle = financeLayout->rowCount();
     montantCotisationPilote = new QDoubleSpinBox(this);
@@ -308,8 +308,8 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     utiliserRessourcesHtmlInternes->setToolTip(tr("Ce paramètre permet de changer la source des templates HTML utilisés. Le mode ressources externes permet de modifier les templates HTML à des fins de mise au point ou s'il est nécessaire d'utiliser un nouveau template compatible avec l'ancien et que l'on ne souhaite pas recompiler le logiciel. En cas d'utilisation en mode ressource externe, les fichiers HTML sont attendus dans : ") + QFileInfo(cheminBdd->text()).absolutePath() + "/ressources/HTML/.");
     systemeLayout->addWidget(new QLabel(tr("Ressources HTML : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(utiliserRessourcesHtmlInternes, ligneActuelle, K_COLONNE_CHAMP);
-    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE_EXTERNE), tr("Ressources HTML externes"), false);
-    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsServices::Icone_RESSOURCE), tr("Ressources HTML internes"), true);
+    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE_EXTERNE), tr("Ressources HTML externes"), false);
+    utiliserRessourcesHtmlInternes->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE), tr("Ressources HTML internes"), true);
 
     utiliserRessourcesHtmlInternes->setCurrentIndex(p_parametresSysteme.utiliserRessourcesHtmlInternes);
 
