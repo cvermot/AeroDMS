@@ -15,6 +15,6 @@
 #endif
 #endif
 
-#define VER_PRODUCTVERSION          "1.2"
+#define VER_PRODUCTVERSION          "1.3"
 #define VER_PRODUCTVERSION_STR      VER_PRODUCTVERSION "\0"
 #define VER_PRODUCTNAME_STR         "AeroDMSLauncher"

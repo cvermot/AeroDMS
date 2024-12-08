@@ -598,12 +598,14 @@ void AeroDms::verifierPresenceDeMiseAjour()
 {
     const QString dossierAVerifier = parametresSysteme.cheminStockageBdd + "/update/";
     //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
-    //  -AeroDms.exe : mise à jour de l'application et eventuellement de ses librairies
+    //  -AeroDms.exe : mise à jour de l'application
+    //  -AeroDmsLauncher.exe : mise à jour du lanceur de l'application
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
     // de sécurité/maintenance de Qt avec compatibilité des interfaces)
     //  -podofo.dll : mise à jour de la librairie PDF et des librairies associées
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
-         || uneMaJEstDisponible(dossierAVerifier,"Qt6Core.dll")
+         || uneMaJEstDisponible(dossierAVerifier, "AeroDmsLauncher.exe")
+         || uneMaJEstDisponible(dossierAVerifier, "Qt6Core.dll")
          || uneMaJEstDisponible(dossierAVerifier, "podofo.dll"))
     {
         fermerSplashscreen();

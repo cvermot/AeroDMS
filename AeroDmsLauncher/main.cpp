@@ -21,12 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QDir>
 #include <QMessageBox>
 #include <QFile>
-#include <QDebug>
+#include <QSplashScreen>
+#include <QThread>
 
 int main(int argc, char* argv[])
 {
-    // Crée un QCoreApplication pour votre logique et un QApplication pour l'interface graphique
     QApplication app(argc, argv);
+
+    QSplashScreen* splash = new QSplashScreen(QPixmap(":AeroDmsLauncher/ressources/splash.webp"), Qt::WindowStaysOnTopHint);
+    splash->show();
+    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 
     // Chemin vers le répertoire contenant "legacy.dll"
     const QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable
@@ -43,7 +47,9 @@ int main(int argc, char* argv[])
     const QStringList arguments; // Exemple : arguments << "--debug" << "--config=config.ini";
 
     // Vérifie si la DLL critique existe avant de le lancer
-    if (!QFile::exists(legacyDll)) {
+    if (!QFile::exists(legacyDll)) 
+    {
+        splash->close();
         QMessageBox::critical(nullptr, 
             QApplication::applicationName() + " - Erreur", 
             "La DLL legacy.dll est introuvable dans : "
@@ -54,7 +60,9 @@ int main(int argc, char* argv[])
     }
 
     // Vérifie si le fichier existe avant de le lancer
-    if (!QFile::exists(program)) {
+    if (!QFile::exists(program)) 
+    {
+        splash->close();
         QMessageBox::critical(nullptr, 
             QApplication::applicationName() + " - Erreur",
             "L'exécutable principal AeroDms.exe est introuvable dans : " 
@@ -67,11 +75,16 @@ int main(int argc, char* argv[])
     process.setProgram(program);
     process.setArguments(arguments);
 
-    // Lancer l'application principale et attendre sa fin
-    if (!process.startDetached()) {
+    // Lancer l'application principale
+    if (!process.startDetached()) 
+    {
+        splash->close();
         QMessageBox::critical(nullptr, "Erreur", "Erreur lors du lancement de l'application principale : " + process.errorString());
         return -1;
     }
+
+    //On donne un peu de temps au processus AeroDms d'afficher son propre bootscreen
+    QThread::sleep(2);
 
     return 0; // Le launcher se termine ici
 }

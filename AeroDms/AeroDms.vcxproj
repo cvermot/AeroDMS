@@ -79,7 +79,8 @@
       <Compression>default</Compression>
     </QtRcc>
     <QtRcc>
-      <NoCompression>false</NoCompression>
+      <NoCompression>
+      </NoCompression>
     </QtRcc>
     <QtRcc>
       <CompressThreshold>1</CompressThreshold>

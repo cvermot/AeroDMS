@@ -63,6 +63,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <QtRcc>
+      <NoCompression>
+      </NoCompression>
+    </QtRcc>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -101,9 +107,9 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AeroDmsLauncher.rc" />
+    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon1.ico" />
     <Image Include="ressources\shield-airplane.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
