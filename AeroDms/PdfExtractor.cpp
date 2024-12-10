@@ -89,6 +89,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
                 aeroclub = AeroDmsTypes::Aeroclub_UACA;
                 //qDebug() << "Aéroclub trouvé : UACA";
             }
+            else if (QString(entries.at(index).Text.data()).contains("ATVV"))
+            {
+                aeroclub = AeroDmsTypes::Aeroclub_ATVV;
+                qDebug() << "Aéroclub trouvé : ATVV";
+            }
             index++;
         }
 
@@ -131,6 +136,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             case AeroDmsTypes::Aeroclub_UACA:
             {
                 liste.append(extraireDonneesUaca(entries, noPage));
+            }
+            break;
+            case AeroDmsTypes::Aeroclub_ATVV:
+            {
+                liste.append(extraireDonneesAtvv(entries, noPage));
             }
             break;
             case AeroDmsTypes::Aeroclub_GENERIQUE:
@@ -466,6 +476,133 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesUaca(std::vector<
     return liste;
 }
 
+AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesAtvv(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage)
+{
+    AeroDmsTypes::ListeDonneesFacture liste;
+
+    QRegularExpression immatReGlobal("(?<immat>(F-[A-Z]{4}|D-\\d{4}))");
+    QRegularExpression dureeRe("\\((?<heure>\\d{1,2}):(?<minute>\\d{2})\\)");
+    QRegularExpression montantRe("\\b(?<montant>(\\d+[.,]\\d{2}))\\b"); // Détecte les nombres au format XX,XX ou XX.XX
+
+    QList<AeroDmsTypes::DonneesFacture> vols;
+    QList<AeroDmsTypes::DonneesFacture> lancements;
+
+    bool recherchePrixLancement = false;
+    bool recherchePrixVol = false;
+
+    for (const auto& entry : p_entries)
+    {
+        QString data = QString(entry.Text.data()).replace("\xc2\xa0", " ");
+
+        if (data.contains("Cellule") && data.contains(immatReGlobal))
+        {
+            AeroDmsTypes::DonneesFacture vol;
+            vol.pageDansLeFichierPdf = p_noPage;
+
+            // Extraction des données de vol
+            QRegularExpressionMatch match = immatReGlobal.match(data);
+            vol.immat = match.captured("immat");
+
+            vol.dateDuVol = extraireDateRegex(data);
+
+            // Extraction de la durée de vol
+            QRegularExpressionMatch dureeMatch = dureeRe.match(data);
+            if (dureeMatch.hasMatch())
+            {
+                vol.dureeDuVol = QTime(dureeMatch.captured("heure").toInt(), dureeMatch.captured("minute").toInt());  
+            }
+
+            recherchePrixLancement = false;
+            recherchePrixVol = false;
+
+            //Parfois, on a le montant en bout de ligne... on vérifie si c'est le cas...
+            QRegularExpressionMatch montantMatch = montantRe.match(data);
+            if (montantMatch.hasMatch())
+            {
+                vol.coutDuVol = montantMatch.captured("montant").replace(",", ".").toFloat();;
+            }
+            else
+            {
+                recherchePrixVol = true;
+            }
+            
+            vols.push_back(vol);
+        }
+        else if (data.contains("Treuillage") 
+            || data.contains("Remorqué") 
+            || data.contains("Tour de piste"))
+        {
+            // Extraction des données de lancement
+            AeroDmsTypes::DonneesFacture lancement;
+
+            QRegularExpressionMatch match = immatReGlobal.match(data);
+            lancement.immat = match.captured("immat");
+
+            lancement.dateDuVol = extraireDateRegex(data);
+
+            recherchePrixLancement = false;
+            recherchePrixVol = false;
+
+            //Parfois, on a le montant en bout de ligne... on vérifie si c'est le cas...
+            QRegularExpressionMatch montantMatch = montantRe.match(data);
+            if (montantMatch.hasMatch())
+            {
+                lancement.coutDuVol = montantMatch.captured("montant").replace(",", ".").toFloat();;
+            }
+            else
+            {
+                recherchePrixLancement = true;
+            }
+
+            lancements.push_back(lancement);
+        }
+        else
+        {
+            // Extraction du coût
+            QStringList parts = data.split(" ");
+            for (QString& part : parts)
+            {
+                QRegularExpressionMatch montantMatch = montantRe.match(data);
+                if (montantMatch.hasMatch())
+                {
+                    if (recherchePrixVol)
+                    {
+                        vols.last().coutDuVol = part.replace(",", ".").toFloat();
+                    }
+                    else if (recherchePrixLancement)
+                    {
+                        lancements.last().coutDuVol = part.replace(",", ".").toFloat();
+                    }
+
+                    recherchePrixVol = false;
+                    recherchePrixLancement = false;
+                }
+            }
+        }
+    }
+
+    // Association des lancements aux vols
+    size_t indexLancement = 0;
+    for (auto& vol : vols)
+    {
+        while (indexLancement < lancements.size())
+        {
+            const auto& lancement = lancements[indexLancement];
+            if (lancement.dateDuVol == vol.dateDuVol)
+            {
+                vol.coutDuVol += lancement.coutDuVol;
+                lancements.remove(indexLancement);
+                break;
+            }
+            indexLancement++;
+        }
+        liste.push_back(vol);
+    }
+
+    return liste;
+}
+
+
 AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::vector<PoDoFo::PdfTextEntry> p_entries, 
                                                                           const unsigned p_noPage)
 {
@@ -642,7 +779,7 @@ const float PdfExtractor::recupererMontantAca(QString p_chaine)
     //On ne sais pas trop pourquoi mais parfois (pas toujours...) les montant sont
     // encodés en partie avec des \uXXXX
     // => "Total TTC 10\u0017,\u0013\u0013€" pour 104,00€ par exemple
-
+        
     //Donc on fait un peu de ménage et on retourne le float...
     return p_chaine.replace("Total TTC", "")
         .replace(" ", "")

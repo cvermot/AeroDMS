@@ -257,6 +257,7 @@ private:
     QAction* scanAutoDaca;
     QAction* scanAutoSepavia;
     QAction* scanAutoUaca;
+    QAction* scanAutoAtvv;
     QAction* scanAutoGenerique1Passe;
     QAction* scanAutoGenerique;
     QAction* scanAutoCsv;

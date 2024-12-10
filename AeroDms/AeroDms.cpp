@@ -1262,7 +1262,7 @@ void AeroDms::initialiserMenuOutils()
     scanAutoAerogest = new QAction(tr("&Aerogest (ACBA)"), this);
     scanAutoAerogest->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAerogest);
-    scanAutoAca = new QAction(tr("Aér&oclub d'Andernos"), this);
+    scanAutoAca = new QAction(tr("Aéroclub d'A&ndernos"), this);
     scanAutoAca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoAca);
     scanAutoDaca = new QAction(tr("&DACA"), this);
@@ -1274,6 +1274,9 @@ void AeroDms::initialiserMenuOutils()
     scanAutoUaca = new QAction(tr("&UACA"), this);
     scanAutoUaca->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
     scanFacture->addAction(scanAutoUaca);
+    scanAutoAtvv = new QAction(tr("AT&VV"), this);
+    scanAutoAtvv->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL));
+    scanFacture->addAction(scanAutoAtvv);
     scanFacture->addSeparator();
     scanAutoGenerique1Passe = new QAction(tr("&Générique (une passe)"), this);
     scanAutoGenerique1Passe->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_FACTURE_GENERIQUE));
@@ -1294,6 +1297,7 @@ void AeroDms::initialiserMenuOutils()
     connect(scanAutoDaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoSepavia, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoUaca, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
+    connect(scanAutoAtvv, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique1Passe, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoGenerique, SIGNAL(triggered()), this, SLOT(scannerUneFactureSelonMethodeChoisie()));
     connect(scanAutoCsv, SIGNAL(triggered()), this, SLOT(recupererVolDepuisCsv()));
@@ -2300,6 +2304,10 @@ void AeroDms::scannerUneFactureSelonMethodeChoisie()
     else if (sender() == scanAutoUaca)
     {
         aeroclub = AeroDmsTypes::Aeroclub_UACA;
+    }
+    else if (sender() == scanAutoAtvv)
+    {
+        aeroclub = AeroDmsTypes::Aeroclub_ATVV;
     }
     else if (sender() == scanAutoGenerique)
     {

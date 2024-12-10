@@ -40,6 +40,7 @@ private:
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesDaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesSepavia(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesUaca(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
+	static AeroDmsTypes::ListeDonneesFacture extraireDonneesAtvv(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique1Passe(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	
