@@ -221,6 +221,11 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/airplane-plus.svg");
         }
         break;
+        case AeroDmsTypes::Icone_AJOUTER_AEROCLUB:
+        {
+            return QIcon(":/AeroDms/ressources/account-multiple-plus.svg");
+        }
+        break;
         case AeroDmsTypes::Icone_MAILING:
         {
             return QIcon(":/AeroDms/ressources/email-multiple.svg");

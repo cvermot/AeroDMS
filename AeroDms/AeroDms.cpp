@@ -697,6 +697,7 @@ void AeroDms::passerLeLogicielEnLectureSeule()
     boutonAjouterCotisation->setEnabled(false);
     boutonAjouterPilote->setEnabled(false);
     boutonAjouterSortie->setEnabled(false);
+    boutonAjouterUnAeroclub->setEnabled(false);
     boutonGenerePdf->setEnabled(false);
     facturesDaca->setEnabled(false);
 
@@ -796,6 +797,14 @@ void AeroDms::initialiserBarreDOutils()
     connect(boutonAjouterPilote, &QAction::triggered, this, &AeroDms::ajouterUnPilote);
     toolBar->addAction(boutonAjouterPilote);
 
+    boutonAjouterUnAeroclub = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AJOUTER_AEROCLUB),
+        tr("Ajouter un &aéroclub"),
+        this);
+    boutonAjouterUnAeroclub->setStatusTip(tr("Ajouter un aéroclub"));
+    boutonAjouterUnAeroclub->setShortcut(Qt::Key_F6);
+    connect(boutonAjouterUnAeroclub, &QAction::triggered, this, &AeroDms::ajouterUnAeroclub);
+    toolBar->addAction(boutonAjouterUnAeroclub);
+
     boutonAjouterCotisation = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), 
         tr("Ajouter une &cotisation pour un pilote"), 
         this);
@@ -816,7 +825,7 @@ void AeroDms::initialiserBarreDOutils()
         tr("Télécharger la facture précédente sur le site du DACA"),
         this);
     fichierPrecedent->setStatusTip(tr("Charger la facture précédente sur le site du DACA"));
-    fichierPrecedent->setShortcut(Qt::Key_F5);
+    //fichierPrecedent->setShortcut(Qt::Key_F5);
     connect(fichierPrecedent, &QAction::triggered, this, &AeroDms::demanderTelechagementFactureSuivanteOuPrecedente);
     toolBar->addAction(fichierPrecedent);
 
@@ -824,7 +833,7 @@ void AeroDms::initialiserBarreDOutils()
         tr("Télécharger la facture suivante sur le site du DACA"),
         this);
     fichierSuivant->setStatusTip(tr("Charger la facture suivante sur le site du DACA"));
-    fichierSuivant->setShortcut(Qt::Key_F5);
+    //fichierSuivant->setShortcut(Qt::Key_F5);
     connect(fichierSuivant, &QAction::triggered, this, &AeroDms::demanderTelechagementFactureSuivanteOuPrecedente);
     toolBar->addAction(fichierSuivant);
 
@@ -938,6 +947,9 @@ void AeroDms::initialiserBoitesDeDialogues()
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
+
+    dialogueGestionAeroclub = new DialogueGestionAeroclub(db, this);
+    connect(dialogueGestionAeroclub, SIGNAL(accepted()), this, SLOT(ajouterUnAeroclubEnBdd()));
 
     dialogueAjouterCotisation = new DialogueAjouterCotisation(db,
         parametresMetiers.montantCotisationPilote,
@@ -1246,6 +1258,7 @@ void AeroDms::initialiserMenuOutils()
     menuOutils->addAction(boutonAjouterPilote);
     menuOutils->addAction(boutonAjouterCotisation);
     menuOutils->addAction(boutonAjouterSortie);
+    menuOutils->addAction(boutonAjouterUnAeroclub);
     menuOutils->addSeparator();
     menuOutils->addAction(boutonGenerePdf);
     menuOutils->addAction(boutonGenerePdfRecapHdv);
@@ -1370,6 +1383,11 @@ void AeroDms::initialiserMenuOutils()
     boutonEditerLePiloteSelectionne->setEnabled(false);
     menuOutils->addAction(boutonEditerLePiloteSelectionne);
     connect(boutonEditerLePiloteSelectionne, SIGNAL(triggered()), this, SLOT(editerPilote()));
+
+    boutonEditerUnAeroclub = new QAction(QIcon(":/AeroDms/ressources/account-multiple.svg"), tr("Éditer un aéroclub"), this);
+    boutonEditerUnAeroclub->setStatusTip(tr("Permet d'éditer un des aéroclub connus du logiciel"));
+    menuOutils->addAction(boutonEditerUnAeroclub);
+    connect(boutonEditerUnAeroclub, SIGNAL(triggered()), this, SLOT(editerAeroclub()));
 
     menuOutils->addSeparator();
 
@@ -2158,7 +2176,7 @@ void AeroDms::chargerBaladesSorties()
 void AeroDms::ajouterUnPiloteEnBdd()
 {
     const AeroDmsTypes::Pilote pilote = dialogueGestionPilote->recupererInfosPilote();
-    const AeroDmsTypes::ResultatCreationPilote resultat = db->creerPilote(pilote);
+    const AeroDmsTypes::ResultatCreationBdd resultat = db->creerPilote(pilote);
 
     //On met à jour les listes de pilotes
     peuplerListesPilotes();
@@ -2181,7 +2199,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
 
     switch (resultat)
     {
-        case AeroDmsTypes::ResultatCreationPilote_SUCCES:
+        case AeroDmsTypes::ResultatCreationBdd_SUCCES:
         {
             if (pilote.idPilote == "")
             {
@@ -2193,7 +2211,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
             } 
             break;
         } 
-        case AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE:
+        case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
         {
             statusBar()->showMessage(tr("Échec ajout pilote : le pilote existe déjà"));
             QMessageBox::critical(this, 
@@ -2201,7 +2219,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
                 tr("Un pilote existe avec ce nom\nexiste déjà. Ajout impossible."));
             break;
         }
-        case AeroDmsTypes::ResultatCreationPilote_AUTRE:
+        case AeroDmsTypes::ResultatCreationBdd_AUTRE:
         {
             statusBar()->showMessage(tr("Échec ajout pilote : erreur indéterminée"));
             QMessageBox::critical(this, 
@@ -2209,6 +2227,42 @@ void AeroDms::ajouterUnPiloteEnBdd()
                 tr("Une erreur indéterminée s'est\nproduite. Ajout du pilote impossible."));
             break;
         }
+    }
+}
+
+void AeroDms::ajouterUnAeroclubEnBdd()
+{
+    const AeroDmsTypes::Club club = dialogueGestionAeroclub->recupererInfosClub();
+    const AeroDmsTypes::ResultatCreationBdd resultat = db->creerAeroclub(club);
+
+    //On met à jour la liste des clubs
+    dialogueGestionPilote->peuplerListeAeroclub();
+    dialogueGestionAeroclub->peuplerListeAeroclub();
+
+    switch (resultat)
+    {
+    case AeroDmsTypes::ResultatCreationBdd_SUCCES:
+    {
+        if (club.idAeroclub == -1)
+        {
+            statusBar()->showMessage(tr("Aéroclub ajouté avec succès"));
+        }
+        else
+        {
+            statusBar()->showMessage(tr("Aéroclub modifié avec succès"));
+        }
+        break;
+    }
+    case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
+    case AeroDmsTypes::ResultatCreationBdd_AUTRE:
+    default:
+    {
+        statusBar()->showMessage(tr("Échec ajout aéroclub : erreur indéterminée"));
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Échec ajoute aéroclub"),
+            tr("Une erreur indéterminée s'est\nproduite. Ajout de l'aéroclub impossible."));
+        break;
+    }
     }
 }
 
@@ -3114,6 +3168,11 @@ void AeroDms::ajouterUnPilote()
     dialogueGestionPilote->exec();
 }
 
+void AeroDms::ajouterUnAeroclub()
+{
+    dialogueGestionAeroclub->ouvrirFenetre(false);
+}
+
 void AeroDms::ajouterUneSortie()
 {
     dialogueAjouterSortie->exec();
@@ -3211,6 +3270,11 @@ void AeroDms::editerPilote()
 {
     dialogueGestionPilote->preparerMiseAJourPilote(piloteAEditer);
     dialogueGestionPilote->exec();
+}
+
+void AeroDms::editerAeroclub()
+{
+    dialogueGestionAeroclub->ouvrirFenetre(true);
 }
 
 void AeroDms::editerCotisation()

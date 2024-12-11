@@ -58,21 +58,67 @@ QString ManageDb::getLastError()
     return db.lastError().text();
 }
 
-AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
+AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
 {
-    AeroDmsTypes::ListePilotes listeDesPilotes;
+    AeroDmsTypes::ListeAeroclubs listeDesClubs;
 
-    const QString sql = "SELECT * FROM pilote ORDER BY piloteId";
+    const QString sql = "SELECT * FROM aeroclub ORDER BY aeroclub";
 
     QSqlQuery query;
     query.exec(sql);
 
-    while (query.next()) {
+    while (query.next()) 
+    {
+        AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
+        aeroclub.idAeroclub = query.value("aeroclubId").toInt();
+        aeroclub.aeroclub = query.value("aeroclub").toString();
+        aeroclub.raisonSociale = query.value("raisonSociale").toString();
+        aeroclub.iban = query.value("iban").toString();
+        aeroclub.bic = query.value("bic").toString();
+        listeDesClubs.append(aeroclub);
+    }
+
+    return listeDesClubs;
+}
+
+AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
+{
+    AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM aeroclub WHERE aeroclubId = :aeroclubId");
+    query.bindValue(":aeroclubId", p_aeroclubId);
+    query.exec();
+
+    while (query.next()) 
+    {
+        aeroclub.idAeroclub = query.value("aeroclubId").toInt();
+        aeroclub.aeroclub = query.value("aeroclub").toString();
+        aeroclub.raisonSociale = query.value("raisonSociale").toString();
+        aeroclub.iban = query.value("iban").toString();
+        aeroclub.bic = query.value("bic").toString();
+    }
+
+    return aeroclub;
+}
+
+AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
+{
+    AeroDmsTypes::ListePilotes listeDesPilotes;
+
+    const QString sql = "SELECT * FROM infosPilotes ORDER BY piloteId";
+
+    QSqlQuery query;
+    query.exec(sql);
+
+    while (query.next()) 
+    {
         AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
         pilote.idPilote = query.value("piloteId").toString();
         pilote.nom = query.value("nom").toString();
         pilote.prenom = query.value("prenom").toString();
         pilote.aeroclub = query.value("aeroclub").toString();
+        pilote.idAeroclub = query.value("aeroclubId").toInt();
         pilote.estAyantDroit = query.value("estAyantDroit").toBool();
         pilote.mail = query.value("mail").toString();
         pilote.telephone = query.value("telephone").toString();
@@ -90,15 +136,17 @@ AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
     AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM pilote WHERE piloteId = :piloteId");
+    query.prepare("SELECT * FROM infosPilotes WHERE piloteId = :piloteId");
     query.bindValue(":piloteId", p_idPilote); 
     query.exec();
 
-    while (query.next()) {
+    while (query.next()) 
+    {
         pilote.idPilote = query.value("piloteId").toString();
         pilote.nom = query.value("nom").toString();
         pilote.prenom = query.value("prenom").toString();
         pilote.aeroclub = query.value("aeroclub").toString();
+        pilote.idAeroclub = query.value("aeroclubId").toInt();
         pilote.estAyantDroit = query.value("estAyantDroit").toBool();
         pilote.mail = query.value("mail").toString();
         pilote.telephone = query.value("telephone").toString();
@@ -339,7 +387,6 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.annee = query.value("annee").toInt();
         subvention.nom = query.value("nom").toString();
         subvention.prenom = query.value("prenom").toString();
-        subvention.aeroclub = query.value("aeroclub").toString();
         subvention.mail = query.value("mail").toString();
         subvention.montantSubventionEntrainement = query.value("montantSubventionAnnuelleEntrainement").toFloat();
 
@@ -395,7 +442,6 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
     totaux.annee = p_annee;
     totaux.nom = "Totaux";
     totaux.prenom = "";
-    totaux.aeroclub = "";
 
     int heuresDeVolEnMinutes = 0;
 
@@ -1067,7 +1113,7 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDeman
 QString ManageDb::recupererAeroclub(const QString p_piloteId)
 {
     QSqlQuery query;
-    query.prepare("SELECT aeroclub FROM pilote WHERE piloteId = :piloteId");
+    query.prepare("SELECT aeroclub FROM infosPilotes WHERE piloteId = :piloteId");
     query.bindValue(":piloteId", p_piloteId);
 
     query.exec();
@@ -1346,9 +1392,9 @@ float ManageDb::recupererSubventionEntrainement( const QString p_pilote,
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
 //dans la base de données
-AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::Pilote p_pilote)
+AeroDmsTypes::ResultatCreationBdd ManageDb::creerPilote(const AeroDmsTypes::Pilote p_pilote)
 {
-    AeroDmsTypes::ResultatCreationPilote resultat = AeroDmsTypes::ResultatCreationPilote_SUCCES;
+    AeroDmsTypes::ResultatCreationBdd resultat = AeroDmsTypes::ResultatCreationBdd_SUCCES;
 
     QSqlQuery query;
     
@@ -1362,22 +1408,21 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
         AeroDmsServices::normaliser(piloteId);
 
         //Verifier si le pilote existe
-        
         query.prepare("SELECT * FROM pilote WHERE piloteId = :piloteId");
         query.bindValue(":piloteId", piloteId);
         query.exec();
         query.next();
         if (query.size() > 0)
         {
-            resultat = AeroDmsTypes::ResultatCreationPilote_PILOTE_EXISTE;
+            resultat = AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE;
         }
         else
         {
-            query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclub','estAyantDroit','mail','telephone','remarque','activitePrincipale','estActif','estBrevete') VALUES(:piloteId,:nom,:prenom,:aeroclub,:estAyantDroit,:mail,:telephone,:remarque,:activitePrincipale,:estActif,:estBrevete)");
+            query.prepare("INSERT INTO 'pilote' ('piloteId','nom','prenom','aeroclubId','estAyantDroit','mail','telephone','remarque','activitePrincipale','estActif','estBrevete') VALUES(:piloteId,:nom,:prenom,:aeroclubId,:estAyantDroit,:mail,:telephone,:remarque,:activitePrincipale,:estActif,:estBrevete)");
             query.bindValue(":piloteId", piloteId);
             query.bindValue(":nom", p_pilote.nom);
             query.bindValue(":prenom", p_pilote.prenom);
-            query.bindValue(":aeroclub", p_pilote.aeroclub);
+            query.bindValue(":aeroclubId", p_pilote.idAeroclub);
             query.bindValue(":estAyantDroit", p_pilote.estAyantDroit);
             query.bindValue(":mail", p_pilote.mail);
             query.bindValue(":telephone", p_pilote.telephone);
@@ -1388,18 +1433,18 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
 
             if (!query.exec())
             {
-                resultat = AeroDmsTypes::ResultatCreationPilote_AUTRE;
+                resultat = AeroDmsTypes::ResultatCreationBdd_AUTRE;
             }
         } 
     }
     //mise à jour
     else
     {
-        query.prepare("UPDATE 'pilote' SET 'nom' = :nom,'prenom' = :prenom,'aeroclub' = :aeroclub,'estAyantDroit' = :estAyantDroit,'mail' = :mail,'telephone' = :telephone,'remarque' = :remarque, 'activitePrincipale' =:activitePrincipale, 'estActif' =:estActif, 'estBrevete' =:estBrevete WHERE piloteId = :piloteId");
+        query.prepare("UPDATE 'pilote' SET 'nom' = :nom,'prenom' = :prenom,'aeroclubId' = :aeroclubId,'estAyantDroit' = :estAyantDroit,'mail' = :mail,'telephone' = :telephone,'remarque' = :remarque, 'activitePrincipale' =:activitePrincipale, 'estActif' =:estActif, 'estBrevete' =:estBrevete WHERE piloteId = :piloteId");
         query.bindValue(":piloteId", p_pilote.idPilote);
         query.bindValue(":nom", p_pilote.nom);
         query.bindValue(":prenom", p_pilote.prenom);
-        query.bindValue(":aeroclub", p_pilote.aeroclub);
+        query.bindValue(":aeroclubId", p_pilote.idAeroclub);
         query.bindValue(":estAyantDroit", p_pilote.estAyantDroit);
         query.bindValue(":mail", p_pilote.mail);
         query.bindValue(":telephone", p_pilote.telephone);
@@ -1410,7 +1455,46 @@ AeroDmsTypes::ResultatCreationPilote ManageDb::creerPilote(const AeroDmsTypes::P
 
         if (!query.exec())
         {
-            resultat = AeroDmsTypes::ResultatCreationPilote_AUTRE;
+            resultat = AeroDmsTypes::ResultatCreationBdd_AUTRE;
+        }
+    }
+
+    return resultat;
+}
+
+AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTypes::Club p_aeroclub)
+{
+    AeroDmsTypes::ResultatCreationBdd resultat = AeroDmsTypes::ResultatCreationBdd_SUCCES;
+
+    QSqlQuery query;
+
+    //creation
+    if (p_aeroclub.idAeroclub == -1)
+    {
+        query.prepare("INSERT INTO 'aeroclub' ('aeroclub','raisonSociale','IBAN','BIC') VALUES(:aeroclub,:raisonSociale,:IBAN,:BIC)");
+        query.bindValue(":aeroclub", p_aeroclub.aeroclub);
+        query.bindValue(":raisonSociale", p_aeroclub.raisonSociale);
+        query.bindValue(":IBAN", p_aeroclub.iban);
+        query.bindValue(":BIC", p_aeroclub.bic);
+
+        if (!query.exec())
+        {
+            resultat = AeroDmsTypes::ResultatCreationBdd_AUTRE;
+        }
+    }
+    //mise à jour
+    else
+    {
+        query.prepare("UPDATE 'aeroclub' SET 'aeroclub' = :aeroclub,'raisonSociale' = :raisonSociale,'IBAN' = :IBAN,'BIC' = :BIC WHERE aeroclubId = :aeroclubId");
+        query.bindValue(":aeroclubId", p_aeroclub.idAeroclub);
+        query.bindValue(":aeroclub", p_aeroclub.aeroclub);
+        query.bindValue(":raisonSociale", p_aeroclub.raisonSociale);
+        query.bindValue(":IBAN", p_aeroclub.iban);
+        query.bindValue(":BIC", p_aeroclub.bic);
+
+        if (!query.exec())
+        {
+            resultat = AeroDmsTypes::ResultatCreationBdd_AUTRE;
         }
     }
 

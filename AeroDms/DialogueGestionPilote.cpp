@@ -48,9 +48,9 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     QLabel* prenomLabel = new QLabel(tr("Prénom : "), this);
     connect(prenom, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
-    aeroclub = new QLineEdit(this);
+    aeroclub = new QComboBox();
     QLabel* aeroclubLabel = new QLabel(tr("Aéroclub : "), this);
-    connect(aeroclub, &QLineEdit::textChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
+    connect(aeroclub, &QComboBox::currentIndexChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
 
     activitePrincipale = new QComboBox();
     QLabel* activitePrincipaleLabel = new QLabel(tr("Activité principale : "), this);
@@ -115,6 +115,7 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QD
     setLayout(mainLayout);
 
     peuplerActivitePrincipale();
+    peuplerListeAeroclub();
     AeroDmsServices::ajouterIconesComboBox(*activitePrincipale);
 
     setWindowTitle(QApplication::applicationName() + " - " + tr("Ajouter un pilote"));
@@ -125,6 +126,19 @@ void DialogueGestionPilote::peuplerActivitePrincipale()
     activitePrincipale->addItems(database->recupererListeActivites());
 }
 
+void DialogueGestionPilote::peuplerListeAeroclub()
+{
+    AeroDmsTypes::ListeAeroclubs aeroclubs = database->recupererAeroclubs();
+
+    aeroclub->clear();
+
+    aeroclub->addItem("Séléctionner un aéroclub", -1);
+    for (AeroDmsTypes::Club club : aeroclubs)
+    {
+        aeroclub->addItem(club.aeroclub, club.idAeroclub);
+    }
+}
+
 AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
 {
     AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
@@ -133,7 +147,8 @@ AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
     pilote.nom = nom->text().toUpper();
     pilote.prenom = prenom->text();
     pilote.estAyantDroit = estAyantDroit->checkState() == Qt::Checked ;
-    pilote.aeroclub = aeroclub->text();
+    pilote.aeroclub = aeroclub->currentText();
+    pilote.idAeroclub = aeroclub->currentData().toInt();
     pilote.mail = mail->text();
     pilote.telephone = telephone->text();
     pilote.remarque = remarque->toPlainText();
@@ -153,7 +168,7 @@ void DialogueGestionPilote::prevaliderDonneesSaisies()
 
     if (nom->text() == ""
         || prenom->text() == ""
-        || aeroclub->text() == "")
+        || aeroclub->currentIndex() == 0)
     {
         okButton->setDisabled(true);
     }
@@ -190,7 +205,7 @@ void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)
     {
         estBrevete->setChecked(false);
     }
-    aeroclub->setText(pilote.aeroclub);
+    aeroclub->setCurrentIndex(aeroclub->findData(pilote.idAeroclub));
     mail->setText(pilote.mail);
     telephone->setText(pilote.telephone);
     remarque->setText(pilote.remarque);
@@ -207,7 +222,7 @@ void DialogueGestionPilote::annulationOuFinSaisie()
     nom->clear();
     prenom->clear();
     estAyantDroit->setChecked(false);
-    aeroclub->clear();
+    aeroclub->setCurrentIndex(0);
     mail->clear();
     telephone->clear();
     remarque->clear();

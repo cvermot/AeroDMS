@@ -35,6 +35,8 @@ public:
     QString getLastError();
     AeroDmsTypes::ListePilotes recupererPilotes();
     AeroDmsTypes::Pilote recupererPilote(const QString p_idPilote);
+    AeroDmsTypes::ListeAeroclubs recupererAeroclubs();
+    AeroDmsTypes::Club recupererAeroclub(int p_aeroclubId);
 
     int recupererProchainNumeroFacture();
     int ajouterFacture(QString& nomFichier);
@@ -123,7 +125,8 @@ public:
 
     int recupererLigneCompta(const QString p_typeDeRecetteDepenseId);
     
-    AeroDmsTypes::ResultatCreationPilote creerPilote( const AeroDmsTypes::Pilote p_pilote);
+    AeroDmsTypes::ResultatCreationBdd creerPilote( const AeroDmsTypes::Pilote p_pilote);
+    AeroDmsTypes::ResultatCreationBdd creerAeroclub(const AeroDmsTypes::Club p_aeroclub);
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const;

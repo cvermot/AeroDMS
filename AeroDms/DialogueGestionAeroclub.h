@@ -15,47 +15,46 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
-#ifndef DIALOGUEGESTIONPILOTE_H
-#define DIALOGUEGESTIONPILOTE_H
+#ifndef DIALOGUEGESTIONAEROCLUB_H
+#define DIALOGUEGESTIONAEROCLUB_H
 #include <QDialog>
 #include "ManageDb.h"
 
-class DialogueGestionPilote : public QDialog
+class DialogueGestionAeroclub : public QDialog
 {
     Q_OBJECT
 
 public:
-    DialogueGestionPilote(ManageDb* db, QWidget* parent = nullptr);
+    DialogueGestionAeroclub(ManageDb* db, QWidget* parent = nullptr);
 
-    AeroDmsTypes::Pilote recupererInfosPilote();
-    void preparerMiseAJourPilote(const QString p_piloteId);
+    AeroDmsTypes::Club recupererInfosClub();
     void peuplerListeAeroclub();
+    void ouvrirFenetre(const bool p_modeEdition);
+    //void preparerMiseAJourClub(const int p_aerolcubId);
 
 private:
-    QLineEdit *nom;
-    QLineEdit* prenom;
-    QComboBox* aeroclub;
-    QCheckBox *estAyantDroit;
-    QComboBox* activitePrincipale;
-    QLineEdit* mail;
-    QLineEdit* telephone;
-    QTextEdit* remarque;
-    QCheckBox* estActif;
-    QCheckBox* estBrevete;
+    QComboBox* selectionAeroclub;
+    QLabel* selectionAeroclubLabel;
+    QLineEdit* nomAeroclub;
+    QLineEdit* raisonSociale;
+    QLineEdit* iban;
+    QLineEdit* bic;
 
-    QString idPilote;
+    int idAeroclub;
 
     ManageDb* database;
 
     QDialogButtonBox* buttonBox;
     QPushButton* cancelButton;
     QPushButton* okButton;
-    
-    void peuplerActivitePrincipale();
+
+    bool validerIbanFrancais(const QString& p_iban);
 
 private slots:
     void prevaliderDonneesSaisies();
     void annulationOuFinSaisie();
+    void chargerDonneesAeroclub();
+    void validerIban();
 };
 
-#endif // DIALOGUEGESTIONPILOTE_H
+#endif // DIALOGUEGESTIONAEROCLUB_H

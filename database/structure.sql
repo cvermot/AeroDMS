@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. nov. 22 13:46:11 2024
+-- File generated with SQLiteStudio v3.4.4 on mer. déc. 11 20:56:34 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -13,6 +13,9 @@ INSERT INTO activite (nom) VALUES ('ULM');
 INSERT INTO activite (nom) VALUES ('Planeur');
 INSERT INTO activite (nom) VALUES ('Helicoptère');
 INSERT INTO activite (nom) VALUES ('Avion électrique');
+
+-- Table: aeroclub
+CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY UNIQUE NOT NULL, aeroclub TEXT NOT NULL UNIQUE, raisonSociale TEXT, IBAN TEXT, BIC TEXT);
 
 -- Table: aeronef
 CREATE TABLE IF NOT EXISTS aeronef (
@@ -41,7 +44,7 @@ CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, inf
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.7', NULL, NULL);
 
 -- Table: pilote
-CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclub TEXT NOT NULL, estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
+CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
 
 -- Table: recettes
 CREATE TABLE IF NOT EXISTS recettes (recetteId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeRecette TEXT NOT NULL REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId), Intitule TEXT NOT NULL, montant REAL NOT NULL, identifiantFormulaireSoumissionCe INTEGER REFERENCES demandeRemboursementSoumises (demandeId));
@@ -153,6 +156,9 @@ INNER JOIN pilote ON facturesSorties.payeur = pilote.piloteId
 INNER JOIN sortie ON facturesSorties.sortie = sortie.sortieId
 INNER JOIN fichiersFacture ON facturesSorties.facture = fichiersFacture.factureId
 WHERE facturesSorties.demandeRemboursement IS NULL;
+
+-- View: infosPilotes
+CREATE VIEW IF NOT EXISTS infosPilotes AS SELECT * FROM pilote INNER JOIN aeroclub ON pilote.aeroclubId = aeroclub.aeroclubId;
 
 -- View: mailParDateDeDemandeDeSubvention
 CREATE VIEW IF NOT EXISTS mailParDateDeDemandeDeSubvention AS SELECT dateDemande, mail, pilote

@@ -108,10 +108,10 @@ public:
         AeronefTableElement_NB_COLONNES = 0x2,
     };
 
-    enum ResultatCreationPilote {
-        ResultatCreationPilote_SUCCES = 0x0,
-        ResultatCreationPilote_PILOTE_EXISTE = 0x1,
-        ResultatCreationPilote_AUTRE = 0x2
+    enum ResultatCreationBdd {
+        ResultatCreationBdd_SUCCES = 0x0,
+        ResultatCreationBdd_ELEMENT_EXISTE = 0x1,
+        ResultatCreationBdd_AUTRE = 0x2
     };
 
     enum PdfTypeDeDemande {
@@ -229,7 +229,6 @@ public:
         EtatRecuperationDonneesFactures_RECUPERATION_FACTURE_EN_COURS,
         EtatRecuperationDonneesFactures_FACTURE_RECUPEREE,
         EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE
-
     };
 
     struct DemandeEnCoursDeTraitement {
@@ -256,6 +255,7 @@ public:
         QString nom;
         QString prenom;
         QString aeroclub;
+        int idAeroclub;
         QString activitePrincipale;
         bool estAyantDroit;
         QString mail;
@@ -266,6 +266,16 @@ public:
     };
     static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;
+
+    struct Club {
+        int idAeroclub;
+        QString aeroclub;
+        QString raisonSociale;
+        QString iban;
+        QString bic;
+    };
+    static const Club K_INIT_CLUB;
+    typedef QList<Club> ListeAeroclubs;
 
     struct HeureDeVolRemboursement
     {
@@ -297,7 +307,6 @@ public:
         int annee;
         QString nom;
         QString prenom;
-        QString aeroclub;
         QString mail;
         float montantSubventionEntrainement;
         HeureDeVolRemboursement entrainement;
@@ -692,6 +701,7 @@ public:
         Icone_GENERE_DEMANDE_SUBVENTIONS,
         Icone_GENERE_RECAP_HDV,
         Icone_AJOUTER_VOL,
+        Icone_AJOUTER_AEROCLUB,
         Icone_MAILING,
         Icone_IMPRIMER,
         Icone_OUVRIR_DOSSIER,

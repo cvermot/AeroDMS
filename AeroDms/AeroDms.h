@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfRenderer.h"
 #include "PdfDownloader.h"
 #include "DialogueGestionPilote.h"
+#include "DialogueGestionAeroclub.h"
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
@@ -124,6 +125,7 @@ private:
 
     //Fenêtres
     DialogueGestionPilote* dialogueGestionPilote;
+    DialogueGestionAeroclub* dialogueGestionAeroclub;
     DialogueAjouterCotisation* dialogueAjouterCotisation;
     DialogueAjouterSortie* dialogueAjouterSortie;
     DialogueGestionAeronefs* dialogueGestionAeronefs;
@@ -193,6 +195,7 @@ private:
     QAction* miseAJourAction;
     QAction* boutonModeDebug;
     QAction* boutonAjouterUnVol;
+    QAction* boutonAjouterUnAeroclub;
     QAction* boutonAjouterCotisation;
     QAction* boutonAjouterPilote;
     QAction* boutonAjouterSortie;
@@ -263,6 +266,7 @@ private:
     QAction* scanAutoCsv;
 
     QAction* boutonEditerLePiloteSelectionne;
+    QAction* boutonEditerUnAeroclub;
 
     //Données internes
     //Gestion des actions métier
@@ -322,10 +326,12 @@ public slots:
     void chargerBaladesSorties();
     void ajouterUnPilote();
     void ajouterUnPiloteEnBdd();
+    void ajouterUnAeroclubEnBdd();
     void ajouterUneSortie();
     void ajouterUneSortieEnBdd();
     void ajouterUneCotisation();
     void ajouterUneCotisationEnBdd();
+    void ajouterUnAeroclub();
     void ouvrirGestionAeronefs();
     void peuplerTablePilotes();
     void peuplerTableVols();
@@ -340,6 +346,7 @@ public slots:
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
     void editerPilote();
+    void editerAeroclub();
     void editerCotisation();
     void editerVol();
     void supprimerVol();

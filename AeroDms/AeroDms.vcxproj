@@ -116,6 +116,7 @@
     <ClCompile Include="AeroDmsServices.cpp" />
     <ClCompile Include="AeroDmsTypes.cpp" />
     <ClCompile Include="DialogueEditionParametres.cpp" />
+    <ClCompile Include="DialogueGestionAeroclub.cpp" />
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
     <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="DialogueProgressionImpression.cpp" />
@@ -160,6 +161,7 @@
     <QtMoc Include="PdfPrinter.h" />
     <QtMoc Include="PdfDownloader.h" />
     <QtMoc Include="PdfPrinterWorker.h" />
+    <QtMoc Include="DialogueGestionAeroclub.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />

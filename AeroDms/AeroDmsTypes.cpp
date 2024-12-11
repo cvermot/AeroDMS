@@ -24,7 +24,7 @@ const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_RE
                                                                                                 "0h00",
                                                                                                 0 };
 
-const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", "", 0.0,
+const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", 0.0,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
@@ -59,6 +59,7 @@ const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilot
                                                            "", //QString nom;
                                                            "", //QString prenom;
                                                            "", //QString aeroclub;
+                                                           0, // int idAeroclub;
                                                            "", //QString activitePrincipale;
                                                            false, //bool estAyantDroit;
                                                            "", //QString mail;
@@ -66,6 +67,13 @@ const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilot
                                                            "", //QString remarque;
                                                            false, //bool estActif;
                                                            false //bool estPiloteBrevete;
+};
+
+const AeroDmsTypes::Club AeroDmsTypes::K_INIT_CLUB = { 0, //int idAeroclub;
+                                                       "", //QString aeroclub;
+                                                       "", //QString raisonSociale;
+                                                       "", //QString iban;
+                                                       "", //QString bic;
 };
 
 const AeroDmsTypes::StatsPilotes AeroDmsTypes::K_INIT_DONNEES_STATS_PILOTES =
