@@ -15,7 +15,8 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
                                       const AeroDmsTypes::Statistiques p_statistique, 
                                       QWidget* parent,
                                       int p_annee,
-                                      const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
+                                      const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres,
+                                      const AeroDmsTypes::OptionsDonneesStatistiques p_options)
     : StatistiqueWidget(parent)
 {
     setMinimumSize(p_parametres.tailleMiniImage);
@@ -36,7 +37,7 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
         case AeroDmsTypes::Statistiques_AERONEFS:
         default:
         {
-            afficherStatsAeronefs(p_db, p_annee, p_parametres, animation);
+            afficherStatsAeronefs(p_db, p_annee, p_options, p_parametres, animation);
             break;
         }
     }
@@ -120,10 +121,11 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
 
 void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db, 
                                                int p_annee, 
+                                               const AeroDmsTypes::OptionsDonneesStatistiques p_options,
                                                const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres,
                                                QChart::AnimationOption p_animation)
 {
-    const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
+    const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, p_options);
 
     auto chartView = new QChartView(this);
     chartView->setRenderHint(QPainter::Antialiasing);

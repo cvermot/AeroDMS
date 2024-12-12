@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. déc. 11 20:56:34 2024
+-- File generated with SQLiteStudio v3.4.4 on jeu. déc. 12 23:46:55 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -15,7 +15,8 @@ INSERT INTO activite (nom) VALUES ('Helicoptère');
 INSERT INTO activite (nom) VALUES ('Avion électrique');
 
 -- Table: aeroclub
-CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY UNIQUE NOT NULL, aeroclub TEXT NOT NULL UNIQUE, raisonSociale TEXT, IBAN TEXT, BIC TEXT);
+CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, aeroclub TEXT NOT NULL UNIQUE, raisonSociale TEXT, IBAN TEXT, BIC TEXT);
+INSERT INTO aeroclub (aeroclubId, aeroclub, raisonSociale, IBAN, BIC) VALUES (0, ' Aéroclub indéterminé', NULL, NULL, NULL);
 
 -- Table: aeronef
 CREATE TABLE IF NOT EXISTS aeronef (
@@ -41,7 +42,7 @@ INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePo
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.8', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.9', NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -314,9 +315,10 @@ volARembourserParFacture.annee;
 CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote AS SELECT 
     vol.pilote,
     vol.typeDeVol,
+    vol.activite,
+    vol.montantRembourse AS subvention,
     pilote.nom,
     pilote.prenom,
-    pilote.aeroclub,
     strftime('%Y', vol.date) AS annee,
     SUM(vol.montantRembourse) AS montantRembourse,
     SUM(vol.cout) AS cout,
@@ -330,9 +332,10 @@ ORDER BY annee, vol.pilote, typeDeVol;
 CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis AS SELECT 
     vol.pilote,
     vol.typeDeVol,
+    vol.activite,
+    vol.montantRembourse AS subvention,
     pilote.nom,
     pilote.prenom,
-    pilote.aeroclub,
     strftime('%Y', vol.date) AS annee,
     SUM(vol.montantRembourse) AS montantRembourse,
     SUM(vol.cout) AS cout,

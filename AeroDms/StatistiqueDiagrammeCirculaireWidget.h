@@ -12,12 +12,15 @@ class StatistiqueDiagrammeCirculaireWidget : public StatistiqueWidget
 {
     Q_OBJECT
 private:
-    AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes(ManageDb* p_db, const int p_annee);
+    AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes(ManageDb* p_db, 
+        const int p_annee,
+        const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
 public:
     explicit StatistiqueDiagrammeCirculaireWidget( ManageDb* p_db, 
                                                    const int p_annee, 
                                                    const AeroDmsTypes::Statistiques p_statistique, 
                                                    QWidget* parent = nullptr,
+                                                   const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
                                                    const QChart::AnimationOption p_animation = QChart::AllAnimations,
                                                    const bool p_legende = true,
                                                    const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES) ;

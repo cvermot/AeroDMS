@@ -238,6 +238,11 @@ private:
     QAction* boutonGraphResolution4k;
     QAction* boutonGraphRatioIso216;
     QAction* boutonGraphRatio16x9;
+    QAction* boutonGraphiquesVolsSubventionnesUniquement;
+    QAction* boutonGraphiquesExclurePlaneur;
+    QAction* boutonGraphiquesExclureUlm;
+    QAction* boutonGraphiquesExclureAvion;
+    QAction* boutonGraphiquesExclureHelico;
 
     QMenu* facturesDaca;
     QAction* boutonChargerFacturesDaca;

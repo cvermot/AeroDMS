@@ -1044,6 +1044,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false, 
             tailleImage);
@@ -1065,6 +1066,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false,
             tailleImage);
@@ -1086,6 +1088,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false, 
             tailleImage);
@@ -1108,6 +1111,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false,
             tailleImage);
@@ -1130,6 +1134,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false,
             tailleImage);
@@ -1152,6 +1157,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
             m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false,
             tailleImage);
@@ -1174,6 +1180,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_AERONEFS,
             m_contentArea,
             p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             QChart::NoAnimation,
             false,
             tailleImage);

@@ -11,12 +11,13 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                               const AeroDmsTypes::Statistiques p_statistique,
                                                               QWidget* parent,
                                                               const int p_annee,
+                                                              const int p_options,
                                                               const QChart::AnimationOption p_animation,
                                                               const bool p_legende,
                                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
-    const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee);
+    const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, p_options);
     setMinimumSize(p_parametres.tailleMiniImage);
 
     indiceCouleurEnCours = 0;

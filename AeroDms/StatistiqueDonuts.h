@@ -18,7 +18,8 @@ public:
                        const AeroDmsTypes::Statistiques p_statistique, 
                        QWidget* parent = nullptr,
                        int p_annee = -1,
-                       const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
+                       const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES,
+                       const AeroDmsTypes::OptionsDonneesStatistiques p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
 
 public slots:
     void explodeSlice(bool exploded);
@@ -31,6 +32,7 @@ private:
         QChart::AnimationOption p_animation);
     void afficherStatsAeronefs(ManageDb* p_db, 
         int p_annee, 
+        const AeroDmsTypes::OptionsDonneesStatistiques p_options,
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
         QChart::AnimationOption p_animation);
 };

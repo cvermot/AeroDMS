@@ -1190,7 +1190,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphRatio16x9 = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
         tr("Ratio 16/9"),
         this);
-    boutonGraphRatio16x9->setToolTip(tr("Ratio d'une écran"));
+    boutonGraphRatio16x9->setToolTip(tr("Ratio d'un écran"));
     resolutionGraphiques->addAction(boutonGraphRatio16x9);
     boutonGraphRatio16x9->setCheckable(true);
 
@@ -1219,6 +1219,49 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonDemandesAGenererToutes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererRecettes, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
     connect(boutonDemandesAGenererDepenses, SIGNAL(triggered()), this, SLOT(changerDemandesAGenerer()));
+
+    QMenu *menuOptionsGraphiques = menuOption->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
+        tr("Options des &graphiques"));
+    boutonGraphiquesVolsSubventionnesUniquement = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
+        tr("Vols avec subvention uniquement"),
+        this);
+    boutonGraphiquesVolsSubventionnesUniquement->setToolTip(tr("Ne prendre en compte que les vols ayant bénéficé d'une subventions pour l'élaboration des graphiques"));
+    menuOptionsGraphiques->addAction(boutonGraphiquesVolsSubventionnesUniquement);
+    boutonGraphiquesVolsSubventionnesUniquement->setCheckable(true);
+    boutonGraphiquesVolsSubventionnesUniquement->setChecked(true);
+    connect(boutonGraphiquesVolsSubventionnesUniquement, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
+
+    boutonGraphiquesExclureAvion = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AVION),
+        tr("Exclure vols avions"),
+        this);
+    boutonGraphiquesExclureAvion->setToolTip(tr("Ne pas prendre en compte les vols avion dans les graphiques"));
+    menuOptionsGraphiques->addAction(boutonGraphiquesExclureAvion);
+    boutonGraphiquesExclureAvion->setCheckable(true);
+    connect(boutonGraphiquesExclureAvion, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
+
+    boutonGraphiquesExclureHelico = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_HELICOPTERE),
+        tr("Exclure vols hélicoptères"),
+        this);
+    boutonGraphiquesExclureHelico->setToolTip(tr("Ne pas prendre en compte les vols hélicoptère dans les graphiques"));
+    menuOptionsGraphiques->addAction(boutonGraphiquesExclureHelico);
+    boutonGraphiquesExclureHelico->setCheckable(true);
+    connect(boutonGraphiquesExclureHelico, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
+
+    boutonGraphiquesExclurePlaneur = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_PLANEUR),
+        tr("Exclure vols planeurs"),
+        this);
+    boutonGraphiquesExclurePlaneur->setToolTip(tr("Ne pas prendre en compte les vols planeurs dans les graphiques"));
+    menuOptionsGraphiques->addAction(boutonGraphiquesExclurePlaneur);
+    boutonGraphiquesExclurePlaneur->setCheckable(true);
+    connect(boutonGraphiquesExclurePlaneur, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
+
+    boutonGraphiquesExclureUlm = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ULM),
+        tr("Exclure vols ULM"),
+        this);
+    boutonGraphiquesExclureUlm->setToolTip(tr("Ne pas prendre en compte les vols ULM dans les graphiques"));
+    menuOptionsGraphiques->addAction(boutonGraphiquesExclureUlm);
+    boutonGraphiquesExclureUlm->setCheckable(true);
+    connect(boutonGraphiquesExclureUlm, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
 
     menuOption->addSeparator();
 
@@ -1683,22 +1726,45 @@ void AeroDms::peuplerStatistiques()
         m_activeWidget->setVisible(false);
         m_activeWidget->deleteLater();
     }
+     
+    int options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS;
+    if (boutonGraphiquesVolsSubventionnesUniquement->isChecked())
+    {
+        options = options + AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT;
+    }
+    if (boutonGraphiquesExclurePlaneur->isChecked())
+    {
+        options = options + AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_PLANEUR;
+    }
+    if (boutonGraphiquesExclureUlm->isChecked())
+    {
+        options = options + AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_ULM;
+    }
+    if (boutonGraphiquesExclureAvion->isChecked())
+    {
+        options = options + AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION;
+    }
+    if (boutonGraphiquesExclureHelico->isChecked())
+    {
+        options = options + AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_HELICOPTERE;
+    }
 
     switch (listeDeroulanteStatistique->currentData().toInt())
     {
         case AeroDmsTypes::Statistiques_HEURES_ANNUELLES:
         {
             m_activeWidget = new StatistiqueHistogrammeEmpile( db, 
-                                                               listeDeroulanteAnnee->currentData().toInt(), 
-                                                               m_contentArea);
+                listeDeroulanteAnnee->currentData().toInt(), 
+                m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
-                                                                       listeDeroulanteAnnee->currentData().toInt(), 
-                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, 
-                                                                       m_contentArea);
+                listeDeroulanteAnnee->currentData().toInt(), 
+                AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, 
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE:
@@ -1706,15 +1772,17 @@ void AeroDms::peuplerStatistiques()
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
                 listeDeroulanteAnnee->currentData().toInt(),
                 AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
-                m_contentArea);
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
-                                                                       listeDeroulanteAnnee->currentData().toInt(), 
-                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
-                                                                       m_contentArea);
+                listeDeroulanteAnnee->currentData().toInt(), 
+                AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
@@ -1722,30 +1790,33 @@ void AeroDms::peuplerStatistiques()
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
                 listeDeroulanteAnnee->currentData().toInt(),
                 AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
-                m_contentArea);
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
         {
             m_activeWidget = new StatistiqueDonuts( db,
-                                                    AeroDmsTypes::Statistiques_STATUTS_PILOTES,
-                                                    m_contentArea);
+                AeroDmsTypes::Statistiques_STATUTS_PILOTES,
+                m_contentArea);
             break;
         }
         case AeroDmsTypes::Statistiques_AERONEFS:
         {
             m_activeWidget = new StatistiqueDonutCombineWidget( db,
-                                                                AeroDmsTypes::Statistiques_AERONEFS,
-                                                                m_contentArea,
-                                                                listeDeroulanteAnnee->currentData().toInt());
+                AeroDmsTypes::Statistiques_AERONEFS,
+                m_contentArea,
+                listeDeroulanteAnnee->currentData().toInt(),
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
-                                                                       listeDeroulanteAnnee->currentData().toInt(), 
-                                                                       AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, 
-                                                                       m_contentArea);
+                listeDeroulanteAnnee->currentData().toInt(), 
+                AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, 
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL:
@@ -1754,7 +1825,8 @@ void AeroDms::peuplerStatistiques()
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
                 listeDeroulanteAnnee->currentData().toInt(),
                 AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL,
-                m_contentArea);
+                m_contentArea, 
+                options);
             break;
         }
     }

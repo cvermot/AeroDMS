@@ -88,8 +88,9 @@ public:
     AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = -1);
     AeroDmsTypes::TotauxRecettes recupererTotauxRecettes(const int p_annee);
     AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee = -1, 
-                                                                          const QString p_piloteId = "*",
-                                                                          const bool p_volsSoumisUniquement = false);
+        const QString p_piloteId = "*",
+        const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+        const bool p_volsSoumisUniquement = false);
     AeroDmsTypes::SubventionsParPilote recupererTotauxAnnuel( const int p_annee,
                                                               const bool p_volsSoumisUniquement = false);
     AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
@@ -134,7 +135,8 @@ public:
     AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
     QString recupererMailPilotes( const int p_annee,
                                   const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
-    const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee);
+    const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
+        const int p_options);
     QList<QDate> recupererDatesDesDemandesDeSubventions();
     QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
 
@@ -148,12 +150,14 @@ public:
 
     bool volSembleExistantEnBdd(const QString p_idPilote, const int p_duree, const QString p_date, const float p_coutDuVol);
 
+    static QString genererClauseFiltrageActivite(const int p_options);
+
 public slots:
 
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.8;
+    const float versionBddAttendue = 1.9;
 };
 
 #endif

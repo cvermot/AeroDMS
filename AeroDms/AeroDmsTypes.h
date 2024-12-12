@@ -149,6 +149,15 @@ public:
         Resolution_MASQUE_RATIO      = 0x2000  //           0010|0000 0000 0000
     };
 
+    enum OptionsDonneesStatistiques {
+        OptionsDonneesStatistiques_TOUS_LES_VOLS                   = 0x0,
+        OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT   = 0x1,
+        OptionsDonneesStatistiques_EXCLURE_PLANEUR                 = 0x2,
+        OptionsDonneesStatistiques_EXCLURE_ULM                     = 0x4,
+        OptionsDonneesStatistiques_EXCLURE_HELICOPTERE             = 0x8,
+        OptionsDonneesStatistiques_EXCLURE_AVION                   = 0x10,
+    };
+
     enum ElementSoumis {
         ElementSoumis_TOUS_LES_ELEMENTS,
         ElementSoumis_ELEMENTS_SOUMIS,

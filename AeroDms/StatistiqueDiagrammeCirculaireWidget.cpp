@@ -13,7 +13,8 @@
 StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( ManageDb* p_db, 
                                                                             const int p_annee, 
                                                                             const AeroDmsTypes::Statistiques p_statistique, 
-                                                                            QWidget* parent, 
+                                                                            QWidget* parent,
+                                                                            const int p_options,
                                                                             const QChart::AnimationOption p_animation, 
                                                                             const bool p_legende,
                                                                             const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
@@ -39,7 +40,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
         { 
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db, 
-                                                                                                      p_annee);
+                p_annee,
+                p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -73,7 +75,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         case AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE:
         {
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes(p_db,
-                p_annee);
+                p_annee,
+                p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -316,7 +319,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         {
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes( p_db,
-                                                                                                              p_annee);
+                p_annee,
+                p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -358,7 +362,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         default:
         {
             const AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = recupererSubventionsPilotes(p_db,
-                p_annee);
+                p_annee,
+                p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -402,9 +407,13 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
     createDefaultChartView(chart);
 }
 
-AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::recupererSubventionsPilotes(ManageDb* p_db, const int p_annee)
+AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::recupererSubventionsPilotes(ManageDb* p_db, 
+    const int p_annee,
+    const int p_options)
 {
-    AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee);
+    AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee, 
+        "*", 
+        p_options);
 
     AeroDmsTypes::ListeSubventionsParPilotes subventionParPiloteSansDoublon = QList<AeroDmsTypes::SubventionsParPilote>();
     while (!subventionParPilote.isEmpty())

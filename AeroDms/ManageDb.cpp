@@ -350,32 +350,49 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
 }
 
 AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( const int p_annee, 
-                                                                                const QString p_piloteId,
-                                                                                const bool p_volsSoumisUniquement)
+    const QString p_piloteId,
+    const int p_options,
+    const bool p_volsSoumisUniquement)
 {
     QSqlQuery query;
     AeroDmsTypes::ListeSubventionsParPilotes liste;
 
     if (p_annee != -1 && p_piloteId != "*")
     {
-        query.prepare("SELECT * FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee AND pilote = :piloteId ORDER BY annee, pilote.nom");    
+        query.prepare("SELECT * FROM cotisation "
+            "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
+            "WHERE annee = :annee AND pilote = :piloteId " 
+            "ORDER BY annee, pilote.nom");    
     }
     else if (p_annee != -1)
     {
-        query.prepare("SELECT * FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE annee = :annee ORDER BY annee, pilote.nom");
+        query.prepare("SELECT * FROM cotisation "
+            "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
+            "WHERE annee = :annee " 
+            "ORDER BY annee, pilote.nom");
     }
     else if (p_piloteId != "*")
     {
-        query.prepare("SELECT * FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId WHERE pilote = :piloteId ORDER BY annee, pilote.nom");
+        query.prepare("SELECT * FROM cotisation "
+            "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
+            "WHERE pilote = :piloteId " 
+            "ORDER BY annee, pilote.nom");
     }
     else
     {
-        query.prepare("SELECT * FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId ORDER BY annee, pilote.nom");
+        query.prepare("SELECT * FROM cotisation "
+            "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
+            "ORDER BY annee, pilote.nom");
     }
     query.bindValue(":annee", QString::number(p_annee));
     query.bindValue(":piloteId", p_piloteId);
 
     query.exec();
+
+    const QString filtre = genererClauseFiltrageActivite(p_options);
+    const QString filtreVolsAvecSubvention = ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+        ? " AND subvention != 0 "
+        : "";
 
     //pour chaque pilote et chaque année de cotisation, on recupère les éventuelles heures de vol effectuées
     while (query.next())
@@ -391,12 +408,19 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         subvention.montantSubventionEntrainement = query.value("montantSubventionAnnuelleEntrainement").toFloat();
 
         QSqlQuery queryVolAnneePilote;
-        queryVolAnneePilote.prepare("SELECT *  FROM volParTypeParAnEtParPilote WHERE annee = :annee AND pilote = :piloteId");
+        QString requete = "SELECT *  FROM volParTypeParAnEtParPilote "
+            "WHERE annee = :annee AND pilote = :piloteId";
+        requete = requete  
+            + (filtre != "" ? " AND " : "") 
+            + filtre
+            + filtreVolsAvecSubvention;
         //Si on veut uniquement les totaux des vols déjà soumis au CSE, on remplace la vue volParTypeParAnEtParPilote par volParTypeParAnEtParPiloteSoumis
         if (p_volsSoumisUniquement)
         {
-            queryVolAnneePilote.prepare("SELECT *  FROM volParTypeParAnEtParPiloteSoumis WHERE annee = :annee AND pilote = :piloteId");
+            requete = requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPiloteSoumis");
         }
+        qDebug() << requete;
+        queryVolAnneePilote.prepare(requete);
         queryVolAnneePilote.bindValue(":annee", QString::number(subvention.annee));
         queryVolAnneePilote.bindValue(":piloteId", subvention.idPilote);
         queryVolAnneePilote.exec();
@@ -1787,9 +1811,18 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
     return statsPilotes;
 }
 
-const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee)
+const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee, 
+    const int p_options)
 {
     AeroDmsTypes::StatsAeronefs statsAeronefs;
+
+    QString nomVue = "stats_aeronefs";
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        nomVue = "stats_aeronefs_volAvecSubvention";
+    }
+
+    QString filtre = genererClauseFiltrageActivite(p_options);
 
     QSqlQuery query;
     if (p_annee != -1)
@@ -1799,8 +1832,10 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
             "type,"
             "activite, "
             "SUM(tempsDeVol) AS tempsDeVol "
-            "FROM stats_aeronefs "
+            "FROM " + nomVue + " "
             "WHERE annee = :annee "
+            + (filtre != "" ? " AND " : "")
+            + filtre +
             "GROUP BY immatriculation "
             "ORDER BY activite, type, immatriculation");
         query.bindValue(":annee", QString::number(p_annee));
@@ -1812,7 +1847,9 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
             "type,"
             "activite, "
             "SUM(tempsDeVol) AS tempsDeVol "
-            "FROM stats_aeronefs "
+            "FROM " + nomVue + " "
+            + (filtre != "" ? " WHERE " : "") 
+            + filtre +
             "GROUP BY immatriculation "
             "ORDER BY activite, type, immatriculation");
     }
@@ -1909,4 +1946,40 @@ bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote, const int p_dure
     query.exec();
 
     return query.next();
+}
+
+QString ManageDb::genererClauseFiltrageActivite(const int p_options)
+{
+    QString filtre = "";
+ 
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_PLANEUR) == AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_PLANEUR)
+    {
+        filtre = filtre + "activite != 'Planeur' ";
+    }
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_ULM) == AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_ULM)
+    {
+        if (filtre != "")
+        {
+            filtre = filtre + " AND ";
+        }
+        filtre = filtre + "activite != 'ULM' ";
+    }
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_HELICOPTERE) == AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_HELICOPTERE)
+    {
+        if (filtre != "")
+        {
+            filtre = filtre + " AND ";
+        }
+        filtre = filtre + "activite != 'Hélicoptère' ";
+    }
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION) == AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION)
+    {
+        if (filtre != "")
+        {
+            filtre = filtre + " AND ";
+        }
+        filtre = filtre + "activite != 'Avion électrique' AND activite != 'Avion' ";
+    }
+
+    return filtre;
 }
