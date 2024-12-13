@@ -1222,7 +1222,7 @@ void AeroDms::initialiserMenuOptions()
 
     QMenu *menuOptionsGraphiques = menuOption->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
         tr("Options des &graphiques"));
-    boutonGraphiquesVolsSubventionnesUniquement = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
+    boutonGraphiquesVolsSubventionnesUniquement = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER),
         tr("Vols avec subvention uniquement"),
         this);
     boutonGraphiquesVolsSubventionnesUniquement->setToolTip(tr("Ne prendre en compte que les vols ayant bénéficé d'une subventions pour l'élaboration des graphiques"));
@@ -1755,7 +1755,8 @@ void AeroDms::peuplerStatistiques()
         {
             m_activeWidget = new StatistiqueHistogrammeEmpile( db, 
                 listeDeroulanteAnnee->currentData().toInt(), 
-                m_contentArea);
+                m_contentArea,
+                options);
             break;
         }
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:

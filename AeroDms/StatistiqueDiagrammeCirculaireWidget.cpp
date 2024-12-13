@@ -113,7 +113,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
 
         case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
         {
-            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee);
+            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee, p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)
@@ -213,7 +213,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
 
         case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
         {
-            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee);
+            AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee, p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
             if (p_animation != QChart::NoAnimation)

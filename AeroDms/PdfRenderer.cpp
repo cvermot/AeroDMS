@@ -1021,10 +1021,11 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_HEURES_ANNUELLES) == AeroDmsTypes::Statistiques_HEURES_ANNUELLES)
     {
         StatistiqueHistogrammeEmpile stats( db,
-                                                                     p_annee,
-                                                                     m_contentArea,
-                                                                     QChart::NoAnimation, 
-                                                                     tailleImage );
+            p_annee,
+            m_contentArea,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            QChart::NoAnimation, 
+            tailleImage );
 
         const QString urlImage = cheminSortie + "heuresAnnuelles";
 

@@ -12,16 +12,17 @@
 #include <QValueAxis>
 
 StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db, 
-                                                            const int p_annee, 
-                                                            QWidget* parent,
-                                                            const QChart::AnimationOption p_animation,
-                                                            const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
+    const int p_annee, 
+    QWidget* parent,
+    const int p_options,
+    const QChart::AnimationOption p_animation,
+    const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
     setMinimumSize(p_parametres.tailleMiniImage);
     QFont font("Arial", p_parametres.tailleDePolice);
 
-    const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee);
+    const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee, p_options);
 
     auto entrainement = new QBarSet("Entrainement");
     auto sortie = new QBarSet("Sortie");

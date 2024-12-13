@@ -83,7 +83,7 @@ public:
                                                          const QString p_typeRecette);
     AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre();
     AeroDmsTypes::ListeDemandeRemboursementFacture recupererToutesLesDemandesDeRemboursement(const int p_annee = -1);
-    AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1);
+    AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1, const int p_option = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
     AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = -1);
     AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = -1);
     AeroDmsTypes::TotauxRecettes recupererTotauxRecettes(const int p_annee);
@@ -132,7 +132,8 @@ public:
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const;
 
-    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1); 
+    AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1,
+        const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
     QString recupererMailPilotes( const int p_annee,
                                   const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,

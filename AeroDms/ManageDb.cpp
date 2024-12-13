@@ -273,20 +273,29 @@ AeroDmsTypes::TotauxRecettes ManageDb::recupererTotauxRecettes(const int p_annee
     return totaux;
 }
 
-AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee)
+AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee,
+    const int p_option)
 {
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite liste;
 
-    QSqlQuery query;
+    QString requete = "";
     if (p_annee != -1)
     {
-        query.prepare("SELECT * FROM stats_heuresDeVolParPiloteEtParActivite WHERE annee = :annee");
-        query.bindValue(":annee", QString::number(p_annee));
+        requete = "SELECT * FROM stats_heuresDeVolParPiloteEtParActivite WHERE annee = :annee";
     }
     else
     {
-        query.prepare("SELECT * FROM stats_heuresDeVolParPiloteEtParActivite");
-    }   
+        requete = "SELECT * FROM stats_heuresDeVolParPiloteEtParActivite";
+    }  
+
+    if ((p_option & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        requete = requete.replace("stats_heuresDeVolParPiloteEtParActivite","stats_heuresDeVolParPiloteEtParActivite_VolsAvecSubventionUniquement");
+    }
+
+    QSqlQuery query;
+    query.prepare(requete);
+    query.bindValue(":annee", QString::number(p_annee));
     query.exec();
 
     AeroDmsTypes::StatsHeuresDeVolParActivite item;
@@ -310,33 +319,48 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
         //On complete les données
         if (query.value("activite").toString() == "Avion")
         {
-            item.minutesVolAvion = item.minutesVolAvion + query.value("tempsDeVol").toInt();
-            item.coutVolAvion = item.coutVolAvion + query.value("coutVol").toFloat();
-            item.subventionVolAvion = item.subventionVolAvion + query.value("subventionVol").toFloat();
+            if((p_option & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION) != AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION)
+            {
+                item.minutesVolAvion = item.minutesVolAvion + query.value("tempsDeVol").toInt();
+                item.coutVolAvion = item.coutVolAvion + query.value("coutVol").toFloat();
+                item.subventionVolAvion = item.subventionVolAvion + query.value("subventionVol").toFloat();
+            }
         }
         else if (query.value("activite").toString() == "Avion électrique")
         {
-            item.minutesVolAvionElectrique = item.minutesVolAvionElectrique + query.value("tempsDeVol").toInt();
-            item.coutVolAvionElectrique = item.coutVolAvionElectrique + query.value("coutVol").toFloat();
-            item.subventionVolAvionElectrique = item.subventionVolAvionElectrique + query.value("subventionVol").toFloat();
+            if ((p_option & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION) != AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_AVION)
+            {
+                item.minutesVolAvionElectrique = item.minutesVolAvionElectrique + query.value("tempsDeVol").toInt();
+                item.coutVolAvionElectrique = item.coutVolAvionElectrique + query.value("coutVol").toFloat();
+                item.subventionVolAvionElectrique = item.subventionVolAvionElectrique + query.value("subventionVol").toFloat();
+            }
         }
         else if (query.value("activite").toString() == "ULM")
         {
-            item.minutesVolUlm = item.minutesVolUlm + query.value("tempsDeVol").toInt();
-            item.coutVolUlm = item.coutVolUlm + query.value("coutVol").toFloat();
-            item.subventionVolUlm = item.subventionVolUlm + query.value("subventionVol").toFloat();
+            if ((p_option & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_ULM) != AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_ULM)
+            {
+                item.minutesVolUlm = item.minutesVolUlm + query.value("tempsDeVol").toInt();
+                item.coutVolUlm = item.coutVolUlm + query.value("coutVol").toFloat();
+                item.subventionVolUlm = item.subventionVolUlm + query.value("subventionVol").toFloat();
+            }
         }
         else if (query.value("activite").toString() == "Planeur")
         {
-            item.minutesVolPlaneur = item.minutesVolPlaneur + query.value("tempsDeVol").toInt();
-            item.coutVolPlaneur = item.coutVolPlaneur + query.value("coutVol").toFloat();
-            item.subventionVolPlaneur = item.subventionVolPlaneur + query.value("subventionVol").toFloat();
+            if ((p_option & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_PLANEUR) != AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_PLANEUR)
+            {
+                item.minutesVolPlaneur = item.minutesVolPlaneur + query.value("tempsDeVol").toInt();
+                item.coutVolPlaneur = item.coutVolPlaneur + query.value("coutVol").toFloat();
+                item.subventionVolPlaneur = item.subventionVolPlaneur + query.value("subventionVol").toFloat();
+            }
         }
         else if (query.value("activite").toString() == "Hélicoptère")
         {
-            item.minutesVolHelicoptere = item.minutesVolHelicoptere + query.value("tempsDeVol").toInt();
-            item.coutVolHelicoptere = item.coutVolHelicoptere + query.value("coutVol").toFloat();
-            item.subventionVolHelicoptere = item.subventionVolHelicoptere + query.value("subventionVol").toFloat();
+            if ((p_option & AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_HELICOPTERE) != AeroDmsTypes::OptionsDonneesStatistiques_EXCLURE_HELICOPTERE)
+            {
+                item.minutesVolHelicoptere = item.minutesVolHelicoptere + query.value("tempsDeVol").toInt();
+                item.coutVolHelicoptere = item.coutVolHelicoptere + query.value("coutVol").toFloat();
+                item.subventionVolHelicoptere = item.subventionVolHelicoptere + query.value("subventionVol").toFloat();
+            }
         }
     }
 
@@ -1534,20 +1558,42 @@ void ManageDb::creerSortie(const AeroDmsTypes::Sortie p_sortie)
     query.exec();
 }
 
-AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const int p_annee)
+AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const int p_annee,
+    const int p_options)
 {
     AeroDmsTypes::ListeStatsHeuresDeVol liste;
 
-    QSqlQuery query;
+    const QString filtre = genererClauseFiltrageActivite(p_options);
+    QString requete = "";
     if (p_annee != -1)
     {
-        query.prepare("SELECT * FROM 'stats_heuresDeVolParMois' WHERE annee = :annee");
-        query.bindValue(":annee", QString::number(p_annee));
+        requete = "SELECT * FROM stats_heuresDeVolParMois WHERE annee = :annee ";
+        if (filtre != "")
+        {
+            requete = requete + " AND ";
+            requete = requete + filtre;
+        }
+        requete = requete + " GROUP BY mois, typeDeVol";
     }
     else
     {
-        query.prepare("SELECT * FROM 'stats_heuresDeVolParMois'");
+        requete = "SELECT * FROM stats_heuresDeVolParMois ";
+        if (filtre != "")
+        {
+            requete = requete + " WHERE ";
+            requete = requete + filtre;
+        }
+        requete = requete + " GROUP BY annee, mois, typeDeVol";
     }
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        requete = requete.replace("stats_heuresDeVolParMois", "stats_heuresDeVolParMois_volsAvecSubventionUniquement");
+    }
+    
+
+    QSqlQuery query;
+    query.prepare(requete);
+    query.bindValue(":annee", QString::number(p_annee));
     query.exec();
 
     AeroDmsTypes::StatsHeuresDeVol heuresMensuelles;

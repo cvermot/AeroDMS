@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on jeu. déc. 12 23:46:55 2024
+-- File generated with SQLiteStudio v3.4.4 on ven. déc. 13 17:34:18 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, inf
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.9', NULL, NULL);
 
 -- Table: pilote
-CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
+CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
 
 -- Table: recettes
 CREATE TABLE IF NOT EXISTS recettes (recetteId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeRecette TEXT NOT NULL REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId), Intitule TEXT NOT NULL, montant REAL NOT NULL, identifiantFormulaireSoumissionCe INTEGER REFERENCES demandeRemboursementSoumises (demandeId));
@@ -238,14 +238,40 @@ INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 GROUP BY vol.immatriculation, annee
 ORDER BY annee, activite, type, vol.immatriculation;
 
+-- View: stats_aeronefs_volAvecSubvention
+CREATE VIEW IF NOT EXISTS stats_aeronefs_volAvecSubvention AS SELECT 
+    vol.immatriculation,
+    aeronef.type,
+    vol.activite,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+WHERE vol.montantRembourse != 0
+GROUP BY vol.immatriculation, annee
+ORDER BY annee, activite, type, vol.immatriculation;
+
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
 strftime('%m', vol.date) AS mois,
 strftime('%Y', vol.date) AS annee,
 SUM(vol.duree) as tempsDeVol,
-typeDeVol
+typeDeVol,
+activite
 FROM vol
-GROUP BY annee, mois, typeDeVol
+GROUP BY annee, mois, typeDeVol, activite
+ORDER BY annee, mois;
+
+-- View: stats_heuresDeVolParMois_volsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois_volsAvecSubventionUniquement AS SELECT 
+strftime('%m', vol.date) AS mois,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol,
+typeDeVol,
+activite
+FROM vol
+WHERE vol.montantRembourse != 0
+GROUP BY annee, mois, typeDeVol, activite
 ORDER BY annee, mois;
 
 -- View: stats_heuresDeVolParPilote
@@ -272,6 +298,22 @@ SUM(vol.cout) AS coutVol,
 SUM(vol.montantRembourse) AS subventionVol
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
+GROUP BY activite, pilote, annee
+ORDER BY nom, prenom, annee;
+
+-- View: stats_heuresDeVolParPiloteEtParActivite_VolsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS stats_heuresDeVolParPiloteEtParActivite_VolsAvecSubventionUniquement AS SELECT 
+vol.pilote,
+pilote.nom,
+pilote.prenom,
+vol.activite,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) AS tempsDeVol,
+SUM(vol.cout) AS coutVol,
+SUM(vol.montantRembourse) AS subventionVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+WHERE vol.montantRembourse != 0
 GROUP BY activite, pilote, annee
 ORDER BY nom, prenom, annee;
 
