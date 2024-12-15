@@ -77,11 +77,25 @@ QString PdfRenderer::mergerPdf()
     
     for (int i = 0; i < demandeEnCours.listeFactures.size(); i++)
     {
-        const QString nomFacture = repertoireDesFactures
-            + demandeEnCours.listeFactures.at(i);
-        PoDoFo::PdfMemDocument facture;
-        facture.Load(nomFacture.toStdString());
-        document.GetPages().AppendDocumentPages(facture);
+        const QString nomFacture = repertoireDesFactures + demandeEnCours.listeFactures.at(i);
+        if (QFile::exists(nomFacture))
+        {
+            PoDoFo::PdfMemDocument facture;
+            facture.Load(nomFacture.toStdString());
+            document.GetPages().AppendDocumentPages(facture);
+        }
+        else
+        {
+            QMessageBox::critical(this,
+                QApplication::applicationName() + " - " + tr("Fichier PDF introuvable"),
+                tr("La facture : ") +
+                demandeEnCours.listeFactures.at(i) +
+                tr(" est introuvable.\n") +
+                tr("\nImpossible de l'ajouter au fichier de demande ")
+                + demandeEnCours.nomFichier
+                + ".\n\n"
+                + tr("La demande est bien génerée mais le justificatif n'y sera pas joint."));
+        }
     }
 
     const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
@@ -138,7 +152,7 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
                                       bool success)
 {
     const QString fichier = mergerPdf();
-
+   
     nombreEtapesEffectuees++;
     emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
 
@@ -146,7 +160,6 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     {
         db->ajouterDemandeCeEnBdd(demandeEnCours);
     }
-
     //Si la demande ne concerne pas un document unique, on fait les demandes suivantes
     if (!laDemandeEstPourUnDocumentUnique)
     {
@@ -157,7 +170,6 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     {
         emit generationTerminee(cheminSortieFichiersGeneres, fichier);
     }
-   
 }
 
 void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
@@ -220,14 +232,15 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 }
 
 void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
-                                                   const QString p_cheminSortieFichiersGeneres,
-                                                   const QString p_cheminStockageFactures,
-                                                   const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf,
-                                                   const AeroDmsTypes::Signature p_signature,
-                                                   const bool p_mergerTousLesPdf,
-                                                   const bool p_recapHdVAvecRecettes,
-                                                   const bool p_recapHdvAvecBaladesEtSorties,
-                                                   const int p_valeurGraphAGenerer )
+    const QString p_cheminSortieFichiersGeneres,
+    const QString p_cheminStockageFactures,
+    const AeroDmsTypes::TypeGenerationPdf p_typeGenerationPdf,
+    const AeroDmsTypes::Signature p_signature,
+    const bool p_mergerTousLesPdf,
+    const bool p_recapHdVAvecRecettes,
+    const bool p_recapHdvAvecBaladesEtSorties,
+    const bool p_virementEstAutorise,
+    const int p_valeurGraphAGenerer )
 {
     demandeEnCours.listeFactures = QStringList();
     demandeEnCours.nomTresorier = p_nomTresorier;
@@ -236,6 +249,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
     demandeEnCours.recapHdVAvecBaladesEtSorties = p_recapHdvAvecBaladesEtSorties;
     demandeEnCours.recapHdVAvecRecettes = p_recapHdVAvecRecettes;
+    demandeEnCours.virementEstAutorise = p_virementEstAutorise;
     demandeEnCours.recapHdvGraphAGenerer = p_valeurGraphAGenerer;
 
     nombreEtapesEffectuees = 0 ;
@@ -297,12 +311,28 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     AeroDmsTypes::EtatGeneration etatGenerationARetourner = AeroDmsTypes::EtatGeneration_OK;
 
     //On ouvre le template et on met à jour les informations communes à toutes les demandes
-    QFile f = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("COMPTA_2023.htm"));
+    QFile f = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("COMPTA.htm"));
     QString templateCeTmp = "";
     if (f.open(QFile::ReadOnly | QFile::Text))
     {
         QTextStream in(&f);
         templateCeTmp = in.readAll();
+
+        if (demandeEnCours.virementEstAutorise)
+        {
+            QFile reglement = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("COMPTA_Virement.htm"));
+            reglement.open(QFile::ReadOnly | QFile::Text);
+            QTextStream in(&reglement);
+            templateCeTmp.replace("<!--AccrocheModeVersement-->", in.readAll());
+        }
+        else
+        {
+            QFile reglement = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("COMPTA_Original.htm"));
+            reglement.open(QFile::ReadOnly | QFile::Text);
+            QTextStream in(&reglement);
+            templateCeTmp.replace("<!--AccrocheModeVersement-->", in.readAll());
+        }
+
     }
     else
     {
@@ -321,6 +351,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     templateCeTmp.replace("xxI", "");
     //Signataire => toujours celui qui exécute le logiciel
     templateCeTmp.replace("xxSignataire", demandeEnCours.nomTresorier);
+    //Pour le moment réglement par virement non géré => on met tous les champs à vide
+    templateCeTmp.replace("xxBeneficiaireVirement", "");
+    templateCeTmp.replace("xxIBAN", "");
+    templateCeTmp.replace("xxBIC", "");
 
     //On génère un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)
@@ -348,8 +382,12 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //Signature
         remplirLeChampSignature(templateCeTmp);
 
-        //Cheque a retirer au CE par le demandeur => a cocher
+        //Chèque à retirer au CE par le demandeur => à cocher
         templateCeTmp.replace("zzC", "X");
+        //Virement : non coché pour le moment
+        templateCeTmp.replace("zzV", "");
+        //Jusitificatif => facture
+        templateCeTmp.replace("xxJustificatif", "Facture");
 
         //Bénéficiaire
         //L'aéroclub du pilote :
@@ -401,8 +439,12 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         templateCeTmp.replace("xxR", "X");
         //Cheque a retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
+        //Virement => non coché
+        templateCeTmp.replace("zzV", "");
         //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
+        //Jusitificatif => pas de justificatif pour une remise...
+        templateCeTmp.replace("xxJustificatif", "-");
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
         //Signature
@@ -438,10 +480,14 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         templateCeTmp.replace("xxD", "");
         //Recette
         templateCeTmp.replace("xxR", "X");
-        //Cheque a retirer au CE par le demandeur => non coché
+        //Chèque à retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
+        //Virement => non coché
+        templateCeTmp.replace("zzV", "");
         //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
+        //Jusitificatif => pas de justificatif...
+        templateCeTmp.replace("xxJustificatif", "-");
 
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
@@ -503,14 +549,19 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT )
     {
         const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = db->recupererLesDemandesDeRembousementAEmettre().at(0);
+
         //Dépense
         templateCeTmp.replace("xxD", "X");
         //Recette
         templateCeTmp.replace("xxR", "");
-        //Cheque a retirer au CE par le demandeur => coché
+        //Chèque à retirer au CE par le demandeur => coché
         templateCeTmp.replace("zzC", "X");
-        //Bénéficiaire : le CSE
+        //Virement : non coché pour le moment
+        templateCeTmp.replace("zzV", "");
+        //Bénéficiaire : le pilote qui a payé
         templateCeTmp.replace("xxBeneficiaire", demandeRembousement.payeur);
+        //Jusitificatif => facture
+        templateCeTmp.replace("xxJustificatif", "Facture");
 
         //Montant
         remplirLeChampMontant(templateCeTmp, demandeRembousement.montant);

@@ -2636,6 +2636,7 @@ void AeroDms::genererPdf()
                 boutonFusionnerLesPdf->font().bold(),
                 boutonOptionRecapAnnuelRecettes->isChecked(),
                 boutonOptionRecapAnnuelBaladesSorties->isChecked(),
+                false,
                 calculerValeurGraphAGenererPdf());
         }
         break;

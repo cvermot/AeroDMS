@@ -255,6 +255,7 @@ public:
         bool mergerTousLesPdf = false;
         bool recapHdVAvecRecettes = false;
         bool recapHdVAvecBaladesEtSorties = false;
+        bool virementEstAutorise = false;
         int recapHdvGraphAGenerer = 0;
         //int idFacture;
     };

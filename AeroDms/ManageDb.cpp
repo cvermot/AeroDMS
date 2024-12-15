@@ -443,7 +443,6 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
         {
             requete = requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPiloteSoumis");
         }
-        qDebug() << requete;
         queryVolAnneePilote.prepare(requete);
         queryVolAnneePilote.bindValue(":annee", QString::number(subvention.annee));
         queryVolAnneePilote.bindValue(":piloteId", subvention.idPilote);
