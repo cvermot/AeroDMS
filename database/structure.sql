@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. déc. 13 17:34:18 2024
+-- File generated with SQLiteStudio v3.4.4 on lun. déc. 16 19:19:46 2024
 --
 -- Text encoding used: UTF-8
 --
@@ -31,7 +31,7 @@ INSERT INTO aeronef (immatriculation, type) VALUES (NULL, 'Inconnu');
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL);
 
 -- Table: demandeRemboursementSoumises
-CREATE TABLE IF NOT EXISTS demandeRemboursementSoumises (demandeId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, dateDemande TEXT NOT NULL, montant REAL NOT NULL, nomBeneficiaire TEXT NOT NULL, typeDeDemande TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL);
+CREATE TABLE IF NOT EXISTS demandeRemboursementSoumises (demandeId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, dateDemande TEXT NOT NULL, montant REAL NOT NULL, nomBeneficiaire TEXT NOT NULL, typeDeDemande TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, modeDeReglement NOT NULL DEFAULT Chèque);
 
 -- Table: facturesSorties
 CREATE TABLE IF NOT EXISTS facturesSorties (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, sortie INTEGER REFERENCES sortie (sortieId) NOT NULL, facture INTEGER REFERENCES fichiersFacture (factureId) NOT NULL, date TEXT, montant REAL NOT NULL, intitule TEXT, payeur TEXT NOT NULL REFERENCES pilote (piloteId), demandeRemboursement NUMERIC REFERENCES demandeRemboursementSoumises (demandeId));
@@ -90,6 +90,7 @@ dateDemande,
 nomBeneficiaire, 
 montant, 
 typeDeDemande, 
+modeDeReglement,
 strftime('%Y', vol.date) AS anneeVol,
 SUM(vol.montantRembourse) AS totalRembourse, 
 SUM(vol.cout) AS totalCoutVol, 

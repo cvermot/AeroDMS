@@ -351,10 +351,6 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
     templateCeTmp.replace("xxI", "");
     //Signataire => toujours celui qui exécute le logiciel
     templateCeTmp.replace("xxSignataire", demandeEnCours.nomTresorier);
-    //Pour le moment réglement par virement non géré => on met tous les champs à vide
-    templateCeTmp.replace("xxBeneficiaireVirement", "");
-    templateCeTmp.replace("xxIBAN", "");
-    templateCeTmp.replace("xxBIC", "");
 
     //On génère un fichier de recap de l'état des subventions déjà allouées avant les demandes que l'on va générer ensuite
     if (listeAnnees.size() > 0)
@@ -372,6 +368,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
     {    
         const AeroDmsTypes::DemandeRemboursement demande = db->recupererLesSubventionsAEmettre().at(0);
+        const AeroDmsTypes::Club aeroclub = db->recupererInfosAeroclubDuPilote(demande.piloteId);
         //Dépense
         templateCeTmp.replace("xxD", "X");
         //Recette
@@ -382,16 +379,52 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //Signature
         remplirLeChampSignature(templateCeTmp);
 
-        //Chèque à retirer au CE par le demandeur => à cocher
-        templateCeTmp.replace("zzC", "X");
-        //Virement : non coché pour le moment
-        templateCeTmp.replace("zzV", "");
+        //Si virement autorisé et IBAN club renseigné => on prépare une demande de
+        //subvention par virement
+        if (demandeEnCours.virementEstAutorise
+            && aeroclub.iban != "")
+        {
+            //Chèque à retirer au CE par le demandeur => non coché
+            templateCeTmp.replace("zzC", "");
+            //Virement : à cocher
+            templateCeTmp.replace("zzV", "X");
+
+            //On renseigne les infos bancaires
+            //Si une raison sociale est renseignée, on l'utilise
+            //Sinon bénéficiaire = nom du club
+            if (aeroclub.raisonSociale != "")
+            {
+                templateCeTmp.replace("zzBeneficiaireVirement", aeroclub.raisonSociale);
+            }
+            else
+            {
+                templateCeTmp.replace("zzBeneficiaireVirement", aeroclub.aeroclub);
+            }
+            templateCeTmp.replace("zzIBAN", aeroclub.iban);
+            templateCeTmp.replace("zzBIC", aeroclub.bic);
+
+            demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_VIREMENT;
+        }
+        //Dans tous les autres cas, chèque
+        else
+        {
+            //Chèque à retirer au CE par le demandeur => à cocher
+            templateCeTmp.replace("zzC", "X");
+            //Virement : non coché
+            templateCeTmp.replace("zzV", "");
+
+            //Champs relatifs aux infos bancaires => vide
+            rincerInfosIban(templateCeTmp);
+
+            demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
+        }
+        
         //Jusitificatif => facture
         templateCeTmp.replace("xxJustificatif", "Facture");
 
         //Bénéficiaire
         //L'aéroclub du pilote :
-        templateCeTmp.replace("xxBeneficiaire", db->recupererAeroclub(demande.piloteId));
+        templateCeTmp.replace("xxBeneficiaire", aeroclub.aeroclub);
 
         //Observation
         QString observation = demande.typeDeVol;
@@ -417,7 +450,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.idPilote = demande.piloteId;
         demandeEnCours.annee = demande.annee;
         demandeEnCours.typeDeVol = demande.typeDeVol;
-        demandeEnCours.nomBeneficiaire = db->recupererAeroclub(demande.piloteId);
+        demandeEnCours.nomBeneficiaire = aeroclub.aeroclub;
         demandeEnCours.montant = demande.montantARembourser;
         demandeEnCours.nomFichier = ".HdV_"
             + (demande.typeDeVol) 
@@ -439,8 +472,9 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         templateCeTmp.replace("xxR", "X");
         //Cheque a retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
-        //Virement => non coché
+        //Virement => non coché et champs liés vides
         templateCeTmp.replace("zzV", "");
+        rincerInfosIban(templateCeTmp);
         //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
         //Jusitificatif => pas de justificatif pour une remise...
@@ -470,6 +504,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.nomFichier = ".Cotisations_"
             +(QString::number(demandeEnCours.annee));
         demandeEnCours.listeFactures = QStringList();
+        demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
     }
     //Recettes "passagers" des sorties et balades
     else if (db->recupererLesRecettesBaladesEtSortiesAEmettre().size() > 0
@@ -482,8 +517,9 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         templateCeTmp.replace("xxR", "X");
         //Chèque à retirer au CE par le demandeur => non coché
         templateCeTmp.replace("zzC", "");
-        //Virement => non coché
+        //Virement => non coché et champs liés vides
         templateCeTmp.replace("zzV", "");
+        rincerInfosIban(templateCeTmp);
         //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
         //Jusitificatif => pas de justificatif...
@@ -543,6 +579,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.nomFichier = ".RecetteBalades_"
             +(QString::number(demandeEnCours.annee));
         demandeEnCours.listeFactures = QStringList();
+        demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
     }
     //Factures payées par les pilotes à rembourser
     else if ( db->recupererLesDemandesDeRembousementAEmettre().size() > 0
@@ -554,10 +591,28 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         templateCeTmp.replace("xxD", "X");
         //Recette
         templateCeTmp.replace("xxR", "");
-        //Chèque à retirer au CE par le demandeur => coché
-        templateCeTmp.replace("zzC", "X");
-        //Virement : non coché pour le moment
-        templateCeTmp.replace("zzV", "");
+        if (demandeEnCours.virementEstAutorise)
+        {
+            //Chèque à retirer au CE par le demandeur => non coché
+            templateCeTmp.replace("zzC", "");
+            //Virement => coché
+            templateCeTmp.replace("zzV", "X");
+            demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_VIREMENT;
+        }
+        else
+        {
+            //Chèque à retirer au CE par le demandeur => coché
+            templateCeTmp.replace("zzC", "X");
+            //Virement => non coché
+            templateCeTmp.replace("zzV", "");
+            demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
+        }
+
+        //Dans ce cas on peut avoir un remboursement par virement
+        //mais pour les pilotes le CSE dispose des infos bancaires
+        //=> on laisse ces champs vides
+        rincerInfosIban(templateCeTmp);
+
         //Bénéficiaire : le pilote qui a payé
         templateCeTmp.replace("xxBeneficiaire", demandeRembousement.payeur);
         //Jusitificatif => facture
@@ -1396,4 +1451,12 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
     }
 
     return nbGraph;
+}
+
+void PdfRenderer::rincerInfosIban(QString& p_templateCe)
+{
+    //Champs relatifs aux infos bancaires => vide
+    p_templateCe.replace("zzBeneficiaireVirement", "");
+    p_templateCe.replace("zzIBAN", "");
+    p_templateCe.replace("zzBIC", "");
 }

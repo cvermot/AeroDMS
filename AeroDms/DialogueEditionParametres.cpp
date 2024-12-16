@@ -157,6 +157,14 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     nomTresorier->setText(p_parametresMetiers.nomTresorier);
 
+    ligneActuelle = financeLayout->rowCount();
+    autoriserVirement = new QCheckBox(this);
+    autoriserVirement->setToolTip(tr("Autorise le remboursement par virement. Active le template de formulaire adéquat."));
+    financeLayout->addWidget(new QLabel(tr("Remboursement par virement autorisé : "), this), ligneActuelle, K_COLONNE_LABEL);
+    financeLayout->addWidget(autoriserVirement, ligneActuelle, K_COLONNE_CHAMP);
+
+    autoriserVirement->setChecked(p_parametresSysteme.autoriserReglementParVirement);
+
     //Eléments impression
     QGridLayout* impressionLayout = new QGridLayout();
     QWidget* impressionWidget = new QWidget(this);
@@ -477,6 +485,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesTraitees = facturesSaisies->text();
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
+    parametresSysteme.autoriserReglementParVirement = autoriserVirement->isChecked();
     parametresSysteme.utiliserRessourcesHtmlInternes = utiliserRessourcesHtmlInternes->currentData().toBool();
     parametresSysteme.loginSiteDaca = loginDaca->text();
     parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();

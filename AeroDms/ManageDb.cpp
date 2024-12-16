@@ -69,16 +69,22 @@ AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
 
     while (query.next()) 
     {
-        AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
-        aeroclub.idAeroclub = query.value("aeroclubId").toInt();
-        aeroclub.aeroclub = query.value("aeroclub").toString();
-        aeroclub.raisonSociale = query.value("raisonSociale").toString();
-        aeroclub.iban = query.value("iban").toString();
-        aeroclub.bic = query.value("bic").toString();
-        listeDesClubs.append(aeroclub);
+        listeDesClubs.append(depilerRequeteAeroclub(query));
     }
 
     return listeDesClubs;
+}
+
+AeroDmsTypes::Club ManageDb::depilerRequeteAeroclub(const QSqlQuery p_query)
+{
+    AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
+    aeroclub.idAeroclub = p_query.value("aeroclubId").toInt();
+    aeroclub.aeroclub = p_query.value("aeroclub").toString();
+    aeroclub.raisonSociale = p_query.value("raisonSociale").toString();
+    aeroclub.iban = p_query.value("iban").toString();
+    aeroclub.bic = p_query.value("bic").toString();
+
+    return aeroclub;
 }
 
 AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
@@ -659,6 +665,14 @@ AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemandesRemb
         demande.coutTotalVolAssocies = query.value("totalCoutVol").toFloat();
         demande.piloteId = query.value("vol.pilote").toString();
         demande.nomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
+        if (query.value("modeDeReglement").toString() == "Virement")
+        {
+            demande.modeDeReglement = AeroDmsTypes::ModeDeReglement_VIREMENT;
+        }
+        else
+        {
+            demande.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
+        }
 
         liste.append(demande);
     }
@@ -931,11 +945,19 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
 {
     //On créé l'entrée dans demandeRemboursementSoumises
     QSqlQuery query;
-    query.prepare("INSERT INTO demandeRemboursementSoumises (dateDemande, montant, nomBeneficiaire, typeDeDemande) VALUES (:dateDemande, :montant, :nomBeneficiaire, :typeDeDemande) RETURNING demandeRemboursementSoumises.demandeId");
+    query.prepare("INSERT INTO demandeRemboursementSoumises (dateDemande, montant, nomBeneficiaire, typeDeDemande, modeDeReglement) VALUES (:dateDemande, :montant, :nomBeneficiaire, :typeDeDemande, :modeDeReglement) RETURNING demandeRemboursementSoumises.demandeId");
     query.bindValue(":dateDemande", QDate::currentDate().toString("yyyy-MM-dd"));
     query.bindValue(":montant", p_demande.montant);
     query.bindValue(":nomBeneficiaire", p_demande.nomBeneficiaire);
     query.bindValue(":typeDeDemande", p_demande.typeDeVol);
+    if (p_demande.modeDeReglement == AeroDmsTypes::ModeDeReglement_VIREMENT)
+    {
+        query.bindValue(":modeDeReglement", "Virement");
+    }
+    else
+    {
+        query.bindValue(":modeDeReglement", "Chèque");
+    }
     query.exec();
     query.next();
     const int idDemandeRemboursement = query.value(0).toInt();
@@ -1166,6 +1188,18 @@ QString ManageDb::recupererAeroclub(const QString p_piloteId)
     query.exec();
     query.next();
     return query.value("aeroclub").toString();
+}
+
+AeroDmsTypes::Club ManageDb::recupererInfosAeroclubDuPilote(const QString p_piloteId)
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM infosPilotes WHERE piloteId = :piloteId");
+    query.bindValue(":piloteId", p_piloteId);
+
+    query.exec();
+    query.next();
+
+    return depilerRequeteAeroclub(query);
 }
 
 AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()

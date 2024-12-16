@@ -102,6 +102,8 @@ private :
 		const QString p_fichierPng,
 		const QSize targetSize);
 
+	void rincerInfosIban(QString& p_templateCe);
+
 signals:
 	void mettreAJourNombreFacturesTraitees(int p_nombreFacturesTraitees);
 	void mettreAJourNombreFacturesATraiter(int p_nombreFacturesATraiter);

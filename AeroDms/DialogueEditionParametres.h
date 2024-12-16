@@ -43,6 +43,7 @@ private:
     QTextEdit* texteSubventionRestantes = nullptr;
     QLineEdit* objetAutresMailings = nullptr;
     QLineEdit* nomTresorier = nullptr;
+    QCheckBox* autoriserVirement = nullptr;
     QSpinBox* delaisGardeBdd = nullptr;
     QDoubleSpinBox* proportionRemboursementBalade = nullptr;
     QDoubleSpinBox* proportionParticipationBalade = nullptr;

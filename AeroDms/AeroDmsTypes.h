@@ -88,8 +88,9 @@ public:
         SubventionDemandeeTableElement_TYPE_DEMANDE = 0x3,
         SubventionDemandeeTableElement_MONTANT = 0x4,
         SubventionDemandeeTableElement_MONTANT_VOL = 0x5,
-        SubventionDemandeeTableElement_ID_DEMANDE = 0x6,
-        SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x7,
+        SubventionDemandeeTableElement_MODE_DE_REGLEMENT = 0x6,
+        SubventionDemandeeTableElement_ID_DEMANDE = 0x7,
+        SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x8,
     };
 
     enum RecetteTableElement {
@@ -240,12 +241,19 @@ public:
         EtatRecuperationDonneesFactures_ECHEC_RECUPERATION_FACTURE
     };
 
+    enum ModeDeReglement
+    {
+        ModeDeReglement_CHEQUE,
+        ModeDeReglement_VIREMENT,
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
         QString idPilote = "";
         QString typeDeVol = "";
         QString nomBeneficiaire = "";
         float montant = 0.0;
+        ModeDeReglement modeDeReglement = ModeDeReglement_CHEQUE;
         int annee = -1;
         QString nomTresorier = "";
         QString nomFichier = "";
@@ -394,6 +402,7 @@ public:
         QString nomPilote;
         QString piloteId;
         QString typeDeVol;
+        AeroDmsTypes::ModeDeReglement modeDeReglement;
         float montant;
         float coutTotalVolAssocies;
         int anneeVol;     
@@ -510,6 +519,7 @@ public:
         int margesHautBas;
         int margesGaucheDroite;
         ParametresImpression parametresImpression;
+        bool autoriserReglementParVirement;
         bool utiliserRessourcesHtmlInternes;
     };
 

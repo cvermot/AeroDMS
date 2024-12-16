@@ -198,6 +198,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settingsMetier.setValue("margesHautBas", "20");
         settingsMetier.setValue("margesGaucheDroite", "20");
         settingsMetier.setValue("utiliserRessourcesHtmlInternes", true);
+        settingsMetier.setValue("autoriserReglementParVirement", false);
         settingsMetier.endGroup();
     }
 
@@ -212,6 +213,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
+    parametresSysteme.autoriserReglementParVirement = settingsMetier.value("parametresSysteme/autoriserReglementParVirement", false).toBool();
     parametresSysteme.utiliserRessourcesHtmlInternes = settingsMetier.value("parametresSysteme/utiliserRessourcesHtmlInternes", true).toBool();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
     parametresSysteme.periodiciteVerificationPresenceFactures = settings.value("siteDaca/periodiciteVerification", 3).toInt();
@@ -769,6 +771,7 @@ void AeroDms::initialiserOngletSubventionsDemandees()
     vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem("Type de demande"));
     vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem("Montant"));
     vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem("Montant vol"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem("Mode de réglement"));
     vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem("ID demande"));
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
     vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -2101,6 +2104,14 @@ void AeroDms::peuplerTableSubventionsDemandees()
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem(facture.typeDeVol));
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant, 'f', 2).append(" €")));
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem(QString::number(facture.coutTotalVolAssocies, 'f', 2).append(" €")));
+            if (facture.modeDeReglement == AeroDmsTypes::ModeDeReglement_VIREMENT)
+            {
+                vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem(tr("Virement")));
+            }
+            else
+            {
+                vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem(tr("Chèque")));
+            }
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem(QString::number(facture.id)));
 
             nbItems++;
@@ -2506,11 +2517,13 @@ void AeroDms::chargerUneFacture(const QString p_fichier, const bool p_laFactureA
     cheminDeLaFactureCourante = p_fichier;
 
     choixPilote->setEnabled(true);
+    choixPayeur->setEnabled(true);
     dureeDuVol->setEnabled(true);
     prixDuVol->setEnabled(true);
     typeDeVol->setEnabled(true);
 
     choixPilote->setCurrentIndex(0);
+    choixPayeur->setCurrentIndex(0);
     dureeDuVol->setTime(QTime::QTime(0, 0));
     prixDuVol->setValue(0);
     remarqueVol->clear();
@@ -2636,7 +2649,7 @@ void AeroDms::genererPdf()
                 boutonFusionnerLesPdf->font().bold(),
                 boutonOptionRecapAnnuelRecettes->isChecked(),
                 boutonOptionRecapAnnuelBaladesSorties->isChecked(),
-                false,
+                parametresSysteme.autoriserReglementParVirement,
                 calculerValeurGraphAGenererPdf());
         }
         break;
@@ -3688,6 +3701,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settingsMetier.setValue("delaisDeGardeDbEnMs", parametresMetiers.delaisDeGardeBdd);
     settingsMetier.setValue("margesHautBas", parametresSysteme.margesHautBas);
     settingsMetier.setValue("margesGaucheDroite", parametresSysteme.margesGaucheDroite);
+    settingsMetier.setValue("autoriserReglementParVirement", parametresSysteme.autoriserReglementParVirement);
     settingsMetier.setValue("utiliserRessourcesHtmlInternes", parametresSysteme.utiliserRessourcesHtmlInternes);
     settingsMetier.endGroup();
 

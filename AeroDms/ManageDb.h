@@ -37,6 +37,7 @@ public:
     AeroDmsTypes::Pilote recupererPilote(const QString p_idPilote);
     AeroDmsTypes::ListeAeroclubs recupererAeroclubs();
     AeroDmsTypes::Club recupererAeroclub(int p_aeroclubId);
+    AeroDmsTypes::Club recupererInfosAeroclubDuPilote(const QString p_piloteId);
 
     int recupererProchainNumeroFacture();
     int ajouterFacture(QString& nomFichier);
@@ -97,8 +98,7 @@ public:
     AeroDmsTypes::ListeVols recupererVols( const int p_annee = -1, 
                                            const QString p_piloteId = "*");
     AeroDmsTypes::Vol recupererVol(const int p_idVol);
-    AeroDmsTypes::Vol depilerRequeteVol( const QSqlQuery p_query,
-                                         const bool p_avecFactureEtSortie = true);
+    
     AeroDmsTypes::ListeDemandesRemboursementSoumises recupererDemandesRemboursementSoumises( const int p_annee,
                                                                                              const QString p_piloteId);
 
@@ -159,6 +159,10 @@ private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
     const float versionBddAttendue = 1.9;
+
+    AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
+    AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
+        const bool p_avecFactureEtSortie = true);
 };
 
 #endif
