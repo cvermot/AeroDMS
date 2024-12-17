@@ -359,7 +359,6 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote AS SELECT
     vol.pilote,
     vol.typeDeVol,
     vol.activite,
-    vol.montantRembourse AS subvention,
     pilote.nom,
     pilote.prenom,
     strftime('%Y', vol.date) AS annee,
@@ -368,6 +367,23 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote AS SELECT
     SUM(vol.duree) AS tempsDeVol
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
+GROUP BY vol.pilote, vol.typeDeVol, annee
+ORDER BY annee, vol.pilote, typeDeVol;
+
+-- View: volParTypeParAnEtParPilote_VolsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPilote_VolsAvecSubventionUniquement AS SELECT 
+    vol.pilote,
+    vol.typeDeVol,
+    vol.activite,
+    pilote.nom,
+    pilote.prenom,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.cout) AS cout,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+WHERE vol.montantRembourse != 0
 GROUP BY vol.pilote, vol.typeDeVol, annee
 ORDER BY annee, vol.pilote, typeDeVol;
 

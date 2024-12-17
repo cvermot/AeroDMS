@@ -198,7 +198,6 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 const QByteArray sdata = rep->readAll();
                 if (sdata.contains("%PDF-1.7"))
                 {
-                    //qDebug() << "OK fichier PDF";
                     QString nomFichier = repertoireFacturesATraiter
                         + "/" 
                         + facture.pilote
@@ -228,8 +227,6 @@ void PdfDownloader::serviceRequestFinished(QNetworkReply* rep)
                 }
                 else
                 {
-                    //qDebug() << "Fichier non PDF. Redemande telech";
-
                     if (nombreEssais < 3)
                     {
                         telechargerFichier();

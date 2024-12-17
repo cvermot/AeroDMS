@@ -420,9 +420,6 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
     query.exec();
 
     const QString filtre = genererClauseFiltrageActivite(p_options);
-    const QString filtreVolsAvecSubvention = ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
-        ? " AND subvention != 0 "
-        : "";
 
     //pour chaque pilote et chaque année de cotisation, on recupère les éventuelles heures de vol effectuées
     while (query.next())
@@ -442,12 +439,16 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
             "WHERE annee = :annee AND pilote = :piloteId";
         requete = requete  
             + (filtre != "" ? " AND " : "") 
-            + filtre
-            + filtreVolsAvecSubvention;
+            + filtre;
         //Si on veut uniquement les totaux des vols déjà soumis au CSE, on remplace la vue volParTypeParAnEtParPilote par volParTypeParAnEtParPiloteSoumis
         if (p_volsSoumisUniquement)
         {
             requete = requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPiloteSoumis");
+        }
+        //Sinon (condition exclusive), si on veut uniquement les vols pour lesquels on a eu de la subvention
+        else if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+        {
+            requete = requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPilote_VolsAvecSubventionUniquement");
         }
         queryVolAnneePilote.prepare(requete);
         queryVolAnneePilote.bindValue(":annee", QString::number(subvention.annee));
@@ -1600,29 +1601,28 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
     QString requete = "";
     if (p_annee != -1)
     {
-        requete = "SELECT * FROM stats_heuresDeVolParMois WHERE annee = :annee ";
+        requete = "SELECT mois, annee, SUM(tempsDeVol) AS tempsDeVol, typeDeVol, activite FROM stats_heuresDeVolParMois WHERE annee = :annee ";
         if (filtre != "")
         {
             requete = requete + " AND ";
             requete = requete + filtre;
         }
-        requete = requete + " GROUP BY mois, typeDeVol";
+        requete = requete + " GROUP BY typeDeVol, mois ORDER BY mois";
     }
     else
     {
-        requete = "SELECT * FROM stats_heuresDeVolParMois ";
+        requete = "SELECT mois, annee, SUM(tempsDeVol) AS tempsDeVol, typeDeVol, activite FROM stats_heuresDeVolParMois ";
         if (filtre != "")
         {
             requete = requete + " WHERE ";
             requete = requete + filtre;
         }
-        requete = requete + " GROUP BY annee, mois, typeDeVol";
+        requete = requete + " GROUP BY typeDeVol, mois, annee ORDER BY annee, mois";
     }
     if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
     {
         requete = requete.replace("stats_heuresDeVolParMois", "stats_heuresDeVolParMois_volsAvecSubventionUniquement");
     }
-    
 
     QSqlQuery query;
     query.prepare(requete);
@@ -1693,7 +1693,6 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
     {
         liste.append(heuresMensuelles);
     }
-
     return liste;
 }
 

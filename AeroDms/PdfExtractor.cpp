@@ -92,7 +92,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             else if (QString(entries.at(index).Text.data()).contains("ATVV"))
             {
                 aeroclub = AeroDmsTypes::Aeroclub_ATVV;
-                qDebug() << "Aéroclub trouvé : ATVV";
+                //qDebug() << "Aéroclub trouvé : ATVV";
             }
             index++;
         }
