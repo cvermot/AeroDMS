@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSvgGenerator>
 #include <QSvgRenderer>
 #include <QtConcurrent>
+#include <QWebEngineSettings>
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
                           const QString p_cheminTemplatesHtml, 
@@ -40,6 +41,9 @@ PdfRenderer::PdfRenderer( ManageDb *p_db,
     db = p_db;
     marges = p_marges;
 	view = new QWebEnginePage(this);
+    QWebEngineSettings* settings = view->settings();
+    settings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls, true);
+    settings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
     nombreEtapesEffectuees = 0;
     indiceFichier = 0;
     laDemandeEstPourUnDocumentUnique = false;
@@ -205,8 +209,9 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         listeDesFichiers.clear();
 
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
-                                                                                                                   "*",
-                                                                                                                   false);
+            "*",
+            AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+            false);
         const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
         const AeroDmsTypes::EtatGeneration generationRecapAnnuel = imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
                                                                                                       listePilotesDeCetteAnnee, 
@@ -441,6 +446,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //On envoie le HTML en génération
         view->setHtml( templateCeTmp, 
                        ressourcesHtml);
+        qDebug() << templateCeTmp;
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
         listeDesFichiers.append(facturesAssociees);
@@ -877,12 +883,19 @@ void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant) 
 
 void PdfRenderer::remplirLeChampSignature(QString& p_html) const
 {
+    QString prefixe = "";
+    if (ressourcesHtml.scheme() == "qrc")
+    {
+        //prefixe = "file:///";
+    }
     //Signature => 
     switch (demandeEnCours.typeDeSignatureDemandee)
     {
         case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
         {
-            p_html.replace("xxSignature", "<img src=\""+ AeroDmsServices::recupererCheminFichierImageSignature() +"\" width=\"140\" />");
+            //p_html.replace("xxSignature", "<img src=\"./AeroDMS/signature.svg\" width=\"140\" />");
+            p_html.replace("xxSignature", "<img src=\"qrc:/signature/signature.svg\" width=\"140\" />");
+            //p_html.replace("xxSignature", "<img src=\"" + prefixe + AeroDmsServices::recupererCheminFichierImageSignature() +"\" width=\"140\" />");
         }
         break;
 
@@ -894,7 +907,8 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html) const
                 //se trouvera sur la première page   
                 if (AeroDmsServices::recupererCheminFichierImageSignature() != "")
                 {
-                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + AeroDmsServices::recupererCheminFichierImageSignature() + "\" width=\"140\" />");
+                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"qrc:/signature/signature.svg\" width=\"140\" />");
+                    //p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + prefixe + AeroDmsServices::recupererCheminFichierImageSignature() + "\" width=\"140\" />");
                 }
                 else
                 {

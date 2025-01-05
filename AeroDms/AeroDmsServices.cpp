@@ -744,4 +744,3 @@ QFile AeroDmsServices::fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier)
 
     return QFile(filePath);
 }
-

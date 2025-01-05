@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfPrinter.h"
 #include "PdfDownloader.h"
 
+#include "RccGenerator.h"
+
 #include "StatistiqueHistogrammeEmpile.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
 #include "StatistiqueDonutCombineWidget.h"
@@ -740,6 +742,14 @@ void AeroDms::verifierSignatureNumerisee()
     else
     {
         boutonSignatureManuelle->activate(QAction::Trigger);
+       
+        QString cheminOut = QCoreApplication::applicationDirPath() + "/" + QCoreApplication::applicationName() + "/signature.rcc";
+
+        RCCResourceLibrary library;
+        library.readFiles(AeroDmsServices::recupererCheminFichierImageSignature());
+        library.output(cheminOut);
+
+        QResource::registerResource(cheminOut);
     }
 }
 
@@ -1907,7 +1917,9 @@ void AeroDms::peuplerTablePilotes()
     gererBoutonEditionPilote();
 
     const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = db->recupererSubventionsPilotes( listeDeroulanteAnnee->currentData().toInt(), 
-                                                                                                       listeDeroulantePilote->currentData().toString());
+        listeDeroulantePilote->currentData().toString(),
+        AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+        false);
     vuePilotes->setRowCount(listeSubventions.size());
     for (int i = 0; i < listeSubventions.size(); i++)
     {

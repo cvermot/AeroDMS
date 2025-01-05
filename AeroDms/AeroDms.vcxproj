@@ -124,6 +124,7 @@
     <ClCompile Include="PdfExtractor.cpp" />
     <ClCompile Include="PdfPrinter.cpp" />
     <ClCompile Include="PdfPrinterWorker.cpp" />
+    <ClCompile Include="RccGenerator.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaire.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculairePartie.cpp" />
     <ClCompile Include="StatistiqueDiagrammeCirculaireWidget.cpp" />
@@ -162,6 +163,7 @@
     <QtMoc Include="PdfDownloader.h" />
     <QtMoc Include="PdfPrinterWorker.h" />
     <QtMoc Include="DialogueGestionAeroclub.h" />
+    <ClInclude Include="RccGenerator.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />
     <QtMoc Include="StatistiqueDonutCombineWidget.h" />
