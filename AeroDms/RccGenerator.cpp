@@ -1,6 +1,7 @@
 // Copyright (C) 2018 The Qt Company Ltd.
 // Copyright (C) 2018 Intel Corporation.
 // Copyright (C) 2024 Christoph Cullmann <christoph@cullmann.io>
+// Copyright (C) 2025 ClÃ©ment Vermot-Desroches
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 
 #include "RccGenerator.h"
@@ -140,7 +141,7 @@ void RCCFileInfo::writeDataInfo(RCCResourceLibrary& lib)
         lib.writeNumber4(m_dataOffset);
     }
 
-	//On ne gère que les version de format supérieur ou égale à 2
+	//On ne gÃ¨re que les version de format supÃ©rieur ou Ã©gale Ã  2
     // last modified time stamp
     const QDateTime lastModified = m_fileInfo.lastModified(QTimeZone::UTC);
     quint64 lastmod = quint64(lastModified.isValid() ? lastModified.toMSecsSinceEpoch() : 0);
@@ -170,7 +171,7 @@ qint64 RCCFileInfo::writeDataBlob(RCCResourceLibrary& lib,
                 QApplication::applicationName() + " - " + QObject::tr("Gestion fichier image signature"),
                 QObject::tr("Le fichier signature") +
                 absoluteFilePath +
-                QObject::tr("est impossible à ouvrir. Erreur :\n")
+                QObject::tr("est impossible Ã  ouvrir. Erreur :\n")
                 + file.errorString());
             return 0;
         }
@@ -189,7 +190,7 @@ qint64 RCCFileInfo::writeDataBlob(RCCResourceLibrary& lib,
                     QApplication::applicationName() + " - " + QObject::tr("Gestion fichier image signature"),
                     QObject::tr("Le fichier signature") +
                     candidate->m_fileInfo.absoluteFilePath() +
-                    QObject::tr("est impossible à ouvrir. Erreur :\n")
+                    QObject::tr("est impossible Ã  ouvrir. Erreur :\n")
                     + candidateFile.errorString());
                 return 0;
             }
@@ -433,7 +434,7 @@ bool RCCResourceLibrary::writeDataBlobs()
                 if (offset == 0) {
                     QMessageBox::critical(nullptr,
                         QApplication::applicationName() + " - " + QObject::tr("Gestion fichier image signature"),
-                        QObject::tr("Erreur sur l'écriture du fichier signature :\n") +
+                        QObject::tr("Erreur sur l'Ã©criture du fichier signature :\n") +
                         errorMessage);
                     return false;
                 }
