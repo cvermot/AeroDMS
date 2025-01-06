@@ -741,15 +741,23 @@ void AeroDms::verifierSignatureNumerisee()
     }
     else
     {
-        boutonSignatureManuelle->activate(QAction::Trigger);
-       
         QString cheminOut = QCoreApplication::applicationDirPath() + "/" + QCoreApplication::applicationName() + "/signature.rcc";
 
         RCCResourceLibrary library;
         library.readFiles(AeroDmsServices::recupererCheminFichierImageSignature());
         library.output(cheminOut);
 
-        QResource::registerResource(cheminOut);
+        if (QResource::registerResource(cheminOut))
+        {
+            boutonSignatureManuelle->activate(QAction::Trigger);
+        }
+        else
+        {
+            boutonSignatureManuelle->setEnabled(false);
+            QMessageBox::critical(this,
+                QApplication::applicationName() + " - " + tr("Fichier de signature"),
+                tr("Le fichier ressource RCC de signature n'a pas pu être chargé.\nLa signature numérisée n'est pas disponible."));
+        }
     }
 }
 
@@ -992,10 +1000,12 @@ void AeroDms::initialiserMenuFichier()
         this);
     menuFichier->addAction(boutonOuvrirDossierDemandes);
     boutonOuvrirDossierDemandes->setShortcut(QKeySequence::Open);
+    boutonOuvrirDossierDemandes->setStatusTip(tr("Ouvrir le dossier où sont génerées les PDF de demande de subventions"));
     connect(boutonOuvrirDossierDemandes, SIGNAL(triggered()), this, SLOT(ouvrirDossierDemandesSubventions()));
 
     QMenu* menuOuvrirPdfDemandeSubvention = menuFichier->addMenu(tr("Ouvrir un fichier de &demande de subventions"));
     menuOuvrirPdfDemandeSubvention->setIcon(QIcon(":/AeroDms/ressources/file-pdf-box.svg"));
+    menuOuvrirPdfDemandeSubvention->setStatusTip(tr("Ouvrir directement un PDF ou un dossier d'une demande particulière"));
 
     QAction* boutonOuvrirDerniereDemande = new QAction(QIcon(":/AeroDms/ressources/file-outline.svg"), tr("Ouvrir la &dernière demande"), this);
     menuOuvrirPdfDemandeSubvention->addAction(boutonOuvrirDerniereDemande);
@@ -1196,14 +1206,14 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphRatioIso216 = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
         tr("Ratio ISO 216"),
         this);
-    boutonGraphRatioIso216->setToolTip(tr("Ratio d'une page A4"));
+    boutonGraphRatioIso216->setStatusTip(tr("Ratio d'une page A4"));
     resolutionGraphiques->addAction(boutonGraphRatioIso216);
     boutonGraphRatioIso216->setCheckable(true);
 
     boutonGraphRatio16x9 = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RATIO),
         tr("Ratio 16/9"),
         this);
-    boutonGraphRatio16x9->setToolTip(tr("Ratio d'un écran"));
+    boutonGraphRatio16x9->setStatusTip(tr("Ratio d'un écran"));
     resolutionGraphiques->addAction(boutonGraphRatio16x9);
     boutonGraphRatio16x9->setCheckable(true);
 
@@ -1238,7 +1248,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphiquesVolsSubventionnesUniquement = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER),
         tr("Vols avec subvention uniquement"),
         this);
-    boutonGraphiquesVolsSubventionnesUniquement->setToolTip(tr("Ne prendre en compte que les vols ayant bénéficé d'une subventions pour l'élaboration des graphiques"));
+    boutonGraphiquesVolsSubventionnesUniquement->setStatusTip(tr("Ne prendre en compte que les vols ayant effectivement bénéficié d'une subvention pour l'élaboration des graphiques"));
     menuOptionsGraphiques->addAction(boutonGraphiquesVolsSubventionnesUniquement);
     boutonGraphiquesVolsSubventionnesUniquement->setCheckable(true);
     boutonGraphiquesVolsSubventionnesUniquement->setChecked(true);
@@ -1247,7 +1257,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphiquesExclureAvion = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AVION),
         tr("Exclure vols avions"),
         this);
-    boutonGraphiquesExclureAvion->setToolTip(tr("Ne pas prendre en compte les vols avion dans les graphiques"));
+    boutonGraphiquesExclureAvion->setStatusTip(tr("Ne pas prendre en compte les vols avion dans les graphiques"));
     menuOptionsGraphiques->addAction(boutonGraphiquesExclureAvion);
     boutonGraphiquesExclureAvion->setCheckable(true);
     connect(boutonGraphiquesExclureAvion, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
@@ -1255,7 +1265,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphiquesExclureHelico = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_HELICOPTERE),
         tr("Exclure vols hélicoptères"),
         this);
-    boutonGraphiquesExclureHelico->setToolTip(tr("Ne pas prendre en compte les vols hélicoptère dans les graphiques"));
+    boutonGraphiquesExclureHelico->setStatusTip(tr("Ne pas prendre en compte les vols hélicoptère dans les graphiques"));
     menuOptionsGraphiques->addAction(boutonGraphiquesExclureHelico);
     boutonGraphiquesExclureHelico->setCheckable(true);
     connect(boutonGraphiquesExclureHelico, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
@@ -1263,7 +1273,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphiquesExclurePlaneur = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_PLANEUR),
         tr("Exclure vols planeurs"),
         this);
-    boutonGraphiquesExclurePlaneur->setToolTip(tr("Ne pas prendre en compte les vols planeurs dans les graphiques"));
+    boutonGraphiquesExclurePlaneur->setStatusTip(tr("Ne pas prendre en compte les vols planeurs dans les graphiques"));
     menuOptionsGraphiques->addAction(boutonGraphiquesExclurePlaneur);
     boutonGraphiquesExclurePlaneur->setCheckable(true);
     connect(boutonGraphiquesExclurePlaneur, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
@@ -1271,7 +1281,7 @@ void AeroDms::initialiserMenuOptions()
     boutonGraphiquesExclureUlm = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ULM),
         tr("Exclure vols ULM"),
         this);
-    boutonGraphiquesExclureUlm->setToolTip(tr("Ne pas prendre en compte les vols ULM dans les graphiques"));
+    boutonGraphiquesExclureUlm->setStatusTip(tr("Ne pas prendre en compte les vols ULM dans les graphiques"));
     menuOptionsGraphiques->addAction(boutonGraphiquesExclureUlm);
     boutonGraphiquesExclureUlm->setCheckable(true);
     connect(boutonGraphiquesExclureUlm, &QAction::toggled, this, &AeroDms::peuplerStatistiques);
@@ -1472,7 +1482,7 @@ void AeroDms::initialiserMenuAide()
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
 
     boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG), 
-        tr("Activer le mode &débogage"), 
+        texteBoutonActiverModeDebogage,
         this);
     boutonModeDebug->setStatusTip(tr("Active/désactive le mode débogage. Ce mode permet d'afficher des informations supplémentaires dans l'application et de modifier certains paramètres dans la fenêtre de configuration."));
     boutonModeDebug->setCheckable(true);
@@ -3570,7 +3580,7 @@ void AeroDms::switchModeDebug()
     bool masquageEstDemande = false;
 
     //Si le mode debug n'est pas actif
-    if (boutonModeDebug->text() == "Activer le mode &debug")
+    if (boutonModeDebug->text() == texteBoutonActiverModeDebogage)
     {
         boutonModeDebug->setText("Désactiver le mode &debug");
         boutonModeDebug->setIcon(QIcon(":/AeroDms/ressources/bug-stop.svg"));
@@ -3579,7 +3589,7 @@ void AeroDms::switchModeDebug()
     //Sinon, le mode est actif, on désactive
     else
     {
-        boutonModeDebug->setText("Activer le mode &debug");
+        boutonModeDebug->setText(texteBoutonActiverModeDebogage);
         boutonModeDebug->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG));
         masquageEstDemande = true;
     }

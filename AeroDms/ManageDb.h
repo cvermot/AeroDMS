@@ -88,10 +88,10 @@ public:
     AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = -1);
     AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = -1);
     AeroDmsTypes::TotauxRecettes recupererTotauxRecettes(const int p_annee);
-    AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee = -1, 
-        const QString p_piloteId = "*",
-        const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
-        const bool p_volsSoumisUniquement = false);
+    AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee, 
+        const QString p_piloteId,
+        const int p_options,
+        const bool p_volsSoumisUniquement);
     AeroDmsTypes::SubventionsParPilote recupererTotauxAnnuel( const int p_annee,
                                                               const bool p_volsSoumisUniquement = false);
     AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);

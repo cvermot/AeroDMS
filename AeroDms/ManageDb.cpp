@@ -689,6 +689,8 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
     QSqlQuery query;
     query.exec(sql);
 
+    QThread::msleep(delaisDeGardeBdd);
+
     //Recuperation de l'ID de facture
     sql = "SELECT * FROM 'fichiersFacture' WHERE nomFichier='";
     sql.append(p_nomFichier);
@@ -745,6 +747,8 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
         query.bindValue(":immatriculation", p_immat);
         //Le type est par défaut à inconnu
         query.exec();
+
+        QThread::msleep(delaisDeGardeBdd);
     }
 
     //Si on est sur un ajout
@@ -848,8 +852,9 @@ QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
 AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventionesDejaAllouees(const int p_annee)
 {
     return recupererSubventionsPilotes( p_annee, 
-                                        "*", 
-                                        true);
+        "*",
+        AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+        true);
 }
 
 void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
@@ -867,6 +872,8 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.next();
     const int numeroDeRecetteCree = query.value(0).toInt();
 
+    QThread::msleep(delaisDeGardeBdd);
+
     //On itère sur la liste des vols pour associer la recette aux vols :
     for (int i = 0 ; i < p_listeVols.size() ; i++)
     {
@@ -881,8 +888,9 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         query.bindValue(":recetteId", numeroDeRecetteCree);
         query.bindValue(":volId", numeroDeVol);
         query.exec();
-    }
 
+        QThread::msleep(delaisDeGardeBdd);
+    }
 }
 
 bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, const int annee)
@@ -1435,6 +1443,8 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
 
         const int idRecette = query.value(0).toInt();
 
+        QThread::msleep(delaisDeGardeBdd);
+
         query.prepare("INSERT INTO 'cotisation' ('pilote','annee','idRecette', 'montantSubventionAnnuelleEntrainement') VALUES (:pilote, :annee, :idRecette, :montantSubvention)");
         query.bindValue(":pilote", p_infosCotisation.idPilote);
         query.bindValue(":annee",   p_infosCotisation.annee);
@@ -1450,6 +1460,8 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
         query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
         query.exec();
     }
+
+    QThread::msleep(delaisDeGardeBdd);
 
     //Un pilote pour lequel on vient d'ajouter/editer une cotistion est toujours un pilote actif
     query.prepare("UPDATE 'pilote' SET 'estActif' =:estActif WHERE piloteId = :piloteId");
@@ -1741,7 +1753,10 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
         break;
         case AeroDmsTypes::MailPilotes_SUBVENTION_NON_CONSOMMEE:
         {
-            const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = recupererSubventionsPilotes(p_annee, "*");
+            const AeroDmsTypes::ListeSubventionsParPilotes listeSubventions = recupererSubventionsPilotes(p_annee, 
+                "*", 
+                AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS, 
+                false);
             for (int i = 0; i < listeSubventions.size(); i++)
             {
                 const AeroDmsTypes::SubventionsParPilote subvention = listeSubventions.at(i);

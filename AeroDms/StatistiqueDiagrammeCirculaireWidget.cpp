@@ -413,7 +413,8 @@ AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::r
 {
     AeroDmsTypes::ListeSubventionsParPilotes subventionParPilote = p_db->recupererSubventionsPilotes(p_annee, 
         "*", 
-        p_options);
+        p_options, 
+        false);
 
     AeroDmsTypes::ListeSubventionsParPilotes subventionParPiloteSansDoublon = QList<AeroDmsTypes::SubventionsParPilote>();
     while (!subventionParPilote.isEmpty())

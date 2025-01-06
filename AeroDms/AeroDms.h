@@ -309,6 +309,7 @@ private:
 
     //Textes de certains éléments d'IHM
     const QString texteTitreQMenuFacturesDaca = tr("Récupération des factures DACA");
+    const QString texteBoutonActiverModeDebogage = tr("Activer le mode &débogage");
 
 signals:
     void toucheEchapEstAppuyee();
