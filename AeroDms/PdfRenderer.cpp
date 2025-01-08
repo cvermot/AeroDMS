@@ -64,10 +64,13 @@ void PdfRenderer::mettreAJourCheminRessourcesHtml(const QString p_ressources)
     if (p_ressources.at(0) != ":")
     {
         ressourcesHtml = QUrl(QString("file:///%1/").arg(p_ressources));
+        cheminSignature = AeroDmsServices::recupererCheminFichierImageSignature();
     }
     else
     {
-        ressourcesHtml = QUrl(QString("qrc%1").arg(p_ressources));;
+        ressourcesHtml = QUrl(QString("qrc%1").arg(p_ressources));
+        const QFileInfo info(AeroDmsServices::recupererCheminFichierImageSignature());
+        cheminSignature = "qrc:/" + info.fileName();
     }
 }
 
@@ -884,18 +887,13 @@ void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant) 
 void PdfRenderer::remplirLeChampSignature(QString& p_html) const
 {
     QString prefixe = "";
-    if (ressourcesHtml.scheme() == "qrc")
-    {
-        //prefixe = "file:///";
-    }
+    
     //Signature => 
     switch (demandeEnCours.typeDeSignatureDemandee)
     {
         case AeroDmsTypes::Signature_MANUSCRITE_IMAGE:
         {
-            //p_html.replace("xxSignature", "<img src=\"./AeroDMS/signature.svg\" width=\"140\" />");
-            p_html.replace("xxSignature", "<img src=\"qrc:/signature/signature.svg\" width=\"140\" />");
-            //p_html.replace("xxSignature", "<img src=\"" + prefixe + AeroDmsServices::recupererCheminFichierImageSignature() +"\" width=\"140\" />");
+            p_html.replace("xxSignature", "<img src=\"" + cheminSignature +"\" width=\"140\" />");
         }
         break;
 
@@ -907,8 +905,7 @@ void PdfRenderer::remplirLeChampSignature(QString& p_html) const
                 //se trouvera sur la première page   
                 if (AeroDmsServices::recupererCheminFichierImageSignature() != "")
                 {
-                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"qrc:/signature/signature.svg\" width=\"140\" />");
-                    //p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + prefixe + AeroDmsServices::recupererCheminFichierImageSignature() + "\" width=\"140\" />");
+                    p_html.replace("xxSignature", "<font size=\"1\">Cachet de signature numérique<br/>en première page</font><br /><img src=\"" + cheminSignature + "\" width=\"140\" />");
                 }
                 else
                 {

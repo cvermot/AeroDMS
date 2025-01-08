@@ -135,7 +135,7 @@ void RCCFileInfo::writeDataInfo(RCCResourceLibrary& lib)
 
         // locale
         lib.writeNumber2(QLocale::AnyTerritory);
-        lib.writeNumber2(QLocale::AnyLanguage);
+        lib.writeNumber2(QLocale::C);
 
         //data offset
         lib.writeNumber4(m_dataOffset);

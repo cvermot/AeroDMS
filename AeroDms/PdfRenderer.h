@@ -57,6 +57,7 @@ private :
 	ManageDb *db;
 	QMarginsF marges;
 	QUrl ressourcesHtml;
+	QString cheminSignature = "";
 
 	QString cheminSortieFichiersGeneres;
 	QString repertoireDesFactures;

@@ -3321,7 +3321,7 @@ void AeroDms::aPropos()
         + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
         + tr("L'image de démarrage est générée avec")
         + " <a href = \"https://designer.microsoft.com/\">Microsoft Designer</a>.< br />< br />"
-        + tr("Ce programme inclus du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>")
+        + tr("Ce programme inclut du code source inspiré de code sous licence BSD-3-Clause (Copyright (C) The Qt Company Ltd).<br />< br/>")
         + tr("Mentions légales : <br />")
         + " This program is free software: you can redistribute it and/or modify"
         " it under the terms of the GNU General Public License as published by"
