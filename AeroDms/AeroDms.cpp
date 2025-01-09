@@ -2385,19 +2385,38 @@ void AeroDms::ajouterUneSortieEnBdd()
 
 void AeroDms::selectionnerUneFacture()
 {
-    QString fichier = QFileDialog::getOpenFileName(
+    QStringList fichiers = QFileDialog::getOpenFileNames(
             this,
             QApplication::applicationName() + " - " + tr("Ouvrir une facture"),
             parametresSysteme.cheminStockageFacturesATraiter,
             tr("Fichier PDF (*.pdf)"));
 
-    if (!fichier.isNull())
+    if (fichiers.size() == 1)
     {
         fichierPrecedent->setVisible(false);
         fichierSuivant->setVisible(false);
 
-        chargerUneFactureAvecScan(fichier);
-    }    
+        chargerUneFactureAvecScan(fichiers.at(0));
+    }
+	else if (fichiers.size() > 1)
+	{
+		fichierPrecedent->setVisible(false);
+		fichierSuivant->setVisible(false);
+
+        const QString cheminFactureMergee =  AeroDmsServices::mergerPdf("",
+            QFileInfo(fichiers.at(0)).path() + "/facturesMergees_" + QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm") + ".pdf",
+            fichiers,
+            parametresMetiers.nomTresorier,
+            "Factures fusionnnées",
+            "Factures fusionnnées");
+
+        for (int i = 0; i < fichiers.size(); i++)
+        {
+            QFile::remove(fichiers.at(i));
+        }
+
+		chargerUneFactureAvecScan(cheminFactureMergee);
+	}
 }
 
 void AeroDms::chargerUneFactureAvecScan(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet)

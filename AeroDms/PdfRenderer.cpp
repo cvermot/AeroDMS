@@ -784,32 +784,19 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
 
 const QString PdfRenderer::produireFichierPdfGlobal()
 {
-    PoDoFo::PdfMemDocument document;
-
     const QString nomFichier = cheminSortieFichiersGeneres
         + numeroFichierSur3Digits()
         + ".FichiersAssembles.pdf";
 
     QDir dir(cheminSortieFichiersGeneres);
     const QStringList fichiers = dir.entryList(QStringList("*.pdf"), QDir::Files);
-   
-    for (int i = 0; i < fichiers.size(); i++)
-    {
-        const QString nomFacture = cheminSortieFichiersGeneres
-            + fichiers.at(i);
-        PoDoFo::PdfMemDocument facture;
-        facture.Load(nomFacture.toStdString());
-        document.GetPages().AppendDocumentPages(facture);
-    }
 
-    const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
-    document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
-    document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
-    document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
-    document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
-    document.Save(nomFichier.toStdString());
-
-    return nomFichier;
+    return AeroDmsServices::mergerPdf(cheminSortieFichiersGeneres,
+        nomFichier,
+        fichiers,
+        demandeEnCours.nomTresorier,
+        demandeEnCours.nomFichier,
+        "Formulaire de demande de subvention");
 }
 
 void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant) const

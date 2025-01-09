@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "AeroDmsServices.h"
 
+#include <podofo/podofo.h>
+
 #ifdef Q_OS_WIN
 #pragma comment(lib, "crypt32.lib")
 #include <windows.h>
@@ -743,4 +745,32 @@ QFile AeroDmsServices::fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier)
     filePath = filePath + p_nomFichier;
 
     return QFile(filePath);
+}
+
+QString AeroDmsServices::mergerPdf(const QString p_cheminRepertoireFichiersAMerger,
+    const QString p_cheminFichierPdfDeSortie,
+    const QStringList p_listeFichiersPdfAMerger,
+    const QString p_nomTresorier,
+    const QString p_titreDuFichuer,
+    const QString p_sujetDuFichier)
+{
+    PoDoFo::PdfMemDocument document;
+
+    for (int i = 0; i < p_listeFichiersPdfAMerger.size(); i++)
+    {
+        const QString nomFacture = p_cheminRepertoireFichiersAMerger
+            + p_listeFichiersPdfAMerger.at(i);
+        PoDoFo::PdfMemDocument facture;
+        facture.Load(nomFacture.toStdString());
+        document.GetPages().AppendDocumentPages(facture);
+    }
+
+    const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
+    document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
+    document.GetMetadata().SetAuthor(PoDoFo::PdfString(p_nomTresorier.toStdString()));
+    document.GetMetadata().SetTitle(PoDoFo::PdfString(p_titreDuFichuer.toStdString()));
+    document.GetMetadata().SetSubject(PoDoFo::PdfString(p_sujetDuFichier.toStdString()));
+    document.Save(p_cheminFichierPdfDeSortie.toStdString());
+
+    return p_cheminFichierPdfDeSortie;
 }

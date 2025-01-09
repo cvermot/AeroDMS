@@ -28,16 +28,27 @@ public:
     static const QString convertirMinutesEnHeuresMinutes(const int p_minutes);
     static const QTime convertirMinutesEnQTime(const int p_minutes);
     static const QTime convertirHeuresDecimalesEnQTime(const double p_heureDecimale);
+
     static const QIcon recupererIcone(const QString& p_icone);
     static const QIcon recupererIcone(const QChar p_caractere);
     static const QIcon recupererIcone(const AeroDmsTypes::Icone p_icone);
     static void ajouterIconesComboBox(QComboBox &p_activite);
+
     static void normaliser(QString &p_texte);
 
     static QString recupererCheminFichierImageSignature();
 
-    static QFile fichierDepuisQUrl(QUrl& p_url, QString p_nomFichier);
-    static void calculerTailleQResources(AeroDmsTypes::TailleFichiers& p_tailleFichiers, const QString& prefix = "/AeroDms/");
+    static QFile fichierDepuisQUrl(QUrl& p_url, 
+        QString p_nomFichier);
+    static void calculerTailleQResources(AeroDmsTypes::TailleFichiers& p_tailleFichiers, 
+        const QString& prefix = "/AeroDms/");
+
+    static QString mergerPdf(const QString p_cheminRepertoireFichiersAMerger,
+        const QString p_cheminFichierPdfDeSortie,
+        const QStringList p_listeFichiersPdfAMerger,
+        const QString p_nomTresorier,
+        const QString p_titreDuFichuer,
+        const QString p_sujetDuFichier);
 
     static QString chiffrerDonnees(QString& data);
     static QString dechiffrerDonnees(QString& encryptedData);
