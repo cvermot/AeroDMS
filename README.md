@@ -56,6 +56,7 @@ Le déploiement est réalisé sous forme d'archives ZIP.
 Visual Studio déploie automatiquement les DLL nécéssaires aux librairies utilisées via vcpkg. Pour les DLL Qt, il est nécessaire de passer par [windeployqt](https://doc.qt.io/Qt-5/windows-deployment.html).
 
 :warning: Il existe actuellement un soucis avec la libraire OpenSSL produite par vcpkg et utilisée par PoDoFo. En effet, cette DLL fait appel à une autre DLL qui est referencée par un chemin absolu ([Issue créée sur le GitHub vcpkg](https://github.com/microsoft/vcpkg/issues/36482)). Il est donc pour le moment nécessaire de déployer la DLL `legacy.dll` au chemin exacte ou se trouve celle-ci sur la machine ayant produit la DLL via vcpkg.
+
 Depuis la version 7.1 d'AeroDMS, un lanceur est proposé afin de positionner les variables d'environement adaptées avant l'exécution d'AeroDMS : il n'est donc plus nécessaire de déployer les DLL pour SSL dans un autre repertoire, elles ont seulement besoind d'être présentes dans le répertoire d'AeroDMS.
 
 ## Configuration, utilisation
