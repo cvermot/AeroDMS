@@ -76,6 +76,8 @@ private:
         const bool p_laFactureAChargerEstTelechargeeDInternet = false);
     void mettreAJourBoutonsFichierSuivantPrecedent();
 
+    void peuplerMenuMailDemandesSubvention();
+    void peuplerMenuMailPilotesDUnAerodrome();
     void peuplerListesPilotes();
     void peuplerListeSorties();
     void peuplerListeBaladesEtSorties();
@@ -265,6 +267,8 @@ private:
     QAction* mailingPilotesActifsBrevetes;
     QAction* mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement;
     QAction* mailingPilotesDerniereDemandeSubvention;
+    QMenu* menuMailDemandesSubvention;
+    QMenu* menuMailPilotesDUnAerodrome;
     
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAerogest;

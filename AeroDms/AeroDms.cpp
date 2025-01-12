@@ -1426,37 +1426,14 @@ void AeroDms::initialiserMenuOutils()
         tr("Envoyer un mail aux pilotes concernés par la dernière &demande de subvention"), 
         this);
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
-    QMenu* menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+    menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par une demande de &subvention"));
-    QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
-    for (int i = 0; i < datesDemandes.size(); i++)
-    {
-        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
-            tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), 
-            this);
-        AeroDmsTypes::DonneesMailing data;
-        data.typeMailing = AeroDmsTypes::DonnesMailingType_DEMANDE_DE_SUBVENTION;
-        data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
-        action->setData(QVariant::fromValue(data));
-        menuMailDemandesSubvention->addAction(action);
-        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
-    }
-    QMenu* menuMailPilotesDUnAerodrome = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+    peuplerMenuMailDemandesSubvention();
+   
+    menuMailPilotesDUnAerodrome = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes d'un aérodrome"));
-    AeroDmsTypes::ListeAerodromes aerodromes = db->recupererAerodromesAvecPilotesActifs();
-    for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
-    {
-        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
-            aerodrome.nom + " - " + aerodrome.indicatifOaci,
-            this);
-        //action->setData(aerodrome.indicatifOaci);
-        AeroDmsTypes::DonneesMailing data;
-        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME;
-        data.donneeComplementaire = aerodrome.indicatifOaci;
-        action->setData(QVariant::fromValue(data));
-        menuMailPilotesDUnAerodrome->addAction(action);
-        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
-    }
+    peuplerMenuMailPilotesDUnAerodrome();
+
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     connect(mailingPilotesActifsBrevetes, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -2331,6 +2308,9 @@ void AeroDms::ajouterUnPiloteEnBdd()
     peuplerListesPilotes();
     dialogueAjouterCotisation->mettreAJourLeContenuDeLaFenetre();
 
+    //On met également à jour la liste des aérodromes pour le mailing vers les pilotes d'un aérodrome
+    peuplerMenuMailPilotesDUnAerodrome();
+
     //Si on est sur une mise à jour, on met à jour les éléments d'IHM susceptibles d'être impacté par des changements
     if (pilote.idPilote != "")
     {
@@ -2387,6 +2367,9 @@ void AeroDms::ajouterUnAeroclubEnBdd()
     //On met à jour la liste des clubs
     dialogueGestionPilote->peuplerListeAeroclub();
     dialogueGestionAeroclub->peuplerListeAeroclub();
+
+    //On repeuple la liste des mailings des pilotes d'un terrain
+    peuplerMenuMailPilotesDUnAerodrome();
 
     switch (resultat)
     {
@@ -2753,6 +2736,8 @@ void AeroDms::genererPdf()
         break;
     }
     
+	//On met à jour le menu des mailing pour les demandes de subvention
+    peuplerMenuMailDemandesSubvention();
 }
 
 void AeroDms::genererPdfRecapHdV()
@@ -3169,6 +3154,45 @@ void AeroDms::peuplerListeSorties()
         choixBaladeFacture->addItem(sortie.nom, sortie.id);
     }
 
+}
+
+void AeroDms::peuplerMenuMailDemandesSubvention()
+{
+    menuMailDemandesSubvention->clear();
+
+    QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
+    for (int i = 0; i < datesDemandes.size(); i++)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"),
+            this);
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_DEMANDE_DE_SUBVENTION;
+        data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
+        action->setData(QVariant::fromValue(data));
+        menuMailDemandesSubvention->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
+}
+
+void AeroDms::peuplerMenuMailPilotesDUnAerodrome()
+{
+    menuMailPilotesDUnAerodrome->clear();
+
+    AeroDmsTypes::ListeAerodromes aerodromes = db->recupererAerodromesAvecPilotesActifs();
+    for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            aerodrome.nom + " - " + aerodrome.indicatifOaci,
+            this);
+        //action->setData(aerodrome.indicatifOaci);
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME;
+        data.donneeComplementaire = aerodrome.indicatifOaci;
+        action->setData(QVariant::fromValue(data));
+        menuMailPilotesDUnAerodrome->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
 }
 
 void AeroDms::peuplerListeBaladesEtSorties()
@@ -4836,6 +4860,8 @@ void AeroDms::mettreAJourAerodromes()
         connect(&aixm, &AixmParser::signalerMiseAJourAerodrome, this, &AeroDms::afficherProgressionMiseAJourAerodromes);
 
         aixm.mettreAJourAerodromes(fichier);
+
+        peuplerMenuMailPilotesDUnAerodrome();
     } 
 }
 

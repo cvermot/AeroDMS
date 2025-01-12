@@ -75,7 +75,7 @@ const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
 {
     AeroDmsTypes::ListeAerodromes listeDesAerodromes;
 
-    const QString sql = "SELECT * FROM aerodrome ORDER BY nom";
+    const QString sql = "SELECT * FROM aerodrome ORDER BY nomAerodrome";
 
     QSqlQuery query;
     query.exec(sql);
