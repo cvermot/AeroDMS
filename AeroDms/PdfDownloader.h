@@ -28,12 +28,16 @@ class PdfDownloader : public QWidget {
 	Q_OBJECT
 
 public:
-	PdfDownloader(const QString p_cheminFacturesATraiter, ManageDb *p_db);
+	PdfDownloader(const QString p_cheminFacturesATraiter, 
+		ManageDb *p_db);
 
-	void telechargerDonneesDaca(const QString p_identifiant, const QString p_motDePasse);
-	void telechargerFactureDaca(const QString p_identifiant, const QString p_motDePasse, const AeroDmsTypes::IdentifiantFacture p_identifiantFacture);
+	void telechargerDonneesDaca(const QString p_identifiant, 
+		const QString p_motDePasse);
+	void telechargerFactureDaca(const QString p_identifiant, 
+		const QString p_motDePasse, 
+		const AeroDmsTypes::IdentifiantFacture p_identifiantFacture);
 	const AeroDmsTypes::IdentifiantFacture recupererIdentifiantFactureTelechargee();
-	AeroDmsTypes::DonneesFacturesDaca recupererDonneesDaca();
+	const AeroDmsTypes::DonneesFacturesDaca recupererDonneesDaca();
 	const QString recupererCheminDernierFichierTelecharge();
 
 private:
@@ -72,7 +76,6 @@ private:
 	Etape phaseTraitement = Etape_INITIALISATION;
 	Demande demandeEnCours = Demande_TELECHARGE_FACTURE;
 
-
 	void telechargerFichier();
 	bool connecter();
 	void parserDonneesDaca(const QByteArray& p_donnees);
@@ -80,7 +83,8 @@ private:
 
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
-	void demandeAuthentificationProxy(const QNetworkProxy& p_proxy, QAuthenticator* p_authenticator);
+	void demandeAuthentificationProxy(const QNetworkProxy& p_proxy, 
+		QAuthenticator* p_authenticator);
 
 signals:
 	void etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures);

@@ -3091,7 +3091,7 @@ Saisie non prise en compte."));
     peuplerListeBaladesEtSorties();
 }
 
-float AeroDms::calculerCoutHoraire()
+const float AeroDms::calculerCoutHoraire()
 {
     return (prixDuVol->value() / (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute())) * 60.0;
 }
@@ -3889,7 +3889,7 @@ void AeroDms::envoyerMail()
     }
 }
 
-bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichier)
+const bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichier)
 { 
     QString fichier = p_chemin + p_fichier;
     if (QFile().exists(fichier))
@@ -4219,7 +4219,7 @@ void AeroDms::deselectionnerVolDetecte()
     } 
 }
 
-bool AeroDms::lePiloteEstAJourDeCotisation()
+const bool AeroDms::lePiloteEstAJourDeCotisation()
 {
     const int anneeRenseignee = dateDuVol->date().year();
     const QString idPilote = choixPilote->currentData().toString();
@@ -4366,7 +4366,7 @@ void AeroDms::afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatIm
     }
 }
 
-int AeroDms::calculerValeurGraphAGenererPdf()
+const int AeroDms::calculerValeurGraphAGenererPdf()
 {
     int valeur = 0;
 

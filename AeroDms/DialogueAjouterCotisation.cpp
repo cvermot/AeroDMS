@@ -21,9 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtWidgets>
 
 DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db, 
-                                                      const float p_montantCotisation, 
-                                                      const float p_budgetEntrainement, 
-                                                      QWidget* parent) : QDialog(parent)
+    const float p_montantCotisation, 
+    const float p_budgetEntrainement, 
+    QWidget* parent) : QDialog(parent)
 {
     database = db;
     montantCotisation = p_montantCotisation;
@@ -120,7 +120,7 @@ void DialogueAjouterCotisation::mettreAJourLeContenuDeLaFenetre()
     peuplerListePilote();
 }
 
-AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfosCotisationAAjouter()
+const AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfosCotisationAAjouter()
 {
     AeroDmsTypes::CotisationAnnuelle infosCotisation;
 
@@ -146,8 +146,8 @@ void DialogueAjouterCotisation::prevaliderDonnnesSaisies()
 }
 
 void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
-                                                    const int p_annee, 
-                                                    const float p_montantSubventionDejaAlloue)
+    const int p_annee, 
+    const float p_montantSubventionDejaAlloue)
 {
     int index = listePilote->findData(p_pilote);
     if (index != -1) {

@@ -31,7 +31,7 @@ public:
                                QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();
-    AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
+    const AeroDmsTypes::CotisationAnnuelle recupererInfosCotisationAAjouter();
 
     void editerLaCotisation( const QString p_pilote, 
                              const int p_annee,

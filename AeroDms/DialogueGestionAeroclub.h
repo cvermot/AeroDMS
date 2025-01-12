@@ -27,7 +27,7 @@ class DialogueGestionAeroclub : public QDialog
 public:
     DialogueGestionAeroclub(ManageDb* db, QWidget* parent = nullptr);
 
-    AeroDmsTypes::Club recupererInfosClub();
+    const AeroDmsTypes::Club recupererInfosClub();
     void peuplerListeAeroclub();
     void peuplerListeAerodrome();
     void ouvrirFenetre(const bool p_modeEdition);

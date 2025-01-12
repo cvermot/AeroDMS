@@ -25,11 +25,11 @@ public:
     RCCResourceLibrary();
     ~RCCResourceLibrary();
 
-    bool output(QString p_fichierSortie);
+    const bool output(const QString p_fichierSortie);
 
-    bool readFiles(QString p_fichier);
+    const bool readFiles(const QString p_fichier);
 
-    QStringList dataFiles() const;
+    const QStringList dataFiles() const;
 
     // Return a map of resource identifier (':/newPrefix/images/p1.png') to file.
     typedef QHash<QString, QString> ResourceDataFileMap;

@@ -25,7 +25,8 @@ class DialogueGestionAeronefs : public QDialog
     Q_OBJECT
 
 public:
-    DialogueGestionAeronefs(ManageDb* db, QWidget* parent = nullptr);
+    DialogueGestionAeronefs(ManageDb* db, 
+        QWidget* parent = nullptr);
 
     void peuplerListeAeronefs();
 
@@ -35,7 +36,8 @@ private:
     QTableWidget* vueAeronefs;
 
 private slots:
-    void sauvegarderDonneesSaisies(const int p_ligne, const int p_colonne);
+    void sauvegarderDonneesSaisies(const int p_ligne, 
+        const int p_colonne);
 };
 
 #endif // DIALOGUEGESTIONAERONEFS_H

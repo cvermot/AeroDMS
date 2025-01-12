@@ -21,7 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtWidgets>
 
 
-DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db, QWidget* parent) : QDialog(parent)
+DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db, 
+    QWidget* parent) : QDialog(parent)
 {
     database = db;
 

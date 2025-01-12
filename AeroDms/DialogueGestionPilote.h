@@ -25,9 +25,10 @@ class DialogueGestionPilote : public QDialog
     Q_OBJECT
 
 public:
-    DialogueGestionPilote(ManageDb* db, QWidget* parent = nullptr);
+    DialogueGestionPilote(ManageDb* db, 
+        QWidget* parent = nullptr);
 
-    AeroDmsTypes::Pilote recupererInfosPilote();
+    const AeroDmsTypes::Pilote recupererInfosPilote();
     void preparerMiseAJourPilote(const QString p_piloteId);
     void peuplerListeAeroclub();
 

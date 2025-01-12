@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 
-DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, QWidget* parent) : QDialog(parent)
+DialogueGestionPilote::DialogueGestionPilote(ManageDb* db, 
+    QWidget* parent) : QDialog(parent)
 {
     database = db;
 
@@ -139,7 +140,7 @@ void DialogueGestionPilote::peuplerListeAeroclub()
     }
 }
 
-AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
+const AeroDmsTypes::Pilote DialogueGestionPilote::recupererInfosPilote()
 {
     AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
 

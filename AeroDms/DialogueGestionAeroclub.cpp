@@ -106,7 +106,7 @@ DialogueGestionAeroclub::DialogueGestionAeroclub(ManageDb* db, QWidget* parent) 
     peuplerListeAerodrome();
 }
 
-AeroDmsTypes::Club DialogueGestionAeroclub::recupererInfosClub()
+const AeroDmsTypes::Club DialogueGestionAeroclub::recupererInfosClub()
 {
     AeroDmsTypes::Club club = AeroDmsTypes::K_INIT_CLUB;
 

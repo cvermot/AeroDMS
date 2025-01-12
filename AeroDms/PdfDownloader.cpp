@@ -18,7 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "PdfDownloader.h"
 
-PdfDownloader::PdfDownloader(const QString p_cheminFacturesATraiter, ManageDb* p_db)
+PdfDownloader::PdfDownloader(const QString p_cheminFacturesATraiter, 
+    ManageDb* p_db)
 {
     db = p_db;
 
@@ -75,8 +76,8 @@ void PdfDownloader::telechargerDonneesDaca(const QString p_identifiant,
 }
 
 void PdfDownloader::telechargerFactureDaca( const QString p_identifiant, 
-                                            const QString p_motDePasse, 
-                                            const AeroDmsTypes::IdentifiantFacture p_identifiantFacture)
+    const QString p_motDePasse, 
+    const AeroDmsTypes::IdentifiantFacture p_identifiantFacture)
 {
     identifiantConnexion = p_identifiant;
     motDePasse = p_motDePasse;
@@ -321,7 +322,7 @@ void PdfDownloader::parserDonneesDaca(const QByteArray &p_donnees)
     emit etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures_DONNEES_RECUPEREES);
 }
 
-AeroDmsTypes::DonneesFacturesDaca PdfDownloader::recupererDonneesDaca()
+const AeroDmsTypes::DonneesFacturesDaca PdfDownloader::recupererDonneesDaca()
 {
     return donneesDaca;
 }
@@ -707,7 +708,8 @@ void PdfDownloader::afficherErreur(const QNetworkReply* p_reponse)
     }
 }
 
-void PdfDownloader::demandeAuthentificationProxy(const QNetworkProxy& p_proxy, QAuthenticator* p_authenticator)
+void PdfDownloader::demandeAuthentificationProxy(const QNetworkProxy& p_proxy, 
+    QAuthenticator* p_authenticator)
 {
     QMessageBox::critical(
         this, QApplication::applicationName() + " - " + tr("Erreur proxy"),

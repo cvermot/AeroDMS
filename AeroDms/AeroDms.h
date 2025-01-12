@@ -70,8 +70,10 @@ private:
     void initialiserMenuAide();
     void initialiserRaccourcisClavierSansActionIhm();
 
-    void chargerUneFactureAvecScan(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
-    void chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet = false);
+    void chargerUneFactureAvecScan(const QString p_fichier, 
+        const bool p_laFactureAChargerEstTelechargeeDInternet = false);
+    void chargerUneFacture(const QString p_fichier, 
+        const bool p_laFactureAChargerEstTelechargeeDInternet = false);
     void mettreAJourBoutonsFichierSuivantPrecedent();
 
     void peuplerListesPilotes();
@@ -82,7 +84,7 @@ private:
 
     void gererBoutonEditionPilote();
 
-    bool lePiloteEstAJourDeCotisation();
+    const bool lePiloteEstAJourDeCotisation();
 
     void initialiserOngletGraphiques();
     void initialiserOngletSubventionsDemandees();
@@ -92,13 +94,13 @@ private:
     void afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression);
     const QString texteSubventionRestante();
 
-    float calculerCoutHoraire();
-    int calculerValeurGraphAGenererPdf();
+    const float calculerCoutHoraire();
+    const int calculerValeurGraphAGenererPdf();
     
     const QString rechercherDerniereDemande();
 
-    bool uneMaJEstDisponible(const QString p_chemin,
-                             const QString p_fichier);
+    const bool uneMaJEstDisponible(const QString p_chemin,
+        const QString p_fichier);
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule();
@@ -108,11 +110,14 @@ private:
 
     void verifierSignatureNumerisee();
     void verifierDispoIdentifiantsDaca();
-    void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, const AeroDmsTypes::ListeCleStringValeur p_listePilote, const QDate p_mois);
+    void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, 
+        const AeroDmsTypes::ListeCleStringValeur p_listePilote, 
+        const QDate p_mois);
 
     const QString elaborerCheminRessourcesHtml();
 
-    bool eventFilter(QObject* object, QEvent* event);
+    bool eventFilter(QObject* object, 
+        QEvent* event);
     void closeEvent(QCloseEvent* event);
 
     //Classes gestionnaires et actionnaires
@@ -393,7 +398,7 @@ public slots:
     void imprimerLaDerniereDemandeAgrafage();
     void ouvrirDialogueParametresApplication();
     void enregistrerParametresApplication( const AeroDmsTypes::ParametresMetier p_parametresMetiers,
-                                           const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
+        const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionGenerationPdf();
     void mettreAJourAerodromes();
     void afficherProgressionMiseAJourAerodromes(int nombreTotal,

@@ -296,7 +296,7 @@ void RCCResourceLibrary::reset()
 }
 
 
-bool RCCResourceLibrary::readFiles(QString p_fichier)
+const bool RCCResourceLibrary::readFiles(const QString p_fichier)
 {
     reset();
     //read in data
@@ -310,7 +310,7 @@ bool RCCResourceLibrary::readFiles(QString p_fichier)
     return true;
 }
 
-QStringList RCCResourceLibrary::dataFiles() const
+const QStringList RCCResourceLibrary::dataFiles() const
 {
     QStringList ret;
     QStack<RCCFileInfo*> pending;
@@ -332,7 +332,7 @@ QStringList RCCResourceLibrary::dataFiles() const
     return ret;
 }
 
-bool RCCResourceLibrary::output(QString p_fichierSortie)
+const bool RCCResourceLibrary::output(const QString p_fichierSortie)
 {
     //write out
     if (!writeHeader()) {

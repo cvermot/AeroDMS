@@ -29,12 +29,16 @@ class PdfPrinterWorker : public QThread
     Q_OBJECT
 
 public:
-    PdfPrinterWorker(const QString& filePath, QPrinter *printer, bool forceRecto, QObject* parent = nullptr)
+    PdfPrinterWorker(const QString& filePath, 
+        QPrinter *printer, 
+        bool forceRecto, 
+        QObject* parent = nullptr)
         : QThread(parent), m_filePath(filePath), m_printer(printer), m_forceRecto(forceRecto) {
     }
 
 signals:
-    void progress(int currentPage, int totalPages);
+    void progress(int currentPage, 
+        int totalPages);
     void finished();
     void error(const QString& message);
 
