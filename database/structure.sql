@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on dim. janv. 12 12:52:41 2025
+-- File generated with SQLiteStudio v3.4.4 on dim. janv. 12 16:56:24 2025
 --
 -- Text encoding used: UTF-8
 --
@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY AUTOINCREMEN
 INSERT INTO aeroclub (aeroclubId, aeroclub, aerodrome, raisonSociale, IBAN, BIC) VALUES (0, ' Aéroclub indéterminé', 'LF', NULL, NULL, NULL);
 
 -- Table: aerodrome
-CREATE TABLE IF NOT EXISTS aerodrome (identifiantOaci TEXT PRIMARY KEY NOT NULL UNIQUE, nom TEXT NOT NULL);
-INSERT INTO aerodrome (identifiantOaci, nom) VALUES ('LF', '  Aérodrome Inconnu');
+CREATE TABLE IF NOT EXISTS aerodrome (identifiantOaci TEXT PRIMARY KEY NOT NULL UNIQUE, nomAerodrome TEXT NOT NULL);
+INSERT INTO aerodrome (identifiantOaci, nomAerodrome) VALUES ('LF', '  Aérodrome Inconnu');
 
 -- Table: aeronef
 CREATE TABLE IF NOT EXISTS aeronef (
@@ -164,7 +164,9 @@ INNER JOIN fichiersFacture ON facturesSorties.facture = fichiersFacture.factureI
 WHERE facturesSorties.demandeRemboursement IS NULL;
 
 -- View: infosPilotes
-CREATE VIEW IF NOT EXISTS infosPilotes AS SELECT * FROM pilote INNER JOIN aeroclub ON pilote.aeroclubId = aeroclub.aeroclubId;
+CREATE VIEW IF NOT EXISTS infosPilotes AS SELECT * FROM pilote 
+INNER JOIN aeroclub ON pilote.aeroclubId = aeroclub.aeroclubId
+INNER JOIN aerodrome ON aerodrome.identifiantOaci = aeroclub.aerodrome;
 
 -- View: mailParDateDeDemandeDeSubvention
 CREATE VIEW IF NOT EXISTS mailParDateDeDemandeDeSubvention AS SELECT dateDemande, mail, pilote

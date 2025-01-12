@@ -254,6 +254,17 @@ public:
         Status_CREATION
     };
 
+    enum DonnesMailingType
+    {
+        DonnesMailingType_DEMANDE_DE_SUBVENTION,
+        DonnesMailingType_PILOTES_D_UN_AERODROME
+    };
+
+    struct DonneesMailing {
+        DonnesMailingType typeMailing;
+        QString donneeComplementaire;
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
         QString idPilote = "";
@@ -776,5 +787,6 @@ public:
 };
 
 Q_DECLARE_METATYPE(AeroDmsTypes::IdentifiantFacture)
+Q_DECLARE_METATYPE(AeroDmsTypes::DonneesMailing)
 
 #endif // AERODMSTYPES_H

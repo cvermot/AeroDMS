@@ -88,7 +88,7 @@ AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
     {
         AeroDmsTypes::Aerodrome aerodrome;
 		aerodrome.indicatifOaci = query.value("identifiantOaci").toString();
-		aerodrome.nom = query.value("nom").toString();
+		aerodrome.nom = query.value("nomAerodrome").toString();
         listeDesAerodromes.append(aerodrome);
     }
 
@@ -1754,7 +1754,7 @@ QStringList ManageDb::recupererListeActivites()
 QString ManageDb::recupererMailPilotes( const int p_annee, 
                                         const AeroDmsTypes::MailPilotes p_mailingDemande)
 {
-    QString listeMail;
+    QStringList listeMail;
     QSqlQuery query;
 
     switch(p_mailingDemande)
@@ -1791,7 +1791,6 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
                 if (subvention.entrainement.montantRembourse < subvention.montantSubventionEntrainement)
                 {
                     listeMail.append(subvention.mail);
-                    listeMail.append(";");
                 }
             }
             //query.prepare("SELECT piloteId, mail, annee, montantSubventionAnnuelleEntrainement, SUM(vol.montantRembourse) AS montantRembourse, vol.typeDeVol FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId INNER JOIN vol ON pilote.piloteId = vol.pilote WHERE annee = :annee AND strftime('%Y', vol.date) = :anneeStr AND vol.typeDeVol = 'Entrainement' GROUP BY piloteId");
@@ -1813,20 +1812,13 @@ QString ManageDb::recupererMailPilotes( const int p_annee,
         while (query.next())
         {
             listeMail.append(query.value("mail").toString());
-            listeMail.append(";");
         }
     }  
 
-    //On retire le dernier ";" si liste non vide
-    if (listeMail.size() != 0)
-    {
-        listeMail.chop(1);
-    }
-
-    return listeMail;
+    return listeMail.join(";");
 }
 
-QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
+const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
 {
     QList<QDate> listeDemandes;
 
@@ -1843,9 +1835,28 @@ QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
     return listeDemandes;
 }
 
-QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
+const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActifs()
 {
-    QString listeMail;
+    AeroDmsTypes::ListeAerodromes aerodromes;
+
+    QSqlQuery query;
+    query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes  WHERE estActif GROUP BY aerodrome ORDER BY nomAerodrome");
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::Aerodrome aerodrome;
+        aerodrome.indicatifOaci = query.value("aerodrome").toString();
+        aerodrome.nom = query.value("nomAerodrome").toString();
+        aerodromes.append(aerodrome);
+    }
+
+    return aerodromes;
+}
+
+const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
+{
+    QStringList listeMail;
 
     QSqlQuery query;
     QString date = "";
@@ -1873,17 +1884,28 @@ QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
         while (query.next())
         {
             listeMail.append(query.value("mail").toString());
-            listeMail.append(";");
-        }
-
-        //On retire le dernier ";" si liste non vide
-        if (listeMail.size() != 0)
-        {
-            listeMail.chop(1);
         }
     }
 
-    return listeMail;
+    return listeMail.join(";");
+}
+
+const QString ManageDb::recupererMailPilotesDUnAerodrome(const QString p_codeOaci)
+{
+    QStringList listeMail;
+
+    QSqlQuery query;
+
+    query.prepare("SELECT mail FROM infosPilotes WHERE estActif AND aerodrome = :aerodrome AND mail IS NOT NULL AND mail != ''");
+	query.bindValue(":aerodrome", p_codeOaci);
+    query.exec();
+
+    while (query.next())
+    {
+        listeMail.append(query.value("mail").toString());
+    }
+
+    return listeMail.join(";");
 }
 
 //Un changement de version attendue de la BDD intervient notamment si 
@@ -2020,7 +2042,7 @@ void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJ
     }
 }
 
-AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBaladesEtSorties(const int p_annee)
+const AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBaladesEtSorties(const int p_annee)
 {
     AeroDmsTypes::ListeDetailsBaladesEtSorties listeDetails;
 
@@ -2116,16 +2138,12 @@ AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOac
     //Si le terrain existe, on vérifie si besoin de le mettre à jour
     if (query.next())
     {
-        if (query.value("nom") != p_nom)
+        if (query.value("nomAerodrome") != p_nom)
         {
-            query.prepare("UPDATE aerodrome SET nom = :nom WHERE identifiantOaci = :identifiantOaci");
-            query.bindValue(":nom", p_nom);
+            query.prepare("UPDATE aerodrome SET nomAerodrome = :nomAerodrome WHERE identifiantOaci = :identifiantOaci");
+            query.bindValue(":nomAerodrome", p_nom);
             query.bindValue(":identifiantOaci", p_indicatifOaci);
             query.exec();
-
-            qDebug() << p_nom << p_indicatifOaci << query.lastQuery();
-            qDebug() << p_nom << p_indicatifOaci << query.last();
-            qDebug() << p_nom << p_indicatifOaci << query.lastError();
 
             QThread::msleep(delaisDeGardeBdd);
 
@@ -2135,9 +2153,9 @@ AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOac
     //Sinon on le créé
     else
 	{
-		query.prepare("INSERT INTO aerodrome ('identifiantOaci','nom') VALUES(:identifiantOaci,:nom)");
+		query.prepare("INSERT INTO aerodrome ('identifiantOaci','nomAerodrome') VALUES(:identifiantOaci,:nomAerodrome)");
 		query.bindValue(":identifiantOaci", p_indicatifOaci);
-		query.bindValue(":nom", p_nom);
+		query.bindValue(":nomAerodrome", p_nom);
 		query.exec();
 
         QThread::msleep(delaisDeGardeBdd);

@@ -140,10 +140,12 @@ public:
                                   const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
-    QList<QDate> recupererDatesDesDemandesDeSubventions();
-    QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
+    const QList<QDate> recupererDatesDesDemandesDeSubventions();
+    const AeroDmsTypes::ListeAerodromes recupererAerodromesAvecPilotesActifs();
+    const QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
+    const QString recupererMailPilotesDUnAerodrome(const QString p_codeOaci);
 
-    AeroDmsTypes::ListeDetailsBaladesEtSorties recupererListeDetailsBaladesEtSorties(const int p_annee);
+    const AeroDmsTypes::ListeDetailsBaladesEtSorties recupererListeDetailsBaladesEtSorties(const int p_annee);
 
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
 

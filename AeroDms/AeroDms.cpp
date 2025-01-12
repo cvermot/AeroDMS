@@ -1434,8 +1434,27 @@ void AeroDms::initialiserMenuOutils()
         QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
             tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"), 
             this);
-        action->setData(datesDemandes.at(i).toString("yyyy-MM-dd"));
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_DEMANDE_DE_SUBVENTION;
+        data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
+        action->setData(QVariant::fromValue(data));
         menuMailDemandesSubvention->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
+    QMenu* menuMailPilotesDUnAerodrome = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+        tr("Envoyer un mail aux pilotes d'un aérodrome"));
+    AeroDmsTypes::ListeAerodromes aerodromes = db->recupererAerodromesAvecPilotesActifs();
+    for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            aerodrome.nom + " - " + aerodrome.indicatifOaci,
+            this);
+        //action->setData(aerodrome.indicatifOaci);
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME;
+        data.donneeComplementaire = aerodrome.indicatifOaci;
+        action->setData(QVariant::fromValue(data));
+        menuMailPilotesDUnAerodrome->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     }
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -3844,11 +3863,30 @@ void AeroDms::envoyerMail()
     else
     {
         QAction* action = qobject_cast<QAction*>(sender());
-        QDesktopServices::openUrl(QUrl("mailto:"
-            + db->recupererMailDerniereDemandeDeSubvention(action->data().toString())
-            + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
-            + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
-    }  
+
+        if (action->data().canConvert<AeroDmsTypes::DonneesMailing>()) {
+            AeroDmsTypes::DonneesMailing donnnesMailing = action->data().value<AeroDmsTypes::DonneesMailing>();
+            switch (donnnesMailing.typeMailing)
+            {
+            case AeroDmsTypes::DonnesMailingType_DEMANDE_DE_SUBVENTION:
+            {
+                QDesktopServices::openUrl(QUrl("mailto:"
+                    + db->recupererMailDerniereDemandeDeSubvention(donnnesMailing.donneeComplementaire)
+                    + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
+                    + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
+            }
+            break;
+            case AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME:
+            {
+                QDesktopServices::openUrl(QUrl("mailto:"
+                    + db->recupererMailPilotesDUnAerodrome(donnnesMailing.donneeComplementaire)
+                    + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
+            }
+            break;
+            }
+
+        }
+    }
 }
 
 bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichier)
