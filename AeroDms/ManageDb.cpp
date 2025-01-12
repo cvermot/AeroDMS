@@ -20,7 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "QMessageBox"
 #include "AeroDmsServices.h"
 
-ManageDb::ManageDb(const QString &database, const int p_delaisDeGardeBdd) 
+ManageDb::ManageDb(const QString &database, 
+    const int p_delaisDeGardeBdd) 
 {
     delaisDeGardeBdd = p_delaisDeGardeBdd;
 
@@ -53,12 +54,7 @@ void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
     db.open();
 }
 
-QString ManageDb::getLastError()
-{
-    return db.lastError().text();
-}
-
-AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
+const AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
 {
     AeroDmsTypes::ListeAeroclubs listeDesClubs;
 
@@ -75,7 +71,7 @@ AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
     return listeDesClubs;
 }
 
-AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
+const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
 {
     AeroDmsTypes::ListeAerodromes listeDesAerodromes;
 
@@ -95,7 +91,7 @@ AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
     return listeDesAerodromes;
 }
 
-AeroDmsTypes::Club ManageDb::depilerRequeteAeroclub(const QSqlQuery p_query)
+const AeroDmsTypes::Club ManageDb::depilerRequeteAeroclub(const QSqlQuery p_query)
 {
     AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
     aeroclub.idAeroclub = p_query.value("aeroclubId").toInt();
@@ -108,7 +104,7 @@ AeroDmsTypes::Club ManageDb::depilerRequeteAeroclub(const QSqlQuery p_query)
     return aeroclub;
 }
 
-AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
+const AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
 {
     AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
 
@@ -125,7 +121,7 @@ AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
     return aeroclub;
 }
 
-AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
+const AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
 {
     AeroDmsTypes::ListePilotes listeDesPilotes;
 
@@ -154,7 +150,7 @@ AeroDmsTypes::ListePilotes ManageDb::recupererPilotes()
     return listeDesPilotes;
 }
 
-AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
+const AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
 {
     AeroDmsTypes::Pilote pilote = AeroDmsTypes::K_INIT_PILOTE;
 
@@ -183,7 +179,7 @@ AeroDmsTypes::Pilote ManageDb::recupererPilote(const QString p_idPilote)
 }
 
 //Cette methode retourne le prochain ID de facture disponible
-int ManageDb::recupererProchainNumeroFacture()
+const int ManageDb::recupererProchainNumeroFacture()
 {
     const QString sql = "SELECT seq FROM sqlite_sequence WHERE name = 'fichiersFacture'";
 
@@ -193,7 +189,7 @@ int ManageDb::recupererProchainNumeroFacture()
     return query.value(0).toInt() + 1 ;
 }
 
-AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const int p_annee)
+const AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const int p_annee)
 {
     AeroDmsTypes::ListeRecetteDetail liste;
 
@@ -228,7 +224,7 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(const in
     return liste;
 }
 
-AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const int p_annee)
+const AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const int p_annee)
 {
     AeroDmsTypes::ListeRecetteDetail liste;
 
@@ -263,7 +259,7 @@ AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation(const
     return liste;
 }
 
-AeroDmsTypes::TotauxRecettes ManageDb::recupererTotauxRecettes(const int p_annee)
+const AeroDmsTypes::TotauxRecettes ManageDb::recupererTotauxRecettes(const int p_annee)
 {
     AeroDmsTypes::TotauxRecettes totaux = AeroDmsTypes::K_INIT_TOTAUX_RECETTE;
 
@@ -296,7 +292,7 @@ AeroDmsTypes::TotauxRecettes ManageDb::recupererTotauxRecettes(const int p_annee
     return totaux;
 }
 
-AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee,
+const AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActivite(const int p_annee,
     const int p_option)
 {
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite liste;
@@ -396,7 +392,7 @@ AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresParActiv
     return liste;
 }
 
-AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( const int p_annee, 
+const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( const int p_annee,
     const QString p_piloteId,
     const int p_options,
     const bool p_volsSoumisUniquement)
@@ -505,8 +501,8 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPilotes( 
     return liste;
 }
 
-AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_annee,
-                                                                    const bool p_volsSoumisUniquement)
+const AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_annee,
+    const bool p_volsSoumisUniquement)
 {
     AeroDmsTypes::SubventionsParPilote totaux = AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE;
     totaux.idPilote = "";
@@ -555,7 +551,7 @@ AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_
     return totaux;
 }
 
-AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
+const AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM vol WHERE volId = :volId");
@@ -567,8 +563,8 @@ AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
     return depilerRequeteVol(query);
 }
 
-AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
-                                                 const QString p_piloteId)
+const AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
+    const QString p_piloteId)
 {
     AeroDmsTypes::ListeVols liste;
 
@@ -603,8 +599,8 @@ AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     return liste;
 }
 
-AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
-                                               const bool p_avecFactureEtSortie)
+const AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
+    const bool p_avecFactureEtSortie)
 {
     AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
 
@@ -644,7 +640,7 @@ AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
     return vol;
 }
 
-AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemandesRemboursementSoumises( const int p_annee,
+const AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemandesRemboursementSoumises( const int p_annee,
                                                                                                    const QString p_piloteId)
 {
     AeroDmsTypes::ListeDemandesRemboursementSoumises liste;
@@ -697,7 +693,7 @@ AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemandesRemb
     return liste;
 }
 
-int ManageDb::ajouterFacture(QString& p_nomFichier)
+const int ManageDb::ajouterFacture(QString& p_nomFichier)
 {
     QString sql = "INSERT INTO 'fichiersFacture' ('nomFichier') VALUES('";
     sql.append(p_nomFichier);
@@ -720,7 +716,7 @@ int ManageDb::ajouterFacture(QString& p_nomFichier)
 
 //Recupère le subvention restante pour l'année p_annne et pour le pilote p_piloteId. Ne concerne que les vols de
 //type Entrainement (heures perso), les autres types de vols ne sont pas plafonnés
-float ManageDb::recupererSubventionRestante( const QString& p_piloteId, 
+const float ManageDb::recupererSubventionRestante( const QString& p_piloteId,
                                              const int p_annee)
 {
     QSqlQuery query;
@@ -812,7 +808,7 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     query.exec();
 }
 
-bool ManageDb::supprimerUnVol(const int p_volAEditer)
+const bool ManageDb::supprimerUnVol(const int p_volAEditer)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM 'xAssociationRecette-Vol' WHERE volId = :volId");
@@ -832,11 +828,11 @@ bool ManageDb::supprimerUnVol(const int p_volAEditer)
 }
 
 void ManageDb::enregistrerUneFacture( const QString& p_payeur,
-                                      const int factureId,
-                                      const QDate& p_date,
-                                      const float p_montantFacture,
-                                      const int p_idSortie,
-                                      const QString& p_remarqueFacture )
+    const int factureId,
+    const QDate& p_date,
+    const float p_montantFacture,
+    const int p_idSortie,
+    const QString& p_remarqueFacture )
 {
     QSqlQuery query;
     query.prepare("INSERT INTO 'facturesSorties' ('sortie','facture','date','montant','intitule','payeur') VALUES(:sortie,:facture,:date,:montant,:intitule,:payeur)");
@@ -850,7 +846,7 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
     query.exec();
 }
 
-QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
+const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
 {
     QSqlQuery query;
     query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL GROUP BY annee");
@@ -866,7 +862,7 @@ QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
     return listeAnnees;
 }
 
-AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventionesDejaAllouees(const int p_annee)
+const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventionesDejaAllouees(const int p_annee)
 {
     return recupererSubventionsPilotes( p_annee, 
         "*",
@@ -875,9 +871,9 @@ AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventionesDejaA
 }
 
 void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
-                                              const QString& p_typeDeRecette,
-                                              const QString& p_intitule,
-                                              const float p_montant)
+    const QString& p_typeDeRecette,
+    const QString& p_intitule,
+    const float p_montant)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO 'recettes' ('typeDeRecette','intitule','montant') VALUES(:typeRecette, :intitule, :montant) RETURNING recetteId");
@@ -910,7 +906,8 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     }
 }
 
-bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, const int annee)
+const bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, 
+    const int annee)
 {
     //Recuperation de l'ID de facture
     QString sql = "SELECT * FROM 'cotisation' WHERE pilote='";
@@ -926,7 +923,7 @@ bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId, const int a
     return false;
 }
 
-AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettre()
+const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettre()
 {
     //Recuperation de l'ID de facture
     QString sql = "SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'";
@@ -947,7 +944,7 @@ AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettr
     return liste;
 }
 
-QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTypes::DemandeRemboursement p_demande)
+const QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  AeroDmsTypes::DemandeRemboursement p_demande)
 {
     QStringList listeFactures;
 
@@ -1045,7 +1042,7 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     QThread::msleep(delaisDeGardeBdd);
 }
 
-AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
+const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
 {
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
@@ -1104,7 +1101,7 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
     return liste;
 }
 
-AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettre()
+const AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettre()
 {
     //Récupération des cotisation à soumettre au CE
     AeroDmsTypes::ListeRecette liste;
@@ -1123,8 +1120,8 @@ AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettr
     return liste;
 }
 
-QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p_annee,
-                                                               const QString p_typeRecette)
+const QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p_annee,
+    const QString p_typeRecette)
 {
     QList<QString> liste;
 
@@ -1142,7 +1139,7 @@ QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p_annee
     return liste;
 }
 
-AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre()
+const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre()
 {
     //Récupérationd des demandes de remboursement à soumettre au CE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
@@ -1168,7 +1165,7 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeR
     return liste;
 }
 
-AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDemandesDeRemboursement(const int p_annee)
+const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDemandesDeRemboursement(const int p_annee)
 {
     //Récupérationd des demandes de remboursement soumises ou non au CSE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
@@ -1205,7 +1202,7 @@ AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLesDeman
     return liste;
 }
 
-QString ManageDb::recupererAeroclub(const QString p_piloteId)
+const QString ManageDb::recupererAeroclub(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT aeroclub FROM infosPilotes WHERE piloteId = :piloteId");
@@ -1216,7 +1213,7 @@ QString ManageDb::recupererAeroclub(const QString p_piloteId)
     return query.value("aeroclub").toString();
 }
 
-AeroDmsTypes::Club ManageDb::recupererInfosAeroclubDuPilote(const QString p_piloteId)
+const AeroDmsTypes::Club ManageDb::recupererInfosAeroclubDuPilote(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM infosPilotes WHERE piloteId = :piloteId");
@@ -1228,7 +1225,7 @@ AeroDmsTypes::Club ManageDb::recupererInfosAeroclubDuPilote(const QString p_pilo
     return depilerRequeteAeroclub(query);
 }
 
-AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
+const AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM aeronef");
@@ -1251,7 +1248,7 @@ AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
     return listeAeronefs;
 }
 
-QList<int> ManageDb::recupererAnnees()
+const QList<int> ManageDb::recupererAnnees()
 {
     QList<int> listeAnnees;
     QSqlQuery query;
@@ -1265,7 +1262,7 @@ QList<int> ManageDb::recupererAnnees()
     return listeAnnees;
 }
 
-QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
+const QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT prenom, nom FROM pilote WHERE piloteId = :piloteId");
@@ -1276,7 +1273,8 @@ QString ManageDb::recupererNomPrenomPilote(const QString p_piloteId)
     return query.value("prenom").toString().append(" ").append(query.value("nom").toString());
 }
 
-const QString ManageDb::piloteExiste(const QString p_nom, const QString p_prenom)
+const QString ManageDb::piloteExiste(const QString p_nom,
+    const QString p_prenom)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM pilote WHERE prenom = :prenom AND nom = :nom");
@@ -1291,7 +1289,7 @@ const QString ManageDb::piloteExiste(const QString p_nom, const QString p_prenom
     return "";
 }
 
-QString ManageDb::recupererActivitePrincipale(const QString p_piloteId)
+const QString ManageDb::recupererActivitePrincipale(const QString p_piloteId)
 {
     QSqlQuery query;
     query.prepare("SELECT activitePrincipale FROM pilote WHERE piloteId = :piloteId");
@@ -1302,7 +1300,7 @@ QString ManageDb::recupererActivitePrincipale(const QString p_piloteId)
     return query.value("activitePrincipale").toString();
 }
 
-QString ManageDb::recupererNomFacture(const int p_volId)
+const QString ManageDb::recupererNomFacture(const int p_volId)
 {
     QSqlQuery query;
     query.prepare("SELECT fichiersFacture.nomFichier AS nomFichier FROM vol INNER JOIN fichiersFacture ON vol.facture = fichiersFacture.factureId WHERE volId = :volId");
@@ -1313,7 +1311,7 @@ QString ManageDb::recupererNomFacture(const int p_volId)
     return query.value("nomFichier").toString();
 }
 
-int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)
+const int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)
 {
     QSqlQuery query;
     query.prepare("SELECT identifiantCompta FROM typeDeRecetteDepense WHERE typeDeRecetteDepenseId = :typeDeRecetteDepenseId");
@@ -1324,7 +1322,7 @@ int ManageDb::recupererLigneCompta(QString p_typeDeRecetteDepenseId)
     return query.value(0).toInt();
 }
 
-QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesTypesDeVolAvecRecette)
+const QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesTypesDeVolAvecRecette)
 {
     QString sql = "SELECT * FROM 'typeDeRecetteDepense' WHERE estVol = 1";
     if (recupererUniquementLesTypesDeVolAvecRecette)
@@ -1342,9 +1340,9 @@ QStringList ManageDb::recupererTypesDesVol(const bool recupererUniquementLesType
     return liste;
 }
 
-AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const QString p_typeDeVol, 
-                                                                          const float p_proportionRemboursement,
-                                                                          const int p_annee )
+const AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const QString p_typeDeVol, 
+    const float p_proportionRemboursement,
+    const int p_annee )
 {
     AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
@@ -1383,7 +1381,7 @@ AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( const 
     return liste;
 }
 
-AeroDmsTypes::ListeSortie ManageDb::recupererListeSorties()
+const AeroDmsTypes::ListeSortie ManageDb::recupererListeSorties()
 {
     AeroDmsTypes::ListeSortie liste;
 
@@ -1402,7 +1400,7 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeSorties()
     return liste;
 }
 
-AeroDmsTypes::ListeSortie ManageDb::recupererListeDepensesPouvantAvoirUneFacture()
+const AeroDmsTypes::ListeSortie ManageDb::recupererListeDepensesPouvantAvoirUneFacture()
 {
     AeroDmsTypes::ListeSortie liste;
 
@@ -1421,7 +1419,7 @@ AeroDmsTypes::ListeSortie ManageDb::recupererListeDepensesPouvantAvoirUneFacture
     return liste;
 }
 
-AeroDmsTypes::ListeSortie ManageDb::recupererListeBalade()
+const AeroDmsTypes::ListeSortie ManageDb::recupererListeBalade()
 {
     AeroDmsTypes::ListeSortie liste;
 
@@ -1487,8 +1485,8 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
     query.exec();
 }
 
-float ManageDb::recupererSubventionEntrainement( const QString p_pilote, 
-                                                 const int p_annee)
+const float ManageDb::recupererSubventionEntrainement( const QString p_pilote,
+    const int p_annee)
 {
     QSqlQuery query;
 
@@ -1503,7 +1501,7 @@ float ManageDb::recupererSubventionEntrainement( const QString p_pilote,
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote
 //dans la base de données
-AeroDmsTypes::ResultatCreationBdd ManageDb::creerPilote(const AeroDmsTypes::Pilote p_pilote)
+const AeroDmsTypes::ResultatCreationBdd ManageDb::creerPilote(const AeroDmsTypes::Pilote p_pilote)
 {
     AeroDmsTypes::ResultatCreationBdd resultat = AeroDmsTypes::ResultatCreationBdd_SUCCES;
 
@@ -1573,7 +1571,7 @@ AeroDmsTypes::ResultatCreationBdd ManageDb::creerPilote(const AeroDmsTypes::Pilo
     return resultat;
 }
 
-AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTypes::Club p_aeroclub)
+const AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTypes::Club p_aeroclub)
 {
     AeroDmsTypes::ResultatCreationBdd resultat = AeroDmsTypes::ResultatCreationBdd_SUCCES;
 
@@ -1632,7 +1630,7 @@ void ManageDb::creerSortie(const AeroDmsTypes::Sortie p_sortie)
     query.exec();
 }
 
-AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const int p_annee,
+const AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const int p_annee,
     const int p_options)
 {
     AeroDmsTypes::ListeStatsHeuresDeVol liste;
@@ -1736,7 +1734,7 @@ AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(const in
     return liste;
 }
 
-QStringList ManageDb::recupererListeActivites()
+const QStringList ManageDb::recupererListeActivites()
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM 'activite'");
@@ -1751,8 +1749,8 @@ QStringList ManageDb::recupererListeActivites()
     return listeActivite;
 }
 
-QString ManageDb::recupererMailPilotes( const int p_annee, 
-                                        const AeroDmsTypes::MailPilotes p_mailingDemande)
+const QString ManageDb::recupererMailPilotes( const int p_annee, 
+    const AeroDmsTypes::MailPilotes p_mailingDemande)
 {
     QStringList listeMail;
     QSqlQuery query;
@@ -2014,8 +2012,8 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
 }
 
 void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
-                                           const QString p_nouvelleValeur,
-                                           const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour )
+    const QString p_nouvelleValeur,
+    const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour )
 {
     QSqlQuery query;
     bool requeteAExecuter = true;
@@ -2078,7 +2076,10 @@ const AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetails
     return listeDetails;
 }
 
-bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote, const int p_duree, const QString p_date, const float p_coutDuVol)
+const bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote, 
+    const int p_duree, 
+    const QString p_date, 
+    const float p_coutDuVol)
 {
     QSqlQuery query;
     query.prepare("SELECT * FROM vol WHERE pilote = :pilote AND date = :date AND duree = :duree");
@@ -2091,7 +2092,7 @@ bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote, const int p_dure
     return query.next();
 }
 
-QString ManageDb::genererClauseFiltrageActivite(const int p_options)
+const QString ManageDb::genererClauseFiltrageActivite(const int p_options)
 {
     QString filtre = "";
  
@@ -2127,7 +2128,8 @@ QString ManageDb::genererClauseFiltrageActivite(const int p_options)
     return filtre;
 }
 
-AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOaci, const QString p_nom)
+const AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOaci, 
+    const QString p_nom)
 {
 	QSqlQuery query;
 
