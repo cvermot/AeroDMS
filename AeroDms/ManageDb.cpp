@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -2075,4 +2075,47 @@ QString ManageDb::genererClauseFiltrageActivite(const int p_options)
     }
 
     return filtre;
+}
+
+AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOaci, const QString p_nom)
+{
+	QSqlQuery query;
+
+	query.prepare("SELECT * FROM aerodrome WHERE identifiantOaci = :identifiantOaci");
+    query.bindValue(":identifiantOaci", p_indicatifOaci);
+	query.exec();
+
+    //Si le terrain existe, on vérifie si besoin de le mettre à jour
+    if (query.next())
+    {
+        if (query.value("nom") != p_nom)
+        {
+            query.prepare("UPDATE aerodrome SET nom = :nom WHERE identifiantOaci = :identifiantOaci");
+            query.bindValue(":nom", p_nom);
+            query.bindValue(":identifiantOaci", p_indicatifOaci);
+            query.exec();
+
+            qDebug() << p_nom << p_indicatifOaci << query.lastQuery();
+            qDebug() << p_nom << p_indicatifOaci << query.last();
+            qDebug() << p_nom << p_indicatifOaci << query.lastError();
+
+            QThread::msleep(delaisDeGardeBdd);
+
+            return AeroDmsTypes::Status_MIS_A_JOUR;
+        }
+    }
+    //Sinon on le créé
+    else
+	{
+		query.prepare("INSERT INTO aerodrome ('identifiantOaci','nom') VALUES(:identifiantOaci,:nom)");
+		query.bindValue(":identifiantOaci", p_indicatifOaci);
+		query.bindValue(":nom", p_nom);
+		query.exec();
+
+        QThread::msleep(delaisDeGardeBdd);
+
+        return AeroDmsTypes::Status_CREATION;
+	}
+
+    return AeroDmsTypes::Status_AUCUNE_ACTION_EFFECTUEE;
 }

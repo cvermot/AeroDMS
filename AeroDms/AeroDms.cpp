@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfExtractor.h"
 #include "PdfPrinter.h"
 #include "PdfDownloader.h"
+#include "AixmParser.h"
 
 #include "RccGenerator.h"
 
@@ -95,10 +96,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     verifierPresenceDeMiseAjour();
     initialiserGestionnaireTelechargement();
    
-    statusBar()->showMessage(tr("Prêt"));
-
+    preparerStatusBar();
     demanderFermetureSplashscreen();
-
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -715,11 +714,19 @@ void AeroDms::ouvrirSplashscreen()
     splash->showMessage(tr("Chargement en cours..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 }
 
+void AeroDms::preparerStatusBar()
+{
+    barreDeProgressionStatusBar = new QProgressBar(this);
+    statusBar()->addPermanentWidget(barreDeProgressionStatusBar);
+    barreDeProgressionStatusBar->hide();
+    statusBar()->showMessage(tr("Prêt"));
+}
+
 void AeroDms::demanderFermetureSplashscreen()
 {
     if (splash != nullptr)
     {
-        QTimer::singleShot(500, this, &AeroDms::fermerSplashscreen);
+        QTimer::singleShot(100, this, &AeroDms::fermerSplashscreen);
     }   
 }
 void AeroDms::fermerSplashscreen()
@@ -1454,6 +1461,11 @@ void AeroDms::initialiserMenuOutils()
     boutonEditerUnAeroclub->setStatusTip(tr("Permet d'éditer un des aéroclub connus du logiciel"));
     menuOutils->addAction(boutonEditerUnAeroclub);
     connect(boutonEditerUnAeroclub, SIGNAL(triggered()), this, SLOT(editerAeroclub()));
+
+    QAction *boutonMettreAJourAerodromes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT), tr("Mettre à jour la liste des aérodromes"), this);
+    boutonMettreAJourAerodromes->setStatusTip(tr("Permet de mettre à jour la liste des aérodromes à partir d'un fichier AIXM 4.5"));
+    menuOutils->addAction(boutonMettreAJourAerodromes);
+    connect(boutonMettreAJourAerodromes, SIGNAL(triggered()), this, SLOT(mettreAJourAerodromes()));
 
     menuOutils->addSeparator();
 
@@ -2232,8 +2244,17 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     {
         listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
     }
-    //On affiche de base les infos de l'année courante
-    listeDeroulanteAnnee->setCurrentText(QDate::currentDate().toString("yyyy"));
+    //On affiche de base les infos de l'année courante, et, si pas encore de cotisation sur l'année courante,
+    //on affiche la dernière année disponible
+	const int indexAnneeCourante = listeDeroulanteAnnee->findText(QDate::currentDate().toString("yyyy"));
+	if (indexAnneeCourante != -1)
+	{
+		listeDeroulanteAnnee->setCurrentIndex(indexAnneeCourante);
+	}
+	else
+	{
+		listeDeroulanteAnnee->setCurrentIndex(listeDeroulanteAnnee->count() - 1);
+	}
 }
 
 void AeroDms::ajouterUneCotisationEnBdd()
@@ -4741,6 +4762,71 @@ void AeroDms::verifierDispoIdentifiantsDaca()
         facturesDaca->setEnabled(true);
         facturesDaca->setStatusTip(tr("Chargement des factures du DACA"));
     }
+}
+
+void AeroDms::mettreAJourAerodromes()
+{
+    QMessageBox::information(this,
+        QApplication::applicationName() + " - " + tr("Mise à jour de la liste des aérodromes"),
+        tr("Cette fonction permet de mettre à jour la liste des aérodromes à partir d'un fichier AIXM 4.5.<br><br>Le fichier AIXM est téléchargeable gratuitement depuis la boutique du <a href=\"https://www.sia.aviation-civile.gouv.fr/produits-numeriques-en-libre-disposition/les-bases-de-donnees-sia.html\">SIA</a>."));
+
+    QString fichier = QFileDialog::getOpenFileName(
+        this,
+        QApplication::applicationName() + " - " + "Ouvrir un fichier AIXM 4.5",
+        "",
+        tr("Fichier AIXM (*.xml)"));
+
+    if (!fichier.isNull())
+    {
+        barreDeProgressionStatusBar->setMaximum(1);
+        barreDeProgressionStatusBar->setValue(0);
+        barreDeProgressionStatusBar->show();
+        statusBar()->showMessage(tr("Lecture du fichier AIXM en cours"));
+        qApp->processEvents();
+
+        AixmParser aixm(db);
+        connect(&aixm, &AixmParser::signalerMiseAJourAerodrome, this, &AeroDms::afficherProgressionMiseAJourAerodromes);
+
+        aixm.mettreAJourAerodromes(fichier);
+    } 
+}
+
+void AeroDms::afficherProgressionMiseAJourAerodromes(int nombreTotal, 
+    int nombreTraite, 
+    int nombreCree, 
+    int nombreMisAJour)
+{
+	statusBar()->showMessage(tr("Mise à jour des aérodromes en cours : ")
+		+ QString::number(nombreTraite)
+		+ tr(" traités")
+        +"/"
+		+ QString::number(nombreTotal)
+        + tr(" lus")
+        + " ("
+        + tr("Créés : ")
+        + QString::number(nombreCree)
+        + tr(" / Mis à jour : ")
+        + QString::number(nombreMisAJour)
+        + ")");
+    barreDeProgressionStatusBar->setMaximum(nombreTotal);
+    barreDeProgressionStatusBar->setValue(nombreTraite);
+
+    if ((barreDeProgressionStatusBar->maximum() - barreDeProgressionStatusBar->value()) == 0)
+    {
+        statusBar()->showMessage(tr("Mise à jour des aérodromes terminée")
+            + " ("
+            + tr("Créés : ")
+            + QString::number(nombreCree)
+            + tr(" / Mis à jour : ")
+            + QString::number(nombreMisAJour)
+            + ")");
+        QTimer::singleShot(5000, this, &AeroDms::masquerBarreDeProgressionDeLaStatusBar);
+    }
+}
+
+void AeroDms::masquerBarreDeProgressionDeLaStatusBar()
+{
+    barreDeProgressionStatusBar->hide();
 }
 
 void AeroDms::closeEvent(QCloseEvent* event)

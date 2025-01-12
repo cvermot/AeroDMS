@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -603,6 +603,34 @@ void AeroDmsServices::normaliser(QString & p_texte)
     p_texte.replace(QRegularExpression("[Æ]"), "AE");
     p_texte.replace(QRegularExpression("[œ]"), "oe");
     p_texte.replace(QRegularExpression("[Œ]"), "OE");
+}
+
+QString AeroDmsServices::capitaliserTexte(const QString& p_input)
+{
+    QLocale locale; // Utilise la locale par défaut
+    QString result;
+    bool capitalizeNext = true;
+
+    for (int i = 0; i < p_input.length(); ++i) 
+    {
+        if (p_input[i].isSpace()
+            || p_input[i] == "-") 
+        {
+            capitalizeNext = true;
+            result.append(p_input[i]);
+        }
+        else if (capitalizeNext) 
+        {
+            result.append(locale.toUpper(p_input[i]));
+            capitalizeNext = false;
+        }
+        else 
+        {
+            result.append(locale.toLower(p_input[i]));
+        }
+    }
+
+    return result;
 }
 
 QString AeroDmsServices::chiffrerDonnees(QString& p_string) 

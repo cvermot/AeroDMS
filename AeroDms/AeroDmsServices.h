@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ public:
     static void ajouterIconesComboBox(QComboBox &p_activite);
 
     static void normaliser(QString &p_texte);
+    static QString capitaliserTexte(const QString& p_input);
 
     static QString recupererCheminFichierImageSignature();
 

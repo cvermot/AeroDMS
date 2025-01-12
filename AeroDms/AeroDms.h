@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ private:
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule();
+    void preparerStatusBar();
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();
 
@@ -188,6 +189,7 @@ private:
 
     //Barre de progression
     DialogueProgressionGenerationPdf* progressionGenerationPdf = nullptr;
+    QProgressBar* barreDeProgressionStatusBar;
 
     //Boutons
     QAction* boutonGenerePdf;
@@ -393,6 +395,12 @@ public slots:
     void enregistrerParametresApplication( const AeroDmsTypes::ParametresMetier p_parametresMetiers,
                                            const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionGenerationPdf();
+    void mettreAJourAerodromes();
+    void afficherProgressionMiseAJourAerodromes(int nombreTotal,
+        int nombreTraite,
+        int nombreCree,
+        int nombreMisAJour);
+    void masquerBarreDeProgressionDeLaStatusBar();
 
     //Téléchargement de factures
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);

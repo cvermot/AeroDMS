@@ -247,6 +247,13 @@ public:
         ModeDeReglement_VIREMENT,
     };
 
+    enum Status
+    {
+        Status_AUCUNE_ACTION_EFFECTUEE,
+        Status_MIS_A_JOUR,
+        Status_CREATION
+    };
+
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
         QString idPilote = "";

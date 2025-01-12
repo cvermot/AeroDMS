@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
     <QtInstall>6.8.0_msvc2022_64</QtInstall>
-    <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
+    <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
@@ -115,6 +115,7 @@
   <ItemGroup>
     <ClCompile Include="AeroDmsServices.cpp" />
     <ClCompile Include="AeroDmsTypes.cpp" />
+    <ClCompile Include="AixmParser.cpp" />
     <ClCompile Include="DialogueEditionParametres.cpp" />
     <ClCompile Include="DialogueGestionAeroclub.cpp" />
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
@@ -163,6 +164,7 @@
     <QtMoc Include="PdfDownloader.h" />
     <QtMoc Include="PdfPrinterWorker.h" />
     <QtMoc Include="DialogueGestionAeroclub.h" />
+    <QtMoc Include="AixmParser.h" />
     <ClInclude Include="RccGenerator.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />

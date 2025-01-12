@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -81,7 +81,6 @@ private:
 private slots:
 	void serviceRequestFinished(QNetworkReply*);
 	void demandeAuthentificationProxy(const QNetworkProxy& p_proxy, QAuthenticator* p_authenticator);
-	//void saveFile(QNetworkReply* rep);
 
 signals:
 	void etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures);
