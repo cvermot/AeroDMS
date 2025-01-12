@@ -1446,10 +1446,6 @@ void AeroDms::initialiserMenuOutils()
     connect(mailingPilotesActifs, SIGNAL(triggered()), this, SLOT(envoyerMail()));
 
     menuOutils->addSeparator();
-    QAction* boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
-    boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
-    menuOutils->addAction(boutonGestionAeronefs);
-    connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
     boutonEditerLePiloteSelectionne = new QAction(QIcon(":/AeroDms/ressources/account-edit.svg"), tr("É&diter le pilote sélectionné"), this);
     boutonEditerLePiloteSelectionne->setStatusTip(tr("Permet d'éditer le pilote actuellement sélectionné. Fonction disponible uniquement si un pilote est sélectionné dans la vue courante."));
@@ -1461,6 +1457,13 @@ void AeroDms::initialiserMenuOutils()
     boutonEditerUnAeroclub->setStatusTip(tr("Permet d'éditer un des aéroclub connus du logiciel"));
     menuOutils->addAction(boutonEditerUnAeroclub);
     connect(boutonEditerUnAeroclub, SIGNAL(triggered()), this, SLOT(editerAeroclub()));
+
+    menuOutils->addSeparator();
+
+    QAction* boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
+    boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
+    menuOutils->addAction(boutonGestionAeronefs);
+    connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
     QAction *boutonMettreAJourAerodromes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT), tr("Mettre à jour la liste des aérodromes"), this);
     boutonMettreAJourAerodromes->setStatusTip(tr("Permet de mettre à jour la liste des aérodromes à partir d'un fichier AIXM 4.5"));
@@ -2369,27 +2372,34 @@ void AeroDms::ajouterUnAeroclubEnBdd()
     switch (resultat)
     {
     case AeroDmsTypes::ResultatCreationBdd_SUCCES:
-    {
-        if (club.idAeroclub == -1)
         {
-            statusBar()->showMessage(tr("Aéroclub ajouté avec succès"));
+            if (club.idAeroclub == -1)
+            {
+                statusBar()->showMessage(tr("Aéroclub ajouté avec succès"));
+            }
+            else
+            {
+                statusBar()->showMessage(tr("Aéroclub modifié avec succès"));
+            }
+            break;
         }
-        else
+        case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
+	    {
+		    statusBar()->showMessage(tr("Échec ajout aéroclub : l'aéroclub existe déjà"));
+		    QMessageBox::critical(this,
+			    QApplication::applicationName() + " - " + tr("Échec ajoute aéroclub"),
+			    tr("Un aéroclub existe avec ce nom\nexiste déjà. Ajout impossible."));
+		    break;
+	    }
+        case AeroDmsTypes::ResultatCreationBdd_AUTRE:
+        default:
         {
-            statusBar()->showMessage(tr("Aéroclub modifié avec succès"));
+            statusBar()->showMessage(tr("Échec ajout aéroclub : erreur indéterminée"));
+            QMessageBox::critical(this,
+                QApplication::applicationName() + " - " + tr("Échec ajoute aéroclub"),
+                tr("Une erreur indéterminée s'est\nproduite. Ajout de l'aéroclub impossible."));
+            break;
         }
-        break;
-    }
-    case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
-    case AeroDmsTypes::ResultatCreationBdd_AUTRE:
-    default:
-    {
-        statusBar()->showMessage(tr("Échec ajout aéroclub : erreur indéterminée"));
-        QMessageBox::critical(this,
-            QApplication::applicationName() + " - " + tr("Échec ajoute aéroclub"),
-            tr("Une erreur indéterminée s'est\nproduite. Ajout de l'aéroclub impossible."));
-        break;
-    }
     }
 }
 

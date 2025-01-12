@@ -38,6 +38,7 @@ public:
     AeroDmsTypes::ListeAeroclubs recupererAeroclubs();
     AeroDmsTypes::Club recupererAeroclub(int p_aeroclubId);
     AeroDmsTypes::Club recupererInfosAeroclubDuPilote(const QString p_piloteId);
+    AeroDmsTypes::ListeAerodromes recupererAerodromes();
 
     int recupererProchainNumeroFacture();
     int ajouterFacture(QString& nomFichier);
@@ -159,7 +160,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.9;
+    const float versionBddAttendue = 1.10;
 
     AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,

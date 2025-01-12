@@ -29,11 +29,13 @@ public:
 
     AeroDmsTypes::Club recupererInfosClub();
     void peuplerListeAeroclub();
+    void peuplerListeAerodrome();
     void ouvrirFenetre(const bool p_modeEdition);
     //void preparerMiseAJourClub(const int p_aerolcubId);
 
 private:
     QComboBox* selectionAeroclub;
+    QComboBox* selectionAerodrome;
     QLabel* selectionAeroclubLabel;
     QLineEdit* nomAeroclub;
     QLineEdit* raisonSociale;

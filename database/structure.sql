@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on sam. janv. 11 23:33:57 2025
+-- File generated with SQLiteStudio v3.4.4 on dim. janv. 12 12:52:41 2025
 --
 -- Text encoding used: UTF-8
 --
@@ -15,12 +15,12 @@ INSERT INTO activite (nom) VALUES ('Helicoptère');
 INSERT INTO activite (nom) VALUES ('Avion électrique');
 
 -- Table: aeroclub
-CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, aeroclub TEXT NOT NULL UNIQUE, raisonSociale TEXT, IBAN TEXT, BIC TEXT);
-INSERT INTO aeroclub (aeroclubId, aeroclub, raisonSociale, IBAN, BIC) VALUES (0, ' Aéroclub indéterminé', NULL, NULL, NULL);
+CREATE TABLE IF NOT EXISTS aeroclub (aeroclubId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, aeroclub TEXT NOT NULL UNIQUE, aerodrome TEXT REFERENCES aerodrome (identifiantOaci) NOT NULL DEFAULT LF, raisonSociale TEXT, IBAN TEXT, BIC TEXT);
+INSERT INTO aeroclub (aeroclubId, aeroclub, aerodrome, raisonSociale, IBAN, BIC) VALUES (0, ' Aéroclub indéterminé', 'LF', NULL, NULL, NULL);
 
 -- Table: aerodrome
 CREATE TABLE IF NOT EXISTS aerodrome (identifiantOaci TEXT PRIMARY KEY NOT NULL UNIQUE, nom TEXT NOT NULL);
-INSERT INTO aerodrome (identifiantOaci, nom) VALUES ('LF', 'Aérodrome Inconnu');
+INSERT INTO aerodrome (identifiantOaci, nom) VALUES ('LF', '  Aérodrome Inconnu');
 
 -- Table: aeronef
 CREATE TABLE IF NOT EXISTS aeronef (

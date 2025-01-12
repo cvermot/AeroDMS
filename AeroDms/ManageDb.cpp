@@ -75,11 +75,32 @@ AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
     return listeDesClubs;
 }
 
+AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromes()
+{
+    AeroDmsTypes::ListeAerodromes listeDesAerodromes;
+
+    const QString sql = "SELECT * FROM aerodrome ORDER BY nom";
+
+    QSqlQuery query;
+    query.exec(sql);
+
+    while (query.next())
+    {
+        AeroDmsTypes::Aerodrome aerodrome;
+		aerodrome.indicatifOaci = query.value("identifiantOaci").toString();
+		aerodrome.nom = query.value("nom").toString();
+        listeDesAerodromes.append(aerodrome);
+    }
+
+    return listeDesAerodromes;
+}
+
 AeroDmsTypes::Club ManageDb::depilerRequeteAeroclub(const QSqlQuery p_query)
 {
     AeroDmsTypes::Club aeroclub = AeroDmsTypes::K_INIT_CLUB;
     aeroclub.idAeroclub = p_query.value("aeroclubId").toInt();
     aeroclub.aeroclub = p_query.value("aeroclub").toString();
+    aeroclub.aerodrome = p_query.value("aerodrome").toString();
     aeroclub.raisonSociale = p_query.value("raisonSociale").toString();
     aeroclub.iban = p_query.value("iban").toString();
     aeroclub.bic = p_query.value("bic").toString();
@@ -98,11 +119,7 @@ AeroDmsTypes::Club ManageDb::recupererAeroclub(int p_aeroclubId)
 
     while (query.next()) 
     {
-        aeroclub.idAeroclub = query.value("aeroclubId").toInt();
-        aeroclub.aeroclub = query.value("aeroclub").toString();
-        aeroclub.raisonSociale = query.value("raisonSociale").toString();
-        aeroclub.iban = query.value("iban").toString();
-        aeroclub.bic = query.value("bic").toString();
+        aeroclub = depilerRequeteAeroclub(query);
     }
 
     return aeroclub;
@@ -1565,8 +1582,9 @@ AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTypes::Cl
     //creation
     if (p_aeroclub.idAeroclub == -1)
     {
-        query.prepare("INSERT INTO 'aeroclub' ('aeroclub','raisonSociale','IBAN','BIC') VALUES(:aeroclub,:raisonSociale,:IBAN,:BIC)");
+        query.prepare("INSERT INTO 'aeroclub' ('aeroclub', 'aerodrome', 'raisonSociale','IBAN','BIC') VALUES(:aeroclub,:aerodrome,:raisonSociale,:IBAN,:BIC)");
         query.bindValue(":aeroclub", p_aeroclub.aeroclub);
+        query.bindValue(":aerodrome", p_aeroclub.aerodrome);
         query.bindValue(":raisonSociale", p_aeroclub.raisonSociale);
         query.bindValue(":IBAN", p_aeroclub.iban);
         query.bindValue(":BIC", p_aeroclub.bic);
@@ -1574,14 +1592,24 @@ AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTypes::Cl
         if (!query.exec())
         {
             resultat = AeroDmsTypes::ResultatCreationBdd_AUTRE;
+            
+            query.prepare("SELECT * FROM aeroclub WHERE aeroclub = :aeroclub");
+            query.bindValue(":aeroclub", p_aeroclub.aeroclub);
+            query.exec();
+
+            if (query.next())
+            {
+				resultat = AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE;
+            }
         }
     }
     //mise à jour
     else
     {
-        query.prepare("UPDATE 'aeroclub' SET 'aeroclub' = :aeroclub,'raisonSociale' = :raisonSociale,'IBAN' = :IBAN,'BIC' = :BIC WHERE aeroclubId = :aeroclubId");
+        query.prepare("UPDATE 'aeroclub' SET 'aeroclub' = :aeroclub,'aerodrome' = :aerodrome,'raisonSociale' = :raisonSociale,'IBAN' = :IBAN,'BIC' = :BIC WHERE aeroclubId = :aeroclubId");
         query.bindValue(":aeroclubId", p_aeroclub.idAeroclub);
         query.bindValue(":aeroclub", p_aeroclub.aeroclub);
+        query.bindValue(":aerodrome", p_aeroclub.aerodrome);
         query.bindValue(":raisonSociale", p_aeroclub.raisonSociale);
         query.bindValue(":IBAN", p_aeroclub.iban);
         query.bindValue(":BIC", p_aeroclub.bic);

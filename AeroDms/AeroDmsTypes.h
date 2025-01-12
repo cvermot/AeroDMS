@@ -292,9 +292,16 @@ public:
     static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;
 
+	struct Aerodrome {
+		QString indicatifOaci;
+		QString nom;
+	};
+    typedef QList<Aerodrome> ListeAerodromes;
+
     struct Club {
         int idAeroclub;
         QString aeroclub;
+        QString aerodrome;
         QString raisonSociale;
         QString iban;
         QString bic;

@@ -71,6 +71,7 @@ const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilot
 
 const AeroDmsTypes::Club AeroDmsTypes::K_INIT_CLUB = { 0, //int idAeroclub;
                                                        "", //QString aeroclub;
+                                                       "LF", //QString aerodrome;
                                                        "", //QString raisonSociale;
                                                        "", //QString iban;
                                                        "", //QString bic;

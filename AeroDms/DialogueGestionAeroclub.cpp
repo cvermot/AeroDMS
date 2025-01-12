@@ -54,6 +54,9 @@ DialogueGestionAeroclub::DialogueGestionAeroclub(ManageDb* db, QWidget* parent) 
     selectionAeroclubLabel = new QLabel(tr("Aéroclub à éditer : "), this);
     connect(selectionAeroclub, &QComboBox::currentIndexChanged, this, &DialogueGestionAeroclub::chargerDonneesAeroclub);
 
+	selectionAerodrome = new QComboBox(this);
+    QLabel *selectionAerodromeLabel = new QLabel(tr("Aérodrome : "), this);
+
     nomAeroclub = new QLineEdit(this);
     QLabel* nomAeroclubLabel = new QLabel(tr("Nom de l'aéroclub : "), this);
     connect(nomAeroclub, &QLineEdit::textChanged, this, &DialogueGestionAeroclub::prevaliderDonneesSaisies);
@@ -83,20 +86,24 @@ DialogueGestionAeroclub::DialogueGestionAeroclub(ManageDb* db, QWidget* parent) 
     mainLayout->addWidget(nomAeroclubLabel, 1, 0);
     mainLayout->addWidget(nomAeroclub, 1, 1);
 
-    mainLayout->addWidget(raisonSocialeLabel, 2, 0);
-    mainLayout->addWidget(raisonSociale, 2, 1);
+    mainLayout->addWidget(selectionAerodromeLabel, 2, 0);
+    mainLayout->addWidget(selectionAerodrome, 2, 1);
 
-    mainLayout->addWidget(ibanLabel, 3, 0);
-    mainLayout->addWidget(iban, 3, 1);
+    mainLayout->addWidget(raisonSocialeLabel, 3, 0);
+    mainLayout->addWidget(raisonSociale, 3, 1);
 
-    mainLayout->addWidget(bicLabel, 4, 0);
-    mainLayout->addWidget(bic, 4, 1);
+    mainLayout->addWidget(ibanLabel, 4, 0);
+    mainLayout->addWidget(iban, 4, 1);
+
+    mainLayout->addWidget(bicLabel, 5, 0);
+    mainLayout->addWidget(bic, 5, 1);
 
     mainLayout->addWidget(buttonBox, 10, 0, 1, 2);
 
     setLayout(mainLayout);
 
     peuplerListeAeroclub();
+    peuplerListeAerodrome();
 }
 
 AeroDmsTypes::Club DialogueGestionAeroclub::recupererInfosClub()
@@ -105,6 +112,7 @@ AeroDmsTypes::Club DialogueGestionAeroclub::recupererInfosClub()
 
     club.idAeroclub = idAeroclub;
     club.aeroclub = nomAeroclub->text();
+	club.aerodrome = selectionAerodrome->currentData().toString();
     club.raisonSociale = raisonSociale->text();
     club.iban = iban->text().replace(" ", "");
     club.bic = bic->text();
@@ -128,6 +136,18 @@ void DialogueGestionAeroclub::peuplerListeAeroclub()
     }
 }
 
+void DialogueGestionAeroclub::peuplerListeAerodrome()
+{
+    AeroDmsTypes::ListeAerodromes aerodromes = database->recupererAerodromes();
+
+    selectionAerodrome->clear();
+
+    for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
+    {
+        selectionAerodrome->addItem(aerodrome.nom + " - " + aerodrome.indicatifOaci, aerodrome.indicatifOaci);
+    }
+}
+
 void DialogueGestionAeroclub::prevaliderDonneesSaisies()
 {
     okButton->setDisabled(false);
@@ -146,13 +166,18 @@ void DialogueGestionAeroclub::chargerDonneesAeroclub()
     {
         const AeroDmsTypes::Club aeroclub = database->recupererAeroclub(selectionAeroclub->currentData().toInt());
 
+        qDebug() << aeroclub.aeroclub;
+        qDebug() << aeroclub.aerodrome;
+
         idAeroclub = selectionAeroclub->currentData().toInt();
         nomAeroclub->setText(aeroclub.aeroclub);
+        selectionAerodrome->setCurrentIndex(selectionAerodrome->findData(aeroclub.aerodrome));
         raisonSociale->setText(aeroclub.raisonSociale);
         iban->setText(aeroclub.iban);
         bic-> setText(aeroclub.bic);
 
         nomAeroclub->setEnabled(true);
+        selectionAerodrome->setEnabled(true);
         raisonSociale->setEnabled(true);
         iban->setEnabled(true);
         bic->setEnabled(true);
@@ -161,6 +186,7 @@ void DialogueGestionAeroclub::chargerDonneesAeroclub()
     {
         annulationOuFinSaisie();
         nomAeroclub->setEnabled(false);
+        selectionAerodrome->setEnabled(false);
         raisonSociale->setEnabled(false);
         iban->setEnabled(false);
         bic->setEnabled(false);
@@ -185,6 +211,7 @@ void DialogueGestionAeroclub::ouvrirFenetre(const bool p_modeEdition)
     selectionAeroclubLabel->setHidden(!p_modeEdition);
 
     nomAeroclub->setEnabled(!p_modeEdition);
+    selectionAerodrome->setEnabled(!p_modeEdition);
     raisonSociale->setEnabled(!p_modeEdition);
     iban->setEnabled(!p_modeEdition);
     bic->setEnabled(!p_modeEdition);
