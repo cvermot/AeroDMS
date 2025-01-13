@@ -1838,7 +1838,7 @@ const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActi
     AeroDmsTypes::ListeAerodromes aerodromes;
 
     QSqlQuery query;
-    query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes  WHERE estActif GROUP BY aerodrome ORDER BY nomAerodrome");
+    query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes WHERE estActif GROUP BY aerodrome ORDER BY nomAerodrome");
     query.exec();
 
     while (query.next())

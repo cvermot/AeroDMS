@@ -1967,7 +1967,7 @@ void AeroDms::peuplerTablePilotes()
         item->setToolTip(tr("Subvention entrainement restante pour ce pilote : ")
             + QString::number(subvention.montantSubventionEntrainement - subvention.entrainement.montantRembourse)
             + tr(" € (subvention consommée : ")
-            + QString::number(proportionConsommationSubvention*100)
+            + QString::number(proportionConsommationSubvention*100, 'f', 2)
             + " %)");
         if (proportionConsommationSubvention < 0.75)
         {
