@@ -704,6 +704,10 @@ void AeroDms::passerLeLogicielEnLectureSeule()
     boutonGenerePdf->setEnabled(false);
     facturesDaca->setEnabled(false);
 
+    boutonEditerUnAeroclub->setEnabled(false);
+    boutonGestionAeronefs->setEnabled(false);
+    boutonMettreAJourAerodromes->setEnabled(false);
+
     logicielEnModeLectureSeule = true;
 }
 
@@ -1456,12 +1460,12 @@ void AeroDms::initialiserMenuOutils()
 
     menuOutils->addSeparator();
 
-    QAction* boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
+    boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
     boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
     menuOutils->addAction(boutonGestionAeronefs);
     connect(boutonGestionAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionAeronefs()));
 
-    QAction *boutonMettreAJourAerodromes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT), tr("Mettre à jour la liste des aérodromes"), this);
+    boutonMettreAJourAerodromes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT), tr("Mettre à jour la liste des aérodromes"), this);
     boutonMettreAJourAerodromes->setStatusTip(tr("Permet de mettre à jour la liste des aérodromes à partir d'un fichier AIXM 4.5"));
     menuOutils->addAction(boutonMettreAJourAerodromes);
     connect(boutonMettreAJourAerodromes, SIGNAL(triggered()), this, SLOT(mettreAJourAerodromes()));
@@ -1977,22 +1981,26 @@ void AeroDms::peuplerTablePilotes()
 
 void AeroDms::gererBoutonEditionPilote()
 {
-    //On mette à jour l'info pilote a éditer en cas de demande d'édition du pilote via le menu outils,
-    //si on a sélectionné un pilote donné et pas "Tous les pilotes"
-    boutonEditerLePiloteSelectionne->setEnabled(false);
-    if (mainTabWidget->currentWidget() == widgetAjoutVol)
+    //Edition possible du pilote uniquement si logiciel pas en lecture seule 
+    if (!logicielEnModeLectureSeule)
     {
-        if (choixPilote->currentIndex() != 0)
+        //On met à jour l'info pilote a éditer en cas de demande d'édition du pilote via le menu outils,
+        //si on a sélectionné un pilote donné et pas "Tous les pilotes"
+        boutonEditerLePiloteSelectionne->setEnabled(false);
+        if (mainTabWidget->currentWidget() == widgetAjoutVol)
         {
-            piloteAEditer = choixPilote->currentData().toString();
+            if (choixPilote->currentIndex() != 0)
+            {
+                piloteAEditer = choixPilote->currentData().toString();
+                boutonEditerLePiloteSelectionne->setEnabled(true);
+            }
+        }
+        else if (listeDeroulantePilote->currentData().toString() != "*")
+        {
+            piloteAEditer = listeDeroulantePilote->currentData().toString();
             boutonEditerLePiloteSelectionne->setEnabled(true);
         }
-    }
-    else if (listeDeroulantePilote->currentData().toString() != "*")
-    {
-        piloteAEditer = listeDeroulantePilote->currentData().toString();
-        boutonEditerLePiloteSelectionne->setEnabled(true);
-    }
+    } 
 }
 
 void AeroDms::peuplerTableVols()

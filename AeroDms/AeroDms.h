@@ -283,6 +283,8 @@ private:
 
     QAction* boutonEditerLePiloteSelectionne;
     QAction* boutonEditerUnAeroclub;
+    QAction* boutonGestionAeronefs;
+    QAction* boutonMettreAJourAerodromes;
 
     //Données internes
     //Gestion des actions métier
