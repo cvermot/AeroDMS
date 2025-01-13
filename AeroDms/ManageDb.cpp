@@ -1833,12 +1833,26 @@ const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
     return listeDemandes;
 }
 
-const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActifs()
+const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande)
 {
     AeroDmsTypes::ListeAerodromes aerodromes;
 
     QSqlQuery query;
-    query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes WHERE estActif GROUP BY aerodrome ORDER BY nomAerodrome");
+    switch (p_demande)
+    {
+        case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME :
+        {
+            query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes WHERE estActif GROUP BY aerodrome ORDER BY nomAerodrome");
+        }
+        break;
+        case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME:
+        default:
+        {
+            query.prepare("SELECT aerodrome, nomAerodrome FROM infosPilotes WHERE estActif AND estBrevete AND activitePrincipale != 'Planeur' GROUP BY aerodrome ORDER BY nomAerodrome");
+        }
+        break;
+    }
+    
     query.exec();
 
     while (query.next())
@@ -1888,13 +1902,28 @@ const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p
     return listeMail.join(";");
 }
 
-const QString ManageDb::recupererMailPilotesDUnAerodrome(const QString p_codeOaci)
+const QString ManageDb::recupererMailPilotesDUnAerodrome(const QString p_codeOaci, 
+    const AeroDmsTypes::DonnesMailingType p_demande)
 {
     QStringList listeMail;
 
     QSqlQuery query;
 
-    query.prepare("SELECT mail FROM infosPilotes WHERE estActif AND aerodrome = :aerodrome AND mail IS NOT NULL AND mail != ''");
+	switch (p_demande)
+	{
+	    case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME:
+	    {
+            query.prepare("SELECT mail FROM infosPilotes WHERE estActif AND aerodrome = :aerodrome AND mail IS NOT NULL AND mail != ''");
+	    }
+	    break;
+	    case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME:
+	    default:
+	    {
+		    query.prepare("SELECT mail FROM infosPilotes WHERE estActif AND estBrevete AND activitePrincipale != 'Planeur' AND aerodrome = :aerodrome AND mail IS NOT NULL AND mail != ''");
+	    }
+	    break;
+	    }
+
 	query.bindValue(":aerodrome", p_codeOaci);
     query.exec();
 

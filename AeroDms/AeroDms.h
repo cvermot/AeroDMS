@@ -269,6 +269,8 @@ private:
     QAction* mailingPilotesDerniereDemandeSubvention;
     QMenu* menuMailDemandesSubvention;
     QMenu* menuMailPilotesDUnAerodrome;
+    QMenu* menuMailPilotesDUnAerodromeActif;
+    QMenu* menuMailPilotesDUnAerodromeActifBreveteMoteur;
     
     QAction* scanAutoOpenFlyer;
     QAction* scanAutoAerogest;

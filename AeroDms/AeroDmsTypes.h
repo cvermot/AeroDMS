@@ -257,7 +257,8 @@ public:
     enum DonnesMailingType
     {
         DonnesMailingType_DEMANDE_DE_SUBVENTION,
-        DonnesMailingType_PILOTES_D_UN_AERODROME
+        DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME,
+        DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME
     };
 
     struct DonneesMailing {

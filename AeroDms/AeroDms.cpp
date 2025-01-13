@@ -1436,6 +1436,10 @@ void AeroDms::initialiserMenuOutils()
    
     menuMailPilotesDUnAerodrome = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes d'un aérodrome"));
+    menuMailPilotesDUnAerodromeActif = menuMailPilotesDUnAerodrome->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+        tr("Pilotes actifs"));
+    menuMailPilotesDUnAerodromeActifBreveteMoteur = menuMailPilotesDUnAerodrome->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+        tr("Pilotes actifs, brevetés et vol moteur"));
     peuplerMenuMailPilotesDUnAerodrome();
 
     connect(mailingPilotesAyantCotiseCetteAnnee, SIGNAL(triggered()), this, SLOT(envoyerMail()));
@@ -3197,20 +3201,37 @@ void AeroDms::peuplerMenuMailDemandesSubvention()
 
 void AeroDms::peuplerMenuMailPilotesDUnAerodrome()
 {
-    menuMailPilotesDUnAerodrome->clear();
+    menuMailPilotesDUnAerodromeActif->clear();
 
-    AeroDmsTypes::ListeAerodromes aerodromes = db->recupererAerodromesAvecPilotesActifs();
+    AeroDmsTypes::ListeAerodromes aerodromes = db->recupererAerodromesAvecPilotesActifs(AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME);
     for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
     {
         QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
             aerodrome.nom + " - " + aerodrome.indicatifOaci,
             this);
-        //action->setData(aerodrome.indicatifOaci);
+        
         AeroDmsTypes::DonneesMailing data;
-        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME;
         data.donneeComplementaire = aerodrome.indicatifOaci;
         action->setData(QVariant::fromValue(data));
-        menuMailPilotesDUnAerodrome->addAction(action);
+        menuMailPilotesDUnAerodromeActif->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
+
+    menuMailPilotesDUnAerodromeActifBreveteMoteur->clear();
+
+    aerodromes = db->recupererAerodromesAvecPilotesActifs(AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME);
+    for (AeroDmsTypes::Aerodrome aerodrome : aerodromes)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            aerodrome.nom + " - " + aerodrome.indicatifOaci,
+            this);
+
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME;
+        data.donneeComplementaire = aerodrome.indicatifOaci;
+        action->setData(QVariant::fromValue(data));
+        menuMailPilotesDUnAerodromeActifBreveteMoteur->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     }
 }
@@ -3920,10 +3941,19 @@ void AeroDms::envoyerMail()
                     + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
             }
             break;
-            case AeroDmsTypes::DonnesMailingType_PILOTES_D_UN_AERODROME:
+            case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME:
             {
                 QDesktopServices::openUrl(QUrl("mailto:"
-                    + db->recupererMailPilotesDUnAerodrome(donnnesMailing.donneeComplementaire)
+                    + db->recupererMailPilotesDUnAerodrome(donnnesMailing.donneeComplementaire, 
+                        AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME)
+                    + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
+            }
+            break;
+            case AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME:
+            {
+                QDesktopServices::openUrl(QUrl("mailto:"
+                    + db->recupererMailPilotesDUnAerodrome(donnnesMailing.donneeComplementaire, 
+                        AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME)
                     + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
             }
             break;

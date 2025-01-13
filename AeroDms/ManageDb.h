@@ -142,9 +142,10 @@ public:
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
-    const AeroDmsTypes::ListeAerodromes recupererAerodromesAvecPilotesActifs();
+    const AeroDmsTypes::ListeAerodromes recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande);
     const QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
-    const QString recupererMailPilotesDUnAerodrome(const QString p_codeOaci);
+    const QString recupererMailPilotesDUnAerodrome(const QString p_codeOaci, 
+        const AeroDmsTypes::DonnesMailingType p_demande);
 
     const AeroDmsTypes::ListeDetailsBaladesEtSorties recupererListeDetailsBaladesEtSorties(const int p_annee);
 
