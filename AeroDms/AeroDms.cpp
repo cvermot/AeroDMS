@@ -1963,17 +1963,29 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
 
         QTableWidgetItem* item = vuePilotes->item(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE);
-        if (subvention.entrainement.montantRembourse < subvention.montantSubventionEntrainement)
+        const float proportionConsommationSubvention = subvention.entrainement.montantRembourse / subvention.montantSubventionEntrainement;
+        item->setToolTip(tr("Subvention entrainement restante pour ce pilote : ")
+            + QString::number(subvention.montantSubventionEntrainement - subvention.entrainement.montantRembourse)
+            + tr(" € (subvention consommée : ")
+            + QString::number(proportionConsommationSubvention*100)
+            + " %)");
+        if (proportionConsommationSubvention < 0.75)
         {
-            item->setBackground(QBrush(QColor(140, 255, 135, 120)));
-            item->setToolTip("Subvention entrainement restante pour ce pilote : " 
-                + QString::number(subvention.montantSubventionEntrainement - subvention.entrainement.montantRembourse) 
-                + " €");
+            item->setBackground(QBrush(QColor(140, 255, 135, 120))); 
+        }
+        else if (proportionConsommationSubvention < 0.95)
+        {
+            item->setBackground(QBrush(QColor(255, 255, 133, 120)));
+        }
+        else if (proportionConsommationSubvention < 1.0)
+        {
+            qDebug() << proportionConsommationSubvention << (proportionConsommationSubvention < 0.95);
+            item->setBackground(QBrush(QColor(255, 194, 133, 120)));
         }
         else
         {
             item->setBackground(QBrush(QColor(255, 140, 135, 120)));
-            item->setToolTip("Ce pilote a consommé la totalité de sa subvention d'entrainement");   
+            item->setToolTip(tr("Ce pilote a consommé la totalité de sa subvention d'entrainement"));   
         }
     }
     vuePilotes->resizeColumnsToContents();
