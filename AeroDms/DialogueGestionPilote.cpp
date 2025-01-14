@@ -51,7 +51,9 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db,
 
     aeroclub = new QComboBox();
     QLabel* aeroclubLabel = new QLabel(tr("Aéroclub : "), this);
+    ajouterAeroclubButton = new QPushButton(tr("Ajouter un aéroclub"), this);
     connect(aeroclub, &QComboBox::currentIndexChanged, this, &DialogueGestionPilote::prevaliderDonneesSaisies);
+    connect(ajouterAeroclubButton, SIGNAL(clicked()), this, SLOT(ajouterUnAeroclub()));
 
     activitePrincipale = new QComboBox();
     QLabel* activitePrincipaleLabel = new QLabel(tr("Activité principale : "), this);
@@ -82,36 +84,37 @@ DialogueGestionPilote::DialogueGestionPilote(ManageDb* db,
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
     mainLayout->addWidget(nomLabel, 0, 0);
-    mainLayout->addWidget(nom, 0, 1);
+    mainLayout->addWidget(nom, 0, 1, 1, 2);
 
     mainLayout->addWidget(prenomLabel, 1, 0);
-    mainLayout->addWidget(prenom, 1, 1);
+    mainLayout->addWidget(prenom, 1, 1, 1, 2);
 
     mainLayout->addWidget(aeroclubLabel, 2, 0);
     mainLayout->addWidget(aeroclub, 2, 1);
+    mainLayout->addWidget(ajouterAeroclubButton, 2, 2);
 
     mainLayout->addWidget(activitePrincipaleLabel, 3, 0);
-    mainLayout->addWidget(activitePrincipale, 3, 1);
+    mainLayout->addWidget(activitePrincipale, 3, 1, 1, 2);
 
     mainLayout->addWidget(estAyantDroitLabel, 4, 0);
-    mainLayout->addWidget(estAyantDroit, 4, 1);
+    mainLayout->addWidget(estAyantDroit, 4, 1, 1, 2);
 
     mainLayout->addWidget(mailLabel, 5, 0);
-    mainLayout->addWidget(mail, 5, 1);
+    mainLayout->addWidget(mail, 5, 1, 1, 2);
 
     mainLayout->addWidget(telephoneLabel, 6, 0);
-    mainLayout->addWidget(telephone, 6, 1);
+    mainLayout->addWidget(telephone, 6, 1, 1, 2);
 
     mainLayout->addWidget(remarqueLabel, 7, 0);
-    mainLayout->addWidget(remarque, 7, 1);
+    mainLayout->addWidget(remarque, 7, 1, 1, 2);
 
     mainLayout->addWidget(estActifLabel, 8, 0);
-    mainLayout->addWidget(estActif, 8, 1);
+    mainLayout->addWidget(estActif, 8, 1, 1, 2);
 
     mainLayout->addWidget(estBreveteLabel, 9, 0);
-    mainLayout->addWidget(estBrevete, 9, 1);
+    mainLayout->addWidget(estBrevete, 9, 1, 1, 2);
 
-    mainLayout->addWidget(buttonBox, 10, 0, 1, 2);
+    mainLayout->addWidget(buttonBox, 10, 0, 1, 3);
 
     setLayout(mainLayout);
 
@@ -173,6 +176,11 @@ void DialogueGestionPilote::prevaliderDonneesSaisies()
     {
         okButton->setDisabled(true);
     }
+}
+
+void DialogueGestionPilote::ajouterUnAeroclub()
+{
+	emit demandeAjoutAeroclub();
 }
 
 void DialogueGestionPilote::preparerMiseAJourPilote(const QString p_piloteId)

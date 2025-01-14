@@ -44,6 +44,8 @@ private:
     QCheckBox* estActif;
     QCheckBox* estBrevete;
 
+    QPushButton* ajouterAeroclubButton;
+
     QString idPilote;
 
     ManageDb* database;
@@ -57,6 +59,10 @@ private:
 private slots:
     void prevaliderDonneesSaisies();
     void annulationOuFinSaisie();
+    void ajouterUnAeroclub();
+
+signals:
+    void demandeAjoutAeroclub();
 };
 
 #endif // DIALOGUEGESTIONPILOTE_H

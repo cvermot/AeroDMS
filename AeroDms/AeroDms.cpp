@@ -979,6 +979,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
+    connect(dialogueGestionPilote, SIGNAL(demandeAjoutAeroclub()), this, SLOT(ajouterUnAeroclub()));
 
     dialogueGestionAeroclub = new DialogueGestionAeroclub(db, this);
     connect(dialogueGestionAeroclub, SIGNAL(accepted()), this, SLOT(ajouterUnAeroclubEnBdd()));
@@ -1973,7 +1974,11 @@ void AeroDms::peuplerTablePilotes()
             + tr(" € (subvention consommée : ")
             + QString::number(proportionConsommationSubvention*100, 'f', 2)
             + " %)");
-        if (proportionConsommationSubvention < 0.75)
+        if (proportionConsommationSubvention < 0.05)
+        {
+            item->setBackground(QBrush(QColor(133, 194, 255, 120)));
+        }
+        else if (proportionConsommationSubvention < 0.75)
         {
             item->setBackground(QBrush(QColor(140, 255, 135, 120))); 
         }
@@ -1983,7 +1988,6 @@ void AeroDms::peuplerTablePilotes()
         }
         else if (proportionConsommationSubvention < 1.0)
         {
-            qDebug() << proportionConsommationSubvention << (proportionConsommationSubvention < 0.95);
             item->setBackground(QBrush(QColor(255, 194, 133, 120)));
         }
         else
@@ -4912,6 +4916,7 @@ void AeroDms::mettreAJourAerodromes()
         aixm.mettreAJourAerodromes(fichier);
 
         peuplerMenuMailPilotesDUnAerodrome();
+        dialogueGestionAeroclub->peuplerListeAerodrome();
     } 
 }
 
