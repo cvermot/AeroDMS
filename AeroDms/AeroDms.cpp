@@ -2812,7 +2812,7 @@ void AeroDms::genererPdf()
                 boutonOptionRecapAnnuelBaladesSorties->isChecked(),
                 parametresSysteme.autoriserReglementParVirement,
                 calculerValeurGraphAGenererPdf(),
-                -1);
+                anneeAGenerer);
         }
         break;
 
@@ -3092,14 +3092,18 @@ void AeroDms::enregistrerUnVol()
 void AeroDms::enregistrerLesVols()
 {
     //On ne peut enregistrer les vols que si le pilote est à jour de cotisation
-    //Cela sera vérifie dans la méthode enregistrerUnVol() cependant on le prévérifie
+    //Cela sera vérifié dans la méthode enregistrerUnVol() cependant on le prévérifie
     //ici pour éviter d'avoir N fois la notification d'échec si le pilote n'est 
     //pas à jour de sa cotisation
     chargerUnVolDetecte(0, 0);
     if (lePiloteEstAJourDeCotisation())
     {
+		barreDeProgressionStatusBar->setMaximum(factures.size());
+		barreDeProgressionStatusBar->setValue(0);
+        barreDeProgressionStatusBar->show();
         while (!factures.isEmpty())
         {
+			barreDeProgressionStatusBar->setValue(barreDeProgressionStatusBar->value() + 1);
             //On charge le premier vol de la ligne
             chargerUnVolDetecte(0, 0);
 
@@ -3110,6 +3114,8 @@ void AeroDms::enregistrerLesVols()
         validerLesVols->setEnabled(false);
         supprimerLeVolSelectionne->setEnabled(false);
     }
+
+    QTimer::singleShot(5000, this, &AeroDms::masquerBarreDeProgressionDeLaStatusBar);
 }
 
 void AeroDms::supprimerLeVolDeLaVueVolsDetectes()
