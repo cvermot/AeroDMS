@@ -343,6 +343,7 @@ public slots:
     void genererPdfRecapHdV();
     void prevaliderDonnnesSaisies();
     void prevaliderDonnneesSaisiesRecette();
+    void traiterClicSurVolBaladesEtSorties();
     void changerInfosVolSurSelectionTypeVol();
     void chargerBaladesSorties();
     void ajouterUnPilote();

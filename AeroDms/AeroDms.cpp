@@ -902,6 +902,7 @@ void AeroDms::initialiserBarreDeFiltres()
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerListeBaladesEtSorties);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableSubventionsDemandees);
+    connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::traiterClicSurVolBaladesEtSorties);
     actionListeDeroulanteAnnee = selectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
@@ -3256,13 +3257,31 @@ void AeroDms::peuplerListeBaladesEtSorties()
         if (vol.montantSubventionAttendu != 0)
         {
             itemBaladesEtSorties->setToolTip("Montant participation attendu : " + QString::number(vol.montantSubventionAttendu, 'f', 2) + " €");
+            itemBaladesEtSorties->setData(Qt::UserRole, vol.montantSubventionAttendu);
         }  
-        if (!vol.volAAuMoinsUnPaiement)
+        if (!vol.volAAuMoinsUnPaiement) 
         {
             itemBaladesEtSorties->setForeground(Qt::red);
         }
         listeBaladesEtSorties->addItem(itemBaladesEtSorties);
+        connect(listeBaladesEtSorties, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(traiterClicSurVolBaladesEtSorties()));
     }
+}
+
+void AeroDms::traiterClicSurVolBaladesEtSorties()
+{
+    float montantRecetteAttendu = 0;
+
+    //On somme les montants des vols cochés
+    for (int i = 0; i < listeBaladesEtSorties->count(); i++)
+    {
+        if (listeBaladesEtSorties->item(i)->checkState() == Qt::Checked)
+        {
+            montantRecetteAttendu = montantRecetteAttendu + listeBaladesEtSorties->item(i)->data(Qt::UserRole).toFloat();
+        }
+    }
+
+	montantRecette->setValue(montantRecetteAttendu);
 }
 
 void AeroDms::prevaliderDonnnesSaisies()
