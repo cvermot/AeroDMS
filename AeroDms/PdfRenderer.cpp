@@ -248,7 +248,8 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     const bool p_recapHdVAvecRecettes,
     const bool p_recapHdvAvecBaladesEtSorties,
     const bool p_virementEstAutorise,
-    const int p_valeurGraphAGenerer )
+    const int p_valeurGraphAGenerer,
+    const int p_annee)
 {
     demandeEnCours.listeFactures = QStringList();
     demandeEnCours.nomTresorier = p_nomTresorier;
@@ -259,6 +260,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     demandeEnCours.recapHdVAvecRecettes = p_recapHdVAvecRecettes;
     demandeEnCours.virementEstAutorise = p_virementEstAutorise;
     demandeEnCours.recapHdvGraphAGenerer = p_valeurGraphAGenerer;
+	demandeEnCours.anneeATraiter = p_annee;
 
     nombreEtapesEffectuees = 0 ;
     indiceFichier = 0;
@@ -277,16 +279,16 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
         if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
              || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
         {
-            nombreEtapesAEffectuer = db->recupererLesCotisationsAEmettre().size() +
-                                     db->recupererLesRecettesBaladesEtSortiesAEmettre().size();
+            nombreEtapesAEffectuer = db->recupererLesCotisationsAEmettre(p_annee).size() +
+                                     db->recupererLesRecettesBaladesEtSortiesAEmettre(p_annee).size();
         }
         if ( demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_TOUTES
              || demandeEnCours.typeDeGenerationDemandee == AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT)
         {
-            listeAnnees = db->recupererAnneesAvecVolNonSoumis();
+            listeAnnees = db->recupererAnneesAvecVolNonSoumis(p_annee);
             nombreEtapesAEffectuer = nombreEtapesAEffectuer +
-                                     db->recupererLesSubventionsAEmettre().size() +
-                                     db->recupererLesDemandesDeRembousementAEmettre().size() +
+                                     db->recupererLesSubventionsAEmettre(p_annee).size() +
+                                     db->recupererLesDemandesDeRembousementAEmettre(p_annee).size() +
                                      listeAnnees.size();
         }
 
@@ -372,10 +374,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
                                                                        listePilotesDeCetteAnnee, 
                                                                        totaux);
     }
-    else if (db->recupererLesSubventionsAEmettre().size() > 0
+    else if (db->recupererLesSubventionsAEmettre(demandeEnCours.anneeATraiter).size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT)
     {    
-        const AeroDmsTypes::DemandeRemboursement demande = db->recupererLesSubventionsAEmettre().at(0);
+        const AeroDmsTypes::DemandeRemboursement demande = db->recupererLesSubventionsAEmettre(demandeEnCours.anneeATraiter).at(0);
         const AeroDmsTypes::Club aeroclub = db->recupererInfosAeroclubDuPilote(demande.piloteId);
         //Dépense
         templateCeTmp.replace("xxD", "X");
@@ -471,10 +473,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
 
     }
     //Recettes "Cotisations"
-    else if (db->recupererLesCotisationsAEmettre().size() > 0
+    else if (db->recupererLesCotisationsAEmettre(demandeEnCours.anneeATraiter).size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
-        const AeroDmsTypes::Recette recette = db->recupererLesCotisationsAEmettre().at(0);
+        const AeroDmsTypes::Recette recette = db->recupererLesCotisationsAEmettre(demandeEnCours.anneeATraiter).at(0);
         //Dépense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -516,10 +518,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
     }
     //Recettes "passagers" des sorties et balades
-    else if (db->recupererLesRecettesBaladesEtSortiesAEmettre().size() > 0
+    else if (db->recupererLesRecettesBaladesEtSortiesAEmettre(demandeEnCours.anneeATraiter).size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_DEPENSES_SEULEMENT )
     {
-        const AeroDmsTypes::Recette recette = db->recupererLesRecettesBaladesEtSortiesAEmettre().at(0);
+        const AeroDmsTypes::Recette recette = db->recupererLesRecettesBaladesEtSortiesAEmettre(demandeEnCours.anneeATraiter).at(0);
         //Dépense
         templateCeTmp.replace("xxD", "");
         //Recette
@@ -591,10 +593,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
     }
     //Factures payées par les pilotes à rembourser
-    else if ( db->recupererLesDemandesDeRembousementAEmettre().size() > 0
+    else if ( db->recupererLesDemandesDeRembousementAEmettre(demandeEnCours.anneeATraiter).size() > 0
               && demandeEnCours.typeDeGenerationDemandee != AeroDmsTypes::TypeGenerationPdf_RECETTES_SEULEMENT )
     {
-        const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = db->recupererLesDemandesDeRembousementAEmettre().at(0);
+        const AeroDmsTypes::DemandeRemboursementFacture demandeRembousement = db->recupererLesDemandesDeRembousementAEmettre(demandeEnCours.anneeATraiter).at(0);
 
         //Dépense
         templateCeTmp.replace("xxD", "X");

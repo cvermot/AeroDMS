@@ -274,6 +274,7 @@ public:
         float montant = 0.0;
         ModeDeReglement modeDeReglement = ModeDeReglement_CHEQUE;
         int annee = -1;
+        int anneeATraiter = -1;
         QString nomTresorier = "";
         QString nomFichier = "";
         QStringList listeFactures = QStringList();

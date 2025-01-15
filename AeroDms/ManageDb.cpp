@@ -846,10 +846,18 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
     query.exec();
 }
 
-const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis()
+const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis(const int p_annee)
 {
     QSqlQuery query;
-    query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL GROUP BY annee");
+	if (p_annee != -1)
+	{
+		query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL AND strftime('%Y', vol.date) = :annee GROUP BY annee");
+		query.bindValue(":annee", QString::number(p_annee));
+	}
+    else
+    {
+        query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL GROUP BY annee");
+    }
     query.exec();
 
     QList<int> listeAnnees;
@@ -923,14 +931,23 @@ const bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId,
     return false;
 }
 
-const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettre()
+const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettre(const int p_annee)
 {
-    //Recuperation de l'ID de facture
-    QString sql = "SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'";
-
-    AeroDmsTypes::ListeDemandeRemboursement liste;
     QSqlQuery query;
-    query.exec(sql);
+
+    //Recuperation de l'ID de facture
+	if (p_annee == -1)
+	{
+        query.prepare("SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'");
+	}
+    else
+    {
+        query.prepare("SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee' WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    AeroDmsTypes::ListeDemandeRemboursement liste;
+    
+    query.exec();
     while (query.next()) {
         AeroDmsTypes::DemandeRemboursement demande;
         demande.typeDeVol = query.value("typeDeVol").toString();
@@ -1042,11 +1059,19 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     QThread::msleep(delaisDeGardeBdd);
 }
 
-const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
+const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre(const int p_annee)
 {
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
-    query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe");
+	if (p_annee != -1)
+	{
+		query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe WHERE annee = :annee");
+		query.bindValue(":annee", p_annee);
+	}
+	else
+	{
+        query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe");
+	}
     const bool result = query.exec();
 
     AeroDmsTypes::Recette recette;
@@ -1101,12 +1126,20 @@ const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre()
     return liste;
 }
 
-const AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettre()
+const AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesAEmettre(const int p_annee)
 {
     //Récupération des cotisation à soumettre au CE
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
-    query.prepare("SELECT * FROM 'recettesASoumettreCeParTypeEtParAnnee'");
+	if (p_annee != -1)
+	{
+		query.prepare("SELECT * FROM 'recettesASoumettreCeParTypeEtParAnnee' WHERE annee = :annee");
+        query.bindValue(":annee", QString::number(p_annee));
+	}
+	else
+	{
+        query.prepare("SELECT * FROM 'recettesASoumettreCeParTypeEtParAnnee'");
+	}
     query.exec();
     
     while (query.next()) {
@@ -1139,12 +1172,20 @@ const QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p
     return liste;
 }
 
-const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre()
+const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre(const int p_annee)
 {
     //Récupérationd des demandes de remboursement à soumettre au CE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
     QSqlQuery query;
-    query.prepare("SELECT * FROM 'facturesARembourser'");
+	if (p_annee != -1)
+	{
+		query.prepare("SELECT * FROM 'facturesARembourser' WHERE annee = :annee");
+		query.bindValue(":annee", QString::number(p_annee));
+	}
+	else
+	{
+        query.prepare("SELECT * FROM 'facturesARembourser'");
+	}
     query.exec();
 
     while (query.next()) {

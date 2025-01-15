@@ -1104,6 +1104,8 @@ void AeroDms::initialiserMenuOptions()
         this);
     boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
+	boutonDemandesAGenererDepenses->setCheckable(true);
+	menuDemandesAGenererAnnees = menuDemandesAGenerer->addMenu(tr("&Année"));
 
     menuOptionsRecapAnnuel = menuOption->addMenu(QIcon(":/AeroDms/ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
     boutonOptionRecapAnnuelRecettes = new QAction(QIcon(":/AeroDms/ressources/table-plus.svg"), 
@@ -2266,11 +2268,28 @@ void AeroDms::peuplerTableRecettes()
 void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
+    menuDemandesAGenererAnnees->clear();
     listeDeroulanteAnnee->addItem("Toutes les années", -1);
+
+    QAction* actionToutesLesAnnees = new QAction(QIcon(":/AeroDms/ressources/file-document-multiple.svg"), tr("&Toutes"), this);
+    actionToutesLesAnnees->setStatusTip(tr("Générer les demandes pour toutes les années pour lesquelles il existe des entrées en base de données"));
+    actionToutesLesAnnees->setCheckable(true);
+    actionToutesLesAnnees->setChecked(true);
+    actionToutesLesAnnees->setData(-1);
+    menuDemandesAGenererAnnees->addAction(actionToutesLesAnnees);
+    connect(actionToutesLesAnnees, SIGNAL(triggered()), this, SLOT(gererSelectionAnneeAGenerer()));
+
     QList<int> listeAnnees = db->recupererAnnees();
     for (int i = 0; i < listeAnnees.size(); i++)
     {
         listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
+
+        QAction* actionAnnees = new QAction(QString::number(listeAnnees.at(i)), this);
+        actionAnnees->setStatusTip(tr("Générer uniquement les demandes pour l'année ") + QString::number(listeAnnees.at(i)));
+        actionAnnees->setCheckable(true);
+        actionAnnees->setData(listeAnnees.at(i));
+        menuDemandesAGenererAnnees->addAction(actionAnnees);
+        connect(actionAnnees, SIGNAL(triggered()), this, SLOT(gererSelectionAnneeAGenerer()));
     }
     //On affiche de base les infos de l'année courante, et, si pas encore de cotisation sur l'année courante,
     //on affiche la dernière année disponible
@@ -2283,6 +2302,37 @@ void AeroDms::peuplerListeDeroulanteAnnee()
 	{
 		listeDeroulanteAnnee->setCurrentIndex(listeDeroulanteAnnee->count() - 1);
 	}
+}
+
+void AeroDms::gererSelectionAnneeAGenerer()
+{
+	QAction* actionSelectionnee = qobject_cast<QAction*>(sender());
+	if (actionSelectionnee != nullptr)
+	{
+		for (QAction* action : menuDemandesAGenererAnnees->actions())
+		{
+            if (action != actionSelectionnee)
+            {
+                action->setChecked(false);
+            }
+            else
+			{
+				action->setChecked(true);
+			}
+		}
+	}
+}
+
+const int AeroDms::recupererAnneeAGenerer()
+{
+    for (QAction* action : menuDemandesAGenererAnnees->actions())
+    {
+        if (action->isChecked())
+        {
+            return action->data().toInt();
+        }
+    }
+    return -1;
 }
 
 void AeroDms::ajouterUneCotisationEnBdd()
@@ -2662,10 +2712,17 @@ void AeroDms::genererPdf()
         break;
     }
 
-    QString nbSubventions = QString::number(db->recupererLesSubventionsAEmettre().size());
-    QString nbFactures = QString::number(db->recupererLesDemandesDeRembousementAEmettre().size());
-    QString nbCotisations = QString::number(db->recupererLesCotisationsAEmettre().size());
-    QString nbBaladesSorties = QString::number(db->recupererLesRecettesBaladesEtSortiesAEmettre().size());
+    const int anneeAGenerer = recupererAnneeAGenerer();
+	QString anneeAGenererTexte = tr("Toutes");
+	if (anneeAGenerer != -1)
+	{
+		anneeAGenererTexte = QString::number(anneeAGenerer) + tr(" seulement");
+	}
+
+    QString nbSubventions = QString::number(db->recupererLesSubventionsAEmettre(anneeAGenerer).size());
+    QString nbFactures = QString::number(db->recupererLesDemandesDeRembousementAEmettre(anneeAGenerer).size());
+    QString nbCotisations = QString::number(db->recupererLesCotisationsAEmettre(anneeAGenerer).size());
+    QString nbBaladesSorties = QString::number(db->recupererLesRecettesBaladesEtSortiesAEmettre(anneeAGenerer).size());
 
     QString texteDemande = "<b>Demandes à générer : </b>";
     switch (typeGenerationPdf)
@@ -2716,6 +2773,7 @@ void AeroDms::genererPdf()
     QMessageBox demandeConfirmationGeneration;
     demandeConfirmationGeneration.setText(QString("Voulez vous générer les PDF de demande de subventions ? <br /><br />")
         + "La génération sera réalisée avec les options suivantes : <br />"
+		+ "<b>Année</b> : " + anneeAGenererTexte + "<br />"
         + texteSignature + "<br />"
         + texteDemande + "<br />"
         + "<b>Fusion des PDF</b> : " + fusionnerLesPdf + "<br />"
@@ -2729,10 +2787,10 @@ void AeroDms::genererPdf()
     demandeConfirmationGeneration.setIcon(QMessageBox::Question);
     demandeConfirmationGeneration.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
 
-    if ( (db->recupererLesSubventionsAEmettre().size()
-         + db->recupererLesDemandesDeRembousementAEmettre().size()
-         + db->recupererLesCotisationsAEmettre().size()
-         + db->recupererLesRecettesBaladesEtSortiesAEmettre().size()) == 0)
+    if ( (db->recupererLesSubventionsAEmettre(anneeAGenerer).size()
+         + db->recupererLesDemandesDeRembousementAEmettre(anneeAGenerer).size()
+         + db->recupererLesCotisationsAEmettre(anneeAGenerer).size()
+         + db->recupererLesRecettesBaladesEtSortiesAEmettre(anneeAGenerer).size()) == 0)
     {
         demandeConfirmationGeneration.setInformativeText(tr("Rien à générer. Génération indisponible."));
         demandeConfirmationGeneration.setStandardButtons( QMessageBox::Close);
@@ -2753,7 +2811,8 @@ void AeroDms::genererPdf()
                 boutonOptionRecapAnnuelRecettes->isChecked(),
                 boutonOptionRecapAnnuelBaladesSorties->isChecked(),
                 parametresSysteme.autoriserReglementParVirement,
-                calculerValeurGraphAGenererPdf());
+                calculerValeurGraphAGenererPdf(),
+                -1);
         }
         break;
 

@@ -115,6 +115,7 @@ private:
     void ajouterPilotesDansMenuFacturesDaca(QMenu* p_menu, 
         const AeroDmsTypes::ListeCleStringValeur p_listePilote, 
         const QDate p_mois);
+    const int recupererAnneeAGenerer();
 
     const QString elaborerCheminRessourcesHtml();
 
@@ -225,6 +226,7 @@ private:
     QAction* boutonDemandesAGenererToutes;
     QAction* boutonDemandesAGenererRecettes;
     QAction* boutonDemandesAGenererDepenses;
+    QMenu* menuDemandesAGenererAnnees;
     QAction* boutonFusionnerLesPdf;
     QAction* boutonNePasFusionnerLesPdf;
     QAction* boutonActivationScanAutoFactures;
@@ -415,6 +417,7 @@ public slots:
         int nombreCree,
         int nombreMisAJour);
     void masquerBarreDeProgressionDeLaStatusBar();
+    void gererSelectionAnneeAGenerer();
 
     //Téléchargement de factures
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);

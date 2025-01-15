@@ -78,12 +78,12 @@ public:
     const float recupererSubventionEntrainement( const QString p_pilote,
         const int p_annee);
 
-    const AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre();
-    const AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre();
-    const AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre();
+    const AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre(const int p_annee);
+    const AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre(const int p_annee);
+    const AeroDmsTypes::ListeRecette recupererLesRecettesBaladesEtSortiesAEmettre(const int p_annee);
     const QList<QString> recupererListeRecettesNonSoumisesCse( const int p_annee,
         const QString p_typeRecette);
-    const AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre();
+    const AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre(const int p_annee);
     const AeroDmsTypes::ListeDemandeRemboursementFacture recupererToutesLesDemandesDeRemboursement(const int p_annee = -1);
     const AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1, const int p_option = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
     const AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = -1);
@@ -114,7 +114,7 @@ public:
 
     const AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
     const QList<int> recupererAnnees();
-    const QList<int> recupererAnneesAvecVolNonSoumis();
+    const QList<int> recupererAnneesAvecVolNonSoumis(const int p_annee);
     const AeroDmsTypes::ListeSortie recupererListeSorties();
     const AeroDmsTypes::ListeSortie recupererListeBalade();
     const AeroDmsTypes::ListeSortie recupererListeDepensesPouvantAvoirUneFacture();

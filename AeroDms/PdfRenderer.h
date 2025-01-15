@@ -44,7 +44,8 @@ public:
 		const bool p_recapHdVAvecRecettes,
 		const bool p_recapHdvAvecBaladesEtSorties,
 		const bool p_virementEstAutorise,
-		const int p_valeurGraphAGenerer);
+		const int p_valeurGraphAGenerer,
+		const int p_annee);
 	void imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 		const QString p_cheminSortieFichiersGeneres,
 		const QString p_cheminStockageFactures,
