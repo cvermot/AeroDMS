@@ -766,6 +766,9 @@ public:
         Icone_RESSOURCE,
         Icone_RESSOURCE_EXTERNE,
         Icone_DEBUG,
+        Icone_CHOIX_ANNEE,
+        Icone_TOUTES_LES_ANNEES,
+        Icone_UNE_ANNEE,
 
         Icone_RATIO,
 

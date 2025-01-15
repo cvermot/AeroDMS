@@ -130,5 +130,8 @@
         <file>ressources/HTML/COMPTA.htm</file>
         <file>ressources/HTML/COMPTA_Original.htm</file>
         <file>ressources/HTML/COMPTA_Virement.htm</file>
+        <file>ressources/calendar.svg</file>
+        <file>ressources/calendar-filter.svg</file>
+        <file>ressources/calendar-multiple.svg</file>
     </qresource>
 </RCC>

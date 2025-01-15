@@ -1105,7 +1105,8 @@ void AeroDms::initialiserMenuOptions()
     boutonDemandesAGenererDepenses->setStatusTip(tr("Générer uniquement les documents de demande de subventions/remboursements"));
     menuDemandesAGenerer->addAction(boutonDemandesAGenererDepenses);
 	boutonDemandesAGenererDepenses->setCheckable(true);
-	menuDemandesAGenererAnnees = menuDemandesAGenerer->addMenu(tr("&Année"));
+	menuDemandesAGenererAnnees = menuDemandesAGenerer->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CHOIX_ANNEE),
+        tr("&Année"));
 
     menuOptionsRecapAnnuel = menuOption->addMenu(QIcon(":/AeroDms/ressources/account-file-text.svg"), tr("&Options du récapitulatif annuel"));
     boutonOptionRecapAnnuelRecettes = new QAction(QIcon(":/AeroDms/ressources/table-plus.svg"), 
@@ -2271,7 +2272,7 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     menuDemandesAGenererAnnees->clear();
     listeDeroulanteAnnee->addItem("Toutes les années", -1);
 
-    QAction* actionToutesLesAnnees = new QAction(QIcon(":/AeroDms/ressources/file-document-multiple.svg"), tr("&Toutes"), this);
+    QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES), tr("&Toutes"), this);
     actionToutesLesAnnees->setStatusTip(tr("Générer les demandes pour toutes les années pour lesquelles il existe des entrées en base de données"));
     actionToutesLesAnnees->setCheckable(true);
     actionToutesLesAnnees->setChecked(true);
@@ -2284,7 +2285,7 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     {
         listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
 
-        QAction* actionAnnees = new QAction(QString::number(listeAnnees.at(i)), this);
+        QAction* actionAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_UNE_ANNEE), QString::number(listeAnnees.at(i)), this);
         actionAnnees->setStatusTip(tr("Générer uniquement les demandes pour l'année ") + QString::number(listeAnnees.at(i)));
         actionAnnees->setCheckable(true);
         actionAnnees->setData(listeAnnees.at(i));

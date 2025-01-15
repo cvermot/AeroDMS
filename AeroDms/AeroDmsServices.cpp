@@ -313,6 +313,21 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/bug.svg");
         }
         break;
+        case AeroDmsTypes::Icone_CHOIX_ANNEE:
+        {
+            return QIcon(":/AeroDms/ressources/calendar-filter.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_TOUTES_LES_ANNEES:
+        {
+            return QIcon(":/AeroDms/ressources/calendar-multiple.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_UNE_ANNEE:
+        {
+            return QIcon(":/AeroDms/ressources/calendar.svg");
+        }
+        break;
 
         case AeroDmsTypes::Icone_RATIO:
         {
