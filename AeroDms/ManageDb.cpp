@@ -974,14 +974,13 @@ const QStringList ManageDb::recupererListeFacturesAssocieeASubvention(const  Aer
     query.exec(sql);
     while (query.next())
     {
-        //listeFactures.append(QString("C:/Users/cleme/OneDrive/Documents/AeroDMS/FacturesTraitees/").append(query.value(5).toString()));
         listeFactures.append(query.value("nomFichier").toString());
     }
 
     return listeFactures;
 }
 
-void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const 
+void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) 
 {
     //On créé l'entrée dans demandeRemboursementSoumises
     QSqlQuery query;
@@ -998,7 +997,7 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     {
         query.bindValue(":modeDeReglement", "Chèque");
     }
-    query.exec();
+    executerRequeteAvecControle(query, "ajout demande remboursement soumise", "");
     query.next();
     const int idDemandeRemboursement = query.value(0).toInt();
 
@@ -1011,7 +1010,7 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
         query.bindValue(":annee", QString::number(p_demande.annee));
         query.bindValue(":pilote", p_demande.idPilote);
         query.bindValue(":typeDeVol", p_demande.typeDeVol);
-        query.exec();    
+        executerRequeteAvecControle(query, "mise à jour table vol", "Demande de remboursement heure de vol");
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_COTISATION)
     {
@@ -1025,12 +1024,11 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             queryCotisation.bindValue(":recetteId", query.value(0).toInt());
-            queryCotisation.exec();
+            executerRequeteAvecControle(queryCotisation, "mise à jour table recette", "Dépot cotisation");
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
     {
-        //query.prepare(QString("SELECT idRecette FROM recettesASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
         query.prepare("SELECT recetteId FROM recettesASoumettreCe WHERE annee = :annee AND nom = :nomSortie");
         query.bindValue(":annee", QString::number(p_demande.annee));
         query.bindValue(":nomSortie", p_demande.typeDeVol);
@@ -1043,20 +1041,51 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             querySortie.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             querySortie.bindValue(":recetteId", query.value(0).toInt());
-            querySortie.exec();
+            executerRequeteAvecControle(querySortie, "mise à jour table recette", "Dépot paiement balade ou sortie");
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_FACTURE)
     {
-        //query.prepare(QString("SELECT idRecette FROM recettesASoumettreCe WHERE annee = ").append(QString::number(p_demande.annee)));
         query.prepare("UPDATE facturesSorties SET demandeRemboursement = :idDemandeRemboursement WHERE id = :id");
         query.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
         //L'année contient en fait l'ID de facture pour une facture...
         query.bindValue(":id", p_demande.annee);
-        query.exec();
+        executerRequeteAvecControle(query, "mise à jour table factureSortie", "Remboursement facture");
     }
 
     QThread::msleep(delaisDeGardeBdd);
+}
+
+void ManageDb::executerRequeteAvecControle(QSqlQuery &p_query,
+    const QString p_nomRequete,
+    const QString p_texteDetailErreur)
+{
+    int nbEssais = 1;
+
+    while (!p_query.exec())
+    {
+        QMessageBox dialogueErreurExecutionRequete;
+        dialogueErreurExecutionRequete.setText(QString(tr("Erreur d'exécution de la requête ") + p_nomRequete +".\n")
+            + p_query.lastError().text()
+            + "\n"
+            + p_texteDetailErreur
+            + "\n\n"
+            + tr("Nombre d'essais pour cette requête : ")
+			+ QString::number(nbEssais)
+            + "\n"
+            + tr("Voulez vous réexécuter cette requete ?"));
+        dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur d'exécution d'une requête"));
+        dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
+        dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+        dialogueErreurExecutionRequete.setDefaultButton(QMessageBox::Retry);
+
+        const int ret = dialogueErreurExecutionRequete.exec();
+
+        if (ret == QMessageBox::Cancel) {
+            return;
+        }
+        nbEssais = nbEssais + 1;
+    }
 }
 
 const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre(const int p_annee)
@@ -1494,7 +1523,26 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
         query.prepare("INSERT INTO 'recettes' ('typeDeRecette','Intitule','montant') VALUES ('Cotisation', :intitule, :montant) RETURNING recetteId");
         query.bindValue(":intitule", intitule);
         query.bindValue(":montant", p_infosCotisation.montant);
-        query.exec();
+		while (!query.exec())
+		{
+            QMessageBox dialogueErreurExecutionRequete;
+            dialogueErreurExecutionRequete.setText(QString(tr("Erreur d'exécution de la requête de création recette.\n"))
+                + query.lastError().text()
+				+ "\n"
+                + "Intitulé " + intitule
+                + "\n" + "\n"
+                + tr("Voulez vous réexécuter cette requete ?"));
+            dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Enregistrement de la recette"));
+            dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
+            dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+            dialogueErreurExecutionRequete.setDefaultButton(QMessageBox::Retry);
+
+            const int ret = dialogueErreurExecutionRequete.exec();
+
+            if (ret == QMessageBox::Cancel) {
+                return ;
+            }
+		}
         query.next();
 
         const int idRecette = query.value(0).toInt();
@@ -1506,7 +1554,26 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
         query.bindValue(":annee",   p_infosCotisation.annee);
         query.bindValue(":idRecette", idRecette);
         query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
-        query.exec();
+        while (!query.exec())
+        {
+            QMessageBox dialogueErreurExecutionRequete;
+            dialogueErreurExecutionRequete.setText(QString(tr("Erreur d'exécution de la requête de création cotisation.\n"))
+                + query.lastError().text()
+                + "\n"
+                + "Id recette " + QString::number(idRecette)
+                + "\n" + "\n"
+                + tr("Voulez vous réexécuter cette requete ?"));
+            dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Enregistrement de la cotisation"));
+            dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
+            dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
+            dialogueErreurExecutionRequete.setDefaultButton(QMessageBox::Retry);
+
+            const int ret = dialogueErreurExecutionRequete.exec();
+
+            if (ret == QMessageBox::Cancel) {
+                return;
+            }
+        }
     }
     else
     {
@@ -1832,7 +1899,6 @@ const QString ManageDb::recupererMailPilotes( const int p_annee,
                     listeMail.append(subvention.mail);
                 }
             }
-            //query.prepare("SELECT piloteId, mail, annee, montantSubventionAnnuelleEntrainement, SUM(vol.montantRembourse) AS montantRembourse, vol.typeDeVol FROM cotisation INNER JOIN pilote ON cotisation.pilote = pilote.piloteId INNER JOIN vol ON pilote.piloteId = vol.pilote WHERE annee = :annee AND strftime('%Y', vol.date) = :anneeStr AND vol.typeDeVol = 'Entrainement' GROUP BY piloteId");
         }
         break;
         case AeroDmsTypes::MailPilotes_AYANT_COTISE:

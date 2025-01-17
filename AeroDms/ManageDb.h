@@ -133,7 +133,7 @@ public:
         const QString p_nom);
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
-    void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande) const;
+    void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
 
     const AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1,
         const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
@@ -160,8 +160,6 @@ public:
         const QString p_date, 
         const float p_coutDuVol);
 
-    static const QString genererClauseFiltrageActivite(const int p_options);
-
 public slots:
 
 private:
@@ -172,6 +170,10 @@ private:
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
         const bool p_avecFactureEtSortie = true);
+    static const QString genererClauseFiltrageActivite(const int p_options);
+    void executerRequeteAvecControle(QSqlQuery& p_query,
+        const QString p_nomRequete,
+        const QString p_texteDetailErreur);
 };
 
 #endif
