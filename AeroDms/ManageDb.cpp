@@ -843,7 +843,7 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
     query.bindValue(":intitule", p_remarqueFacture);
     query.bindValue(":payeur", p_payeur);
 
-    query.exec();
+    executerRequeteAvecControle(query, "insertion facture", "Ajout d'une facture en base de données");
 }
 
 const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis(const int p_annee)
@@ -890,7 +890,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.bindValue(":montant", p_montant);
 
     query.exec();
-    query.next();
+    executerRequeteAvecControle(query, "insertion recette", "Ajout recette associée à vol");
     const int numeroDeRecetteCree = query.value(0).toInt();
 
     QThread::msleep(delaisDeGardeBdd);
@@ -908,7 +908,7 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         query.prepare("INSERT INTO 'xAssociationRecette-Vol' ('recetteId','volId') VALUES (:recetteId, :volId)");
         query.bindValue(":recetteId", numeroDeRecetteCree);
         query.bindValue(":volId", numeroDeVol);
-        query.exec();
+        executerRequeteAvecControle(query, "insertion recette (xAssociationRecette-Vol)", "Numero vol " + QString::number(numeroDeVol) + "\nNumero recette créée " + QString::number(numeroDeRecetteCree));
 
         QThread::msleep(delaisDeGardeBdd);
     }
