@@ -41,8 +41,8 @@ public:
 	const QString recupererCheminDernierFichierTelecharge();
 
 private:
-	QNetworkAccessManager* networkManager;
-	ManageDb* db;
+	QNetworkAccessManager* networkManager = nullptr;
+	ManageDb* db = nullptr;
 
 	QString identifiantConnexion = "";
 	QString motDePasse = "";

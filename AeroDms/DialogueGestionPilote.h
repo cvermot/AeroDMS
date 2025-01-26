@@ -33,26 +33,26 @@ public:
     void peuplerListeAeroclub();
 
 private:
-    QLineEdit *nom;
-    QLineEdit* prenom;
-    QComboBox* aeroclub;
-    QCheckBox *estAyantDroit;
-    QComboBox* activitePrincipale;
-    QLineEdit* mail;
-    QLineEdit* telephone;
-    QTextEdit* remarque;
-    QCheckBox* estActif;
-    QCheckBox* estBrevete;
+    QLineEdit *nom = nullptr;
+    QLineEdit* prenom = nullptr;
+    QComboBox* aeroclub = nullptr;
+    QCheckBox *estAyantDroit = nullptr;
+    QComboBox* activitePrincipale = nullptr;
+    QLineEdit* mail = nullptr;
+    QLineEdit* telephone = nullptr;
+    QTextEdit* remarque = nullptr;
+    QCheckBox* estActif = nullptr;
+    QCheckBox* estBrevete = nullptr;
 
-    QPushButton* ajouterAeroclubButton;
+    QPushButton* ajouterAeroclubButton = nullptr;
 
-    QString idPilote;
+    QString idPilote = "";
 
-    ManageDb* database;
+    ManageDb* database = nullptr;
 
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
+    QDialogButtonBox* buttonBox = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* okButton = nullptr;
     
     void peuplerActivitePrincipale();
 

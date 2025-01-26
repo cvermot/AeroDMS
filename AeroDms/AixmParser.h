@@ -32,7 +32,7 @@ public:
 	void mettreAJourAerodromes(const QString p_fichierAixm);
 
 private:
-	ManageDb* db;
+	ManageDb* db = nullptr;
 
 signals:
 	void signalerMiseAJourAerodrome(int nombreTotal, int nombreTraite, int nombreCree, int nombreMisAJour);

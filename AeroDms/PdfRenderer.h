@@ -54,8 +54,8 @@ public:
 		const QString p_nomTresorier);
 
 private :
-	QWebEnginePage* view;
-	ManageDb *db;
+	QWebEnginePage* view = nullptr;
+	ManageDb *db = nullptr;
 	QMarginsF marges;
 	QUrl ressourcesHtml;
 	QString cheminSignature = "";

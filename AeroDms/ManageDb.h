@@ -134,6 +134,7 @@ public:
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
+    void ajouterNoteSubvention(const int p_idSubventionAAnoter, const QString p_note);
 
     const AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1,
         const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
@@ -165,7 +166,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.10;
+    const float versionBddAttendue = 1.11;
 
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,

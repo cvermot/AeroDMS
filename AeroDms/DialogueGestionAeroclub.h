@@ -34,21 +34,21 @@ public:
     //void preparerMiseAJourClub(const int p_aerolcubId);
 
 private:
-    QComboBox* selectionAeroclub;
-    QComboBox* selectionAerodrome;
-    QLabel* selectionAeroclubLabel;
-    QLineEdit* nomAeroclub;
-    QLineEdit* raisonSociale;
-    QLineEdit* iban;
-    QLineEdit* bic;
+    QComboBox* selectionAeroclub = nullptr;
+    QComboBox* selectionAerodrome = nullptr;
+    QLabel* selectionAeroclubLabel = nullptr;
+    QLineEdit* nomAeroclub = nullptr;
+    QLineEdit* raisonSociale = nullptr;
+    QLineEdit* iban = nullptr;
+    QLineEdit* bic = nullptr;
 
-    int idAeroclub;
+    int idAeroclub = -1;
 
-    ManageDb* database;
+    ManageDb* database = nullptr;
 
-    QDialogButtonBox* buttonBox;
-    QPushButton* cancelButton;
-    QPushButton* okButton;
+    QDialogButtonBox* buttonBox = nullptr;
+    QPushButton* cancelButton = nullptr;
+    QPushButton* okButton = nullptr;
 
     bool validerIbanFrancais(const QString& p_iban);
 

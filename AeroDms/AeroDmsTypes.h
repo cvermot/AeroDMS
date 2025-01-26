@@ -89,8 +89,9 @@ public:
         SubventionDemandeeTableElement_MONTANT = 0x4,
         SubventionDemandeeTableElement_MONTANT_VOL = 0x5,
         SubventionDemandeeTableElement_MODE_DE_REGLEMENT = 0x6,
-        SubventionDemandeeTableElement_ID_DEMANDE = 0x7,
-        SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x8,
+        SubventionDemandeeTableElement_NOTE = 0x7,
+        SubventionDemandeeTableElement_ID_DEMANDE = 0x8,
+        SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x9,
     };
 
     enum RecetteTableElement {
@@ -430,11 +431,17 @@ public:
         QString piloteId;
         QString typeDeVol;
         AeroDmsTypes::ModeDeReglement modeDeReglement;
+        QString note;
         float montant;
         float coutTotalVolAssocies;
         int anneeVol;     
     };
     typedef QList<DemandeRemboursementSoumise> ListeDemandesRemboursementSoumises;
+
+    struct SubventionAAnoter {
+        int id = 0;
+        QString texteActuel = "";
+    };
 
     struct Sortie {
         int id;
@@ -763,6 +770,7 @@ public:
         Icone_TELECHARGER_FICHIER,
         Icone_FICHIER_TELECHARGE,
         Icone_CHIFFREMENT,
+        Icone_AJOUTER_NOTE,
         Icone_RESSOURCE,
         Icone_RESSOURCE_EXTERNE,
         Icone_DEBUG,

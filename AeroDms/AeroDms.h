@@ -124,171 +124,171 @@ private:
     void closeEvent(QCloseEvent* event);
 
     //Classes gestionnaires et actionnaires
-    ManageDb* db;
-    PdfRenderer* pdf;
-    PdfDownloader* pdfdl;
+    ManageDb* db = nullptr;
+    PdfRenderer* pdf = nullptr;
+    PdfDownloader* pdfdl = nullptr;
 
     AeroDmsTypes::Signature signature = AeroDmsTypes::Signature_SANS;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
     AeroDmsTypes::ListeDonneesFacture factures;
 
     //Fenêtres
-    DialogueGestionPilote* dialogueGestionPilote;
-    DialogueGestionAeroclub* dialogueGestionAeroclub;
-    DialogueAjouterCotisation* dialogueAjouterCotisation;
-    DialogueAjouterSortie* dialogueAjouterSortie;
-    DialogueGestionAeronefs* dialogueGestionAeronefs;
+    DialogueGestionPilote* dialogueGestionPilote = nullptr;
+    DialogueGestionAeroclub* dialogueGestionAeroclub = nullptr;
+    DialogueAjouterCotisation* dialogueAjouterCotisation = nullptr;
+    DialogueAjouterSortie* dialogueAjouterSortie = nullptr;
+    DialogueGestionAeronefs* dialogueGestionAeronefs = nullptr;
 
-    QPdfDocument* pdfDocument;
-    QPdfView* pdfView;
+    QPdfDocument* pdfDocument = nullptr;
+    QPdfView* pdfView = nullptr;
 
-    QTabWidget* mainTabWidget;
+    QTabWidget* mainTabWidget = nullptr;
 
-    QTableWidget* vuePilotes;
-    QTableWidget* vueVols;
-    QTableWidget* vueFactures;
-    QTableWidget* vueRecettes;
-    QTableWidget* vueSubventions;
-    QTableWidget* vueVolsDetectes;
+    QTableWidget* vuePilotes = nullptr;
+    QTableWidget* vueVols = nullptr;
+    QTableWidget* vueFactures = nullptr;
+    QTableWidget* vueRecettes = nullptr;
+    QTableWidget* vueSubventions = nullptr;
+    QTableWidget* vueVolsDetectes = nullptr;
 
     //Onglet "Ajouter dépense"
-    QWidget* widgetAjoutVol;
-    QComboBox* typeDeVol;
-    QComboBox* choixPilote;
-    QLineEdit* aeroclubPiloteSelectionne;
-    QComboBox* activite;
-    QDateTimeEdit* dateDuVol;
-    QTimeEdit* dureeDuVol;
-    QDoubleSpinBox* prixDuVol;
-    QComboBox* choixBalade;
-    QLineEdit* remarqueVol;
-    QLineEdit* immat;
-    QPushButton* validerLeVol;
-    QPushButton* validerLesVols;
-    QPushButton* supprimerLeVolSelectionne;
+    QWidget* widgetAjoutVol = nullptr;
+    QComboBox* typeDeVol = nullptr;
+    QComboBox* choixPilote = nullptr;
+    QLineEdit* aeroclubPiloteSelectionne = nullptr;
+    QComboBox* activite = nullptr;
+    QDateTimeEdit* dateDuVol = nullptr;
+    QTimeEdit* dureeDuVol = nullptr;
+    QDoubleSpinBox* prixDuVol = nullptr;
+    QComboBox* choixBalade = nullptr;
+    QLineEdit* remarqueVol = nullptr;
+    QLineEdit* immat = nullptr;
+    QPushButton* validerLeVol = nullptr;
+    QPushButton* validerLesVols = nullptr;
+    QPushButton* supprimerLeVolSelectionne = nullptr;
 
-    QComboBox* choixPayeur;
-    QDateEdit* dateDeFacture;
-    QDoubleSpinBox* montantFacture;
-    QLineEdit* remarqueFacture;
-    QComboBox* choixBaladeFacture;
-    QPushButton* validerLaFacture;
+    QComboBox* choixPayeur = nullptr;
+    QDateEdit* dateDeFacture = nullptr;
+    QDoubleSpinBox* montantFacture = nullptr;
+    QLineEdit* remarqueFacture = nullptr;
+    QComboBox* choixBaladeFacture = nullptr;
+    QPushButton* validerLaFacture = nullptr;
 
     //Onglet "Ajouter recette"
-    QWidget* widgetAjoutRecette;
-    QListWidget* listeBaladesEtSorties;
-    QComboBox* typeDeRecette;
-    QLineEdit* nomEmetteurChequeRecette;
-    QLineEdit* banqueNumeroChequeRecette;
-    QDoubleSpinBox* montantRecette;
-    QPushButton* validerLaRecette;
+    QWidget* widgetAjoutRecette = nullptr;
+    QListWidget* listeBaladesEtSorties = nullptr;
+    QComboBox* typeDeRecette = nullptr;
+    QLineEdit* nomEmetteurChequeRecette = nullptr;
+    QLineEdit* banqueNumeroChequeRecette = nullptr;
+    QDoubleSpinBox* montantRecette = nullptr;
+    QPushButton* validerLaRecette = nullptr;
 
     //Listes déroulantes de la barre principale
-    QComboBox* listeDeroulanteAnnee;
-    QAction* actionListeDeroulanteAnnee;
-    QComboBox* listeDeroulantePilote;
-    QAction* actionListeDeroulantePilote;
-    QComboBox* listeDeroulanteType;
-    QAction* actionListeDeroulanteType;
-    QComboBox* listeDeroulanteElementsSoumis;
-    QAction* actionListeDeroulanteElementsSoumis;
-    QComboBox* listeDeroulanteStatistique;
-    QAction* actionListeDeroulanteStatistique;
+    QComboBox* listeDeroulanteAnnee = nullptr;
+    QAction* actionListeDeroulanteAnnee = nullptr;
+    QComboBox* listeDeroulantePilote = nullptr;
+    QAction* actionListeDeroulantePilote = nullptr;
+    QComboBox* listeDeroulanteType = nullptr;
+    QAction* actionListeDeroulanteType = nullptr;
+    QComboBox* listeDeroulanteElementsSoumis = nullptr;
+    QAction* actionListeDeroulanteElementsSoumis = nullptr;
+    QComboBox* listeDeroulanteStatistique = nullptr;
+    QAction* actionListeDeroulanteStatistique = nullptr;
 
     //Barre de progression
     DialogueProgressionGenerationPdf* progressionGenerationPdf = nullptr;
-    QProgressBar* barreDeProgressionStatusBar;
+    QProgressBar* barreDeProgressionStatusBar = nullptr;
 
     //Boutons
-    QAction* boutonGenerePdf;
-    QAction* boutonGenerePdfRecapHdv;
-    QAction* miseAJourAction;
-    QAction* boutonModeDebug;
-    QAction* boutonAjouterUnVol;
-    QAction* boutonAjouterUnAeroclub;
-    QAction* boutonAjouterCotisation;
-    QAction* boutonAjouterPilote;
-    QAction* boutonAjouterSortie;
-    QAction* fichierPrecedent;
-    QAction* fichierSuivant;
+    QAction* boutonGenerePdf = nullptr;
+    QAction* boutonGenerePdfRecapHdv = nullptr;
+    QAction* miseAJourAction = nullptr;
+    QAction* boutonModeDebug = nullptr;
+    QAction* boutonAjouterUnVol = nullptr;
+    QAction* boutonAjouterUnAeroclub = nullptr;
+    QAction* boutonAjouterCotisation = nullptr;
+    QAction* boutonAjouterPilote = nullptr;
+    QAction* boutonAjouterSortie = nullptr;
+    QAction* fichierPrecedent = nullptr;
+    QAction* fichierSuivant = nullptr;
 
     //QAction pour raccourcis claviers sans item d'IHM
-    QShortcut* ongletSuivantRaccourciClavier;
-    QShortcut* ongletPrecedentRaccourciClavier;
+    QShortcut* ongletSuivantRaccourciClavier = nullptr;
+    QShortcut* ongletPrecedentRaccourciClavier = nullptr;
 
     //Menu Fichier
-    QMenu* menuOuvrirAutreDemande;
+    QMenu* menuOuvrirAutreDemande = nullptr;
 
     //Menu options
-    QAction* boutonAucuneSignature;
-    QAction* boutonSignatureManuelle;
-    QAction* boutonSignatureNumerique;
-    QAction* boutonDemandesAGenererToutes;
-    QAction* boutonDemandesAGenererRecettes;
-    QAction* boutonDemandesAGenererDepenses;
-    QMenu* menuDemandesAGenererAnnees;
-    QAction* boutonFusionnerLesPdf;
-    QAction* boutonNePasFusionnerLesPdf;
-    QAction* boutonActivationScanAutoFactures;
-    QAction* boutonParametresDuLogiciel;
-    QAction* boutonOptionRecapAnnuelRecettes;
-    QAction* boutonOptionRecapAnnuelBaladesSorties;
-    QAction* boutonGraphRecapAnnuelHeuresAnnuelles;
-    QAction* boutonGraphRecapAnnuelHeuresParPilote;
-    QAction* boutonGraphRecapAnnuelEurosParPilote;
-    QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol;
-    QAction* boutonGraphRecapAnnuelEurosParTypeDeVol;
-    QAction* boutonGraphRecapAnnuelHeuresParActivite;
-    QAction* boutonGraphRecapAnnuelEurosParActivite;
-    QAction* boutonGraphRecapAnnuelStatutsDesPilotes;
-    QAction* boutonGraphRecapAnnuelAeronefs;
-    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs;
-    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap;
-    QAction* boutonGraphResolutionFullHd;
-    QAction* boutonGraphResolutionQhd;
-    QAction* boutonGraphResolution4k;
-    QAction* boutonGraphRatioIso216;
-    QAction* boutonGraphRatio16x9;
-    QAction* boutonGraphiquesVolsSubventionnesUniquement;
-    QAction* boutonGraphiquesExclurePlaneur;
-    QAction* boutonGraphiquesExclureUlm;
-    QAction* boutonGraphiquesExclureAvion;
-    QAction* boutonGraphiquesExclureHelico;
+    QAction* boutonAucuneSignature = nullptr;
+    QAction* boutonSignatureManuelle = nullptr;
+    QAction* boutonSignatureNumerique = nullptr;
+    QAction* boutonDemandesAGenererToutes = nullptr;
+    QAction* boutonDemandesAGenererRecettes = nullptr;
+    QAction* boutonDemandesAGenererDepenses = nullptr;
+    QMenu* menuDemandesAGenererAnnees = nullptr;
+    QAction* boutonFusionnerLesPdf = nullptr;
+    QAction* boutonNePasFusionnerLesPdf = nullptr;
+    QAction* boutonActivationScanAutoFactures = nullptr;
+    QAction* boutonParametresDuLogiciel = nullptr;
+    QAction* boutonOptionRecapAnnuelRecettes = nullptr;
+    QAction* boutonOptionRecapAnnuelBaladesSorties = nullptr;
+    QAction* boutonGraphRecapAnnuelHeuresAnnuelles = nullptr;
+    QAction* boutonGraphRecapAnnuelHeuresParPilote = nullptr;
+    QAction* boutonGraphRecapAnnuelEurosParPilote = nullptr;
+    QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol = nullptr;
+    QAction* boutonGraphRecapAnnuelEurosParTypeDeVol = nullptr;
+    QAction* boutonGraphRecapAnnuelHeuresParActivite = nullptr;
+    QAction* boutonGraphRecapAnnuelEurosParActivite = nullptr;
+    QAction* boutonGraphRecapAnnuelStatutsDesPilotes = nullptr;
+    QAction* boutonGraphRecapAnnuelAeronefs = nullptr;
+    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs = nullptr;
+    QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphsEtTousLesRecap = nullptr;
+    QAction* boutonGraphResolutionFullHd = nullptr;
+    QAction* boutonGraphResolutionQhd = nullptr;
+    QAction* boutonGraphResolution4k = nullptr;
+    QAction* boutonGraphRatioIso216 = nullptr;
+    QAction* boutonGraphRatio16x9 = nullptr;
+    QAction* boutonGraphiquesVolsSubventionnesUniquement = nullptr;
+    QAction* boutonGraphiquesExclurePlaneur = nullptr;
+    QAction* boutonGraphiquesExclureUlm = nullptr;
+    QAction* boutonGraphiquesExclureAvion = nullptr;
+    QAction* boutonGraphiquesExclureHelico = nullptr;
 
-    QMenu* facturesDaca;
-    QAction* boutonChargerFacturesDaca;
-    QMenu* menuOption;
-    QMenu* menuOptionsRecapAnnuel;
-    QMenu* graphiquesDuRecapAnnuel;
-    QMenu* resolutionGraphiques;
+    QMenu* facturesDaca = nullptr;
+    QAction* boutonChargerFacturesDaca = nullptr;
+    QMenu* menuOption = nullptr;
+    QMenu* menuOptionsRecapAnnuel = nullptr;
+    QMenu* graphiquesDuRecapAnnuel = nullptr;
+    QMenu* resolutionGraphiques = nullptr;
 
     //Menu outils
-    QAction* mailingPilotesAyantCotiseCetteAnnee;
-    QAction* mailingPilotesActifs;
-    QAction* mailingPilotesActifsAyantCotiseCetteAnnee;
-    QAction* mailingPilotesActifsBrevetes;
-    QAction* mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement;
-    QAction* mailingPilotesDerniereDemandeSubvention;
-    QMenu* menuMailDemandesSubvention;
-    QMenu* menuMailPilotesDUnAerodrome;
-    QMenu* menuMailPilotesDUnAerodromeActif;
-    QMenu* menuMailPilotesDUnAerodromeActifBreveteMoteur;
+    QAction* mailingPilotesAyantCotiseCetteAnnee = nullptr;
+    QAction* mailingPilotesActifs = nullptr;
+    QAction* mailingPilotesActifsAyantCotiseCetteAnnee = nullptr;
+    QAction* mailingPilotesActifsBrevetes = nullptr;
+    QAction* mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = nullptr;
+    QAction* mailingPilotesDerniereDemandeSubvention = nullptr;
+    QMenu* menuMailDemandesSubvention = nullptr;
+    QMenu* menuMailPilotesDUnAerodrome = nullptr;
+    QMenu* menuMailPilotesDUnAerodromeActif = nullptr;
+    QMenu* menuMailPilotesDUnAerodromeActifBreveteMoteur = nullptr;
     
-    QAction* scanAutoOpenFlyer;
-    QAction* scanAutoAerogest;
-    QAction* scanAutoAca;
-    QAction* scanAutoDaca;
-    QAction* scanAutoSepavia;
-    QAction* scanAutoUaca;
-    QAction* scanAutoAtvv;
-    QAction* scanAutoGenerique1Passe;
-    QAction* scanAutoGenerique;
-    QAction* scanAutoCsv;
+    QAction* scanAutoOpenFlyer = nullptr;
+    QAction* scanAutoAerogest = nullptr;
+    QAction* scanAutoAca = nullptr;
+    QAction* scanAutoDaca = nullptr;
+    QAction* scanAutoSepavia = nullptr;
+    QAction* scanAutoUaca = nullptr;
+    QAction* scanAutoAtvv = nullptr;
+    QAction* scanAutoGenerique1Passe = nullptr;
+    QAction* scanAutoGenerique = nullptr;
+    QAction* scanAutoCsv = nullptr;
 
-    QAction* boutonEditerLePiloteSelectionne;
-    QAction* boutonEditerUnAeroclub;
-    QAction* boutonGestionAeronefs;
-    QAction* boutonMettreAJourAerodromes;
+    QAction* boutonEditerLePiloteSelectionne = nullptr;
+    QAction* boutonEditerUnAeroclub = nullptr;
+    QAction* boutonGestionAeronefs = nullptr;
+    QAction* boutonMettreAJourAerodromes = nullptr;
 
     //Données internes
     //Gestion des actions métier
@@ -296,6 +296,7 @@ private:
     float montantSubventionDejaAlloue = 0.0;
     int anneeAEditer = 0;
     int volAEditer = -1;
+    AeroDmsTypes::SubventionAAnoter subventionAAnoter;
     bool volPartiellementEditable = false;
     int factureIdEnBdd = 0;
     QString fichierAImprimer = "";
@@ -320,13 +321,16 @@ private:
     QWidget* widgetGraphiques;
     StatistiqueWidget* m_activeWidget = nullptr;
     QWidget* m_contentArea = nullptr;
-    QHBoxLayout* graphiques;
+    QHBoxLayout* graphiques = nullptr;
 
-    QSplashScreen* splash;
+    QSplashScreen* splash = nullptr;
 
     //Textes de certains éléments d'IHM
     const QString texteTitreQMenuFacturesDaca = tr("Récupération des factures DACA");
     const QString texteBoutonActiverModeDebogage = tr("Activer le mode &débogage");
+
+protected:
+    void resizeEvent(QResizeEvent* event);
 
 signals:
     void toucheEchapEstAppuyee();
@@ -362,6 +366,7 @@ public slots:
     void peuplerTableFactures();
     void peuplerTableRecettes();
     void peuplerTableSubventionsDemandees();
+    void ajusterTableSubventionsDemandeesAuContenu();
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge);
@@ -369,12 +374,14 @@ public slots:
     void aPropos();
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
+    void menuContextuelSubvention(const QPoint& pos);
+    void menuContextuelVols(const QPoint& pos);
     void editerPilote();
     void editerAeroclub();
     void editerCotisation();
     void editerVol();
     void supprimerVol();
-    void menuContextuelVols(const QPoint& pos);
+    void ajouterUneNoteSubvention();
     void switchModeDebug();
     void switchScanAutomatiqueDesFactures();
     void convertirHeureDecimalesVersHhMm();

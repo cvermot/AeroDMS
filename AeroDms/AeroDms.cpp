@@ -119,6 +119,8 @@ void AeroDms::initialiserBaseApplication()
     piloteAEditer = "";
     volAEditer = -1;
     factureIdEnBdd = 0;
+    subventionAAnoter.id = -1;
+    subventionAAnoter.texteActuel = "";
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
@@ -794,19 +796,22 @@ void AeroDms::initialiserOngletSubventionsDemandees()
 {
     //=============Onglet Subventions demandées
     vueSubventions = new QTableWidget(0, AeroDmsTypes::SubventionDemandeeTableElementTableElement_NB_COLONNES, this);
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem("Date"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem("Pilote"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem("Nom bénéficiaire"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem("Type de demande"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem("Montant"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem("Montant vol"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem("Mode de réglement"));
-    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem("ID demande"));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_DATE, new QTableWidgetItem(tr("Date")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE, new QTableWidgetItem(tr("Pilote")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE, new QTableWidgetItem(tr("Nom bénéficiaire")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem(tr("Type de demande")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem(tr("Montant")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem(tr("Montant vol")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem(tr("Mode de réglement")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_NOTE, new QTableWidgetItem(tr("Note")));
+    vueSubventions->setHorizontalHeaderItem(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, new QTableWidgetItem(tr("ID demande")));
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, true);
     vueSubventions->setEditTriggers(QAbstractItemView::NoEditTriggers);
     vueSubventions->setSelectionBehavior(QAbstractItemView::SelectRows);
     vueSubventions->setContextMenuPolicy(Qt::CustomContextMenu);
-    mainTabWidget->addTab(vueSubventions, QIcon(":/AeroDms/ressources/checkbook.svg"), "Subventions demandées");
+    mainTabWidget->addTab(vueSubventions, QIcon(":/AeroDms/ressources/checkbook.svg"), tr("Subventions demandées"));
+
+    connect(vueSubventions, &QTableWidget::customContextMenuRequested, this, &AeroDms::menuContextuelSubvention);
 }
 
 void AeroDms::initialiserBarreDOutils()
@@ -2169,6 +2174,8 @@ void AeroDms::peuplerTableSubventionsDemandees()
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE, new QTableWidgetItem(facture.typeDeVol));
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT, new QTableWidgetItem(QString::number(facture.montant, 'f', 2).append(" €")));
             vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL, new QTableWidgetItem(QString::number(facture.coutTotalVolAssocies, 'f', 2).append(" €")));
+            vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_NOTE, new QTableWidgetItem(facture.note));
+            vueSubventions->item(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_NOTE)->setToolTip(facture.note);
             if (facture.modeDeReglement == AeroDmsTypes::ModeDeReglement_VIREMENT)
             {
                 vueSubventions->setItem(nbItems, AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT, new QTableWidgetItem(tr("Virement")));
@@ -2184,6 +2191,29 @@ void AeroDms::peuplerTableSubventionsDemandees()
     }
     vueSubventions->resizeColumnsToContents();
 
+    ajusterTableSubventionsDemandeesAuContenu();
+}
+
+void AeroDms::ajusterTableSubventionsDemandeesAuContenu()
+{
+    const int tailleColonnesHorsNote =
+        vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_DATE)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_DATE)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_PILOTE)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_BENEFICIAIRE)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_TYPE_DEMANDE)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_MONTANT_VOL)
+        + vueSubventions->columnWidth(AeroDmsTypes::SubventionDemandeeTableElement_MODE_DE_REGLEMENT);
+    vueSubventions->setColumnWidth(AeroDmsTypes::SubventionDemandeeTableElement_NOTE,
+        vueSubventions->width() - tailleColonnesHorsNote);
+}
+
+void AeroDms::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    if(vueSubventions != nullptr)
+        ajusterTableSubventionsDemandeesAuContenu();
 }
 
 void AeroDms::peuplerTableRecettes()
@@ -3617,6 +3647,61 @@ void AeroDms::editerCotisation()
     dialogueAjouterCotisation->exec();
 }
 
+void AeroDms::menuContextuelSubvention(const QPoint& pos)
+{
+    if (vueSubventions->itemAt(pos) != nullptr)
+    {
+        QMenu menuClicDroitSubvention(tr("Menu contextuel"), this);
+        const int ligneSelectionnee = vueSubventions->itemAt(pos)->row();
+        subventionAAnoter.id = vueSubventions->item(ligneSelectionnee, 
+            AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE)->text().toInt();
+        subventionAAnoter.texteActuel = vueSubventions->item(ligneSelectionnee,
+            AeroDmsTypes::SubventionDemandeeTableElement_NOTE)->text();
+
+        QAction ajouterNote(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_AJOUTER_NOTE),
+            tr("Ajouter une note"),
+            this);
+        connect(&ajouterNote, SIGNAL(triggered()), this, SLOT(ajouterUneNoteSubvention()));
+        menuClicDroitSubvention.addAction(&ajouterNote);
+
+        if (logicielEnModeLectureSeule)
+        {
+            menuClicDroitSubvention.setEnabled(false);
+        }
+
+        //Afficher le menu sur la vue des pilotes
+        menuClicDroitSubvention.exec(vueSubventions->mapToParent(QCursor::pos()));
+    }
+}
+
+void AeroDms::ajouterUneNoteSubvention()
+{
+    QInputDialog dialogueNote;
+    dialogueNote.setInputMode(QInputDialog::TextInput);
+    dialogueNote.setWindowTitle(QApplication::applicationName() + " - " + tr("Ajout d'une note sur une subvention demandée"));
+    dialogueNote.setLabelText(tr("Cette note est destinée à un usge interne et permet de tracer par exemple à\nqui a été remis le chèque s'il n'a pas été remis en direct à son destinataire.\n\nNote à ajouter à cette demande de subvention :"));
+
+    dialogueNote.setTextValue(subventionAAnoter.texteActuel);
+    
+    switch (dialogueNote.exec())
+    {
+        case QDialog::Accepted:
+        {
+            db->ajouterNoteSubvention(subventionAAnoter.id, dialogueNote.textValue());
+
+            //On repeuple la table des subventions demandées pour afficher la nouvelle note
+            peuplerTableSubventionsDemandees();
+            break;
+        }
+        case QDialog::Rejected:
+        default:
+        {
+            //On ne fais rien
+            break;
+        }
+    }
+}
+
 void AeroDms::volsSelectionnes()
 {
     int nombreDeColonnes = 0;
@@ -4427,6 +4512,7 @@ void AeroDms::gererChangementOnglet()
     }
     else if (mainTabWidget->currentWidget() == vueSubventions)
     {
+        ajusterTableSubventionsDemandeesAuContenu();
         listeDeroulanteType->setItemText(4, tr("Tous les types de demandes"));
         actionListeDeroulanteType->setVisible(true);
     }

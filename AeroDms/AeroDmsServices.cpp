@@ -298,6 +298,11 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/lock.svg");
         }
         break;
+        case AeroDmsTypes::Icone_AJOUTER_NOTE:
+        {
+            return QIcon(":/AeroDms/ressources/note-edit.svg");
+        }
+        break;
         case AeroDmsTypes::Icone_RESSOURCE:
         {
             return QIcon(":/AeroDms/ressources/package-variant.svg");

@@ -31,9 +31,9 @@ public:
     void peuplerListeAeronefs();
 
 private:
-    ManageDb* database;
+    ManageDb* database = nullptr;
 
-    QTableWidget* vueAeronefs;
+    QTableWidget* vueAeronefs = nullptr;
 
 private slots:
     void sauvegarderDonneesSaisies(const int p_ligne, 

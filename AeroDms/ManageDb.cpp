@@ -38,9 +38,9 @@ ManageDb::ManageDb(const QString &database,
     if (!db.open()) {
         QMessageBox::critical(this, 
             QApplication::applicationName() + " - " + tr("Impossible d'ouvrir la base de données"),
-            "Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : \n"
+            tr("Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : ") + "\n"
                 +db.lastError().text()
-                +"\nCliquez Annuler pour quitter", QMessageBox::Cancel);
+                +"\n"+ tr("Cliquez Annuler pour quitter"), QMessageBox::Cancel);
     }
 }
 
@@ -679,13 +679,17 @@ const AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemand
         demande.coutTotalVolAssocies = query.value("totalCoutVol").toFloat();
         demande.piloteId = query.value("vol.pilote").toString();
         demande.nomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
+
+        demande.note = "";
+        if (!query.value("note").isNull())
+        {
+            demande.note = query.value("note").toString();
+        }
+
+        demande.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
         if (query.value("modeDeReglement").toString() == "Virement")
         {
             demande.modeDeReglement = AeroDmsTypes::ModeDeReglement_VIREMENT;
-        }
-        else
-        {
-            demande.modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
         }
 
         liste.append(demande);
@@ -1054,6 +1058,18 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     }
 
     QThread::msleep(delaisDeGardeBdd);
+}
+
+void ManageDb::ajouterNoteSubvention(const int p_idSubventionAAnoter, const QString p_note)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE demandeRemboursementSoumises SET note = :note WHERE demandeId = :demandeId");
+    query.bindValue(":note", p_note);
+    query.bindValue(":demandeId", p_idSubventionAAnoter);
+
+    executerRequeteAvecControle(query, 
+        "mise à jour de la note sur la subvention d'ID " + QString::number(p_idSubventionAAnoter), 
+        "Ajout note");
 }
 
 void ManageDb::executerRequeteAvecControle(QSqlQuery &p_query,
