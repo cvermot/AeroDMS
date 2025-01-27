@@ -1071,8 +1071,8 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
                         html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dateVol.toString("dd/MM/yyyy") + "</td >\n";
                         html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).nomPassagers + "</td>\n";
                         html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + AeroDmsServices::convertirMinutesEnHeuresMinutes(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).dureeVol) + "</td>\n";
-                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).coutVol) + " €</td>\n";
-                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).montantRembouse) + " €</td>\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).coutVol, 'f', 2) + " €</td>\n";
+                        html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourVol) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).volsUniques.at(compteurVol).montantRembouse, 'f', 2) + " €</td>\n";
                         compteurVol++;
                     }
                     if (compteurLignesPourRecette == 0)
@@ -1082,7 +1082,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
                         if (listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette != 0)
                         {
                             html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).intituleRecette + "</td >\n";
-                            html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette) + " €</td>\n";
+                            html = html + "    <td class = 'tg-lboi' rowspan = '" + QString::number(compteurLignesPourRecette) + "'>" + QString::number(listesParIdSortie.at(i).baladesEtSortiesAssociees.at(j).recettesUniques.at(compteurRecettes).montantRecette, 'f', 2) + " €</td>\n";
                         }
                         else
                         {
