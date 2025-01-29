@@ -38,8 +38,18 @@ int main(int argc, char* argv[])
     // Définir la variable d'environnement OPENSSL_MODULES
     qputenv("OPENSSL_MODULES", opensslModulesPath.toUtf8());
 
+    QString appName = "AeroDms.exe";
+    //Si le nom du lanceur vaut AeroDms.exe, c'est que le binaire à lancer vaut AeroDmsExe
+    //Sinon, on vérifie ce qui existe : si AeroDmsExe existe, on lancera AeroDmsExe
+    if ( QCoreApplication::applicationFilePath().split("/").last() == appName
+         || QFile::exists(QDir::currentPath() + QDir::separator() + "AeroDmsExe"))
+    {
+        appName = "AeroDmsExe";
+    }
+    //Sinon, on lancer AeroDms.exe
+
     // Chemin vers l'application principale
-    const QString program = QDir::currentPath() + QDir::separator() + "AeroDms.exe";
+    const QString program = QDir::currentPath() + QDir::separator() + appName;
     // Chemin vers DLL legacy
     const QString legacyDll = QDir::currentPath() + QDir::separator() + "legacy.dll";
 
