@@ -4556,7 +4556,8 @@ void AeroDms::gererChangementOnglet()
     //les onglets qui permettent l'édition des pilotes, on appelle la méthode
     //qui gère le bouton associé
     boutonEditerLePiloteSelectionne->setEnabled(false);
-    if (mainTabWidget->currentWidget() == vueVols
+    if (mainTabWidget->currentWidget() == vuePilotes
+        || mainTabWidget->currentWidget() == vueVols
         || mainTabWidget->currentWidget() == vueSubventions
         || mainTabWidget->currentWidget() == vueFactures
         || mainTabWidget->currentWidget() == vueRecettes
