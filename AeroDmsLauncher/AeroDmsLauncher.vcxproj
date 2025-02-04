@@ -107,7 +107,6 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AeroDmsLauncher.rc" />
-    <ResourceCompile Include="version.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="ressources\shield-airplane.ico" />

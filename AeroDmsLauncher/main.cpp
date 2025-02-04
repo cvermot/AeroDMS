@@ -23,14 +23,56 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QSplashScreen>
 #include <QThread>
+#include <QCommandLineParser>
+
+#include "resource.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 int main(int argc, char* argv[])
 {
+#ifdef _WIN32
+    if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+        FILE* fp_out = NULL;
+        FILE* fp_err = NULL;
+        freopen_s(&fp_out, "CONOUT$", "w", stdout);
+        freopen_s(&fp_err, "CONOUT$", "w", stderr);
+    }
+#endif
+
     QApplication app(argc, argv);
 
     QSplashScreen* splash = new QSplashScreen(QPixmap(":AeroDmsLauncher/ressources/splash.webp"), Qt::WindowStaysOnTopHint);
     splash->show();
     splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+
+    QApplication::setApplicationVersion(VER_PRODUCTVERSION);
+
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QApplication::tr("Lanceur AeroDMS"));
+    QCommandLineOption helpOption(QStringList() << "h" << "help",
+        QApplication::tr("Affiche l'aide du logiciel"));
+    parser.addOption(helpOption);
+    QCommandLineOption versionOption(QStringList() << "v" << "version",
+        QApplication::tr("Affiche la version du logiciel"));
+    parser.addOption(versionOption);
+    parser.process(app);
+
+    
+
+    if (parser.isSet(versionOption))
+    {
+        QTextStream(stdout) << "\n";
+        QTextStream(stdout) << "AeroDmsLauncher v" << QApplication::applicationVersion() << "\n";
+    }
+    if (parser.isSet(helpOption))
+    {
+        QTextStream(stdout) << "\n";
+        parser.showHelp();
+        QTextStream(stdout) << "\n";
+    }
 
     // Chemin vers le répertoire contenant "legacy.dll"
     const QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable
