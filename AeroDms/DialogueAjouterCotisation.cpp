@@ -73,6 +73,9 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
     montantSubventionAnnuelle->setValue(budgetEntrainement);
     montantSubventionAnnuelle->setSuffix("€");
 
+    remarque = new QLineEdit(this);
+    QLabel* remarqueLabel = new QLabel(tr("Remarque : "), this);
+
     QGridLayout* mainLayout = new QGridLayout(this);
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -87,6 +90,9 @@ DialogueAjouterCotisation::DialogueAjouterCotisation( ManageDb* db,
 
     mainLayout->addWidget(montantSubventionAnnuelleLabel, 3, 0);
     mainLayout->addWidget(montantSubventionAnnuelle, 3, 1);
+
+    mainLayout->addWidget(remarqueLabel, 4, 0);
+    mainLayout->addWidget(remarque, 4, 1);
 
     mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
 
@@ -128,6 +134,7 @@ const AeroDmsTypes::CotisationAnnuelle DialogueAjouterCotisation::recupererInfos
     infosCotisation.annee = annee->currentText().toInt();
     infosCotisation.montant = montant->value();
     infosCotisation.montantSubvention = montantSubventionAnnuelle->value();
+    infosCotisation.remarque = remarque->text();
     infosCotisation.estEnEdition = modeEdition;
 
     rincerFenetre();
@@ -162,6 +169,7 @@ void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
     montant->setEnabled(false);
     montantSubventionAnnuelle->setMinimum(p_montantSubventionDejaAlloue);
     montantSubventionAnnuelle->setValue(database->recupererSubventionEntrainement(p_pilote, p_annee));
+    remarque->setText(database->recupererRemarqueSubvention(p_pilote, p_annee));
 
     setWindowTitle(QApplication::applicationName() + " - " + tr("Modifier une cotisation pilote"));
     okButton->setText("&Modifier");
@@ -187,6 +195,7 @@ void DialogueAjouterCotisation::rincerFenetre()
     annee->setCurrentIndex(1);
     montant->setValue(montantCotisation);
     montantSubventionAnnuelle->setValue(budgetEntrainement);
+    remarque->clear();
 
     //Si on a 4 item c'est qu'on est en mode édition => on supprime l'item additionnel ajouté par simplicité en mode édition
     if (annee->count() == 4)

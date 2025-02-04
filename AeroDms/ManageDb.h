@@ -77,6 +77,8 @@ public:
     void ajouterCotisation (const AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
     const float recupererSubventionEntrainement( const QString p_pilote,
         const int p_annee);
+    const QString recupererRemarqueSubvention(const QString p_pilote,
+        const int p_annee);
 
     const AeroDmsTypes::ListeDemandeRemboursement recupererLesSubventionsAEmettre(const int p_annee);
     const AeroDmsTypes::ListeRecette recupererLesCotisationsAEmettre(const int p_annee);
@@ -166,7 +168,7 @@ public slots:
 private:
     QSqlDatabase db;
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.11;
+    const float versionBddAttendue = 1.12;
 
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,

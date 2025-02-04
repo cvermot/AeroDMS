@@ -42,6 +42,7 @@ private:
     QComboBox* annee = nullptr;
     QDoubleSpinBox* montant = nullptr;
     QDoubleSpinBox* montantSubventionAnnuelle = nullptr;
+    QLineEdit* remarque = nullptr;
 
     ManageDb* database = nullptr;
 

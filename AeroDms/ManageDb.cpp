@@ -218,6 +218,10 @@ const AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(co
         {
             recette.estSoumisCe = false;
         }
+        if (!query.value("remarque").isNull())
+        {
+            recette.remarque = query.value("remarque").toString();
+        }
         liste.append(recette);
     }
 
@@ -1565,11 +1569,12 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
 
         QThread::msleep(delaisDeGardeBdd);
 
-        query.prepare("INSERT INTO 'cotisation' ('pilote','annee','idRecette', 'montantSubventionAnnuelleEntrainement') VALUES (:pilote, :annee, :idRecette, :montantSubvention)");
+        query.prepare("INSERT INTO 'cotisation' ('pilote','annee','idRecette', 'montantSubventionAnnuelleEntrainement', 'remarque') VALUES (:pilote, :annee, :idRecette, :montantSubvention, :remarque)");
         query.bindValue(":pilote", p_infosCotisation.idPilote);
         query.bindValue(":annee",   p_infosCotisation.annee);
         query.bindValue(":idRecette", idRecette);
         query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
+        query.bindValue(":remarque", p_infosCotisation.remarque);
         while (!query.exec())
         {
             QMessageBox dialogueErreurExecutionRequete;
@@ -1593,10 +1598,11 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
     }
     else
     {
-        query.prepare("UPDATE 'cotisation' SET 'montantSubventionAnnuelleEntrainement' = :montantSubvention WHERE pilote = :pilote AND annee = :annee");
+        query.prepare("UPDATE 'cotisation' SET 'montantSubventionAnnuelleEntrainement' = :montantSubvention, 'remarque' = :remarque WHERE pilote = :pilote AND annee = :annee");
         query.bindValue(":pilote", p_infosCotisation.idPilote);
         query.bindValue(":annee", p_infosCotisation.annee);
         query.bindValue(":montantSubvention", p_infosCotisation.montantSubvention);
+        query.bindValue(":remarque", p_infosCotisation.remarque);
         query.exec();
     }
 
@@ -1621,6 +1627,20 @@ const float ManageDb::recupererSubventionEntrainement( const QString p_pilote,
     query.next();
 
     return query.value("montantSubventionAnnuelleEntrainement").toFloat();
+}
+
+const QString ManageDb::recupererRemarqueSubvention(const QString p_pilote,
+    const int p_annee)
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT remarque FROM 'cotisation' WHERE pilote = :pilote AND annee = :annee");
+    query.bindValue(":pilote", p_pilote);
+    query.bindValue(":annee", p_annee);
+    query.exec();
+    query.next();
+
+    return query.value("remarque").toString();
 }
 
 //Cette fonction créé (p_pilote.idPilote = "") ou met à jour (p_pilote.idPilote renseigné) un pilote

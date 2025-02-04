@@ -420,6 +420,7 @@ public:
         int annee;
         bool estSoumisCe;
         int id;
+        QString remarque;
     };
     typedef QList<RecetteDetail> ListeRecetteDetail;
 
@@ -462,6 +463,7 @@ public:
         float montantSubvention;
         float montant;
         bool estEnEdition;
+        QString remarque;
     };
     
     struct DemandeRemboursementFacture {

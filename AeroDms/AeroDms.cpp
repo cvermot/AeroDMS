@@ -2239,7 +2239,13 @@ void AeroDms::peuplerTableRecettes()
             const int position = vueRecettes->rowCount();
             vueRecettes->setRowCount(vueRecettes->rowCount() + 1);
 
-            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, new QTableWidgetItem(recette.intitule));
+            QTableWidgetItem *inituleCotisation = new QTableWidgetItem(recette.intitule);
+            if (recette.remarque != "")
+            {
+                inituleCotisation->setToolTip("Remarque : " + recette.remarque);
+            }
+
+            vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_INTITULE, inituleCotisation);
             vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_ID, new QTableWidgetItem(QString::number(recette.id)));
             vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_MONTANT, new QTableWidgetItem(QString::number(recette.montant, 'f', 2) + " €"));
             vueRecettes->setItem(position, AeroDmsTypes::RecetteTableElement_DATE, new QTableWidgetItem(QString::number(recette.annee)));
