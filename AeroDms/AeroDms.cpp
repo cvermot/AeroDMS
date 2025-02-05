@@ -237,7 +237,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
         QString("/") +
         settings.value("baseDeDonnees/nom", "").toString();
 
-    db = new ManageDb(database, parametresMetiers.delaisDeGardeBdd);
+    db = new ManageDb(parametresMetiers.delaisDeGardeBdd);
+    connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
+    db->ouvrirLaBdd(database);
+
     pdf = new PdfRenderer(db,
         elaborerCheminRessourcesHtml(),
         QMarginsF(parametresSysteme.margesGaucheDroite,

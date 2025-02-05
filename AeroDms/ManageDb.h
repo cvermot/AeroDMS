@@ -27,8 +27,8 @@ class ManageDb : public QWidget {
     Q_OBJECT
 
 public:
-    ManageDb(const QString& database, 
-        const int p_delaisDeGardeBdd);
+    ManageDb(const int p_delaisDeGardeBdd);
+    bool ouvrirLaBdd(const QString& p_database);
 
     void sauvegarderLaBdd( const QString p_repertoireDeSauvegarde);
     const bool laBddEstALaVersionAttendue() const;
@@ -165,8 +165,12 @@ public:
 
 public slots:
 
+signals:
+    void erreurOuvertureBdd();
+
 private:
     QSqlDatabase db;
+    QString database = "";
     int delaisDeGardeBdd = 0;
     const float versionBddAttendue = 1.12;
 

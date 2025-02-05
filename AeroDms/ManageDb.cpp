@@ -20,28 +20,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "QMessageBox"
 #include "AeroDmsServices.h"
 
-ManageDb::ManageDb(const QString &database, 
-    const int p_delaisDeGardeBdd) 
+ManageDb::ManageDb(const int p_delaisDeGardeBdd) 
 {
     delaisDeGardeBdd = p_delaisDeGardeBdd;
+}
 
+bool ManageDb::ouvrirLaBdd(const QString& p_database)
+{
     if (!QSqlDatabase::drivers().contains("QSQLITE"))
+    {
+        emit erreurOuvertureBdd();
         QMessageBox::critical(
             this,
             QApplication::applicationName() + " - " + tr("Impossible de charger la base de données"),
             tr("Ce logiciel nécessite le driver Qt SQLite. Celui ci n'est pas disponible.")
         );
+        return false;
+    }
 
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(database);
+    db.setDatabaseName(p_database);
 
-    if (!db.open()) {
-        QMessageBox::critical(this, 
+    if (!db.open())
+    {
+        emit erreurOuvertureBdd();
+        QMessageBox::critical(this,
             QApplication::applicationName() + " - " + tr("Impossible d'ouvrir la base de données"),
             tr("Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : ") + "\n"
-                +db.lastError().text()
-                +"\n"+ tr("Cliquez Annuler pour quitter"), QMessageBox::Cancel);
+            + db.lastError().text()
+            + "\n" + tr("Cliquez Annuler pour quitter"), QMessageBox::Cancel);
+        return false;
     }
+    return true;
 }
 
 void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
