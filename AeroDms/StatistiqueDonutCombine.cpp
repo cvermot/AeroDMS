@@ -36,7 +36,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     // customize the slice
     mainSlice->setBrush(color);
     mainSlice->setLabelVisible();
-    const float darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
+    const double darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
     if(darkness > 0.5)
         mainSlice->setLabelColor(Qt::black);
     else

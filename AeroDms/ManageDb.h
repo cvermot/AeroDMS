@@ -43,15 +43,15 @@ public:
     const int recupererProchainNumeroFacture();
     const int ajouterFacture( QString& nomFichier);
 
-    const float recupererSubventionRestante( const QString& piloteId,
+    const double recupererSubventionRestante( const QString& piloteId,
         const int annee);
 
     void enregistrerUnVol( const QString& p_piloteId,
         const QString& p_typeDeVol,
         const QDate& p_date,
         const int p_dureeEnMinutes,
-        const float p_cout,
-        const float p_montantSubventionne,
+        const double p_cout,
+        const double p_montantSubventionne,
         const int p_facture,
         const int p_idSortie,
         const QString& p_remarque,
@@ -62,20 +62,20 @@ public:
     void enregistrerUneFacture( const QString& p_payeur,
         const int factureId,
         const QDate& p_date,
-        const float p_montantFacture,
+        const double p_montantFacture,
         const int p_idSortie,
         const QString& p_remarqueFacture);
 
     void ajouterUneRecetteAssocieeAVol( const QStringList& p_listeVols,
         const QString& p_typeDeRecette,
         const QString& p_intitule,
-        const float p_montant);
+        const double p_montant);
 
     const bool piloteEstAJourDeCotisation( const QString& p_piloteId,
         const int annee);
 
     void ajouterCotisation (const AeroDmsTypes::CotisationAnnuelle &p_infosCotisation );
-    const float recupererSubventionEntrainement( const QString p_pilote,
+    const double recupererSubventionEntrainement( const QString p_pilote,
         const int p_annee);
     const QString recupererRemarqueSubvention(const QString p_pilote,
         const int p_annee);
@@ -111,7 +111,7 @@ public:
     const QStringList recupererTypesDesVol(bool recupererUniquementLesTypesDeVolAvecRecette = false);
 
     const AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties( const QString p_typeDeVol, 
-        const float p_proportionRemboursement,
+        const double p_proportionRemboursement,
         const int p_annee = -1 );
 
     const AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
@@ -161,7 +161,7 @@ public:
     const bool volSembleExistantEnBdd(const QString p_idPilote,
         const int p_duree, 
         const QString p_date, 
-        const float p_coutDuVol);
+        const double p_coutDuVol);
 
 public slots:
 
@@ -172,7 +172,7 @@ private:
     QSqlDatabase db;
     QString database = "";
     int delaisDeGardeBdd = 0;
-    const float versionBddAttendue = 1.12;
+    const double versionBddAttendue = 1.12;
 
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,

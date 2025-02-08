@@ -194,12 +194,12 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesOpenFlyer( std::vector
             { 
                 if (QString(p_entries.at(index + 2).Text.data()).contains("€"))
                 {
-                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + QString(p_entries.at(index + 2).Text.data()).replace("€", "").replace(",", ".").toFloat();
+                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + QString(p_entries.at(index + 2).Text.data()).replace("€", "").replace(",", ".").toDouble();
                 }
                 else if (QString(p_entries.at(index + 1).Text.data()).contains("€"))
                 {
                     QString montant = QString(p_entries.at(index + 1).Text.data()).split(" ").at(1);
-                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + montant.replace("€", "").replace(",", ".").toFloat();
+                    donneesFactures.coutDuVol = donneesFactures.coutDuVol + montant.replace("€", "").replace(",", ".").toDouble();
                 }
             }            
         }
@@ -233,13 +233,13 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesAerogest( std::vector<
 
         if (data.contains("€") && data.contains("Tarif standard"))
         {
-            donneesFactures.coutDuVol = data.remove("Tarif standard : ").remove("€").replace(",",".").toFloat();
+            donneesFactures.coutDuVol = data.remove("Tarif standard : ").remove("€").replace(",",".").toDouble();
         }
 
         if (data.contains(euroRe))
         {
             QRegularExpressionMatch match = euroRe.match(data);
-            donneesFactures.coutDuVol = match.captured("montant").toFloat();
+            donneesFactures.coutDuVol = match.captured("montant").toDouble();
         }
 
         if (data.contains(" minutes"))
@@ -325,7 +325,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                 else if (str.at(i).contains("vol"))
                 {
                     QString montant = str.at(i);
-                    donneesFactures.coutDuVol = montant.replace("vol", "").replace(",", ".").toFloat();
+                    donneesFactures.coutDuVol = montant.replace("vol", "").replace(",", ".").toDouble();
                 }
                 else if (str.at(i).contains(immatRe))
                 {
@@ -342,7 +342,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesDaca( std::vector
                 {
                     index++;
                 }
-                donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toFloat();
+                donneesFactures.coutDuVol = QString(p_entries.at(index).Text.data()).replace("€", "").replace(",", ".").toDouble();
             }
 
             liste.append(donneesFactures);
@@ -405,9 +405,9 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vec
                 {
                     //La condition évite d'écraser un éventuel montant déjà trouvé par un montant nul
                     //(certaines factures indiquent un crédit nul en dernière ligne)
-                    if (str.replace("€","").toFloat() != 0)
+                    if (str.replace("€","").toDouble() != 0)
                     {
-                        donneesFactures.coutDuVol = str.replace("€", "").toFloat();
+                        donneesFactures.coutDuVol = str.replace("€", "").toDouble();
                     }
                 }
             }
@@ -458,7 +458,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesUaca(std::vector<
             {
                 index = index + 1;
                 str = p_entries.at(index).Text.data();
-                donneesFactures.coutDuVol = str.replace("€", "").replace(",", ".").toFloat();
+                donneesFactures.coutDuVol = str.replace("€", "").replace(",", ".").toDouble();
             }
         }
        
@@ -519,7 +519,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesAtvv(std::vector<
             QRegularExpressionMatch montantMatch = montantRe.match(data);
             if (montantMatch.hasMatch())
             {
-                vol.coutDuVol = montantMatch.captured("montant").replace(",", ".").toFloat();;
+                vol.coutDuVol = montantMatch.captured("montant").replace(",", ".").toDouble();;
             }
             else
             {
@@ -547,7 +547,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesAtvv(std::vector<
             QRegularExpressionMatch montantMatch = montantRe.match(data);
             if (montantMatch.hasMatch())
             {
-                lancement.coutDuVol = montantMatch.captured("montant").replace(",", ".").toFloat();;
+                lancement.coutDuVol = montantMatch.captured("montant").replace(",", ".").toDouble();;
             }
             else
             {
@@ -567,11 +567,11 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesAtvv(std::vector<
                 {
                     if (recherchePrixVol)
                     {
-                        vols.last().coutDuVol = part.replace(",", ".").toFloat();
+                        vols.last().coutDuVol = part.replace(",", ".").toDouble();
                     }
                     else if (recherchePrixLancement)
                     {
-                        lancements.last().coutDuVol = part.replace(",", ".").toFloat();
+                        lancements.last().coutDuVol = part.replace(",", ".").toDouble();
                     }
 
                     recherchePrixVol = false;
@@ -643,9 +643,9 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique( std::v
                 QRegularExpressionMatch match = euroRe.match(str);
                 //La condition évite d'écraser un éventuel montant déjà trouvé par un montant nul
                 //(certaines factures indiquent un crédit nul en dernière ligne)
-                if (match.captured("montant").toFloat() != 0)
+                if (match.captured("montant").toDouble() != 0)
                 {
-                    donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                    donneesFactures.coutDuVol = match.captured("montant").toDouble();
                 }
             }
             if (str.contains(immatRe))
@@ -709,9 +709,9 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe( 
                 QRegularExpressionMatch match = euroRe.match(str);
                 //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
                 //(certaines factures indiquent un credit nul en dernière ligne)
-                if (match.captured("montant").toFloat() != 0)
+                if (match.captured("montant").toDouble() != 0)
                 {
-                    donneesFactures.coutDuVol = match.captured("montant").toFloat();
+                    donneesFactures.coutDuVol = match.captured("montant").toDouble();
                 }
             }
             if (str.contains(immatRe))
@@ -774,13 +774,13 @@ const QTime PdfExtractor::extraireDureeRegex(const QString p_str)
     return duree;
 }
 
-const float PdfExtractor::recupererMontantAca(QString p_chaine)
+const double PdfExtractor::recupererMontantAca(QString p_chaine)
 {
     //On ne sais pas trop pourquoi mais parfois (pas toujours...) les montant sont
     // encodés en partie avec des \uXXXX
     // => "Total TTC 10\u0017,\u0013\u0013€" pour 104,00€ par exemple
         
-    //Donc on fait un peu de ménage et on retourne le float...
+    //Donc on fait un peu de ménage et on retourne le double...
     return p_chaine.replace("Total TTC", "")
         .replace(" ", "")
         .replace("€", "")
@@ -795,7 +795,7 @@ const float PdfExtractor::recupererMontantAca(QString p_chaine)
         .replace('\u0020', "7")
         .replace('\u0021', "8")
         .replace('\u0022', "9")
-        .toFloat();
+        .toDouble();
 }
 
 AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuCsv(const QString p_fichier)
@@ -832,7 +832,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuCsv(const Q
                 }
                 else if (str.contains("€"))
                 {
-                    donnesFacture.coutDuVol = str.replace("€", "").toFloat();
+                    donnesFacture.coutDuVol = str.replace("€", "").toDouble();
                 }
                 else if (str.contains(immatRe))
                 {

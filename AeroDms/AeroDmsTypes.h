@@ -262,22 +262,26 @@ public:
         DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME
     };
 
+    static const QString K_INIT_QSTRING;
+    static const int K_INIT_INT_INVALIDE;
+    static const int K_INIT_INT;
+
     struct DonneesMailing {
-        DonnesMailingType typeMailing;
-        QString donneeComplementaire;
+        DonnesMailingType typeMailing = DonnesMailingType_DEMANDE_DE_SUBVENTION;
+        QString donneeComplementaire = K_INIT_QSTRING;
     };
 
     struct DemandeEnCoursDeTraitement {
         PdfTypeDeDemande typeDeDemande = PdfTypeDeDemande_HEURE_DE_VOL;
-        QString idPilote = "";
-        QString typeDeVol = "";
-        QString nomBeneficiaire = "";
-        float montant = 0.0;
+        QString idPilote = K_INIT_QSTRING;
+        QString typeDeVol = K_INIT_QSTRING;
+        QString nomBeneficiaire = K_INIT_QSTRING;
+        double montant = 0.0;
         ModeDeReglement modeDeReglement = ModeDeReglement_CHEQUE;
-        int annee = -1;
-        int anneeATraiter = -1;
-        QString nomTresorier = "";
-        QString nomFichier = "";
+        int annee = K_INIT_INT_INVALIDE;
+        int anneeATraiter = K_INIT_INT_INVALIDE;
+        QString nomTresorier = K_INIT_QSTRING;
+        QString nomFichier = K_INIT_QSTRING;
         QStringList listeFactures = QStringList();
         AeroDmsTypes::TypeGenerationPdf typeDeGenerationDemandee = AeroDmsTypes::TypeGenerationPdf_TOUTES;
         AeroDmsTypes::Signature typeDeSignatureDemandee = AeroDmsTypes::Signature_SANS;
@@ -285,50 +289,50 @@ public:
         bool recapHdVAvecRecettes = false;
         bool recapHdVAvecBaladesEtSorties = false;
         bool virementEstAutorise = false;
-        int recapHdvGraphAGenerer = 0;
+        int recapHdvGraphAGenerer = K_INIT_INT;
         //int idFacture;
     };
 
     struct Pilote {
-        QString idPilote;
-        QString nom;
-        QString prenom;
-        QString aeroclub;
-        int idAeroclub;
-        QString activitePrincipale;
-        bool estAyantDroit;
-        QString mail;
-        QString telephone;
-        QString remarque;
-        bool estActif;
-        bool estBrevete;
+        QString idPilote = K_INIT_QSTRING;
+        QString nom = K_INIT_QSTRING;
+        QString prenom = K_INIT_QSTRING;
+        QString aeroclub = K_INIT_QSTRING;
+        int idAeroclub = K_INIT_INT_INVALIDE;
+        QString activitePrincipale = K_INIT_QSTRING;
+        bool estAyantDroit = false;
+        QString mail = K_INIT_QSTRING;
+        QString telephone = K_INIT_QSTRING;
+        QString remarque = K_INIT_QSTRING;
+        bool estActif = false;
+        bool estBrevete = false;
     };
     static const Pilote K_INIT_PILOTE;
     typedef QList<Pilote> ListePilotes;
 
 	struct Aerodrome {
-		QString indicatifOaci;
-		QString nom;
+		QString indicatifOaci = K_INIT_QSTRING;
+		QString nom = K_INIT_QSTRING;
 	};
     typedef QList<Aerodrome> ListeAerodromes;
 
     struct Club {
-        int idAeroclub;
-        QString aeroclub;
-        QString aerodrome;
-        QString raisonSociale;
-        QString iban;
-        QString bic;
+        int idAeroclub = K_INIT_INT_INVALIDE;
+        QString aeroclub = K_INIT_QSTRING;
+        QString aerodrome = K_INIT_QSTRING;
+        QString raisonSociale = K_INIT_QSTRING;
+        QString iban = K_INIT_QSTRING;
+        QString bic = K_INIT_QSTRING;
     };
     static const Club K_INIT_CLUB;
     typedef QList<Club> ListeAeroclubs;
 
     struct HeureDeVolRemboursement
     {
-        float montantRembourse;
-        float coutTotal;
-        QString heuresDeVol;
-        int tempsDeVolEnMinutes;
+        double montantRembourse = 0.0;
+        double coutTotal = 0.0;
+        QString heuresDeVol = K_INIT_QSTRING;
+        int tempsDeVolEnMinutes = 0.0;
 
         HeureDeVolRemboursement& operator+(const HeureDeVolRemboursement& a)
         {
@@ -349,16 +353,16 @@ public:
     static const HeureDeVolRemboursement K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
 
     struct SubventionsParPilote {
-        QString idPilote;
-        int annee;
-        QString nom;
-        QString prenom;
-        QString mail;
-        float montantSubventionEntrainement;
-        HeureDeVolRemboursement entrainement;
-        HeureDeVolRemboursement balade;
-        HeureDeVolRemboursement sortie;
-        HeureDeVolRemboursement totaux;
+        QString idPilote = K_INIT_QSTRING;
+        int annee = K_INIT_INT_INVALIDE;
+        QString nom = K_INIT_QSTRING;
+        QString prenom = K_INIT_QSTRING;
+        QString mail = K_INIT_QSTRING;
+        double montantSubventionEntrainement = 0.0;
+        HeureDeVolRemboursement entrainement = K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
+        HeureDeVolRemboursement balade = K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
+        HeureDeVolRemboursement sortie = K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
+        HeureDeVolRemboursement totaux = K_INIT_HEURE_DE_VOL_REMBOURSEMENT;
 
         SubventionsParPilote& operator+(const SubventionsParPilote& a)
         {
@@ -374,299 +378,299 @@ public:
     typedef QList<SubventionsParPilote> ListeSubventionsParPilotes;
 
     struct Vol {
-        QString idPilote;
-        QDate date;
-        QString nomPilote;
-        QString prenomPilote;
-        QString typeDeVol;
-        QString duree;
-        QString remarque;
-        QString immat;
-        QString activite;
-        QString estSoumisCe;
-        bool estSoumis;
-        float coutVol;
-        float montantRembourse;
-        int volId;
-        int dureeEnMinutes;
-        int baladeId;
-        int facture;
+        QString idPilote = K_INIT_QSTRING;
+        QDate date = QDate();
+        QString nomPilote = K_INIT_QSTRING;
+        QString prenomPilote = K_INIT_QSTRING;
+        QString typeDeVol = K_INIT_QSTRING;
+        QString duree = K_INIT_QSTRING;
+        QString remarque = K_INIT_QSTRING;
+        QString immat = K_INIT_QSTRING;
+        QString activite = K_INIT_QSTRING;
+        QString estSoumisCe = K_INIT_QSTRING;
+        bool estSoumis = false;
+        double coutVol = 0.0;
+        double montantRembourse = 0.0;
+        int volId = K_INIT_INT_INVALIDE;
+        int dureeEnMinutes = K_INIT_INT;
+        int baladeId = K_INIT_INT_INVALIDE;
+        int facture = K_INIT_INT_INVALIDE;
     };
     static const Vol K_INIT_VOL;
     typedef QList<Vol> ListeVols;
 
     struct DemandeRemboursement {
-        QString typeDeVol;
-        QString piloteId;
-        float montantARembourser;
-        int annee;
-        QString nomFichierFacture;
+        QString typeDeVol = K_INIT_QSTRING;
+        QString piloteId = K_INIT_QSTRING;
+        double montantARembourser = 0.0;
+        int annee = K_INIT_INT_INVALIDE;
+        QString nomFichierFacture = K_INIT_QSTRING;
     };
     typedef QList<DemandeRemboursement> ListeDemandeRemboursement;
 
     struct Recette {
-        QString intitule;
-        QString typeDeSortie;
-        float montant;
-        int annee;
+        QString intitule = K_INIT_QSTRING;
+        QString typeDeSortie = K_INIT_QSTRING;
+        double montant = 0.0;
+        int annee = K_INIT_INT_INVALIDE;
     };
     typedef QList<Recette> ListeRecette;
 
     struct RecetteDetail {
-        QString intitule;
-        QString typeDeRecette;
-        float montant;
-        QDate date;
-        int annee;
-        bool estSoumisCe;
-        int id;
-        QString remarque;
+        QString intitule = K_INIT_QSTRING;
+        QString typeDeRecette = K_INIT_QSTRING;
+        double montant = 0.0;
+        QDate date = QDate();
+        int annee = K_INIT_INT_INVALIDE;
+        bool estSoumisCe = false;
+        int id = K_INIT_INT_INVALIDE;
+        QString remarque = K_INIT_QSTRING;
     };
     typedef QList<RecetteDetail> ListeRecetteDetail;
 
     struct DemandeRemboursementSoumise {
-        int id;
-        QDate dateDemande;
-        QString nomBeneficiaire;
-        QString nomPilote;
-        QString piloteId;
-        QString typeDeVol;
-        AeroDmsTypes::ModeDeReglement modeDeReglement;
-        QString note;
-        float montant;
-        float coutTotalVolAssocies;
-        int anneeVol;     
+        int id = K_INIT_INT_INVALIDE;
+        QDate dateDemande = QDate();
+        QString nomBeneficiaire = K_INIT_QSTRING;
+        QString nomPilote = K_INIT_QSTRING;
+        QString piloteId = K_INIT_QSTRING;
+        QString typeDeVol = K_INIT_QSTRING;
+        AeroDmsTypes::ModeDeReglement modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
+        QString note = K_INIT_QSTRING;
+        double montant = 0.0;
+        double coutTotalVolAssocies = 0.0;
+        int anneeVol = K_INIT_INT_INVALIDE;     
     };
     typedef QList<DemandeRemboursementSoumise> ListeDemandesRemboursementSoumises;
 
     struct SubventionAAnoter {
-        int id = 0;
-        QString texteActuel = "";
+        int id = K_INIT_INT;
+        QString texteActuel = K_INIT_QSTRING;
     };
 
     struct Sortie {
-        int id;
-        QString nom;
-        QDate date;
+        int id = K_INIT_INT_INVALIDE;
+        QString nom = K_INIT_QSTRING;
+        QDate date = QDate();
     };
     typedef QList<Sortie> ListeSortie;
 
     struct Aeronef {
-        QString immatriculation;
-        QString type;
+        QString immatriculation = K_INIT_QSTRING;
+        QString type = K_INIT_QSTRING;
     };
     typedef QList<Aeronef> ListeAeronefs;
 
     struct CotisationAnnuelle {
-        QString idPilote;
-        int annee;
-        float montantSubvention;
-        float montant;
-        bool estEnEdition;
-        QString remarque;
+        QString idPilote = K_INIT_QSTRING;
+        int annee = K_INIT_INT_INVALIDE;
+        double montantSubvention = 0.0;
+        double montant = 0.0;
+        bool estEnEdition = false;
+        QString remarque = K_INIT_QSTRING;
     };
     
     struct DemandeRemboursementFacture {
-        int id;
-        QString intitule;
-        float montant;
-        QString payeur;
-        QString nomSortie;
-        QString typeDeSortie;
-        QDate date;
-        int annee;
-        bool soumisCe;
-        QString nomFacture;
+        int id = K_INIT_INT_INVALIDE;
+        QString intitule = K_INIT_QSTRING;
+        double montant = 0.0;
+        QString payeur = K_INIT_QSTRING;
+        QString nomSortie = K_INIT_QSTRING;
+        QString typeDeSortie = K_INIT_QSTRING;
+        QDate date = QDate();
+        int annee = K_INIT_INT_INVALIDE;
+        bool soumisCe = false;
+        QString nomFacture = K_INIT_QSTRING;
     };
     typedef QList<DemandeRemboursementFacture> ListeDemandeRemboursementFacture;
 
     struct StatsHeuresDeVol {
-        QString mois;
-        int minutesEntrainement;
-        int minutesSortie;
-        int minutesBalade;
+        QString mois = K_INIT_QSTRING;
+        int minutesEntrainement = K_INIT_INT;
+        int minutesSortie = K_INIT_INT;
+        int minutesBalade = K_INIT_INT;
     };
     typedef QList< StatsHeuresDeVol> ListeStatsHeuresDeVol;
 
     struct VolSortieOuBalade {
-        QString nomVol = "";
-        float montantSubventionAttendu = 0;
-        bool volAAuMoinsUnPaiement = 0;
+        QString nomVol = K_INIT_QSTRING;
+        double montantSubventionAttendu = K_INIT_INT;
+        bool volAAuMoinsUnPaiement = K_INIT_INT;
     };
     typedef QList<VolSortieOuBalade> ListeVolSortieOuBalade;
 
     struct StatsHeuresDeVolParActivite {
-        QString piloteId;
-        QString nomPrenomPilote;
+        QString piloteId = K_INIT_QSTRING;
+        QString nomPrenomPilote = K_INIT_QSTRING;
 
-        int minutesVolAvion;
-        int minutesVolAvionElectrique;
-        int minutesVolUlm;
-        int minutesVolPlaneur;
-        int minutesVolHelicoptere;
+        int minutesVolAvion = K_INIT_INT;
+        int minutesVolAvionElectrique = K_INIT_INT;
+        int minutesVolUlm = K_INIT_INT;
+        int minutesVolPlaneur = K_INIT_INT;
+        int minutesVolHelicoptere = K_INIT_INT;
 
-        float subventionVolAvion;
-        float subventionVolAvionElectrique;
-        float subventionVolUlm;
-        float subventionVolPlaneur;
-        float subventionVolHelicoptere;
+        double subventionVolAvion = 0.0;
+        double subventionVolAvionElectrique = 0.0;
+        double subventionVolUlm = 0.0;
+        double subventionVolPlaneur = 0.0;
+        double subventionVolHelicoptere = 0.0;
 
-        float coutVolAvion;
-        float coutVolAvionElectrique;
-        float coutVolUlm;
-        float coutVolPlaneur;
-        float coutVolHelicoptere;
+        double coutVolAvion = 0.0;
+        double coutVolAvionElectrique = 0.0;
+        double coutVolUlm = 0.0;
+        double coutVolPlaneur = 0.0;
+        double coutVolHelicoptere = 0.0;
     };
     static const StatsHeuresDeVolParActivite K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES;
     typedef QList< StatsHeuresDeVolParActivite> ListeStatsHeuresDeVolParActivite;
 
     struct ParametresMetier {
-        float montantSubventionEntrainement;
-        float montantCotisationPilote;
-        float proportionRemboursementEntrainement;
-        float proportionRemboursementBalade;
-        float plafondHoraireRemboursementEntrainement;
-        float proportionParticipationBalade;
-        QString nomTresorier;
-        int delaisDeGardeBdd;
-        QString objetMailDispoCheques;
-        QString texteMailDispoCheques;
-        QString objetMailSubventionRestante;
-        QString texteMailSubventionRestante;
-        QString objetMailAutresMailings;
+        double montantSubventionEntrainement = 0.0;
+        double montantCotisationPilote = 0.0;
+        double proportionRemboursementEntrainement = 0.0;
+        double proportionRemboursementBalade = 0.0;
+        double plafondHoraireRemboursementEntrainement = 0.0;
+        double proportionParticipationBalade = 0.0;
+        QString nomTresorier = K_INIT_QSTRING;
+        int delaisDeGardeBdd = K_INIT_INT;
+        QString objetMailDispoCheques = K_INIT_QSTRING;
+        QString texteMailDispoCheques = K_INIT_QSTRING;
+        QString objetMailSubventionRestante = K_INIT_QSTRING;
+        QString texteMailSubventionRestante = K_INIT_QSTRING;
+        QString objetMailAutresMailings = K_INIT_QSTRING;
     };
 
     struct ParametresImpression {
-        QString imprimante;
-        QPrinter::ColorMode modeCouleurImpression;
-        int resolutionImpression;
-        bool forcageImpressionRecto;
+        QString imprimante = K_INIT_QSTRING;
+        QPrinter::ColorMode modeCouleurImpression = QPrinter::GrayScale;
+        int resolutionImpression = K_INIT_INT;
+        bool forcageImpressionRecto = false;
     };
 
     struct ParametresSysteme {
-        QString cheminStockageBdd;
-        QString cheminStockageFacturesTraitees;
-        QString cheminStockageFacturesATraiter;
-        QString cheminSortieFichiersGeneres;
-        QString nomBdd;
-        QString loginSiteDaca;
-        QString motDePasseSiteDaca;
-        int periodiciteVerificationPresenceFactures;
-        int margesHautBas;
-        int margesGaucheDroite;
+        QString cheminStockageBdd = K_INIT_QSTRING;
+        QString cheminStockageFacturesTraitees = K_INIT_QSTRING;
+        QString cheminStockageFacturesATraiter = K_INIT_QSTRING;
+        QString cheminSortieFichiersGeneres = K_INIT_QSTRING;
+        QString nomBdd = K_INIT_QSTRING;
+        QString loginSiteDaca = K_INIT_QSTRING;
+        QString motDePasseSiteDaca = K_INIT_QSTRING;
+        int periodiciteVerificationPresenceFactures = K_INIT_INT;
+        int margesHautBas = K_INIT_INT;
+        int margesGaucheDroite = K_INIT_INT;
         ParametresImpression parametresImpression;
-        bool autoriserReglementParVirement;
-        bool utiliserRessourcesHtmlInternes;
+        bool autoriserReglementParVirement = false;
+        bool utiliserRessourcesHtmlInternes = false;
     };
 
     struct TotauxRecettes {
-        double cotisations;
-        double balades;
-        double sorties;
+        double cotisations = 0.0;
+        double balades = 0.0;
+        double sorties = 0.0;
     };
     static const TotauxRecettes K_INIT_TOTAUX_RECETTE;
 
     struct DonneesFacture
     {
-        QDate dateDuVol;
-        QTime dureeDuVol;
-        float coutDuVol;
-        QString immat;
-        int pageDansLeFichierPdf;
+        QDate dateDuVol = QDate();
+        QTime dureeDuVol = QTime();
+        double coutDuVol = 0.0;
+        QString immat = K_INIT_QSTRING;
+        int pageDansLeFichierPdf = K_INIT_INT;
     };
     static const DonneesFacture K_INIT_DONNEES_FACTURE;
     typedef QList<DonneesFacture> ListeDonneesFacture;
 
     struct StatsPilotes
     {
-        int nbBrevete;
-        int nbNonBrevete;
-        int nbOuvranDroit;
-        int nbAyantDroit;
+        int nbBrevete = K_INIT_INT;
+        int nbNonBrevete = K_INIT_INT;
+        int nbOuvranDroit = K_INIT_INT;
+        int nbAyantDroit = K_INIT_INT;
     };
     static const StatsPilotes K_INIT_DONNEES_STATS_PILOTES;
 
     struct StatsAeronef
     {
-        QString immat;
-        QString type;
-        int nombreMinutesVol;
+        QString immat = K_INIT_QSTRING;
+        QString type = K_INIT_QSTRING;
+        int nombreMinutesVol = K_INIT_INT;
     };
     static const StatsAeronef K_INIT_STAT_AERONEF;
     typedef QList<StatsAeronef> StatsAeronefs;
 
     struct DetailsBaladesEtSorties
     {
-        int volId;
-        int idSortie;
-        int idRecette;
+        int volId = K_INIT_INT_INVALIDE;
+        int idSortie = K_INIT_INT_INVALIDE;
+        int idRecette = K_INIT_INT_INVALIDE;
         QDate dateVol;
-        int dureeVol;
-        float coutVol;
-        float montantRembouse;
-        QString nomPassagers;
-        QString intituleRecette;
-        float montantRecette;
-        QString nomSortie;
+        int dureeVol = K_INIT_INT;
+        double coutVol = 0.0;
+        double montantRembouse = 0.0;
+        QString nomPassagers = K_INIT_QSTRING;
+        QString intituleRecette = K_INIT_QSTRING;
+        double montantRecette = 0.0;
+        QString nomSortie = K_INIT_QSTRING;
     };
     static const DetailsBaladesEtSorties K_INIT_DETAILS_BALADES_ET_SORTIES;
     typedef QList<DetailsBaladesEtSorties> ListeDetailsBaladesEtSorties;
 
     struct CleStringValeur
     {
-        QString cle = "";
-        QString texte = "";
-        QString idPilote = "";
+        QString cle = K_INIT_QSTRING;
+        QString texte = K_INIT_QSTRING;
+        QString idPilote = K_INIT_QSTRING;
     };
     typedef QList<CleStringValeur> ListeCleStringValeur;
     struct DonneesFacturesDaca
     {
-        ListeCleStringValeur listePilotes;
-        ListeCleStringValeur listePilotesNonConnus;
-        QList<QDate> listeMoisAnnees;
+        ListeCleStringValeur listePilotes = ListeCleStringValeur();
+        ListeCleStringValeur listePilotesNonConnus = ListeCleStringValeur();
+        QList<QDate> listeMoisAnnees = QList<QDate>();
     };
 
     struct IdentifiantFacture
     {
-        QDate moisAnnee;
-        QString pilote;
-        QString idPilote;
-        QString nomPrenomPilote;
+        QDate moisAnnee = QDate();
+        QString pilote = K_INIT_QSTRING;
+        QString idPilote = K_INIT_QSTRING;
+        QString nomPrenomPilote = K_INIT_QSTRING;
     };
 
     struct GroupeBaladesEtSortiesAssociees
     {
-        QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques;
-        QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettesUniques;
+        QVector<AeroDmsTypes::DetailsBaladesEtSorties> volsUniques = QVector<AeroDmsTypes::DetailsBaladesEtSorties>();
+        QVector<AeroDmsTypes::DetailsBaladesEtSorties> recettesUniques = QVector<AeroDmsTypes::DetailsBaladesEtSorties>();
     };
 
     struct BaladesEtSortiesParId
     {
-        int idSortie = 0;
-        int nombreDeLignes = 0;
+        int idSortie = K_INIT_INT;
+        int nombreDeLignes = K_INIT_INT;
         QVector<GroupeBaladesEtSortiesAssociees> baladesEtSortiesAssociees = QVector<GroupeBaladesEtSortiesAssociees>();
     };
     typedef QVector<BaladesEtSortiesParId> ListeBaladesEtSortiesParIdSortie;
 
     struct ResolutionEtParametresStatistiques
     {
-        QSize tailleMiniImage;
-        int tailleDePolice;
+        QSize tailleMiniImage = QSize();
+        int tailleDePolice = K_INIT_INT;
     };
     static const ResolutionEtParametresStatistiques K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES;
 
     struct TailleFichier
     {
-        quint64 compresse = 0;
-        quint64 nonCompresse = 0;
+        quint64 compresse = K_INIT_INT;
+        quint64 nonCompresse = K_INIT_INT;
     };
     struct TailleFichiers
     {
-        TailleFichier total;
-        TailleFichier svg;
-        TailleFichier png;
-        TailleFichier autres;
-        TailleFichier html;
+        TailleFichier total = TailleFichier();
+        TailleFichier svg = TailleFichier();
+        TailleFichier png = TailleFichier();
+        TailleFichier autres = TailleFichier();
+        TailleFichier html = TailleFichier();
     };
 
     enum Icone

@@ -801,7 +801,7 @@ const QString PdfRenderer::produireFichierPdfGlobal()
         "Formulaire de demande de subvention");
 }
 
-void PdfRenderer::remplirLeChampMontant(QString &p_html, const float p_montant) const
+void PdfRenderer::remplirLeChampMontant(QString &p_html, const double p_montant) const
 {
     QString montantARembourser = QString::number(p_montant, 'f', 2);
     QString partieEntiere;
@@ -1403,7 +1403,7 @@ AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolutio
         QPageLayout pageLayout(QPageLayout(QPageSize(QPageSize::A4),
             QPageLayout::Landscape,
             p_marges));
-        const float ratio = pageLayout.paintRect().height() / pageLayout.paintRect().width();
+        const double ratio = pageLayout.paintRect().height() / pageLayout.paintRect().width();
         resolutionEtParametres.tailleMiniImage.setHeight(resolutionEtParametres.tailleMiniImage.width()*ratio - p_marges.top() - p_marges.bottom());
     }
 

@@ -17,94 +17,100 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
 #include "AeroDmsTypes.h"
 
-const AeroDmsTypes::TotauxRecettes AeroDmsTypes::K_INIT_TOTAUX_RECETTE = { 0.0, 0.0, 0.0 };
+const QString AeroDmsTypes::K_INIT_QSTRING = "";
+const int AeroDmsTypes::K_INIT_INT_INVALIDE = -1;
+const int AeroDmsTypes::K_INIT_INT = 0;
+
+const AeroDmsTypes::TotauxRecettes AeroDmsTypes::K_INIT_TOTAUX_RECETTE = { 0.0, 
+                                                                           0.0, 
+                                                                           0.0 };
 
 const AeroDmsTypes::HeureDeVolRemboursement AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT = { 0.0, 
                                                                                                 0.0, 
                                                                                                 "0h00",
                                                                                                 0 };
 
-const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { "", 0, "", "", "", 0.0,
+const AeroDmsTypes::SubventionsParPilote AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE = { K_INIT_QSTRING, K_INIT_INT, K_INIT_QSTRING, K_INIT_QSTRING, K_INIT_QSTRING, 0.0,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT ,
 																						AeroDmsTypes::K_INIT_HEURE_DE_VOL_REMBOURSEMENT };
-const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { "",//QString idPilote;
+const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { K_INIT_QSTRING,//QString idPilote;
                                                      QDate() ,//QDate date;
-                                                     "",//QString nomPilote;
-                                                     "",//QString prenomPilote;
+                                                     K_INIT_QSTRING,//QString nomPilote;
+                                                     K_INIT_QSTRING,//QString prenomPilote;
                                                      "0h00",//QString typeDeVol;
-                                                     "",//QString duree;
-                                                     "",//QString remarque;
-                                                     "",//QString immat;
-                                                     "",//QString activite;
-                                                     "",//QString estSoumisCe;
+                                                     K_INIT_QSTRING,//QString duree;
+                                                     K_INIT_QSTRING,//QString remarque;
+                                                     K_INIT_QSTRING,//QString immat;
+                                                     K_INIT_QSTRING,//QString activite;
+                                                     K_INIT_QSTRING,//QString estSoumisCe;
                                                      false,//bool estSoumis
-                                                     0.0,//float coutVol;
-                                                     0.0,//float montantRembourse;
-                                                     0,//int volId;
-                                                     0,//int dureeEnMinutes;
-                                                     -1,//int baladeId;
-                                                     -1//int facture
+                                                     0.0,//double coutVol;
+                                                     0.0,//double montantRembourse;
+                                                     K_INIT_INT,//int volId;
+                                                     K_INIT_INT,//int dureeEnMinutes;
+                                                     K_INIT_INT_INVALIDE,//int baladeId;
+                                                     K_INIT_INT_INVALIDE//int facture
 };
 
 const AeroDmsTypes::DonneesFacture AeroDmsTypes::K_INIT_DONNEES_FACTURE = { QDate(),
                                                                             QTime(),
                                                                             0.0,
                                                                             QString(),
-                                                                            0
+                                                                            K_INIT_INT
 };
 
-const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { "", //QString idPilote;
-                                                           "", //QString nom;
-                                                           "", //QString prenom;
-                                                           "", //QString aeroclub;
-                                                           0, // int idAeroclub;
-                                                           "", //QString activitePrincipale;
+const AeroDmsTypes::Pilote AeroDmsTypes::K_INIT_PILOTE = { K_INIT_QSTRING, //QString idPilote;
+                                                           K_INIT_QSTRING, //QString nom;
+                                                           K_INIT_QSTRING, //QString prenom;
+                                                           K_INIT_QSTRING, //QString aeroclub;
+                                                           K_INIT_INT, // int idAeroclub;
+                                                           K_INIT_QSTRING, //QString activitePrincipale;
                                                            false, //bool estAyantDroit;
-                                                           "", //QString mail;
-                                                           "", //QString telephone;
-                                                           "", //QString remarque;
+                                                           K_INIT_QSTRING, //QString mail;
+                                                           K_INIT_QSTRING, //QString telephone;
+                                                           K_INIT_QSTRING, //QString remarque;
                                                            false, //bool estActif;
                                                            false //bool estPiloteBrevete;
 };
 
-const AeroDmsTypes::Club AeroDmsTypes::K_INIT_CLUB = { 0, //int idAeroclub;
-                                                       "", //QString aeroclub;
+const AeroDmsTypes::Club AeroDmsTypes::K_INIT_CLUB = { K_INIT_INT, //int idAeroclub;
+                                                       K_INIT_QSTRING, //QString aeroclub;
                                                        "LF", //QString aerodrome;
-                                                       "", //QString raisonSociale;
-                                                       "", //QString iban;
-                                                       "", //QString bic;
+                                                       K_INIT_QSTRING, //QString raisonSociale;
+                                                       K_INIT_QSTRING, //QString iban;
+                                                       K_INIT_QSTRING, //QString bic;
 };
 
 const AeroDmsTypes::StatsPilotes AeroDmsTypes::K_INIT_DONNEES_STATS_PILOTES =
 {
-    0,
-    0,
-    0,
-    0
+    K_INIT_INT,
+    K_INIT_INT,
+    K_INIT_INT,
+    K_INIT_INT
 };
 
 const AeroDmsTypes::StatsAeronef AeroDmsTypes::K_INIT_STAT_AERONEF = 
 {
-    "",
-    "",
-    0
+    K_INIT_QSTRING,
+    K_INIT_QSTRING,
+    K_INIT_INT
 };
 
 const AeroDmsTypes::DetailsBaladesEtSorties AeroDmsTypes::K_INIT_DETAILS_BALADES_ET_SORTIES =
 {
-    -1,
-    -1,
-    -1,
+    K_INIT_INT_INVALIDE,
+    K_INIT_INT_INVALIDE,
+    K_INIT_INT_INVALIDE,
     QDate(),
-    0,
+    K_INIT_INT,
     0.0,
     0.0,
-    "",
-    "",
+    K_INIT_QSTRING,
+    K_INIT_QSTRING,
     0.0,
-    ""
+    K_INIT_QSTRING
 };
 
 const AeroDmsTypes::ResolutionEtParametresStatistiques AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES =
@@ -115,25 +121,25 @@ const AeroDmsTypes::ResolutionEtParametresStatistiques AeroDmsTypes::K_INIT_RESO
 
 const AeroDmsTypes::StatsHeuresDeVolParActivite AeroDmsTypes::K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES =
 {
-    "" ,//QString piloteId;
-    "",//QString nomPrenomPilote;
+    K_INIT_QSTRING ,//QString piloteId;
+    K_INIT_QSTRING,//QString nomPrenomPilote;
 
-    0,//int minutesVolAvion;
-    0,//int minutesVolAvionElectrique;
-    0,//int minutesVolUlm;
-    0,//int minutesVolPlaneur;
-    0,//int minutesVolHelicoptere;
+    K_INIT_INT,//int minutesVolAvion;
+    K_INIT_INT,//int minutesVolAvionElectrique;
+    K_INIT_INT,//int minutesVolUlm;
+    K_INIT_INT,//int minutesVolPlaneur;
+    K_INIT_INT,//int minutesVolHelicoptere;
 
-    0.0,//float subventionVolAvion;
-    0.0,//float subventionVolAvionElectrique;
-    0.0,//float subventionVolUlm;
-    0.0,//float subventionVolPlaneur;
-    0.0,//float subventionVolHelicoptere;
+    0.0,//double subventionVolAvion;
+    0.0,//double subventionVolAvionElectrique;
+    0.0,//double subventionVolUlm;
+    0.0,//double subventionVolPlaneur;
+    0.0,//double subventionVolHelicoptere;
 
-    0.0,//float coutVolAvion;
-    0.0,//float coutVolAvionElectrique;
-    0.0,//float coutVolUlm;
-    0.0,//float coutVolPlaneur;
-    0.0,//float coutVolHelicoptere;
+    0.0,//double coutVolAvion;
+    0.0,//double coutVolAvionElectrique;
+    0.0,//double coutVolUlm;
+    0.0,//double coutVolPlaneur;
+    0.0,//double coutVolHelicoptere;
 };
 

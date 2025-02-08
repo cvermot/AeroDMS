@@ -44,7 +44,7 @@ private:
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	static AeroDmsTypes::ListeDonneesFacture extraireDonneesGenerique1Passe(std::vector<PoDoFo::PdfTextEntry> p_entries, const unsigned p_noPage);
 	
-	static const float recupererMontantAca(QString p_chaine);
+	static const double recupererMontantAca(QString p_chaine);
 
 	static const QDate extraireDateRegex(const QString p_date);
 	static const QDate extraireDateTiretsUsRegex(const QString p_date);

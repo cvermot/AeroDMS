@@ -26,8 +26,8 @@ class DialogueAjouterCotisation : public QDialog
 
 public:
     DialogueAjouterCotisation( ManageDb* db, 
-                               const float p_montantCotisation, 
-                               const float p_budgetEntrainement, 
+                               const double p_montantCotisation, 
+                               const double p_budgetEntrainement, 
                                QWidget* parent = nullptr);
 
     void mettreAJourLeContenuDeLaFenetre();
@@ -35,7 +35,7 @@ public:
 
     void editerLaCotisation( const QString p_pilote, 
                              const int p_annee,
-                             const float p_montantSubventionDejaAlloue);
+                             const double p_montantSubventionDejaAlloue);
 
 private:
     QComboBox* listePilote = nullptr;
@@ -50,8 +50,8 @@ private:
     QPushButton* cancelButton = nullptr;
     QPushButton* okButton = nullptr;
 
-    float montantCotisation = 0;
-    float budgetEntrainement = 0;
+    double montantCotisation = 0;
+    double budgetEntrainement = 0;
 
     bool modeEdition = false;
 

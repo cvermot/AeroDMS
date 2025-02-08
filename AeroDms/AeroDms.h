@@ -96,7 +96,7 @@ private:
     void afficherEtatImpression(const AeroDmsTypes::EtatImpression p_etatImpression);
     const QString texteSubventionRestante();
 
-    const float calculerCoutHoraire();
+    const double calculerCoutHoraire();
     const int calculerValeurGraphAGenererPdf();
     
     const QString rechercherDerniereDemande();
@@ -293,7 +293,7 @@ private:
     //Données internes
     //Gestion des actions métier
     QString piloteAEditer = "";
-    float montantSubventionDejaAlloue = 0.0;
+    double montantSubventionDejaAlloue = 0.0;
     int anneeAEditer = 0;
     int volAEditer = -1;
     AeroDmsTypes::SubventionAAnoter subventionAAnoter;

@@ -224,12 +224,12 @@ void AeroDms::lireParametresEtInitialiserBdd()
     QString valeur = settings.value("siteDaca/password", "").toString();
     parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
 
-    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toFloat();
-    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toFloat();
-    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "0.5").toFloat();
-    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "150").toFloat();
-    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toFloat();
-    parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toFloat();
+    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toDouble();
+    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toDouble();
+    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "0.5").toDouble();
+    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "150").toDouble();
+    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toDouble();
+    parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toDouble();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
@@ -1555,11 +1555,11 @@ void AeroDms::initialiserMenuAide()
             + tr("Cette fenêtre fournit des informations sur les ressources occupées par les données internes à l'application.")
             + "<table border='1' cellspacing='0' cellpadding='3'>"
             + "<tr><th>Element</th><th>Taille compressée</th><th>Taille non compressée</th><th>Taux</th></tr>"
-            + "<tr><td>SVG</td><td>" + QString::number((float)tailleFichiers.svg.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.svg.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.svg.nonCompresse - tailleFichiers.svg.compresse) / tailleFichiers.svg.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
-            + "<tr><td>PNG/WEBP</td><td>" + QString::number((float)tailleFichiers.png.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.png.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.png.nonCompresse - tailleFichiers.png.compresse) / tailleFichiers.png.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
-            + "<tr><td>HTML</td><td>" + QString::number((float)tailleFichiers.html.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.html.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.html.nonCompresse - tailleFichiers.html.compresse) / tailleFichiers.html.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
-            + "<tr><td>Autres</td><td>" + QString::number((float)tailleFichiers.autres.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.autres.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.autres.nonCompresse - tailleFichiers.autres.compresse) / tailleFichiers.autres.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
-            + "<tr><td><b>Total</b></td><td>" + QString::number((float)tailleFichiers.total.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((float)tailleFichiers.total.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((float)(tailleFichiers.total.nonCompresse - tailleFichiers.total.compresse) / tailleFichiers.total.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>SVG</td><td>" + QString::number((double)tailleFichiers.svg.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((double)tailleFichiers.svg.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((double)(tailleFichiers.svg.nonCompresse - tailleFichiers.svg.compresse) / tailleFichiers.svg.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>PNG/WEBP</td><td>" + QString::number((double)tailleFichiers.png.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((double)tailleFichiers.png.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((double)(tailleFichiers.png.nonCompresse - tailleFichiers.png.compresse) / tailleFichiers.png.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>HTML</td><td>" + QString::number((double)tailleFichiers.html.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((double)tailleFichiers.html.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((double)(tailleFichiers.html.nonCompresse - tailleFichiers.html.compresse) / tailleFichiers.html.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td>Autres</td><td>" + QString::number((double)tailleFichiers.autres.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((double)tailleFichiers.autres.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((double)(tailleFichiers.autres.nonCompresse - tailleFichiers.autres.compresse) / tailleFichiers.autres.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
+            + "<tr><td><b>Total</b></td><td>" + QString::number((double)tailleFichiers.total.compresse / 1024, 'f', 2) + " ko</td><td>" + QString::number((double)tailleFichiers.total.nonCompresse / 1024, 'f', 2) + " ko</td><td>" + QString::number(((double)(tailleFichiers.total.nonCompresse - tailleFichiers.total.compresse) / tailleFichiers.total.nonCompresse) * 100, 'f', 2) + " %</td></tr>"
             + "</table>");
         });
 
@@ -1981,7 +1981,7 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
 
         QTableWidgetItem* item = vuePilotes->item(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE);
-        const float proportionConsommationSubvention = subvention.entrainement.montantRembourse / subvention.montantSubventionEntrainement;
+        const double proportionConsommationSubvention = subvention.entrainement.montantRembourse / subvention.montantSubventionEntrainement;
         item->setToolTip(tr("Subvention entrainement restante pour ce pilote : ")
             + QString::number(subvention.montantSubventionEntrainement - subvention.entrainement.montantRembourse)
             + tr(" € (subvention consommée : ")
@@ -3027,9 +3027,9 @@ void AeroDms::enregistrerUnVol()
         //3) on enregistre le vol en BDD    
 		if (!estEnEchec)
 		{
-			float subventionRestante = db->recupererSubventionRestante(idPilote, anneeRenseignee);
+			double subventionRestante = db->recupererSubventionRestante(idPilote, anneeRenseignee);
 			//On initialise le montant subventionné sur la base du prix du vol (cas vols type sortie)
-			float montantSubventionne = prixDuVol->value();
+			double montantSubventionne = prixDuVol->value();
 			if (typeDeVol->currentText() == "Balade")
 			{
 				montantSubventionne = prixDuVol->value() * parametresMetiers.proportionRemboursementBalade;
@@ -3037,7 +3037,7 @@ void AeroDms::enregistrerUnVol()
 			//Si on est en vol d'entrainement, calculs spécifiques et enregistrement spécifique
 			if (typeDeVol->currentText() == "Entrainement")
 			{
-				float coutHoraire = calculerCoutHoraire();
+				double coutHoraire = calculerCoutHoraire();
 				if (coutHoraire > parametresMetiers.plafondHoraireRemboursementEntrainement)
 				{
 					coutHoraire = parametresMetiers.plafondHoraireRemboursementEntrainement;
@@ -3211,7 +3211,7 @@ Saisie non prise en compte."));
     peuplerListeBaladesEtSorties();
 }
 
-const float AeroDms::calculerCoutHoraire()
+const double AeroDms::calculerCoutHoraire()
 {
     return (prixDuVol->value() / (dureeDuVol->time().hour() * 60.0 + dureeDuVol->time().minute())) * 60.0;
 }
@@ -3376,14 +3376,14 @@ void AeroDms::peuplerListeBaladesEtSorties()
 
 void AeroDms::traiterClicSurVolBaladesEtSorties()
 {
-    float montantRecetteAttendu = 0;
+    double montantRecetteAttendu = 0;
 
     //On somme les montants des vols cochés
     for (int i = 0; i < listeBaladesEtSorties->count(); i++)
     {
         if (listeBaladesEtSorties->item(i)->checkState() == Qt::Checked)
         {
-            montantRecetteAttendu = montantRecetteAttendu + listeBaladesEtSorties->item(i)->data(Qt::UserRole).toFloat();
+            montantRecetteAttendu = montantRecetteAttendu + listeBaladesEtSorties->item(i)->data(Qt::UserRole).toDouble();
         }
     }
 
@@ -3431,7 +3431,7 @@ void AeroDms::prevaliderDonnnesSaisies()
         for (int i = 0; i < vueVolsDetectes->rowCount(); i++)
         {
             const int dureeDuVol = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DUREE)->data(Qt::UserRole).toInt();
-            const float coutDuVol = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->data(Qt::UserRole).toFloat();
+            const double coutDuVol = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_MONTANT)->data(Qt::UserRole).toDouble();
             const QString date = vueVolsDetectes->item(i, AeroDmsTypes::VolsDetectesTableElement_DATE)->data(Qt::UserRole).toString();
             const bool volSembleExisterEnDb = db->volSembleExistantEnBdd(choixPilote->currentData().toString(), dureeDuVol, date, coutDuVol);
             
@@ -3570,8 +3570,6 @@ void AeroDms::aPropos()
     }
     const QTime heure = QTime::fromString(__TIME__);
 
-    
-
     QMessageBox::about(this, tr("À propos de ") + QApplication::applicationName(),
         "<b>" + QApplication::applicationName() + " v" + QApplication::applicationVersion() + "</b> <br/>" 
         + "Version compilée le " + date.toString("dd/MM/yyyy") + " à " + heure.toString("hh'h'mm") + " <br/><br/> "
@@ -3614,7 +3612,7 @@ void AeroDms::menuContextuelPilotes(const QPoint& pos)
         piloteAEditer = vuePilotes->item( ligneSelectionnee, 
                                           AeroDmsTypes::PiloteTableElement_PILOTE_ID)->text();
         montantSubventionDejaAlloue = vuePilotes->item( ligneSelectionnee,
-                                                         AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE)->text().remove(" €").toFloat();
+                                                         AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE)->text().remove(" €").toDouble();
         anneeAEditer = vuePilotes->item( ligneSelectionnee,
                                          AeroDmsTypes::PiloteTableElement_ANNEE)->text().toInt();
 
