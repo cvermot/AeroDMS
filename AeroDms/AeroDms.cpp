@@ -613,6 +613,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
     //  -podofo.dll : mise à jour de la librairie PDF et des librairies associées
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
          || uneMaJEstDisponible(dossierAVerifier, "AeroDmsLauncher.exe")
+         || uneMaJEstDisponible(dossierAVerifier, "Aero.exe")
          || uneMaJEstDisponible(dossierAVerifier, "Qt6Core.dll")
          || uneMaJEstDisponible(dossierAVerifier, "podofo.dll"))
     {
@@ -4148,10 +4149,20 @@ void AeroDms::envoyerMail()
 
 const bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_fichier)
 { 
-    QString fichier = p_chemin + p_fichier;
-    if (QFile().exists(fichier))
+    const QString cheminFichierDistant = p_chemin + p_fichier;
+    const QString cheminFichierLocal = QCoreApplication::applicationDirPath() + "/" + p_fichier;
+
+    if (QFile().exists(cheminFichierDistant))
     {
-        QFile fichierDistant(fichier);
+        //Si le fichier existant en distant, mais pas en local, alors
+        //il faut mettre à jour
+        if (QFile().exists(cheminFichierLocal))
+        {
+            return true;
+        }
+
+        //Sinon, on calcul les checksum pour voir s'il faut mettre à jour
+        QFile fichierDistant(cheminFichierDistant);
         if (fichierDistant.open(QFile::ReadOnly))
         {
             QString hashFichierDistant = "";
@@ -4163,12 +4174,12 @@ const bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_
             hash.reset();
 
             //Calcul de la somme de contrôle du fichier courant
-            QFile fichierCourant(QCoreApplication::applicationDirPath()+"/"+p_fichier);
+            QFile fichierLocal(cheminFichierLocal);
 
-            if (fichierCourant.open(QFile::ReadOnly))
+            if (fichierLocal.open(QFile::ReadOnly))
             {
                 QString hashFichierCourant = "";
-                if (hash.addData(&fichierCourant))
+                if (hash.addData(&fichierLocal))
                 {
                     hashFichierCourant = hash.result().toHex();
 
@@ -4197,30 +4208,66 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     progressionMiseAJour->setMinimumSize(QSize(300, 150));
     connect(boutonProgressionMiseAJour, &QPushButton::clicked, this, &QCoreApplication::quit);
 
+    int nombreDeFichiers = 0;
     progressionMiseAJour->setMaximum(1);
     progressionMiseAJour->setValue(0);
     progressionMiseAJour->show();
 
-    //Comptage des fichiers
-    QDirIterator it(p_chemin, QStringList() << "*", QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-    int nombreDeFichiers = 0;
-    while (it.hasNext())
+    const QRegularExpression ini("^.*\\.ini$");
+    const QRegularExpression sqlite("^.*\\.sqlite");
+    const QRegularExpression pdf("^.*\\.pdf");
+
+    //1) On fait du ménage : tous les fichiers locaux qui ne sont 
+    //   ni .sqlite ni .ini ni .pdf sont préfixés en xxx_
+    //   Ils seront supprimés au lancement suivant d'AeroDMS
     {
-        it.next();
-        nombreDeFichiers++;
+        QDirIterator it("./",
+            QStringList() << "*",
+            QDir::Files | QDir::NoDotAndDotDot,
+            QDirIterator::Subdirectories);
+
+        while (it.hasNext())
+        {
+            QString fichier = it.next();
+            //On ne replace pas les éventuels fichiers .ini ou .sqlite qui seraient présents dans le répertoire d'update
+            if (!fichier.contains(ini)
+                && !fichier.contains(sqlite)
+                && !fichier.contains(pdf))
+            {
+                QFileInfo infosFichierLocal(fichier);
+                QString nouveauNomFichierLocal = infosFichierLocal.path() + "/xxx_" + infosFichierLocal.fileName();
+
+                QFile::rename(fichier, nouveauNomFichierLocal);
+            }
+        }
     }
 
+    //2) Comptage des fichiers a recopier
+    {
+        QDirIterator it(p_chemin,
+            QStringList() << "*",
+            QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot,
+            QDirIterator::Subdirectories);
+        
+        while (it.hasNext())
+        {
+            it.next();
+            nombreDeFichiers++;
+        }
+    }
+    
     progressionMiseAJour->setMaximum(nombreDeFichiers);
     progressionMiseAJour->setValue(0);
 
+    //3) on effectue la recopie
     //Pas de fonction reset de l'itérateur dans QDirIterator... on redémarre via un nouveau scope
     {
         int etapeMiseAJour = 0;
 
-        QDirIterator it(p_chemin, QStringList() << "*", QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot, QDirIterator::Subdirectories);
-
-        QRegularExpression ini("^.*\\.ini$");
-        QRegularExpression sqlite("^.*\\.sqlite");
+        QDirIterator it(p_chemin, 
+            QStringList() << "*", 
+            QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot, 
+            QDirIterator::Subdirectories);
 
         //Pour chaque élément présente dans p_chemin, on vérifie s'il existe dans l'arborescence locale
         //Si c'est le cas on renomme le fichier local en suffixant par xxx_
@@ -4238,7 +4285,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
                 QString fichierDistant = fichier;
                 fichierLocal.replace(p_chemin, "");
 
-                //Si c'est un dossier, on vérifie son existance, et on le créé si absent.
+                //Si c'est un dossier, on vérifie son existence, et on le créé si absent.
                 if (it.fileInfo().isDir())
                 {
                     if (!QDir(fichierLocal).exists())
@@ -4246,13 +4293,13 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
                         QDir().mkdir(fichierLocal);
                     }
                 }
-                //Sinon, si c'est un fichier, on renomme le précédent et on copy le nouveau
+                //Sinon, si c'est un fichier, on renomme le précédent et on copie le nouveau
                 else if (it.fileInfo().isFile())
                 {
-                    QFileInfo infosFichierLocal(fichierLocal);
-                    QString nouveauNomFichierLocal = infosFichierLocal.path() + "/xxx_" + infosFichierLocal.fileName();
+                    //QFileInfo infosFichierLocal(fichierLocal);
+                    //QString nouveauNomFichierLocal = infosFichierLocal.path() + "/xxx_" + infosFichierLocal.fileName();
 
-                    QFile::rename(fichierLocal, nouveauNomFichierLocal);
+                    //QFile::rename(fichierLocal, nouveauNomFichierLocal);
                     QFile::copy(fichierDistant, fichierLocal);
                 }
 

@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDmsLauncher : lanceur pour AeroDms>
-Copyright (C) 2023-2024 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -60,12 +60,25 @@ int main(int argc, char* argv[])
     parser.addOption(versionOption);
     parser.process(app);
 
-    
-
     if (parser.isSet(versionOption))
     {
+        QDate date = QDate::fromString(__DATE__, "MMM dd yyyy");
+        if (!date.isValid())
+        {
+            date = QDate::fromString(__DATE__, "MMM  d yyyy");
+        }
+        const QTime heure = QTime::fromString(__TIME__);
+
         QTextStream(stdout) << "\n";
-        QTextStream(stdout) << "AeroDmsLauncher v" << QApplication::applicationVersion() << "\n";
+        QTextStream(stdout) << "AeroDmsLauncher v" 
+            << QApplication::applicationVersion() 
+            << "\n";
+        QTextStream(stdout) 
+            << "Version compilée le " 
+            << date.toString("dd/MM/yyyy") 
+            << " à " 
+            << heure.toString("hh'h'mm") 
+            << "\n";
     }
     if (parser.isSet(helpOption))
     {
@@ -81,12 +94,12 @@ int main(int argc, char* argv[])
     qputenv("OPENSSL_MODULES", opensslModulesPath.toUtf8());
 
     QString appName = "AeroDms.exe";
-    //Si le nom du lanceur vaut AeroDms.exe, c'est que le binaire à lancer vaut AeroDmsExe
-    //Sinon, on vérifie ce qui existe : si AeroDmsExe existe, on lancera AeroDmsExe
+    //Si le nom du lanceur vaut AeroDms.exe, c'est que le binaire à lancer vaut Aero.exe
+    //Sinon, on vérifie ce qui existe : si Aero.exe existe, on lancera Aero.exe
     if ( QCoreApplication::applicationFilePath().split("/").last() == appName
-         || QFile::exists(QDir::currentPath() + QDir::separator() + "AeroDmsExe"))
+         || QFile::exists(QDir::currentPath() + QDir::separator() + "Aero.exe"))
     {
-        appName = "AeroDmsExe";
+        appName = "Aero.exe";
     }
     //Sinon, on lancer AeroDms.exe
 
@@ -117,7 +130,9 @@ int main(int argc, char* argv[])
         splash->close();
         QMessageBox::critical(nullptr, 
             QApplication::applicationName() + " - Erreur",
-            "L'exécutable principal AeroDms.exe est introuvable dans : " 
+            "L'exécutable principal "
+            + appName 
+            +" est introuvable dans : "
             + program);
         return -1;
     }
