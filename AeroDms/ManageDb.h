@@ -86,10 +86,11 @@ public:
     const QList<QString> recupererListeRecettesNonSoumisesCse( const int p_annee,
         const QString p_typeRecette);
     const AeroDmsTypes::ListeDemandeRemboursementFacture recupererLesDemandesDeRembousementAEmettre(const int p_annee);
-    const AeroDmsTypes::ListeDemandeRemboursementFacture recupererToutesLesDemandesDeRemboursement(const int p_annee = -1);
-    const AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = -1, const int p_option = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
-    const AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = -1);
-    const AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = -1);
+    const AeroDmsTypes::ListeDemandeRemboursementFacture recupererToutesLesDemandesDeRemboursement(const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE);
+    const AeroDmsTypes::ListeStatsHeuresDeVolParActivite recupererHeuresParActivite(const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
+        const int p_option = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
+    const AeroDmsTypes::ListeRecetteDetail recupererRecettesCotisations(const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE);
+    const AeroDmsTypes::ListeRecetteDetail recupererRecettesHorsCotisation(const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE);
     const AeroDmsTypes::TotauxRecettes recupererTotauxRecettes(const int p_annee);
     const AeroDmsTypes::ListeSubventionsParPilotes recupererSubventionsPilotes( const int p_annee,
         const QString p_piloteId,
@@ -98,7 +99,7 @@ public:
     const AeroDmsTypes::SubventionsParPilote recupererTotauxAnnuel( const int p_annee,
         const bool p_volsSoumisUniquement = false);
     const AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
-    const AeroDmsTypes::ListeVols recupererVols( const int p_annee = -1, 
+    const AeroDmsTypes::ListeVols recupererVols( const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
         const QString p_piloteId = "*");
     const AeroDmsTypes::Vol recupererVol(const int p_idVol);
     
@@ -112,7 +113,7 @@ public:
 
     const AeroDmsTypes::ListeVolSortieOuBalade recupererBaladesEtSorties( const QString p_typeDeVol, 
         const double p_proportionRemboursement,
-        const int p_annee = -1 );
+        const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE);
 
     const AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
     const QList<int> recupererAnnees();
@@ -138,7 +139,7 @@ public:
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
     void ajouterNoteSubvention(const int p_idSubventionAAnoter, const QString p_note);
 
-    const AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = -1,
+    const AeroDmsTypes::ListeStatsHeuresDeVol recupererHeuresMensuelles(const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
         const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
     const QString recupererMailPilotes( const int p_annee,
         const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);

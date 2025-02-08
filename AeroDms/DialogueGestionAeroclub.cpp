@@ -74,7 +74,7 @@ DialogueGestionAeroclub::DialogueGestionAeroclub(ManageDb* db, QWidget* parent) 
     bic->setValidator(new UppercaseValidator(bic));
     QLabel* bicLabel = new QLabel(tr("BIC : "), this);
 
-    idAeroclub = -1;
+    idAeroclub = AeroDmsTypes::K_INIT_INT_INVALIDE;
 
     QGridLayout* mainLayout = new QGridLayout(this);
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
@@ -129,7 +129,8 @@ void DialogueGestionAeroclub::peuplerListeAeroclub()
 
     selectionAeroclub->clear();
 
-    selectionAeroclub->addItem("", -1);
+    selectionAeroclub->addItem("", 
+        AeroDmsTypes::K_INIT_INT_INVALIDE);
     for (AeroDmsTypes::Club club : aeroclubs)
     {
         selectionAeroclub->addItem(club.aeroclub, club.idAeroclub);
@@ -162,7 +163,7 @@ void DialogueGestionAeroclub::prevaliderDonneesSaisies()
 
 void DialogueGestionAeroclub::chargerDonneesAeroclub()
 {
-    if (selectionAeroclub->currentData().toInt() != -1)
+    if (selectionAeroclub->currentData().toInt() != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         const AeroDmsTypes::Club aeroclub = database->recupererAeroclub(selectionAeroclub->currentData().toInt());
 
@@ -196,7 +197,7 @@ void DialogueGestionAeroclub::chargerDonneesAeroclub()
 void DialogueGestionAeroclub::annulationOuFinSaisie()
 {
     //On rince en vue de l'éventuel ajout du pilote suivant
-    idAeroclub = -1;
+    idAeroclub = AeroDmsTypes::K_INIT_INT_INVALIDE;
     nomAeroclub->clear();
     raisonSociale->clear();
     iban->clear();

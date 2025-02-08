@@ -136,7 +136,8 @@ void DialogueGestionPilote::peuplerListeAeroclub()
 
     aeroclub->clear();
 
-    aeroclub->addItem("Séléctionner un aéroclub", -1);
+    aeroclub->addItem("Séléctionner un aéroclub", 
+        AeroDmsTypes::K_INIT_INT_INVALIDE);
     for (AeroDmsTypes::Club club : aeroclubs)
     {
         aeroclub->addItem(club.aeroclub, club.idAeroclub);

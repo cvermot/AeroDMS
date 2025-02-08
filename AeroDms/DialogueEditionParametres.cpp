@@ -201,7 +201,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     {
         peuplerResolutionImpression(600);
     }
-    if (resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression) != -1)
+    if (resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression) != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         resolutionImpression->setCurrentIndex(resolutionImpression->findData(p_parametresSysteme.parametresImpression.resolutionImpression));
     }

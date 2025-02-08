@@ -117,9 +117,9 @@ void AeroDms::initialiserBaseApplication()
 
     //========================Initialisation des autres attributs
     piloteAEditer = "";
-    volAEditer = -1;
+    volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
     factureIdEnBdd = 0;
-    subventionAAnoter.id = -1;
+    subventionAAnoter.id = AeroDmsTypes::K_INIT_INT_INVALIDE;
     subventionAAnoter.texteActuel = "";
 }
 
@@ -2080,7 +2080,7 @@ void AeroDms::peuplerTableVols()
     mailingPilotesAyantCotiseCetteAnnee->setEnabled(true);
     //On désactive la génération du récap annuel si on est sur la sélection "Toutes les années"
     //et également le bouton d'envoi des mails aux pilotes de l'année
-    if (listeDeroulanteAnnee->currentData().toInt() == -1)
+    if (listeDeroulanteAnnee->currentData().toInt() == AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         boutonGenerePdfRecapHdv->setEnabled(false);
         mailingPilotesAyantCotiseCetteAnnee->setEnabled(false);
@@ -2310,13 +2310,16 @@ void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
     menuDemandesAGenererAnnees->clear();
-    listeDeroulanteAnnee->addItem("Toutes les années", -1);
+    listeDeroulanteAnnee->addItem("Toutes les années", 
+        AeroDmsTypes::K_INIT_INT_INVALIDE);
 
-    QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES), tr("&Toutes"), this);
+    QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES), 
+        tr("&Toutes"), 
+        this);
     actionToutesLesAnnees->setStatusTip(tr("Générer les demandes pour toutes les années pour lesquelles il existe des entrées en base de données"));
     actionToutesLesAnnees->setCheckable(true);
     actionToutesLesAnnees->setChecked(true);
-    actionToutesLesAnnees->setData(-1);
+    actionToutesLesAnnees->setData(AeroDmsTypes::K_INIT_INT_INVALIDE);
     menuDemandesAGenererAnnees->addAction(actionToutesLesAnnees);
     connect(actionToutesLesAnnees, SIGNAL(triggered()), this, SLOT(gererSelectionAnneeAGenerer()));
 
@@ -2335,7 +2338,7 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     //On affiche de base les infos de l'année courante, et, si pas encore de cotisation sur l'année courante,
     //on affiche la dernière année disponible
 	const int indexAnneeCourante = listeDeroulanteAnnee->findText(QDate::currentDate().toString("yyyy"));
-	if (indexAnneeCourante != -1)
+	if (indexAnneeCourante != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		listeDeroulanteAnnee->setCurrentIndex(indexAnneeCourante);
 	}
@@ -2373,7 +2376,7 @@ const int AeroDms::recupererAnneeAGenerer()
             return action->data().toInt();
         }
     }
-    return -1;
+    return AeroDmsTypes::K_INIT_INT_INVALIDE;
 }
 
 void AeroDms::ajouterUneCotisationEnBdd()
@@ -2495,7 +2498,7 @@ void AeroDms::ajouterUnAeroclubEnBdd()
     {
     case AeroDmsTypes::ResultatCreationBdd_SUCCES:
         {
-            if (club.idAeroclub == -1)
+            if (club.idAeroclub == AeroDmsTypes::K_INIT_INT_INVALIDE)
             {
                 statusBar()->showMessage(tr("Aéroclub ajouté avec succès"));
             }
@@ -2577,7 +2580,7 @@ void AeroDms::chargerUneFactureAvecScan(const QString p_fichier, const bool p_la
     if (!p_fichier.isNull())
     {
         chargerUneFacture(p_fichier, p_laFactureAChargerEstTelechargeeDInternet);
-        idFactureDetectee = -1;
+        idFactureDetectee = AeroDmsTypes::K_INIT_INT_INVALIDE;
 
         //On masque par défaut... on réaffiche si le scan est effectué
         //et qu'il ne retourne par une liste vide
@@ -2603,7 +2606,7 @@ void AeroDms::chargerUneFactureAvecScan(const QString p_fichier, const bool p_la
         }
         
         //Si on passe ici, on est pas en édition de vol
-        volAEditer = -1;
+        volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
         //On restaure le texte du bouton de validation (qui a changé si on était en édition)
         validerLeVol->setText("Valider le vol");
     }
@@ -2700,7 +2703,7 @@ void AeroDms::recupererVolDepuisCsv()
 void AeroDms::chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet)
 {
     
-    factureIdEnBdd = -1;
+    factureIdEnBdd = AeroDmsTypes::K_INIT_INT_INVALIDE;
     pdfDocument->load(p_fichier);
     if (factureRecupereeEnLigneEstNonTraitee == true)
     {
@@ -2755,7 +2758,7 @@ void AeroDms::genererPdf()
 
     const int anneeAGenerer = recupererAnneeAGenerer();
 	QString anneeAGenererTexte = tr("Toutes");
-	if (anneeAGenerer != -1)
+	if (anneeAGenerer != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		anneeAGenererTexte = QString::number(anneeAGenerer) + tr(" seulement");
 	}
@@ -3066,11 +3069,11 @@ void AeroDms::enregistrerUnVol()
                     volAEditer);
                 
                 QString volAjouteModifie = "ajouté";
-                if (volAEditer != -1)
+                if (volAEditer != AeroDmsTypes::K_INIT_INT_INVALIDE)
                 {
                     volAjouteModifie = "modifié";
                     //On sort du mode édition
-                    volAEditer = -1;
+                    volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
                     //Et on recharge la liste déroulante de sélection des pilotes dans laquelle on avait remis les pilotes
                     //inactifs...
                     peuplerListesPilotes();
@@ -3161,10 +3164,10 @@ void AeroDms::enregistrerLesVols()
 
 void AeroDms::supprimerLeVolDeLaVueVolsDetectes()
 {
-    if (idFactureDetectee != -1)
+    if (idFactureDetectee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         factures.remove(idFactureDetectee);
-        idFactureDetectee = -1;
+        idFactureDetectee = AeroDmsTypes::K_INIT_INT_INVALIDE;
         peuplerTableVolsDetectes(factures);
 
         vueVolsDetectes->clearSelection();
@@ -3241,7 +3244,7 @@ void AeroDms::peuplerListesPilotes()
         //Et on met tous les pilotes si on est en mode édition de vol
         //(permet d'éditer le vol d'un pilote inactif)
         if (pilote.estActif
-            || volAEditer != -1)
+            || volAEditer != AeroDmsTypes::K_INIT_INT_INVALIDE)
         {
             choixPilote->addItem(AeroDmsServices::recupererIcone(nomPrenomNorm.at(0)), nomPrenom, pilote.idPilote);
             choixPayeur->addItem(AeroDmsServices::recupererIcone(nomPrenomNorm.at(0)), nomPrenom, pilote.idPilote);
@@ -3250,7 +3253,7 @@ void AeroDms::peuplerListesPilotes()
 
     //Si le pilote précédemment sélectionné existe toujours, on le restaure
     const int index = listeDeroulantePilote->findData(piloteSelectionne);
-    if (index != -1)
+    if (index != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         listeDeroulantePilote->setCurrentIndex(index);
     }
@@ -3261,8 +3264,10 @@ void AeroDms::peuplerListeSorties()
 {
     choixBalade->clear();
     choixBaladeFacture->clear();
-    choixBalade->addItem("", -1);
-    choixBaladeFacture->addItem("", -1);
+    choixBalade->addItem("", 
+        AeroDmsTypes::K_INIT_INT_INVALIDE);
+    choixBaladeFacture->addItem("", 
+        AeroDmsTypes::K_INIT_INT_INVALIDE);
 
     AeroDmsTypes::ListeSortie sorties;
     if (typeDeVol->currentText() == "Balade")
@@ -3408,7 +3413,7 @@ void AeroDms::prevaliderDonnnesSaisies()
     if ( choixPilote->currentIndex() == 0
          || pdfDocument->status() != QPdfDocument::Status::Ready
          || (typeDeVol->currentText() != "Entrainement" )
-         || idFactureDetectee != -1)
+         || idFactureDetectee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         validerLesVols->setEnabled(false);
     }
@@ -3888,7 +3893,7 @@ void AeroDms::supprimerVol()
     }
 
     //On sort du mode suppression de vol
-    volAEditer = -1;
+    volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
 }
 
 void AeroDms::switchModeDebug()
@@ -4420,7 +4425,7 @@ const QString AeroDms::rechercherDerniereDemande()
  
         while (i < fichiers.size() - 2 && !fichierTrouve)
         {
-            //Indice n-1 et n-2 contiennent . et ..
+            //Indice nAeroDmsTypes::K_INIT_INT_INVALIDEet n-2 contiennent . et ..
             fichier = parametresSysteme.cheminSortieFichiersGeneres + "/" + fichiers.at(i) + "/";
             const QDir dirCourant(fichier);
             const QStringList fichierFusionne = dirCourant.entryList(filtre);
@@ -4503,9 +4508,9 @@ void AeroDms::ouvrirPdfGenere()
 
 void AeroDms::deselectionnerVolDetecte()
 {
-    if (idFactureDetectee != -1)
+    if (idFactureDetectee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
-        idFactureDetectee = -1;
+        idFactureDetectee = AeroDmsTypes::K_INIT_INT_INVALIDE;
         //On rince les données de vol
         dureeDuVol->setTime(QTime::QTime(0, 0));
         prixDuVol->setValue(0);
@@ -4978,7 +4983,7 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
         }
     }
 
-    int actionACharger = -1;
+    int actionACharger = AeroDmsTypes::K_INIT_INT_INVALIDE;
     if (sender() == fichierSuivant)
     {
         if (actions.at(actionCourante+1)->data().canConvert<AeroDmsTypes::IdentifiantFacture>())
@@ -5004,7 +5009,7 @@ void AeroDms::demanderTelechagementFactureSuivanteOuPrecedente()
         //Sinon -1, valeur d'init
     }
     
-    if (actionACharger != -1)
+    if (actionACharger != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         actionFactureDacaEnCours = actions.at(actionACharger);
         AeroDmsTypes::IdentifiantFacture identifiant = actions.at(actionACharger)->data().value<AeroDmsTypes::IdentifiantFacture>();

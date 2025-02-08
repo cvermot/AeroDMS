@@ -157,7 +157,7 @@ void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
     const double p_montantSubventionDejaAlloue)
 {
     int index = listePilote->findData(p_pilote);
-    if (index != -1) {
+    if (index != AeroDmsTypes::K_INIT_INT_INVALIDE) {
         listePilote->setCurrentIndex(index);
     }
 

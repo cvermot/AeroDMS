@@ -42,7 +42,7 @@ private:
     QLineEdit* iban = nullptr;
     QLineEdit* bic = nullptr;
 
-    int idAeroclub = -1;
+    int idAeroclub = AeroDmsTypes::K_INIT_INT_INVALIDE;
 
     ManageDb* database = nullptr;
 

@@ -204,7 +204,7 @@ const AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesCotisations(co
     AeroDmsTypes::ListeRecetteDetail liste;
 
     QSqlQuery query;
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM recettesCotisations WHERE annee = :annee");
         query.bindValue(":annee", QString::number(p_annee));
@@ -243,7 +243,7 @@ const AeroDmsTypes::ListeRecetteDetail ManageDb::recupererRecettesHorsCotisation
     AeroDmsTypes::ListeRecetteDetail liste;
 
     QSqlQuery query;
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM recettesHorsCotisations WHERE annee = :annee");
         query.bindValue(":annee", QString::number(p_annee));
@@ -312,7 +312,7 @@ const AeroDmsTypes::ListeStatsHeuresDeVolParActivite ManageDb::recupererHeuresPa
     AeroDmsTypes::ListeStatsHeuresDeVolParActivite liste;
 
     QString requete = "";
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         requete = "SELECT * FROM stats_heuresDeVolParPiloteEtParActivite WHERE annee = :annee";
     }
@@ -414,14 +414,15 @@ const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPil
     QSqlQuery query;
     AeroDmsTypes::ListeSubventionsParPilotes liste;
 
-    if (p_annee != -1 && p_piloteId != "*")
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE
+        && p_piloteId != "*")
     {
         query.prepare("SELECT * FROM cotisation "
             "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
             "WHERE annee = :annee AND pilote = :piloteId " 
             "ORDER BY annee, pilote.nom");    
     }
-    else if (p_annee != -1)
+    else if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM cotisation "
             "INNER JOIN pilote ON cotisation.pilote = pilote.piloteId "
@@ -583,11 +584,11 @@ const AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     AeroDmsTypes::ListeVols liste;
 
     QSqlQuery query;
-    if (p_annee != -1 && p_piloteId != "*")
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE&& p_piloteId != "*")
     {
         query.prepare("SELECT * FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId ORDER BY date");
     }
-    else if (p_annee != -1)
+    else if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM vols WHERE strftime('%Y', vols.date) = :annee ORDER BY date");
     }
@@ -660,11 +661,11 @@ const AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemand
     AeroDmsTypes::ListeDemandesRemboursementSoumises liste;
 
     QSqlQuery query;
-    if (p_annee != -1 && p_piloteId != "*")
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE&& p_piloteId != "*")
     {
         query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE anneeVol = :annee AND pilote = :piloteId ORDER BY dateDemande");
     }
-    else if (p_annee != -1)
+    else if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE anneeVol = :annee ORDER BY dateDemande");
     }
@@ -783,11 +784,11 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
     }
 
     //Si on est sur un ajout
-    if (p_idVolAEditer == -1)
+    if (p_idVolAEditer == AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','remarque','immatriculation','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:remarque,:immatriculation,:activite)");
         //Si on est sur une sortie, on la renseigne
-        if (p_idSortie != -1)
+        if (p_idSortie != AeroDmsTypes::K_INIT_INT_INVALIDE)
             query.prepare("INSERT INTO 'vol' ('typeDeVol','pilote','date','duree','cout','montantRembourse','facture','sortie','remarque','immatriculation','activite') VALUES(:typeDeVol,:pilote,:date,:duree,:cout,:montantRembourse,:facture,:sortie,:remarque,:immatriculation,:activite)");
     }
     //Sinon, un numéro de vol est renseigné : on est en édition
@@ -798,14 +799,14 @@ void ManageDb::enregistrerUnVol(const QString& p_piloteId,
         if (p_montantSubventionne != 0)
         {
             query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'activite' = :activite WHERE volId = :volId");
-            if (p_idSortie != -1)
+            if (p_idSortie != AeroDmsTypes::K_INIT_INT_INVALIDE)
                 query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'montantRembourse' = :montantRembourse,'remarque' = :remarque, 'immatriculation' = :immatriculation,'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
         }
         else
         {
             //Les mêmes requetes, sans montantRembourse
             query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'activite' = :activite WHERE volId = :volId");
-            if (p_idSortie != -1)
+            if (p_idSortie != AeroDmsTypes::K_INIT_INT_INVALIDE)
                 query.prepare("UPDATE 'vol' SET 'date' = :date,'duree' = :duree,'cout' = :cout,'remarque' = :remarque, 'immatriculation' = :immatriculation, 'sortie' = :sortie, 'activite' = :activite WHERE volId = :volId");
         }
         query.bindValue(":volId", p_idVolAEditer);
@@ -867,7 +868,7 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
 const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis(const int p_annee)
 {
     QSqlQuery query;
-	if (p_annee != -1)
+	if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		query.prepare("SELECT strftime('%Y', vol.date) AS annee FROM vol WHERE demandeRemboursement IS NULL AND strftime('%Y', vol.date) = :annee GROUP BY annee");
 		query.bindValue(":annee", QString::number(p_annee));
@@ -954,7 +955,7 @@ const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsA
     QSqlQuery query;
 
     //Recuperation de l'ID de facture
-	if (p_annee == -1)
+	if (p_annee == AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
         query.prepare("SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'");
 	}
@@ -1122,7 +1123,7 @@ const AeroDmsTypes::ListeRecette ManageDb::recupererLesCotisationsAEmettre(const
 {
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
-	if (p_annee != -1)
+	if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		query.prepare("SELECT annee, nom, montant FROM cotisationsASoumettreCe WHERE annee = :annee");
 		query.bindValue(":annee", p_annee);
@@ -1190,7 +1191,7 @@ const AeroDmsTypes::ListeRecette ManageDb::recupererLesRecettesBaladesEtSortiesA
     //Récupération des cotisation à soumettre au CE
     AeroDmsTypes::ListeRecette liste;
     QSqlQuery query;
-	if (p_annee != -1)
+	if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		query.prepare("SELECT * FROM 'recettesASoumettreCeParTypeEtParAnnee' WHERE annee = :annee");
         query.bindValue(":annee", QString::number(p_annee));
@@ -1236,7 +1237,7 @@ const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDeman
     //Récupérationd des demandes de remboursement à soumettre au CE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
     QSqlQuery query;
-	if (p_annee != -1)
+	if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
 		query.prepare("SELECT * FROM 'facturesARembourser' WHERE annee = :annee");
 		query.bindValue(":annee", QString::number(p_annee));
@@ -1270,7 +1271,7 @@ const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererToutesLe
     //Récupérationd des demandes de remboursement soumises ou non au CSE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
     QSqlQuery query;
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM factures WHERE annee = :annee");
         query.bindValue(":annee", QString::number(p_annee));
@@ -1446,7 +1447,7 @@ const AeroDmsTypes::ListeVolSortieOuBalade ManageDb::recupererBaladesEtSorties( 
 {
     AeroDmsTypes::ListeVolSortieOuBalade liste;
     QSqlQuery query;
-    if (p_annee == -1)
+    if (p_annee == AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT * FROM 'volsBaladesEtSorties' WHERE typeDeVol = :typeDeVol");
     }
@@ -1732,7 +1733,7 @@ const AeroDmsTypes::ResultatCreationBdd ManageDb::creerAeroclub(const AeroDmsTyp
     QSqlQuery query;
 
     //creation
-    if (p_aeroclub.idAeroclub == -1)
+    if (p_aeroclub.idAeroclub == AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("INSERT INTO 'aeroclub' ('aeroclub', 'aerodrome', 'raisonSociale','IBAN','BIC') VALUES(:aeroclub,:aerodrome,:raisonSociale,:IBAN,:BIC)");
         query.bindValue(":aeroclub", p_aeroclub.aeroclub);
@@ -1791,7 +1792,7 @@ const AeroDmsTypes::ListeStatsHeuresDeVol ManageDb::recupererHeuresMensuelles(co
 
     const QString filtre = genererClauseFiltrageActivite(p_options);
     QString requete = "";
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         requete = "SELECT mois, annee, SUM(tempsDeVol) AS tempsDeVol, typeDeVol, activite FROM stats_heuresDeVolParMois WHERE annee = :annee ";
         if (filtre != "")
@@ -2148,7 +2149,7 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
     QString filtre = genererClauseFiltrageActivite(p_options);
 
     QSqlQuery query;
-    if (p_annee != -1)
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         query.prepare("SELECT "
             "immatriculation,"

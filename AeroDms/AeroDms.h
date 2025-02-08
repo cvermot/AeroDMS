@@ -295,14 +295,14 @@ private:
     QString piloteAEditer = "";
     double montantSubventionDejaAlloue = 0.0;
     int anneeAEditer = 0;
-    int volAEditer = -1;
+    int volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
     AeroDmsTypes::SubventionAAnoter subventionAAnoter;
     bool volPartiellementEditable = false;
     int factureIdEnBdd = 0;
     QString fichierAImprimer = "";
     QString dossierSortieGeneration = "";
     QString cheminDeLaFactureCourante = "";
-    int idFactureDetectee = -1;
+    int idFactureDetectee = AeroDmsTypes::K_INIT_INT_INVALIDE;
     bool scanAutomatiqueDesFacturesEstActif = true;
 
     //Etats internes application
