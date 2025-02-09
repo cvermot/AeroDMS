@@ -4159,7 +4159,7 @@ const bool AeroDms::uneMaJEstDisponible(const QString p_chemin, const QString p_
     {
         //Si le fichier existant en distant, mais pas en local, alors
         //il faut mettre à jour
-        if (QFile().exists(cheminFichierLocal))
+        if (!QFile().exists(cheminFichierLocal))
         {
             return true;
         }
