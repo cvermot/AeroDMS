@@ -908,8 +908,8 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.bindValue(":intitule", p_intitule);
     query.bindValue(":montant", p_montant);
 
-    query.exec();
     executerRequeteAvecControle(query, "insertion recette", "Ajout recette associée à vol");
+    query.next();
     const int numeroDeRecetteCree = query.value(0).toInt();
 
     QThread::msleep(delaisDeGardeBdd);
