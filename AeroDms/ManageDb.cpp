@@ -862,7 +862,9 @@ void ManageDb::enregistrerUneFacture( const QString& p_payeur,
     query.bindValue(":intitule", p_remarqueFacture);
     query.bindValue(":payeur", p_payeur);
 
-    executerRequeteAvecControle(query, "insertion facture", "Ajout d'une facture en base de données");
+    executerRequeteAvecControle(query, 
+        "insertion facture", 
+        "Ajout d'une facture en base de données");
 }
 
 const QList<int> ManageDb::recupererAnneesAvecVolNonSoumis(const int p_annee)
@@ -908,7 +910,9 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     query.bindValue(":intitule", p_intitule);
     query.bindValue(":montant", p_montant);
 
-    executerRequeteAvecControle(query, "insertion recette", "Ajout recette associée à vol");
+    executerRequeteAvecControle(query, 
+        "insertion recette", 
+        "Ajout recette associée à vol");
     query.next();
     const int numeroDeRecetteCree = query.value(0).toInt();
 
@@ -927,7 +931,9 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
         query.prepare("INSERT INTO 'xAssociationRecette-Vol' ('recetteId','volId') VALUES (:recetteId, :volId)");
         query.bindValue(":recetteId", numeroDeRecetteCree);
         query.bindValue(":volId", numeroDeVol);
-        executerRequeteAvecControle(query, "insertion recette (xAssociationRecette-Vol)", "Numero vol " + QString::number(numeroDeVol) + "\nNumero recette créée " + QString::number(numeroDeRecetteCree));
+        executerRequeteAvecControle(query, 
+            "insertion recette (xAssociationRecette-Vol)", 
+            "Numero vol " + QString::number(numeroDeVol) + "\nNumero recette créée " + QString::number(numeroDeRecetteCree));
 
         QThread::msleep(delaisDeGardeBdd);
     }
@@ -1016,7 +1022,9 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     {
         query.bindValue(":modeDeReglement", "Chèque");
     }
-    executerRequeteAvecControle(query, "ajout demande remboursement soumise", "");
+    executerRequeteAvecControle(query, 
+        "ajout demande remboursement soumise", 
+        "");
     query.next();
     const int idDemandeRemboursement = query.value(0).toInt();
 
@@ -1029,7 +1037,9 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
         query.bindValue(":annee", QString::number(p_demande.annee));
         query.bindValue(":pilote", p_demande.idPilote);
         query.bindValue(":typeDeVol", p_demande.typeDeVol);
-        executerRequeteAvecControle(query, "mise à jour table vol", "Demande de remboursement heure de vol");
+        executerRequeteAvecControle(query, 
+            "mise à jour table vol", 
+            "Demande de remboursement heure de vol");
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_COTISATION)
     {
@@ -1043,7 +1053,9 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             queryCotisation.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             queryCotisation.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             queryCotisation.bindValue(":recetteId", query.value(0).toInt());
-            executerRequeteAvecControle(queryCotisation, "mise à jour table recette", "Dépot cotisation");
+            executerRequeteAvecControle(queryCotisation, 
+                "mise à jour table recette", 
+                "Dépot cotisation");
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE)
@@ -1060,7 +1072,9 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
             querySortie.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = :idDemandeRemboursement WHERE recetteId = :recetteId");
             querySortie.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
             querySortie.bindValue(":recetteId", query.value(0).toInt());
-            executerRequeteAvecControle(querySortie, "mise à jour table recette", "Dépot paiement balade ou sortie");
+            executerRequeteAvecControle(querySortie, 
+                "mise à jour table recette", 
+                "Dépot paiement balade ou sortie");
         }
     }
     else if (p_demande.typeDeDemande == AeroDmsTypes::PdfTypeDeDemande_FACTURE)
@@ -1069,13 +1083,16 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
         query.bindValue(":idDemandeRemboursement", idDemandeRemboursement);
         //L'année contient en fait l'ID de facture pour une facture...
         query.bindValue(":id", p_demande.annee);
-        executerRequeteAvecControle(query, "mise à jour table factureSortie", "Remboursement facture");
+        executerRequeteAvecControle(query, 
+            "mise à jour table factureSortie", 
+            "Remboursement facture");
     }
 
     QThread::msleep(delaisDeGardeBdd);
 }
 
-void ManageDb::ajouterNoteSubvention(const int p_idSubventionAAnoter, const QString p_note)
+void ManageDb::ajouterNoteSubvention(const int p_idSubventionAAnoter, 
+    const QString p_note)
 {
     QSqlQuery query;
     query.prepare("UPDATE demandeRemboursementSoumises SET note = :note WHERE demandeId = :demandeId");
