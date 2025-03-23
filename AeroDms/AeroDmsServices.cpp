@@ -333,6 +333,11 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/calendar.svg");
         }
         break;
+        case AeroDmsTypes::Icone_INFOS_COMPLEMENTAIRES:
+        {
+            return QIcon(":/AeroDms/ressources/information-slab-circle.svg");
+        }
+        break;
 
         case AeroDmsTypes::Icone_RATIO:
         {

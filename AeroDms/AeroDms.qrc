@@ -134,5 +134,6 @@
         <file>ressources/calendar-filter.svg</file>
         <file>ressources/calendar-multiple.svg</file>
         <file>ressources/note-edit.svg</file>
+        <file>ressources/information-slab-circle.svg</file>
     </qresource>
 </RCC>

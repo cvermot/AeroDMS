@@ -91,6 +91,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     verifierSignatureNumerisee();
 
     gererChangementOnglet();
+    switchAffichageInfosComplementaires();
 
     terminerMiseAJourApplication();
     verifierPresenceDeMiseAjour();
@@ -256,6 +257,8 @@ void AeroDms::initialiserOngletPilotes()
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_NOM, new QTableWidgetItem(tr("Nom")));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_PRENOM, new QTableWidgetItem(tr("Prénom")));
     vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_ANNEE, new QTableWidgetItem(tr("Année")));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_AEROCLUB, new QTableWidgetItem(tr("Aéroclub")));
+    vuePilotes->setHorizontalHeaderItem(AeroDmsTypes::PiloteTableElement_TERRAIN, new QTableWidgetItem(tr("Terrain")));
 
     QTableWidgetItem* headerHdVEntrainement = new QTableWidgetItem(tr("HdV"));
     headerHdVEntrainement->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ENTRAINEMENT));
@@ -903,6 +906,7 @@ void AeroDms::initialiserBarreDOutils()
 void AeroDms::initialiserBarreDeFiltres()
 {
     QToolBar* selectionToolBar = addToolBar(tr("Filtres"));
+
     listeDeroulanteAnnee = new QComboBox(this);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
@@ -1319,6 +1323,15 @@ void AeroDms::initialiserMenuOptions()
     boutonActivationScanAutoFactures->setStatusTip(tr("Active/désactive le scan à l'ouverture des factures PDF. Cette option permet de désactiver le scan automatique si une facture fait planter le logiciel par exemple."));
     menuOption->addAction(boutonActivationScanAutoFactures);
     connect(boutonActivationScanAutoFactures, SIGNAL(triggered()), this, SLOT(switchScanAutomatiqueDesFactures()));
+
+    selecteurFiltreInformationsSupplementaires = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_INFOS_COMPLEMENTAIRES),
+        tr("Afficher/masquer les informations supplémentaires"),
+        this);
+    selecteurFiltreInformationsSupplementaires->setCheckable(true);
+    selecteurFiltreInformationsSupplementaires->setChecked(false);
+    menuOption->addAction(selecteurFiltreInformationsSupplementaires);
+
+    connect(selecteurFiltreInformationsSupplementaires, &QAction::triggered, this, &AeroDms::switchAffichageInfosComplementaires);
 
     menuOption->addSeparator();
 
@@ -1979,6 +1992,10 @@ void AeroDms::peuplerTablePilotes()
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES, new QTableWidgetItem(subvention.totaux.heuresDeVol));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE, new QTableWidgetItem(QString::number(subvention.totaux.montantRembourse, 'f', 2).append(" €")));
         vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_PILOTE_ID, new QTableWidgetItem(subvention.idPilote));
+
+        const AeroDmsTypes::Club clubDuPilote = db->recupererInfosAeroclubDuPilote(subvention.idPilote);
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_AEROCLUB, new QTableWidgetItem(clubDuPilote.aeroclub));
+        vuePilotes->setItem(i, AeroDmsTypes::PiloteTableElement_TERRAIN, new QTableWidgetItem(clubDuPilote.aerodrome));
 
         QTableWidgetItem* item = vuePilotes->item(i, AeroDmsTypes::PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE);
         const double proportionConsommationSubvention = subvention.entrainement.montantRembourse / subvention.montantSubventionEntrainement;
@@ -3948,8 +3965,13 @@ void AeroDms::switchOnglet()
         {
             mainTabWidget->setCurrentIndex(mainTabWidget->count() - 1);
         }
-    }
-    
+    } 
+}
+
+void AeroDms::switchAffichageInfosComplementaires()
+{
+    vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_AEROCLUB, !selecteurFiltreInformationsSupplementaires->isChecked());
+    vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_TERRAIN, !selecteurFiltreInformationsSupplementaires->isChecked());
 }
 
 void AeroDms::switchScanAutomatiqueDesFactures()
@@ -4549,6 +4571,7 @@ void AeroDms::gererChangementOnglet()
     actionListeDeroulanteAnnee->setVisible(true);
     actionListeDeroulantePilote->setVisible(true);
     actionListeDeroulanteType->setVisible(false);
+    selecteurFiltreInformationsSupplementaires->setVisible(false);
     listeDeroulanteType->setItemText(4, tr("Tous les types de vols"));
     //On affiche la ligne "Entrainement"
     static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(2, false);
@@ -4564,7 +4587,11 @@ void AeroDms::gererChangementOnglet()
         listeDeroulanteType->setCurrentIndex(4);
     }
 
-    if (mainTabWidget->currentWidget() == vueVols)
+    if (mainTabWidget->currentWidget() == vuePilotes)
+    {
+        selecteurFiltreInformationsSupplementaires->setVisible(true);
+    }
+    else if (mainTabWidget->currentWidget() == vueVols)
     {
         actionListeDeroulanteElementsSoumis->setVisible(true);
         actionListeDeroulanteType->setVisible(true);

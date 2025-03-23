@@ -29,17 +29,19 @@ public:
     enum PiloteTableElement {
         PiloteTableElement_NOM = 0x0,
         PiloteTableElement_PRENOM = 0x1,
-        PiloteTableElement_ANNEE = 0x2,
-        PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES = 0x3,
-        PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE = 0x4,
-        PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES = 0x5,
-        PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE = 0x6,
-        PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES = 0x7,
-        PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE = 0x8,
-        PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES = 0x9,
-        PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE = 0xA,
-        PiloteTableElement_PILOTE_ID = 0xB,
-        PiloteTableElement_NB_COLONNES = 0xC,
+        PiloteTableElement_AEROCLUB = 0x2,
+        PiloteTableElement_TERRAIN = 0x3,
+        PiloteTableElement_ANNEE = 0x4,
+        PiloteTableElement_HEURES_ENTRAINEMENT_SUBVENTIONNEES = 0x5,
+        PiloteTableElement_MONTANT_ENTRAINEMENT_SUBVENTIONNE = 0x6,
+        PiloteTableElement_HEURES_BALADES_SUBVENTIONNEES = 0x7,
+        PiloteTableElement_MONTANT_BALADES_SUBVENTIONNE = 0x8,
+        PiloteTableElement_HEURES_SORTIES_SUBVENTIONNEES = 0x9,
+        PiloteTableElement_MONTANT_SORTIES_SUBVENTIONNE = 0xA,
+        PiloteTableElement_HEURES_TOTALES_SUBVENTIONNEES = 0xB,
+        PiloteTableElement_MONTANT_TOTAL_SUBVENTIONNE = 0xC,
+        PiloteTableElement_PILOTE_ID = 0xD,
+        PiloteTableElement_NB_COLONNES = 0xE,
     };
 
     enum VolsDetectesTableElement {
@@ -783,6 +785,7 @@ public:
         Icone_CHOIX_ANNEE,
         Icone_TOUTES_LES_ANNEES,
         Icone_UNE_ANNEE,
+        Icone_INFOS_COMPLEMENTAIRES,
 
         Icone_RATIO,
 

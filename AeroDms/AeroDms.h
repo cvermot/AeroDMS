@@ -184,6 +184,7 @@ private:
     QPushButton* validerLaRecette = nullptr;
 
     //Listes déroulantes de la barre principale
+    QAction* selecteurFiltreInformationsSupplementaires = nullptr;
     QComboBox* listeDeroulanteAnnee = nullptr;
     QAction* actionListeDeroulanteAnnee = nullptr;
     QComboBox* listeDeroulantePilote = nullptr;
@@ -410,6 +411,7 @@ public slots:
     void verifierPresenceDeMiseAjour();
     void initialiserGestionnaireTelechargement();
     void switchOnglet();
+    void switchAffichageInfosComplementaires();
     void imprimerLaDemande();
     void imprimerLaDemandeAgrafage();
     void imprimerLaDerniereDemande();
