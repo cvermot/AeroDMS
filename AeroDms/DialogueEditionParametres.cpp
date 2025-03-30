@@ -65,6 +65,22 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     texteChequeDispo->setText(p_parametresMetiers.texteMailDispoCheques);
 
     ligneActuelle = mailingLayout->rowCount();
+    objetVirementEffectue = new QLineEdit(this);
+    objetVirementEffectue->setToolTip(tr("Objet par défaut du mail qui sera envoyé lors d'un envoi de mailing via la fonction \"Envoyer un mail aux pilotes concernés par un virement\"."));
+    mailingLayout->addWidget(new QLabel(tr("Virement effectué (objet) : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(objetVirementEffectue, ligneActuelle, K_COLONNE_CHAMP);
+
+    objetVirementEffectue->setText(p_parametresMetiers.objetMailVirementSubvention);
+
+    ligneActuelle = mailingLayout->rowCount();
+    texteVirementEffectue = new QTextEdit(this);
+    texteVirementEffectue->setToolTip(tr("Corps par défaut du mail qui sera envoyé lors d'un envoi de mailing via la fonction \"Envoyer un mail aux pilotes concernés par un virement\"."));
+    mailingLayout->addWidget(new QLabel(tr("Virement effectué (texte) : "), this), ligneActuelle, K_COLONNE_LABEL);
+    mailingLayout->addWidget(texteVirementEffectue, ligneActuelle, K_COLONNE_CHAMP);
+
+    texteVirementEffectue->setText(p_parametresMetiers.texteMailVirementSubvention);
+
+    ligneActuelle = mailingLayout->rowCount();
     objetSubventionRestantes = new QLineEdit(this);
     objetSubventionRestantes->setToolTip(tr("Objet par défaut du mail qui sera envoyé lors d'un envoi de mailing via la fonction \"Envoyer un mail aux pilotes n'ayant pas épuisé leur subvention entrainement\"."));
     mailingLayout->addWidget(new QLabel(tr("Subvention restante (objet) : "), this), ligneActuelle, K_COLONNE_LABEL);
@@ -474,6 +490,8 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresMetiers.texteMailDispoCheques = texteChequeDispo->toPlainText();
     parametresMetiers.objetMailSubventionRestante = objetSubventionRestantes->text();
     parametresMetiers.texteMailSubventionRestante = texteSubventionRestantes->toPlainText();
+    parametresMetiers.objetMailVirementSubvention = objetVirementEffectue->text();
+    parametresMetiers.texteMailVirementSubvention = texteVirementEffectue->toPlainText();
     parametresMetiers.objetMailAutresMailings = objetAutresMailings->text();
     
     AeroDmsTypes::ParametresSysteme parametresSysteme;

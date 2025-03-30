@@ -164,10 +164,20 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
+    if (settings.value("mailing/objetVirementSubvention", "") == "")
+    {
+        settings.beginGroup("mailing");
+        settings.setValue("objetVirementSubvention", tr("[Section aéronautique] Versement de votre subvention par virement"));
+        settings.setValue("texteVirementSubvention", tr("Bonjour,\n\nLe CSE vient de verser votre subvention par virement sur le compte de votre aéroclub.\nAfin que vous puissiez saisir ces virement dans votre compte pilote de votre aéroclub, voici le(s) montant(s) du(des) virement(s) réalisé(s) :\n#listeVirements \n\nCordialement"));
+        settings.endGroup();
+    }
+
     parametresMetiers.objetMailDispoCheques = settings.value("mailing/objetChequesDisponibles", "[Section aéronautique] Chèques aéro").toString();
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
     parametresMetiers.objetMailSubventionRestante = settings.value("mailing/objetSubventionRestante", "[Section aéronautique] Subvention entrainement").toString();
     parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
+    parametresMetiers.objetMailVirementSubvention = settings.value("mailing/objetVirementSubvention", "[Section aéronautique] Subvention entrainement").toString();
+    parametresMetiers.texteMailVirementSubvention = settings.value("mailing/texteVirementSubvention", "").toString();
     parametresMetiers.objetMailAutresMailings = settings.value("mailing/objetAutresMailings", "[Section aéronautique] ").toString();
 
     if (settings.value("impression/imprimante") == "")
@@ -1459,6 +1469,8 @@ void AeroDms::initialiserMenuOutils()
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
     menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par une demande de &subvention"));
+    menuMailPilotesSubventionVerseeParVirement = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+        tr("Envoyer un mail aux pilotes concernés par un &virement"));
     peuplerMenuMailDemandesSubvention();
    
     menuMailPilotesDUnAerodrome = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
@@ -3316,6 +3328,7 @@ void AeroDms::peuplerListeSorties()
 void AeroDms::peuplerMenuMailDemandesSubvention()
 {
     menuMailDemandesSubvention->clear();
+    menuMailPilotesSubventionVerseeParVirement->clear();
 
     QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
     for (int i = 0; i < datesDemandes.size(); i++)
@@ -3330,6 +3343,21 @@ void AeroDms::peuplerMenuMailDemandesSubvention()
         menuMailDemandesSubvention->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     }
+
+    datesDemandes = db->recupererDatesDesDemandesDeSubventionsVerseesParVirement();
+    for (int i = 0; i < datesDemandes.size(); i++)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"),
+            this);
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_SUBVENTION_VERSEE_PAR_VIREMENT;
+        data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
+        action->setData(QVariant::fromValue(data));
+        menuMailPilotesSubventionVerseeParVirement->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
+
 }
 
 void AeroDms::peuplerMenuMailPilotesDUnAerodrome()
@@ -4028,9 +4056,11 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.beginGroup("mailing");
     settings.setValue("texteChequesDisponibles", parametresMetiers.texteMailDispoCheques);
     settings.setValue("texteSubventionRestante", parametresMetiers.texteMailSubventionRestante);
+    settings.setValue("texteVirementSubvention", parametresMetiers.texteMailVirementSubvention);
 
     settings.setValue("objetChequesDisponibles", parametresMetiers.objetMailDispoCheques);
     settings.setValue("objetSubventionRestante", parametresMetiers.objetMailSubventionRestante);
+    settings.setValue("objetVirementSubvention", parametresMetiers.objetMailVirementSubvention);
     settings.setValue("objetAutresMailings", parametresMetiers.objetMailAutresMailings);
     settings.endGroup();
 
@@ -4164,6 +4194,30 @@ void AeroDms::envoyerMail()
                     + db->recupererMailPilotesDUnAerodrome(donnnesMailing.donneeComplementaire, 
                         AeroDmsTypes::DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME)
                     + "?subject=" + parametresMetiers.objetMailAutresMailings + "&body=", QUrl::TolerantMode));
+            }
+            break;
+            case AeroDmsTypes::DonnesMailingType_SUBVENTION_VERSEE_PAR_VIREMENT:
+            {
+                const AeroDmsTypes::ListeMailsEtVirements listeVirements = db->recupererMailsVirements(donnnesMailing.donneeComplementaire);
+                for (int pilote = 0; pilote < listeVirements.size(); pilote++)
+                {
+                    QString stringListeVirement = "";
+                    for (int virement = 0; virement < listeVirements.at(pilote).listeMontantsVirements.size(); virement++)
+                    {
+                        stringListeVirement = stringListeVirement 
+                            + tr("Montant virement ") 
+                            + QString::number(virement + 1) 
+                            + " : " 
+                            + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement))
+                            + "€\n";
+                    }
+                    QString texteMail = parametresMetiers.texteMailVirementSubvention;
+                    texteMail = texteMail.replace("#listeVirements", stringListeVirement);
+                    QDesktopServices::openUrl(QUrl("mailto:"
+                        + listeVirements.at(pilote).mail
+                        + "?subject=" + parametresMetiers.objetMailVirementSubvention + "&body=" + texteMail, QUrl::TolerantMode));
+                    QThread::sleep(1.0);
+                }
             }
             break;
             }

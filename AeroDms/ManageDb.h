@@ -146,10 +146,12 @@ public:
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
+    const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();
     const AeroDmsTypes::ListeAerodromes recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande);
     const QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
     const QString recupererMailPilotesDUnAerodrome(const QString p_codeOaci, 
         const AeroDmsTypes::DonnesMailingType p_demande);
+    const AeroDmsTypes::ListeMailsEtVirements recupererMailsVirements(const QString p_dateDemande);
 
     const AeroDmsTypes::ListeDetailsBaladesEtSorties recupererListeDetailsBaladesEtSorties(const int p_annee);
 
@@ -173,7 +175,7 @@ private:
     QSqlDatabase db;
     QString database = "";
     int delaisDeGardeBdd = 0;
-    const double versionBddAttendue = 1.12;
+    const double versionBddAttendue = 1.13;
 
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,

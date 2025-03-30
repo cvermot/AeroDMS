@@ -260,6 +260,7 @@ public:
     enum DonnesMailingType
     {
         DonnesMailingType_DEMANDE_DE_SUBVENTION,
+        DonnesMailingType_SUBVENTION_VERSEE_PAR_VIREMENT,
         DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME,
         DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME
     };
@@ -439,6 +440,7 @@ public:
         QString typeDeVol = K_INIT_QSTRING;
         AeroDmsTypes::ModeDeReglement modeDeReglement = AeroDmsTypes::ModeDeReglement_CHEQUE;
         QString note = K_INIT_QSTRING;
+        QString mail = K_INIT_QSTRING;
         double montant = 0.0;
         double coutTotalVolAssocies = 0.0;
         int anneeVol = K_INIT_INT_INVALIDE;     
@@ -539,6 +541,8 @@ public:
         QString texteMailDispoCheques = K_INIT_QSTRING;
         QString objetMailSubventionRestante = K_INIT_QSTRING;
         QString texteMailSubventionRestante = K_INIT_QSTRING;
+        QString objetMailVirementSubvention = K_INIT_QSTRING;
+        QString texteMailVirementSubvention = K_INIT_QSTRING;
         QString objetMailAutresMailings = K_INIT_QSTRING;
     };
 
@@ -582,6 +586,13 @@ public:
     };
     static const DonneesFacture K_INIT_DONNEES_FACTURE;
     typedef QList<DonneesFacture> ListeDonneesFacture;
+
+    struct MailEtVirements
+    {
+        QString mail;
+        QList<double> listeMontantsVirements;
+    };
+    typedef QList<MailEtVirements> ListeMailsEtVirements;
 
     struct StatsPilotes
     {

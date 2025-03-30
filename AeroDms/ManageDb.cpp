@@ -694,6 +694,7 @@ const AeroDmsTypes::ListeDemandesRemboursementSoumises ManageDb::recupererDemand
         demande.coutTotalVolAssocies = query.value("totalCoutVol").toDouble();
         demande.piloteId = query.value("vol.pilote").toString();
         demande.nomPilote = query.value("prenom").toString() + " " + query.value("nom").toString();
+        demande.mail = query.value("mail").toString();
 
         demande.note = "";
         if (!query.value("note").isNull())
@@ -2004,6 +2005,23 @@ const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventions()
     return listeDemandes;
 }
 
+const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventionsVerseesParVirement()
+{
+    QList<QDate> listeDemandes;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE modeDeReglement = 'Virement' GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 5");
+    query.exec();
+
+    while (query.next())
+    {
+        QDate date = QDate::fromString(query.value("dateDemande").toString(), "yyyy-MM-dd");
+        listeDemandes.append(date);
+    }
+
+    return listeDemandes;
+}
+
 const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande)
 {
     AeroDmsTypes::ListeAerodromes aerodromes;
@@ -2104,6 +2122,38 @@ const QString ManageDb::recupererMailPilotesDUnAerodrome(const QString p_codeOac
     }
 
     return listeMail.join(";");
+}
+
+const AeroDmsTypes::ListeMailsEtVirements ManageDb::recupererMailsVirements(const QString p_dateDemande)
+{
+    AeroDmsTypes::ListeMailsEtVirements listeVirements;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE modeDeReglement = 'Virement' AND dateDemande = :dateDemande");
+    query.bindValue(":dateDemande", p_dateDemande);
+    query.exec();
+
+    QString mail = "";
+    AeroDmsTypes::MailEtVirements mailEtVirements;
+
+    while (query.next())
+    {
+        if (mail != query.value("mail").toString())
+        {
+            //Si on est pas sur le premier tour (mail différent de sa valeur d'init), on ajoute
+            if (mail != "")
+            {
+                listeVirements.append(mailEtVirements);
+            }
+            mailEtVirements.mail = query.value("mail").toString();
+            mailEtVirements.listeMontantsVirements.clear();
+            mail = query.value("mail").toString();
+        }
+        mailEtVirements.listeMontantsVirements.append(query.value("montant").toDouble());
+    }
+    listeVirements.append(mailEtVirements);
+
+    return listeVirements;
 }
 
 //Un changement de version attendue de la BDD intervient notamment si 

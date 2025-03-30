@@ -271,6 +271,7 @@ private:
     QAction* mailingPilotesNAyantPasEpuiseLeurSubventionEntrainement = nullptr;
     QAction* mailingPilotesDerniereDemandeSubvention = nullptr;
     QMenu* menuMailDemandesSubvention = nullptr;
+    QMenu* menuMailPilotesSubventionVerseeParVirement = nullptr;
     QMenu* menuMailPilotesDUnAerodrome = nullptr;
     QMenu* menuMailPilotesDUnAerodromeActif = nullptr;
     QMenu* menuMailPilotesDUnAerodromeActifBreveteMoteur = nullptr;

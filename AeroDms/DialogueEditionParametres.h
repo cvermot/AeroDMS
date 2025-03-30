@@ -39,6 +39,8 @@ private:
     QLineEdit* imprimante = nullptr;
     QLineEdit* objetChequeDispo = nullptr;
     QTextEdit* texteChequeDispo = nullptr;
+    QLineEdit* objetVirementEffectue = nullptr;
+    QTextEdit* texteVirementEffectue = nullptr;
     QLineEdit* objetSubventionRestantes = nullptr;
     QTextEdit* texteSubventionRestantes = nullptr;
     QLineEdit* objetAutresMailings = nullptr;
