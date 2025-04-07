@@ -4293,11 +4293,13 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     progressionMiseAJour->show();
 
     const QRegularExpression ini("^.*\\.ini$");
-    const QRegularExpression sqlite("^.*\\.sqlite");
-    const QRegularExpression pdf("^.*\\.pdf");
+    const QRegularExpression sqlite("^.*\\.sqlite$");
+    const QRegularExpression pdf("^.*\\.pdf$");
+    const QRegularExpression signature("^.*signature\.(jpg|png|jpeg|svg)$");
 
     //1) On fait du ménage : tous les fichiers locaux qui ne sont 
-    //   ni .sqlite ni .ini ni .pdf sont préfixés en xxx_
+    //   ni .sqlite ni .ini ni .pdf ni signature.jpg/png/jpeg/svf 
+    //   sont préfixés en xxx_
     //   Ils seront supprimés au lancement suivant d'AeroDMS
     {
         QDirIterator it("./",
@@ -4308,10 +4310,12 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
         while (it.hasNext())
         {
             QString fichier = it.next();
-            //On ne replace pas les éventuels fichiers .ini ou .sqlite qui seraient présents dans le répertoire d'update
+            //On ne replace pas les éventuels fichiers .ini, .pdf, .sqlite ou signature 
+            //qui seraient présents dans le répertoire d'update
             if (!fichier.contains(ini)
                 && !fichier.contains(sqlite)
-                && !fichier.contains(pdf))
+                && !fichier.contains(pdf)
+                && !fichier.contains(signature))
             {
                 QFileInfo infosFichierLocal(fichier);
                 QString nouveauNomFichierLocal = infosFichierLocal.path() + "/xxx_" + infosFichierLocal.fileName();
