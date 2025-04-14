@@ -2129,7 +2129,7 @@ const AeroDmsTypes::ListeMailsEtVirements ManageDb::recupererMailsVirements(cons
     AeroDmsTypes::ListeMailsEtVirements listeVirements;
 
     QSqlQuery query;
-    query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE modeDeReglement = 'Virement' AND dateDemande = :dateDemande");
+    query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE modeDeReglement = 'Virement' AND dateDemande = :dateDemande ORDER BY pilote");
     query.bindValue(":dateDemande", p_dateDemande);
     query.exec();
 
