@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Espace Protégé"
+AuthUserFile /homepages/6/d310147084/htdocs/aerodms/.htpasswd
+Require valid-user

@@ -265,6 +265,13 @@ public:
         DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME
     };
 
+    enum ModeFonctionnementLogiciel
+    {
+        ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT = 0,
+        ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_INTERNE = 1,
+        ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE = 2
+    };
+
     static const QString K_INIT_QSTRING;
     static const int K_INIT_INT_INVALIDE;
     static const int K_INIT_INT;
@@ -566,6 +573,10 @@ public:
         int margesGaucheDroite = K_INIT_INT;
         ParametresImpression parametresImpression;
         bool autoriserReglementParVirement = false;
+        ModeFonctionnementLogiciel modeFonctionnementLogiciel = ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT;
+        QString adresseServeurModeExterne = "";
+        QString loginServeurModeExterne = "";
+        QString motDePasseServeurModeExterne = "";
         bool utiliserRessourcesHtmlInternes = false;
     };
 

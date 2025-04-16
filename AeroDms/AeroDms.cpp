@@ -75,16 +75,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     //=======================Peupler les vues tables, et initialiser les différents élements d'IHM dépendants
     // du contexte.
-    peuplerListeDeroulanteAnnee();
-    peuplerListesPilotes();
-    peuplerListeSorties();
-    peuplerListeBaladesEtSorties();
-    peuplerTablePilotes();
-    peuplerTableVols();
-    peuplerTableFactures();
-    peuplerTableRecettes();
-    peuplerTableSubventionsDemandees();
-    peuplerStatistiques();
+    peuplerListesEtTables();
     prevaliderDonnnesSaisies();
     prevaliderDonnneesSaisiesRecette();
     changerInfosVolSurSelectionTypeVol();
@@ -99,6 +90,27 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
    
     preparerStatusBar();
     demanderFermetureSplashscreen();
+
+    //Si on est pas en mode fonctionnement interne pur, on réalise des actions supplémentaires
+    if (parametresSysteme.modeFonctionnementLogiciel != AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT)
+    {
+        gestionnaireDonneesEnLigne->activer();
+
+        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(peuplerListesEtTables()));
+        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(verifierVersionBddSuiteChargement()));
+        connect(db, SIGNAL(passerLogicielEnLectureSeuleDurantEnvoiBdd()), this, SLOT(passerLeLogicielEnLectureSeule()));
+        connect(db, SIGNAL(sortirDuModeLectureSeule()), this, SLOT(sortirLeLogicielDeLectureSeule()));
+        connect(db, SIGNAL(signalerBddBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)), this, SLOT(signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)));
+
+        //On passe systématiquement en lecture seule => si la base est identique a celle dispo en ligne,
+        //on recevra le signal signalerChargementBaseSuiteTelechargement() ce qui permettra de repasse
+        //le logiciel en lecture-ecriture.
+        passerLeLogicielEnLectureSeule(true);
+
+        //On fait la demande au gestionnaire de données en ligne.
+        //La réponse sera traitée directement par le gestionnaire de BDD
+        gestionnaireDonneesEnLigne->recupererSha256Bdd();
+    }
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -122,6 +134,20 @@ void AeroDms::initialiserBaseApplication()
     factureIdEnBdd = 0;
     subventionAAnoter.id = AeroDmsTypes::K_INIT_INT_INVALIDE;
     subventionAAnoter.texteActuel = "";
+}
+
+void AeroDms::peuplerListesEtTables()
+{
+    peuplerListeDeroulanteAnnee();
+    peuplerListesPilotes();
+    peuplerListeSorties();
+    peuplerListeBaladesEtSorties();
+    peuplerTablePilotes();
+    peuplerTableVols();
+    peuplerTableFactures();
+    peuplerTableRecettes();
+    peuplerTableSubventionsDemandees();
+    peuplerStatistiques();
 }
 
 void AeroDms::lireParametresEtInitialiserBdd()
@@ -172,6 +198,16 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settings.endGroup();
     }
 
+    if (settings.value("modeFonctionnementLogiciel/modeFonctionnement", "") == "")
+    {
+        settings.beginGroup("modeFonctionnementLogiciel");
+        settings.setValue("modeFonctionnement", AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT);
+        settings.setValue("adresse", "");
+        settings.setValue("login", "");
+        settings.setValue("password", "");
+        settings.endGroup();
+    }
+
     parametresMetiers.objetMailDispoCheques = settings.value("mailing/objetChequesDisponibles", "[Section aéronautique] Chèques aéro").toString();
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
     parametresMetiers.objetMailSubventionRestante = settings.value("mailing/objetSubventionRestante", "[Section aéronautique] Subvention entrainement").toString();
@@ -216,6 +252,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settingsMetier.endGroup();
     }
 
+    settings.beginGroup("");
+
     parametresSysteme.cheminStockageBdd = settings.value("baseDeDonnees/chemin", "").toString();
     parametresSysteme.cheminStockageFacturesTraitees = settings.value("dossiers/facturesSaisies", "").toString();
     parametresSysteme.cheminStockageFacturesATraiter = settings.value("dossiers/facturesATraiter", "").toString();
@@ -229,11 +267,16 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
     parametresSysteme.autoriserReglementParVirement = settingsMetier.value("parametresSysteme/autoriserReglementParVirement", false).toBool();
     parametresSysteme.utiliserRessourcesHtmlInternes = settingsMetier.value("parametresSysteme/utiliserRessourcesHtmlInternes", true).toBool();
+    parametresSysteme.modeFonctionnementLogiciel = static_cast<AeroDmsTypes::ModeFonctionnementLogiciel>(settings.value("modeFonctionnementLogiciel/modeFonctionnement", AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT).toInt());
+    parametresSysteme.adresseServeurModeExterne = settings.value("modeFonctionnementLogiciel/adresse", "").toString();
+    parametresSysteme.loginServeurModeExterne = settings.value("modeFonctionnementLogiciel/login", "").toString();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
     parametresSysteme.periodiciteVerificationPresenceFactures = settings.value("siteDaca/periodiciteVerification", 3).toInt();
     
     QString valeur = settings.value("siteDaca/password", "").toString();
     parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
+    valeur = settings.value("modeFonctionnementLogiciel/password", "").toString();
+    parametresSysteme.motDePasseServeurModeExterne = AeroDmsServices::dechiffrerDonnees(valeur);
 
     parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toDouble();
     parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toDouble();
@@ -244,11 +287,15 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
+    gestionnaireDonneesEnLigne = new GestionnaireDonneesEnLigne(parametresSysteme);
+
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/") +
         settings.value("baseDeDonnees/nom", "").toString();
 
-    db = new ManageDb(parametresMetiers.delaisDeGardeBdd);
+    db = new ManageDb(parametresMetiers.delaisDeGardeBdd,
+        parametresMetiers.nomTresorier,
+        gestionnaireDonneesEnLigne);
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
     db->ouvrirLaBdd(database);
 
@@ -657,7 +704,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
             if (!db->laBddEstALaVersionAttendue())
             {
                 fermerSplashscreen();
-                passerLeLogicielEnLectureSeule();
+                passerLeLogicielEnLectureSeule(true);
 
                 QMessageBox dialogueErreurVersionBdd;
                 dialogueErreurVersionBdd.setText(tr("Une mise à jour de l'application est disponible et doit être réalisée\n\
@@ -683,7 +730,7 @@ L'application va passer en mode lecture seule.\
     else if (!db->laBddEstALaVersionAttendue())
     {
         fermerSplashscreen();
-        passerLeLogicielEnLectureSeule();
+        passerLeLogicielEnLectureSeule(true);
 
         QMessageBox dialogueErreurVersionBdd;
         dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
@@ -715,19 +762,65 @@ void AeroDms::initialiserGestionnaireTelechargement()
 
 void AeroDms::passerLeLogicielEnLectureSeule()
 {
-    boutonAjouterUnVol->setEnabled(false);
-    boutonAjouterCotisation->setEnabled(false);
-    boutonAjouterPilote->setEnabled(false);
-    boutonAjouterSortie->setEnabled(false);
-    boutonAjouterUnAeroclub->setEnabled(false);
-    boutonGenerePdf->setEnabled(false);
-    facturesDaca->setEnabled(false);
+    passerLeLogicielEnLectureSeule(true);
+}
 
-    boutonEditerUnAeroclub->setEnabled(false);
-    boutonGestionAeronefs->setEnabled(false);
-    boutonMettreAJourAerodromes->setEnabled(false);
+void AeroDms::sortirLeLogicielDeLectureSeule()
+{
+    //Si etapeFermetureEnCours vaut FERMETURE_BDD, c'est qu'on est sur un envoi de BDD
+    //consécutif à une demande de fermeture => on termine la cloture du logiciel
+    if (etapeFermetureEnCours == EtapeFermeture_FERMETURE_BDD)
+    {
+        etapeFermetureEnCours = EtapeFermeture_BDD_FERMEE;
+        exit(0);
+    }
+    else
+    {
+        passerLeLogicielEnLectureSeule(false);
+    }
 
-    logicielEnModeLectureSeule = true;
+    //Une fois arrivé ici, on est sur que la BDD est dans un état "stable" :
+    // -on a vérifié si la BDD en ligne a besoin d'être téléchargée
+    // -on l'a téléchargée si besoin
+    // -on a mis le verrou
+    // -on a envoyé la base lockée en ligne
+
+    //si on est sur le premier envoi de BDD, on vérifie si on a des
+    //factures PDF qui n'existe pas en local
+    if (!verificationDeNouvelleFacturesAChargerEnLigneEstEffectue)
+    {
+        verificationDeNouvelleFacturesAChargerEnLigneEstEffectue = true;
+
+        //pour chaque facture de la table "fichiersFacture",
+        //on vérifie si la facture existe dans le répertoire local des factures
+        //s'il n'existe pas, on demande son téléchargement
+        const QStringList listeFactures = db->recupererListeFichiersPdfFactures();
+        for (const QString& facture : listeFactures) 
+        {
+            const QString cheminFichier = parametresSysteme.cheminStockageFacturesTraitees + "/" + facture;
+            if (!QFile::exists(cheminFichier)) 
+            {
+                gestionnaireDonneesEnLigne->telechargerFacture(facture);
+            }
+        }
+    }
+}
+
+void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee)
+{
+    boutonAjouterUnVol->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonAjouterCotisation->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonAjouterPilote->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonAjouterSortie->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonAjouterUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonGenerePdf->setEnabled(!p_lectureSeuleEstDemandee);
+    facturesDaca->setEnabled(!p_lectureSeuleEstDemandee);
+
+    boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
+    boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
+
+    logicielEnModeLectureSeule = p_lectureSeuleEstDemandee;
 }
 
 void AeroDms::ouvrirSplashscreen()
@@ -1967,6 +2060,8 @@ void AeroDms::mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossi
     const QString status = tr("Génération terminée. Fichiers disponibles sous ")
                             +p_cheminDossier;
     statusBar()->showMessage(status);
+
+    db->demanderEnvoiBdd();
 }
 
 void AeroDms::mettreAJourEchecGenerationPdf()
@@ -2433,6 +2528,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
             //On peut avoir réactivé un pilote inactif : on réélabore les listes de pilotes
             peuplerListesPilotes();
 
+            db->demanderEnvoiBdd();
+
             statusBar()->showMessage(tr("Cotisation ") + QString::number(infosCotisation.annee) + tr(" ajoutée pour le pilote ") + db->recupererNomPrenomPilote(infosCotisation.idPilote));
         }
     }
@@ -2443,6 +2540,8 @@ void AeroDms::ajouterUneCotisationEnBdd()
 
         //On met à jour la table des pilotes (en cas de changement de couleur)
         peuplerTablePilotes();
+
+        db->demanderEnvoiBdd();
     }
 }
 
@@ -2490,6 +2589,8 @@ void AeroDms::ajouterUnPiloteEnBdd()
             {
                 statusBar()->showMessage(tr("Pilote modifié avec succès"));
             } 
+
+            db->demanderEnvoiBdd();
             break;
         } 
         case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
@@ -2535,6 +2636,8 @@ void AeroDms::ajouterUnAeroclubEnBdd()
             {
                 statusBar()->showMessage(tr("Aéroclub modifié avec succès"));
             }
+            db->demanderEnvoiBdd();
+
             break;
         }
         case AeroDmsTypes::ResultatCreationBdd_ELEMENT_EXISTE:
@@ -2566,6 +2669,8 @@ void AeroDms::ajouterUneSortieEnBdd()
     peuplerListeSorties();
 
     statusBar()->showMessage(tr("Sortie ") + sortie.nom + tr(" ajoutée"));
+
+    db->demanderEnvoiBdd();
 }
 
 void AeroDms::selectionnerUneFacture()
@@ -2959,6 +3064,8 @@ void AeroDms::enregistrerUneFacture()
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
                 cheminDeLaFactureCourante = cheminComplet;
 
+                gestionnaireDonneesEnLigne->envoyerFichier(cheminDeLaFactureCourante);
+
                 factureRecupereeEnLigneEstNonTraitee = false;
             }
             else
@@ -2991,20 +3098,24 @@ void AeroDms::enregistrerUneFacture()
 
             montantFacture->setValue(0);
             remarqueFacture->clear();
+
+            //On met à jour la vue
+            peuplerTableFactures();
+
+            db->demanderEnvoiBdd();
         }
         else
         {
             statusBar()->showMessage(tr("Erreur d'ajout de la facture"));
         }
     }
-    //On met à jour la vue
-    peuplerTableFactures();
 }
 
 void AeroDms::enregistrerUnVol()
 {
     //Si le pilote n'est pas à jour de sa cotisation => échec immédiat
     bool estEnEchec = !lePiloteEstAJourDeCotisation();
+    bool bddAEnvoyer = false;
 
     //On effectue d'abord quelques contrôles pour savoir si le vol est enregistrable :
     //1) on a une facture chargée
@@ -3041,6 +3152,8 @@ void AeroDms::enregistrerUnVol()
                 pdfDocument->load(cheminComplet);
                 gestionnaireDeFichier.remove(cheminDeLaFactureCourante);
                 cheminDeLaFactureCourante = cheminComplet;
+
+                gestionnaireDonneesEnLigne->envoyerFichier(cheminDeLaFactureCourante);
 
                 factureRecupereeEnLigneEstNonTraitee = false;
             }
@@ -3108,10 +3221,20 @@ void AeroDms::enregistrerUnVol()
                     peuplerListesPilotes();
                 }
 
+                //Si on enregistre un vol seul, 
+                //   ou si on enregistre le dernier vol d'une série de vol détéctés
+                //il faudra envoyer la BDD en ligne à l'issue
+                if (idFactureDetectee == AeroDmsTypes::K_INIT_INT_INVALIDE
+                    ||(idFactureDetectee != AeroDmsTypes::K_INIT_INT_INVALIDE
+                        && factures.size() == 1))
+                {
+                    bddAEnvoyer = true;
+                }
+
                 //On supprime la vol de la liste des vols détectés si on en avait chargé un
                 //On fait ceci avant la mise à jour de la statusBar car supprimerLeVolDeLaVueVolsDetectes()
-                //en fait également une. De cette façon on masque le statu de suppression et on affiche
-                //que le statu d'ajout du vol
+                //en fait également une. De cette façon on masque le status de suppression et on affiche
+                //que le status d'ajout du vol
                 supprimerLeVolDeLaVueVolsDetectes();
 
             statusBar()->showMessage(QString(tr("Vol "))
@@ -3160,6 +3283,11 @@ void AeroDms::enregistrerUnVol()
 
     //On restaure le texte du bouton de validation (qui a changé si on était en édition)
     validerLeVol->setText("Valider le vol");
+    
+    if (bddAEnvoyer)
+    {
+        db->demanderEnvoiBdd();
+    }
 }
 
 void AeroDms::enregistrerLesVols()
@@ -3237,10 +3365,12 @@ Saisie non prise en compte."));
         nomEmetteurChequeRecette->clear();
         banqueNumeroChequeRecette->clear();
         montantRecette->clear();
-    }
 
-    peuplerTableRecettes();
-    peuplerListeBaladesEtSorties();
+        peuplerTableRecettes();
+        peuplerListeBaladesEtSorties();
+
+        db->demanderEnvoiBdd();
+    }
 }
 
 const double AeroDms::calculerCoutHoraire()
@@ -3749,6 +3879,8 @@ void AeroDms::ajouterUneNoteSubvention()
 
             //On repeuple la table des subventions demandées pour afficher la nouvelle note
             peuplerTableSubventionsDemandees();
+
+            db->demanderEnvoiBdd();
             break;
         }
         case QDialog::Rejected:
@@ -3920,13 +4052,16 @@ void AeroDms::supprimerVol()
             if (db->supprimerUnVol(volAEditer))
             {
                 statusBar()->showMessage(tr("Vol supprimé avec succès."));
+
+                peuplerTablePilotes();
+                peuplerTableVols();
+
+                db->demanderEnvoiBdd();
             }
             else
             {
                 statusBar()->showMessage(tr("Vol non supprimé : le vol est associé à une recette d'une sortie. Suppression impossible."));
             }
-            peuplerTablePilotes();
-            peuplerTableVols();
         }
         break;
         case QMessageBox::No:
@@ -4069,6 +4204,13 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.setValue("couleur", parametresSysteme.parametresImpression.modeCouleurImpression);
     settings.setValue("resolution", parametresSysteme.parametresImpression.resolutionImpression);
     settings.setValue("forcageImpressionRecto", parametresSysteme.parametresImpression.forcageImpressionRecto);
+    settings.endGroup();
+
+    settings.beginGroup("modeFonctionnementLogiciel");
+    settings.setValue("modeFonctionnement", parametresSysteme.modeFonctionnementLogiciel);
+    settings.setValue("adresse", parametresSysteme.adresseServeurModeExterne);
+    settings.setValue("login", parametresSysteme.loginServeurModeExterne);
+    settings.setValue("password", AeroDmsServices::chiffrerDonnees(parametresSysteme.motDePasseServeurModeExterne));
     settings.endGroup();
 
     settings.beginGroup("siteDaca");
@@ -5206,6 +5348,44 @@ void AeroDms::verifierDispoIdentifiantsDaca()
     }
 }
 
+void AeroDms::verifierVersionBddSuiteChargement()
+{
+    if (!db->laBddEstALaVersionAttendue())
+    {
+        QMessageBox dialogueErreurVersionBdd;
+        dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
+L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
+Consultez le développeur / responsable de l'application pour plus d'informations."));
+        dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version de base de données"));
+        dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+        dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+        dialogueErreurVersionBdd.exec();
+    }
+    else
+    {
+        passerLeLogicielEnLectureSeule(false);
+    }
+}
+
+void AeroDms::signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
+    const QDateTime p_heureVerrouInitial,
+    const QDateTime p_heureDerniereVerrou)
+{
+    passerLeLogicielEnLectureSeule(true);
+
+    QMessageBox dialogueErreurVersionBdd;
+    dialogueErreurVersionBdd.setText(tr("La base de données est verrouillée par ")
+        + p_nomVerrou
+        + tr("\ndepuis le ")
+        + QLocale::system().toString(p_heureDerniereVerrou, "d MMMM yyyy 'à' hh'h'mm")
+        + ".\n\nLe logiciel est passé en lecture seule."
+        + "\nAttendez que l'utilisateur libère la base de données puis relancez le logiciel.");
+    dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Base de données verrouillée"));
+    dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+    dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+    dialogueErreurVersionBdd.exec();
+}
+
 void AeroDms::mettreAJourAerodromes()
 {
     QMessageBox::information(this,
@@ -5233,6 +5413,8 @@ void AeroDms::mettreAJourAerodromes()
 
         peuplerMenuMailPilotesDUnAerodrome();
         dialogueGestionAeroclub->peuplerListeAerodrome();
+
+        db->demanderEnvoiBdd();
     } 
 }
 
@@ -5281,5 +5463,16 @@ void AeroDms::closeEvent(QCloseEvent* event)
     {
         factureRecupereeEnLigneEstNonTraitee = false;
         QFile::remove(cheminDeLaFactureCourante);
+    }
+
+    if (gestionnaireDonneesEnLigne->estActif())
+    {
+        passerLeLogicielEnLectureSeule(true);
+        statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne"));
+
+        event->ignore();
+        etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;
+
+        db->libererVerrouBdd();
     }
 }

@@ -20,9 +20,179 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "QMessageBox"
 #include "AeroDmsServices.h"
 
-ManageDb::ManageDb(const int p_delaisDeGardeBdd) 
+ManageDb::ManageDb(const int p_delaisDeGardeBdd, 
+    const QString p_nomDuVerrou,
+    GestionnaireDonneesEnLigne *p_gestionnaireDonneesEnLigne)
 {
     delaisDeGardeBdd = p_delaisDeGardeBdd;
+    gestionnaireDonneesEnLigne = p_gestionnaireDonneesEnLigne;
+    nomDuVerrou = p_nomDuVerrou;
+
+    connect(gestionnaireDonneesEnLigne, SIGNAL(receptionSha256Bdd(QString)), this, SLOT(comparerSha256BddLocale(QString)));
+    connect(gestionnaireDonneesEnLigne, SIGNAL(baseDeDonneesTelechargeeEtDisponible()), this, SLOT(prendreEnCompteBddTelechargee()));
+    connect(gestionnaireDonneesEnLigne, SIGNAL(finDEnvoiBdd()), this, SLOT(rechargerBddSuiteEnvoi()));
+    
+}
+
+void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
+{
+    if (p_sha256BaseEnLigne != recupererShaSumBdd())
+    {
+        gestionnaireDonneesEnLigne->telechargerBdd();
+        //On demande le téléchargement de la base distante
+        //On laisse le logiciel en lecture seule pendant la mise à jour de la base
+        //et à l'issue on vérifiera le lock
+    }
+    else
+    {
+        //base distante et locale identique => on ne retélécharge pas
+        //mais on emet le signal signalerChargementBaseSuiteTelechargement()
+        //pour repasse l'IHM en lecture-ecriture
+        emit signalerChargementBaseSuiteTelechargement();
+        gererVerrouBdd();
+    }
+}
+
+void ManageDb::gererVerrouBdd()
+{
+    //Le verrou est la ligne portant le nom "lock" dans la table parametres
+    // Ses options sont :
+    //      -info1 : nom du propriétaire du lock, issu du champ trésorier
+    //      -info2 : date du lock initial
+    //      -info3 : date de dernière mise à jour du lock
+    
+    //Si pas de verrou dans la base de données (ou si le verrou est le notre), 
+    //on positionne (met à jour) le verrou
+    //Si verrou dans la base de données et que le le verrou n'est pas le notre, 
+    //on positionne le logiciel en lecture seule et on demande l'affichage 
+    //d'un message explicatif
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM parametres WHERE nom = 'lock'");
+    query.exec();
+    query.next();
+
+    if (query.value("info1").toString() == "")
+    {
+        //Non verrouillé : on prend
+        query.prepare("UPDATE 'parametres' SET 'info1' = :nomVerrou,'info2' = :dateVerrouInitial,'info3' = :derniereDateVerrou WHERE nom = 'lock'");
+        query.bindValue(":nomVerrou", nomDuVerrou);
+        query.bindValue(":dateVerrouInitial", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
+        query.bindValue(":derniereDateVerrou", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
+        query.exec();
+        //On demande l'envoi de la BDD en ligne avec le verrou
+        demanderEnvoiBdd();
+    }
+    else
+    {
+        //Un verrou existe : on vérifie si c'est le notre :
+        if (query.value("info1").toString() == nomDuVerrou)
+        {
+            //Il faut le mettre à jour puis envoyer la BDD
+            // => mise à jour assurée par demanderEnvoiBdd
+            demanderEnvoiBdd();
+        }
+        else
+        {
+            // Ce n'est pas le notre : on notifie à l'utilisateur et on passe en lecture seule
+            const QDateTime heureVerrouInitial = query.value("info2").toDateTime();
+            const QDateTime heureDerniereVerrou = query.value("info3").toDateTime();
+            emit signalerBddBloqueeParUnAutreUtilisateur(query.value("info1").toString(), 
+                heureVerrouInitial, 
+                heureDerniereVerrou);
+        }
+    }
+}
+
+void ManageDb::libererVerrouBdd()
+{
+    //On ne libère le verrou que si c'est le notre
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM parametres WHERE nom = 'lock'");
+    query.exec();
+    query.next();
+
+    //On verifie si c'est notre verrou
+    if (query.value("info1").toString() == nomDuVerrou)
+    {
+        emit passerLogicielEnLectureSeuleDurantEnvoiBdd();
+
+        //C'est le notre : on le libère
+        query.prepare("UPDATE 'parametres' SET 'info1' = NULL, 'info2' = NULL, 'info3' = NULL WHERE nom = 'lock'");
+        query.exec();
+        //On demande l'envoi de la BDD en ligne avec le verrou à jour
+        db.close();
+
+        QThread::msleep(delaisDeGardeBdd);
+        gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
+    }
+}
+
+void ManageDb::demanderEnvoiBdd()
+{
+    if (gestionnaireDonneesEnLigne->estActif())
+    {
+        emit passerLogicielEnLectureSeuleDurantEnvoiBdd();
+
+        QSqlQuery query;
+        query.prepare("UPDATE 'parametres' SET 'info3' = :derniereDateVerrou WHERE nom = 'lock'");
+        query.bindValue(":derniereDateVerrou", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
+        query.exec();
+
+        QThread::msleep(delaisDeGardeBdd);
+        db.close();
+
+        gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
+    }  
+}
+
+void ManageDb::rechargerBddSuiteEnvoi()
+{
+    db.open();
+    emit sortirDuModeLectureSeule();
+}
+
+const QStringList ManageDb::recupererListeFichiersPdfFactures()
+{
+    QSqlQuery query;
+    query.prepare("SELECT nomFichier FROM fichiersFacture WHERE nomFichier != 'FactureFictivePourInit'");
+    query.exec();
+
+    QStringList listeFactures;
+    
+    while (query.next())
+    {
+        listeFactures.append(query.value("nomFichier").toString());
+    }
+
+    return listeFactures;
+}
+
+void ManageDb::prendreEnCompteBddTelechargee()
+{
+    qDebug() << "actions sur fin téléchargement BDD" << db.databaseName();
+
+    db.close();
+
+    const QString nomSauvegardeBdd = db.databaseName().replace("/AeroDMS.sqlite", "/AeroDMS"+QDateTime::currentDateTime().toString("_yyyy-MM-dd_hhmm") + ".sqlite");
+
+    QFile gestionnaireDeFichier;
+    //On sauvegarde l'ancienne base locale
+    gestionnaireDeFichier.copy(db.databaseName(),
+        nomSauvegardeBdd);
+    //On remet la nouvelle base fraichement téléchargée
+    const QString nomBddTelechargee = db.databaseName().replace("/AeroDMS.sqlite", "/AeroDMS_new.sqlite");
+    gestionnaireDeFichier.remove(db.databaseName());
+    gestionnaireDeFichier.rename(nomBddTelechargee,
+        db.databaseName());
+
+    db.open();
+
+    //On signale le chargement d'une nouvelle BDD à destination de l'IHM notamment
+    emit signalerChargementBaseSuiteTelechargement();
+
+    gererVerrouBdd();
 }
 
 bool ManageDb::ouvrirLaBdd(const QString& p_database)
@@ -62,6 +232,24 @@ void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
     gestionnaireDeFichier.copy(db.databaseName(), p_repertoireDeSauvegarde + "AeroDms.sqlite");
 
     db.open();
+}
+
+const QString ManageDb::recupererShaSumBdd()
+{
+    QFile file(db.databaseName());
+    if (!file.open(QIODevice::ReadOnly)) {
+        return QString(); // Retourne une chaîne vide en cas d'erreur d'ouverture
+    }
+
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    // Lecture du fichier par morceaux pour éviter les problèmes de mémoire avec les gros fichiers
+    while (!file.atEnd()) {
+        hash.addData(file.read(8192)); // Lecture de 8 KB à la fois
+    }
+    file.close();
+
+    // Convertir le hash en QString hexadécimal
+    return QString(hash.result().toHex());
 }
 
 const AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()

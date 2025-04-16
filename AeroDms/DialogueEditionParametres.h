@@ -58,6 +58,10 @@ private:
     QLineEdit* facturesSaisies = nullptr;
     QLineEdit* factureATraiter = nullptr;
     QLineEdit* sortieFichiersGeneres = nullptr;
+    QComboBox* modeFonctionnementLogiciel = nullptr;
+    QLineEdit* adresseServeurModeExterne = nullptr;
+    QLineEdit* loginServeurModeExterne = nullptr;
+    QLineEdit* motDePasseServeurModeExterne = nullptr;
     QComboBox* utiliserRessourcesHtmlInternes = nullptr;
     QLineEdit* loginDaca = nullptr;
     QLineEdit* motDePasseDaca = nullptr;
@@ -82,6 +86,8 @@ public slots:
     void enregistrerParametres();
     void afficherMotDePasse();
     void masquerMotDePasse();
+    void afficherMotDePasseModeExterne();
+    void masquerMotDePasseModeExterne();
 
 signals:
     void envoyerParametres( const AeroDmsTypes::ParametresMetier parametresMetiers, 

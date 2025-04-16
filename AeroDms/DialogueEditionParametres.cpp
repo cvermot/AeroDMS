@@ -328,6 +328,46 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     sortieFichiersGeneres->setText(p_parametresSysteme.cheminSortieFichiersGeneres);
 
     ligneActuelle = systemeLayout->rowCount();
+    modeFonctionnementLogiciel = new QComboBox(this);
+    modeFonctionnementLogiciel->setToolTip(tr("Ce parametre permet d'utiliser le logiciel en mode interne pur ou en mode externe. En mode externe, les données et base de données sont uploadées sur un serveur distant, ce qui permet d'acceder aux données du logiciel en dehors de l'entreprise") );
+    systemeLayout->addWidget(new QLabel(tr("Mode de fonctionnement : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(modeFonctionnementLogiciel, ligneActuelle, K_COLONNE_CHAMP);
+    modeFonctionnementLogiciel->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE_EXTERNE), tr("Mode interne uniquement"), AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT);
+    modeFonctionnementLogiciel->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE), tr("Mode externe autorisé - réseau entreprise"), AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_INTERNE);
+    modeFonctionnementLogiciel->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE), tr("Mode externe autorisé - hors réseau entreprise"), AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE);
+
+    modeFonctionnementLogiciel->setCurrentIndex(p_parametresSysteme.modeFonctionnementLogiciel);
+
+    ligneActuelle = systemeLayout->rowCount();
+    adresseServeurModeExterne = new QLineEdit(this);
+    adresseServeurModeExterne->setToolTip(tr("Adresse du serveur utilisé pour le mode externe"));
+    systemeLayout->addWidget(new QLabel(tr("Adresse serveur mode externe : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(adresseServeurModeExterne, ligneActuelle, K_COLONNE_CHAMP);
+
+    adresseServeurModeExterne->setText(p_parametresSysteme.adresseServeurModeExterne);
+
+    ligneActuelle = systemeLayout->rowCount();
+    loginServeurModeExterne = new QLineEdit(this);
+    loginServeurModeExterne->setToolTip(tr("Login utilisé pour le mode externe"));
+    systemeLayout->addWidget(new QLabel(tr("Login serveur mode externe : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(loginServeurModeExterne, ligneActuelle, K_COLONNE_CHAMP);
+
+    loginServeurModeExterne->setText(p_parametresSysteme.loginServeurModeExterne);
+
+    ligneActuelle = systemeLayout->rowCount();
+    motDePasseServeurModeExterne = new QLineEdit(this);
+    motDePasseServeurModeExterne->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+    motDePasseServeurModeExterne->setToolTip(tr("Mot de passe utilisé pour le mode externe"));
+    systemeLayout->addWidget(new QLabel(tr("Mot de passe serveur mode externe : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(motDePasseServeurModeExterne, ligneActuelle, K_COLONNE_CHAMP);
+    QPushButton* boutonAffichageMotDePasseModeExterne = new QPushButton(tr("Afficher le mot de passe"), this);
+    systemeLayout->addWidget(boutonAffichageMotDePasseModeExterne, ligneActuelle, K_COLONNE_BOUTON);
+    connect(boutonAffichageMotDePasseModeExterne, SIGNAL(pressed()), this, SLOT(afficherMotDePasseModeExterne()));
+    connect(boutonAffichageMotDePasseModeExterne, SIGNAL(released()), this, SLOT(masquerMotDePasseModeExterne()));
+
+    motDePasseServeurModeExterne->setText(p_parametresSysteme.motDePasseServeurModeExterne);
+
+    ligneActuelle = systemeLayout->rowCount();
     utiliserRessourcesHtmlInternes = new QComboBox(this);
     utiliserRessourcesHtmlInternes->setToolTip(tr("Ce paramètre permet de changer la source des templates HTML utilisés. Le mode ressources externes permet de modifier les templates HTML à des fins de mise au point ou s'il est nécessaire d'utiliser un nouveau template compatible avec l'ancien et que l'on ne souhaite pas recompiler le logiciel. En cas d'utilisation en mode ressource externe, les fichiers HTML sont attendus dans : ") + QFileInfo(cheminBdd->text()).absolutePath() + "/ressources/HTML/.");
     systemeLayout->addWidget(new QLabel(tr("Ressources HTML : "), this), ligneActuelle, K_COLONNE_LABEL);
@@ -504,6 +544,10 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.cheminStockageFacturesATraiter = factureATraiter->text();
     parametresSysteme.cheminSortieFichiersGeneres = sortieFichiersGeneres->text();
     parametresSysteme.autoriserReglementParVirement = autoriserVirement->isChecked();
+    parametresSysteme.modeFonctionnementLogiciel = static_cast<AeroDmsTypes::ModeFonctionnementLogiciel>(modeFonctionnementLogiciel->currentData().toInt());
+    parametresSysteme.adresseServeurModeExterne = adresseServeurModeExterne->text();
+    parametresSysteme.loginServeurModeExterne = loginServeurModeExterne->text();
+    parametresSysteme.motDePasseServeurModeExterne = motDePasseServeurModeExterne->text();
     parametresSysteme.utiliserRessourcesHtmlInternes = utiliserRessourcesHtmlInternes->currentData().toBool();
     parametresSysteme.loginSiteDaca = loginDaca->text();
     parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();
@@ -529,4 +573,14 @@ void DialogueEditionParametres::afficherMotDePasse()
 void DialogueEditionParametres::masquerMotDePasse()
 {
     motDePasseDaca->setEchoMode(QLineEdit::PasswordEchoOnEdit);
+}
+
+void DialogueEditionParametres::afficherMotDePasseModeExterne()
+{
+    motDePasseServeurModeExterne->setEchoMode(QLineEdit::Normal);
+}
+
+void DialogueEditionParametres::masquerMotDePasseModeExterne()
+{
+    motDePasseServeurModeExterne->setEchoMode(QLineEdit::PasswordEchoOnEdit);
 }

@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "ManageDb.h"
 #include "PdfRenderer.h"
 #include "PdfDownloader.h"
+#include "GestionnaireDonneesEnLigne.h"
 #include "DialogueGestionPilote.h"
 #include "DialogueGestionAeroclub.h"
 #include "DialogueAjouterCotisation.h"
@@ -105,7 +106,7 @@ private:
         const QString p_fichier);
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
-    void passerLeLogicielEnLectureSeule();
+    void passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee);
     void preparerStatusBar();
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();
@@ -127,6 +128,7 @@ private:
     ManageDb* db = nullptr;
     PdfRenderer* pdf = nullptr;
     PdfDownloader* pdfdl = nullptr;
+    GestionnaireDonneesEnLigne* gestionnaireDonneesEnLigne = nullptr;
 
     AeroDmsTypes::Signature signature = AeroDmsTypes::Signature_SANS;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
@@ -310,6 +312,14 @@ private:
     //Etats internes application
     bool logicielEnModeLectureSeule = false;
     bool miseAJourApplicationEstEnCours = false;
+    bool verificationDeNouvelleFacturesAChargerEnLigneEstEffectue = false;
+    enum EtapeFermeture
+    {
+        EtapeFermeture_NON_DEMANDE,
+        EtapeFermeture_FERMETURE_BDD,
+        EtapeFermeture_BDD_FERMEE
+    };
+    EtapeFermeture etapeFermetureEnCours = EtapeFermeture_NON_DEMANDE;
 
     //Gestion chargement factures DACA
     bool factureRecupereeEnLigneEstNonTraitee = false;
@@ -338,6 +348,8 @@ signals:
     void toucheEchapEstAppuyee();
     void debuterImpression(int p_nombreDePagesAImprimer);
     void mettreAJourNombreDePagesImprimees(int p_nombreDePagesTraitees);
+    void demanderVerificationEtTelechargementBdd();
+    void autoriserSortieLogiciel();
 
 public slots:
     void fermerSplashscreen();
@@ -363,6 +375,7 @@ public slots:
     void ajouterUneCotisationEnBdd();
     void ajouterUnAeroclub();
     void ouvrirGestionAeronefs();
+    void peuplerListesEtTables();
     void peuplerTablePilotes();
     void peuplerTableVols();
     void peuplerTableFactures();
@@ -428,6 +441,14 @@ public slots:
         int nombreMisAJour);
     void masquerBarreDeProgressionDeLaStatusBar();
     void gererSelectionAnneeAGenerer();
+
+    //Gestion du chargement de la BDD en ligne
+    void verifierVersionBddSuiteChargement();
+    void signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
+        const QDateTime p_heureVerrouInitial,
+        const QDateTime p_heureDerniereVerrou);
+    void passerLeLogicielEnLectureSeule();
+    void sortirLeLogicielDeLectureSeule();
 
     //Téléchargement de factures
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);

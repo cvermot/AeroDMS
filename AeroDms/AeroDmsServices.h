@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AERODMSSERVICES_H
 
 #include <QtWidgets>
+#include <QNetworkReply>
 #include "AeroDmsTypes.h"
 
 class AeroDmsServices
@@ -53,6 +54,8 @@ public:
 
     static QString chiffrerDonnees(QString& data);
     static QString dechiffrerDonnees(QString& encryptedData);
+
+    static void afficherErreur(const QNetworkReply* p_reponse);
 };
 
 #endif // AERODMSSERVICES_H

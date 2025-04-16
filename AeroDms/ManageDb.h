@@ -22,12 +22,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtSql>
 
 #include "AeroDmsTypes.h"
+#include "GestionnaireDonneesEnLigne.h"
 
 class ManageDb : public QWidget {
     Q_OBJECT
 
 public:
-    ManageDb(const int p_delaisDeGardeBdd);
+    ManageDb(const int p_delaisDeGardeBdd,
+        const QString p_nomDuVerrou,
+        GestionnaireDonneesEnLigne* p_gestionnaireDonneesEnLigne);
     bool ouvrirLaBdd(const QString& p_database);
 
     void sauvegarderLaBdd( const QString p_repertoireDeSauvegarde);
@@ -166,16 +169,32 @@ public:
         const QString p_date, 
         const double p_coutDuVol);
 
+    void demanderEnvoiBdd();
+    const QStringList recupererListeFichiersPdfFactures();
+    void libererVerrouBdd();
+
 public slots:
+    void comparerSha256BddLocale(QString p_sha256BaseEnLigne);
+    void prendreEnCompteBddTelechargee();
+    void rechargerBddSuiteEnvoi();
 
 signals:
     void erreurOuvertureBdd();
+    void signalerChargementBaseSuiteTelechargement();
+    void signalerBddBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
+        const QDateTime p_heureVerrouInitial,
+        const QDateTime p_heureDerniereVerrou);
+    void passerLogicielEnLectureSeuleDurantEnvoiBdd();
+    void sortirDuModeLectureSeule();
 
 private:
     QSqlDatabase db;
+    GestionnaireDonneesEnLigne* gestionnaireDonneesEnLigne = nullptr;
     QString database = "";
     int delaisDeGardeBdd = 0;
-    const double versionBddAttendue = 1.13;
+    QString nomDuVerrou = "";
+
+    const double versionBddAttendue = 1.14;
 
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
@@ -184,6 +203,9 @@ private:
     void executerRequeteAvecControle(QSqlQuery& p_query,
         const QString p_nomRequete,
         const QString p_texteDetailErreur);
+
+    const QString recupererShaSumBdd();
+    void gererVerrouBdd();
 };
 
 #endif
