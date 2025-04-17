@@ -167,9 +167,6 @@ void DialogueGestionAeroclub::chargerDonneesAeroclub()
     {
         const AeroDmsTypes::Club aeroclub = database->recupererAeroclub(selectionAeroclub->currentData().toInt());
 
-        qDebug() << aeroclub.aeroclub;
-        qDebug() << aeroclub.aerodrome;
-
         idAeroclub = selectionAeroclub->currentData().toInt();
         nomAeroclub->setText(aeroclub.aeroclub);
         selectionAerodrome->setCurrentIndex(selectionAerodrome->findData(aeroclub.aerodrome));

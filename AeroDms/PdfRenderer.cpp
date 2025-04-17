@@ -451,7 +451,6 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //On envoie le HTML en génération
         view->setHtml( templateCeTmp, 
                        ressourcesHtml);
-        qDebug() << templateCeTmp;
 
         QStringList facturesAssociees = db->recupererListeFacturesAssocieeASubvention(demande);
         listeDesFichiers.append(facturesAssociees);

@@ -4365,9 +4365,22 @@ void AeroDms::envoyerMail()
                             + tr("Montant virement ") 
                             + QString::number(virement + 1) 
                             + " : " 
-                            + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement))
+                            + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement), 'f', 2)
                             + "€\n";
                     }
+                    stringListeVirement = stringListeVirement + tr("\nPour information : subvention entrainement restante pour l'année ");
+                    stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
+                    stringListeVirement = stringListeVirement + " : ";
+                    stringListeVirement = stringListeVirement + QString::number(db->recupererSubventionRestante(listeVirements.at(pilote).pilote, QDate::currentDate().year()), 'f', 2);
+                    stringListeVirement = stringListeVirement + " €";
+                    if (!db->piloteEstAJourDeCotisation(listeVirements.at(pilote).pilote, QDate::currentDate().year()))
+                    {
+                        stringListeVirement = stringListeVirement + tr(" (cotisation non payée pour l'année ");
+                        stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
+                        stringListeVirement = stringListeVirement + ")";
+                    }
+                    stringListeVirement = stringListeVirement + ".";
+
                     QString texteMail = parametresMetiers.texteMailVirementSubvention;
                     texteMail = texteMail.replace("#listeVirements", stringListeVirement);
                     QDesktopServices::openUrl(QUrl("mailto:"

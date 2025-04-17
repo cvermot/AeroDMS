@@ -171,8 +171,6 @@ const QStringList ManageDb::recupererListeFichiersPdfFactures()
 
 void ManageDb::prendreEnCompteBddTelechargee()
 {
-    qDebug() << "actions sur fin téléchargement BDD" << db.databaseName();
-
     db.close();
 
     const QString nomSauvegardeBdd = db.databaseName().replace("/AeroDMS.sqlite", "/AeroDMS"+QDateTime::currentDateTime().toString("_yyyy-MM-dd_hhmm") + ".sqlite");
@@ -193,6 +191,25 @@ void ManageDb::prendreEnCompteBddTelechargee()
     emit signalerChargementBaseSuiteTelechargement();
 
     gererVerrouBdd();
+
+    //On fait un peu de ménage parmis les bases de données sauvegardées. On va garder les 25 dernières
+    QDir repertoireBdd(db.databaseName().replace("/AeroDMS.sqlite", ""));
+    QStringList filtreSqlite;
+    filtreSqlite << "*.sqlite";
+    repertoireBdd.setNameFilters(filtreSqlite);
+    QStringList listeBddSqlite = repertoireBdd.entryList(QDir::Files);
+    if (listeBddSqlite.indexOf("AeroDMS.sqlite") != -1)
+    {
+        listeBddSqlite.remove(listeBddSqlite.indexOf("AeroDMS.sqlite"));
+    }
+
+    while (listeBddSqlite.size() > 25)
+    {
+        const QString nomBddASupprimer = db.databaseName().replace("AeroDMS.sqlite", listeBddSqlite.at(0));
+        gestionnaireDeFichier.remove(nomBddASupprimer);
+
+        listeBddSqlite.removeAt(0);
+    }
 }
 
 bool ManageDb::ouvrirLaBdd(const QString& p_database)
@@ -2334,6 +2351,7 @@ const AeroDmsTypes::ListeMailsEtVirements ManageDb::recupererMailsVirements(cons
                 listeVirements.append(mailEtVirements);
             }
             mailEtVirements.mail = query.value("mail").toString();
+            mailEtVirements.pilote = query.value("pilote").toString();
             mailEtVirements.listeMontantsVirements.clear();
             mail = query.value("mail").toString();
         }

@@ -600,7 +600,8 @@ public:
 
     struct MailEtVirements
     {
-        QString mail;
+        QString mail = "";
+        QString pilote = "";
         QList<double> listeMontantsVirements;
     };
     typedef QList<MailEtVirements> ListeMailsEtVirements;
