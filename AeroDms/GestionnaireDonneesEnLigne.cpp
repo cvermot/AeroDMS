@@ -167,13 +167,33 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
             else if (demandeEnCours == Demande_ENVOI_FACTURE)
             {
                 const QByteArray sdata = rep->readAll();
-                //qDebug() << "Envoi facture " << sdata;
+                if (sdata != "Le fichier PDF été téléchargé avec succès.")
+                {
+                    QMessageBox dialogueErreurVersionBdd;
+                    dialogueErreurVersionBdd.setText(tr("L'envoi du fichier PDF en ligne a échoué pour la raison suivante :\n")
+                        + sdata);
+                    dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur d'envoi du PDF en ligne"));
+                    dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+                    dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+                    dialogueErreurVersionBdd.exec();
+                }
+
                 libererMutex();
             }
             else if (demandeEnCours == Demande_ENVOI_BDD)
             {
                 const QByteArray sdata = rep->readAll();
-                //qDebug() << "Envoi BDD " << sdata;
+                if (sdata != "La base de données a été téléchargée avec succès.")
+                {
+                    QMessageBox dialogueErreurVersionBdd;
+                    dialogueErreurVersionBdd.setText(tr("L'envoi de la BDD en ligne a échoué pour la raison suivante :\n")
+                    + sdata);
+                    dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur d'envoi de la BDD en ligne"));
+                    dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
+                    dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
+                    dialogueErreurVersionBdd.exec();
+                }
+                
                 emit finDEnvoiBdd();
                 libererMutex();
             }
