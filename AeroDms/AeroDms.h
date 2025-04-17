@@ -106,7 +106,8 @@ private:
         const QString p_fichier);
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
-    void passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee);
+    void passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee,
+        const bool p_figerLesListes);
     void preparerStatusBar();
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();

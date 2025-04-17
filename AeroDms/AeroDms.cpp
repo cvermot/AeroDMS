@@ -105,7 +105,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
         //On passe systématiquement en lecture seule => si la base est identique a celle dispo en ligne,
         //on recevra le signal signalerChargementBaseSuiteTelechargement() ce qui permettra de repasse
         //le logiciel en lecture-ecriture.
-        passerLeLogicielEnLectureSeule(true);
+        passerLeLogicielEnLectureSeule(true, false);
 
         //On fait la demande au gestionnaire de données en ligne.
         //La réponse sera traitée directement par le gestionnaire de BDD
@@ -704,7 +704,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
             if (!db->laBddEstALaVersionAttendue())
             {
                 fermerSplashscreen();
-                passerLeLogicielEnLectureSeule(true);
+                passerLeLogicielEnLectureSeule(true, false);
 
                 QMessageBox dialogueErreurVersionBdd;
                 dialogueErreurVersionBdd.setText(tr("Une mise à jour de l'application est disponible et doit être réalisée\n\
@@ -730,7 +730,7 @@ L'application va passer en mode lecture seule.\
     else if (!db->laBddEstALaVersionAttendue())
     {
         fermerSplashscreen();
-        passerLeLogicielEnLectureSeule(true);
+        passerLeLogicielEnLectureSeule(true, false);
 
         QMessageBox dialogueErreurVersionBdd;
         dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
@@ -762,7 +762,7 @@ void AeroDms::initialiserGestionnaireTelechargement()
 
 void AeroDms::passerLeLogicielEnLectureSeule()
 {
-    passerLeLogicielEnLectureSeule(true);
+    passerLeLogicielEnLectureSeule(true, true);
 }
 
 void AeroDms::sortirLeLogicielDeLectureSeule()
@@ -776,7 +776,7 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
     }
     else
     {
-        passerLeLogicielEnLectureSeule(false);
+        passerLeLogicielEnLectureSeule(false, true);
     }
 
     //Une fois arrivé ici, on est sur que la BDD est dans un état "stable" :
@@ -806,7 +806,8 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
     }
 }
 
-void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee)
+void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee,
+    const bool p_figerLesListes)
 {
     boutonAjouterUnVol->setEnabled(!p_lectureSeuleEstDemandee);
     boutonAjouterCotisation->setEnabled(!p_lectureSeuleEstDemandee);
@@ -820,7 +821,21 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
     boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
     boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
 
+    listeBaladesEtSorties->setDisabled(p_lectureSeuleEstDemandee);
+    listeDeroulanteAnnee->setDisabled(p_lectureSeuleEstDemandee);
+    listeDeroulanteElementsSoumis->setDisabled(p_lectureSeuleEstDemandee);
+    listeDeroulantePilote->setDisabled(p_lectureSeuleEstDemandee);
+    listeDeroulanteStatistique->setDisabled(p_lectureSeuleEstDemandee);
+    listeDeroulanteType->setDisabled(p_lectureSeuleEstDemandee);
+
     logicielEnModeLectureSeule = p_lectureSeuleEstDemandee;
+
+    //Hors site, on interdit la génération des demandes de subventions (fichiers PDF associés non envoyées en ligne)
+    if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
+    {
+        boutonGenerePdf->setEnabled(false);
+        boutonGenerePdf->setToolTip(tr("La génération des demandes de subventions n'est pas possible hors site."));
+    }
 }
 
 void AeroDms::ouvrirSplashscreen()
@@ -5363,7 +5378,7 @@ Consultez le développeur / responsable de l'application pour plus d'information
     }
     else
     {
-        passerLeLogicielEnLectureSeule(false);
+        passerLeLogicielEnLectureSeule(false, false);
     }
 }
 
@@ -5371,7 +5386,7 @@ void AeroDms::signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_
     const QDateTime p_heureVerrouInitial,
     const QDateTime p_heureDerniereVerrou)
 {
-    passerLeLogicielEnLectureSeule(true);
+    passerLeLogicielEnLectureSeule(true, false);
 
     QMessageBox dialogueErreurVersionBdd;
     dialogueErreurVersionBdd.setText(tr("La base de données est verrouillée par ")
@@ -5467,7 +5482,7 @@ void AeroDms::closeEvent(QCloseEvent* event)
 
     if (gestionnaireDonneesEnLigne->estActif())
     {
-        passerLeLogicielEnLectureSeule(true);
+        passerLeLogicielEnLectureSeule(true, true);
         statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne"));
 
         event->ignore();
