@@ -70,6 +70,7 @@ private:
     void initialiserMenuOutils();
     void initialiserMenuAide();
     void initialiserRaccourcisClavierSansActionIhm();
+    void gererBddDistante();
 
     void chargerUneFactureAvecScan(const QString p_fichier, 
         const bool p_laFactureAChargerEstTelechargeeDInternet = false);
@@ -445,6 +446,7 @@ public slots:
 
     //Gestion du chargement de la BDD en ligne
     void verifierVersionBddSuiteChargement();
+    void afficherStatusDebutTelechargementBdd();
     void signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,
         const QDateTime p_heureDerniereVerrou);

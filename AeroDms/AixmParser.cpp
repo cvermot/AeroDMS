@@ -102,7 +102,6 @@ void  AixmParser::mettreAJourAerodromes(const QString p_fichierAixm)
 				    default:
 					break;
                 }
-                //qDebug() << "ICAO Code:" << icaoCode << ", Name:" << name ;
             }
             emit signalerMiseAJourAerodrome(aerodromes.count(), i + 1, nombreCree, nombreMisAJour);
             qApp->processEvents();

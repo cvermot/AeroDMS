@@ -91,26 +91,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     preparerStatusBar();
     demanderFermetureSplashscreen();
 
-    //Si on est pas en mode fonctionnement interne pur, on réalise des actions supplémentaires
-    if (parametresSysteme.modeFonctionnementLogiciel != AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT)
-    {
-        gestionnaireDonneesEnLigne->activer();
-
-        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(peuplerListesEtTables()));
-        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(verifierVersionBddSuiteChargement()));
-        connect(db, SIGNAL(passerLogicielEnLectureSeuleDurantEnvoiBdd()), this, SLOT(passerLeLogicielEnLectureSeule()));
-        connect(db, SIGNAL(sortirDuModeLectureSeule()), this, SLOT(sortirLeLogicielDeLectureSeule()));
-        connect(db, SIGNAL(signalerBddBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)), this, SLOT(signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)));
-
-        //On passe systématiquement en lecture seule => si la base est identique a celle dispo en ligne,
-        //on recevra le signal signalerChargementBaseSuiteTelechargement() ce qui permettra de repasse
-        //le logiciel en lecture-ecriture.
-        passerLeLogicielEnLectureSeule(true, false);
-
-        //On fait la demande au gestionnaire de données en ligne.
-        //La réponse sera traitée directement par le gestionnaire de BDD
-        gestionnaireDonneesEnLigne->recupererSha256Bdd();
-    }
+    gererBddDistante();
 }
 
 void AeroDms::initialiserBaseApplication()
@@ -772,11 +753,12 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
     if (etapeFermetureEnCours == EtapeFermeture_FERMETURE_BDD)
     {
         etapeFermetureEnCours = EtapeFermeture_BDD_FERMEE;
-        exit(0);
+        QThread::msleep(parametresMetiers.delaisDeGardeBdd);
+        QCoreApplication::quit();
     }
     else
     {
-        passerLeLogicielEnLectureSeule(false, true);
+        passerLeLogicielEnLectureSeule(false, false);
     }
 
     //Une fois arrivé ici, on est sur que la BDD est dans un état "stable" :
@@ -821,12 +803,12 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
     boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
     boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
 
-    listeBaladesEtSorties->setDisabled(p_lectureSeuleEstDemandee);
-    listeDeroulanteAnnee->setDisabled(p_lectureSeuleEstDemandee);
-    listeDeroulanteElementsSoumis->setDisabled(p_lectureSeuleEstDemandee);
-    listeDeroulantePilote->setDisabled(p_lectureSeuleEstDemandee);
-    listeDeroulanteStatistique->setDisabled(p_lectureSeuleEstDemandee);
-    listeDeroulanteType->setDisabled(p_lectureSeuleEstDemandee);
+    listeBaladesEtSorties->setDisabled(p_figerLesListes);
+    listeDeroulanteAnnee->setDisabled(p_figerLesListes);
+    listeDeroulanteElementsSoumis->setDisabled(p_figerLesListes);
+    listeDeroulantePilote->setDisabled(p_figerLesListes);
+    listeDeroulanteStatistique->setDisabled(p_figerLesListes);
+    listeDeroulanteType->setDisabled(p_figerLesListes);
 
     logicielEnModeLectureSeule = p_lectureSeuleEstDemandee;
 
@@ -870,6 +852,34 @@ void AeroDms::fermerSplashscreen()
         splash = nullptr;
     }
 }
+
+void AeroDms::gererBddDistante()
+{
+    //Si on est pas en mode fonctionnement interne pur, on réalise des actions supplémentaires
+    if (parametresSysteme.modeFonctionnementLogiciel != AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT)
+    {
+        statusBar()->showMessage(tr("Vérification de la base de données en ligne en cours... Patientez"));
+
+        gestionnaireDonneesEnLigne->activer();
+
+        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(peuplerListesEtTables()));
+        connect(db, SIGNAL(signalerChargementBaseSuiteTelechargement()), this, SLOT(verifierVersionBddSuiteChargement()));
+        connect(db, SIGNAL(signalerDebutTelechargementBdd()), this, SLOT(afficherStatusDebutTelechargementBdd()));
+        connect(db, SIGNAL(passerLogicielEnLectureSeuleDurantEnvoiBdd()), this, SLOT(passerLeLogicielEnLectureSeule()));
+        connect(db, SIGNAL(sortirDuModeLectureSeule()), this, SLOT(sortirLeLogicielDeLectureSeule()));
+        connect(db, SIGNAL(signalerBddBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)), this, SLOT(signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)));
+
+        //On passe systématiquement en lecture seule => si la base est identique a celle dispo en ligne,
+        //on recevra le signal signalerChargementBaseSuiteTelechargement() ce qui permettra de repasse
+        //le logiciel en lecture-ecriture.
+        passerLeLogicielEnLectureSeule(true, false);
+
+        //On fait la demande au gestionnaire de données en ligne.
+        //La réponse sera traitée directement par le gestionnaire de BDD
+        gestionnaireDonneesEnLigne->recupererSha256Bdd();
+    }
+}
+
 
 void AeroDms::verifierSignatureNumerisee()
 {
@@ -5393,6 +5403,13 @@ Consultez le développeur / responsable de l'application pour plus d'information
     {
         passerLeLogicielEnLectureSeule(false, false);
     }
+
+    statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
+}
+
+void AeroDms::afficherStatusDebutTelechargementBdd()
+{
+    statusBar()->showMessage(tr("Base de données locale non à jour. Téléchargement de la BDD... Patientez"));
 }
 
 void AeroDms::signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
@@ -5404,10 +5421,10 @@ void AeroDms::signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_
     QMessageBox dialogueErreurVersionBdd;
     dialogueErreurVersionBdd.setText(tr("La base de données est verrouillée par ")
         + p_nomVerrou
-        + tr("\ndepuis le ")
+        + tr(" depuis le ")
         + QLocale::system().toString(p_heureDerniereVerrou, "d MMMM yyyy 'à' hh'h'mm")
-        + ".\n\nLe logiciel est passé en lecture seule."
-        + "\nAttendez que l'utilisateur libère la base de données puis relancez le logiciel.");
+        + ".<br /><br />Le logiciel est passé en lecture seule."
+        + "<br />Attendez que l'utilisateur libère la base de données puis relancez le logiciel.");
     dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Base de données verrouillée"));
     dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
     dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
@@ -5486,21 +5503,28 @@ void AeroDms::masquerBarreDeProgressionDeLaStatusBar()
 
 void AeroDms::closeEvent(QCloseEvent* event)
 {
-    delete pdfDocument;
     if (factureRecupereeEnLigneEstNonTraitee == true)
     {
+        delete pdfDocument;
         factureRecupereeEnLigneEstNonTraitee = false;
         QFile::remove(cheminDeLaFactureCourante);
     }
-
-    if (gestionnaireDonneesEnLigne->estActif())
+    
+    //Si on est dans l'état BDD fermée, on ne doit pas intercepter le signal de fermeture
+    if (etapeFermetureEnCours != EtapeFermeture_BDD_FERMEE)
     {
-        passerLeLogicielEnLectureSeule(true, true);
-        statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne"));
+        //On ne renvoie la BDD en ligne que si le gestionnaire de données en ligne est actif
+        //et si le logiciel n'est pas en lecture seule
+        if (gestionnaireDonneesEnLigne->estActif() && !logicielEnModeLectureSeule)
+        {
+            statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne en cours... Patientez, le logiciel fermera automatiquement une fois cette étape effecutée.."));
+            passerLeLogicielEnLectureSeule(true, true);
+            
+            event->ignore();
+            etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;
 
-        event->ignore();
-        etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;
-
-        db->libererVerrouBdd();
+            db->libererVerrouBdd();
+        }
     }
+    
 }

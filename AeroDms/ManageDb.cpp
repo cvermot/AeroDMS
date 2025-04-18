@@ -38,6 +38,7 @@ void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
 {
     if (p_sha256BaseEnLigne != recupererShaSumBdd())
     {
+        emit signalerDebutTelechargementBdd();
         gestionnaireDonneesEnLigne->telechargerBdd();
         //On demande le téléchargement de la base distante
         //On laisse le logiciel en lecture seule pendant la mise à jour de la base
@@ -122,9 +123,11 @@ void ManageDb::libererVerrouBdd()
         query.prepare("UPDATE 'parametres' SET 'info1' = NULL, 'info2' = NULL, 'info3' = NULL WHERE nom = 'lock'");
         query.exec();
         //On demande l'envoi de la BDD en ligne avec le verrou à jour
+        QThread::msleep(delaisDeGardeBdd);
         db.close();
 
         QThread::msleep(delaisDeGardeBdd);
+        envoiTerminalAvantFermetureLogiciel = true;
         gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
     }
 }
@@ -149,7 +152,10 @@ void ManageDb::demanderEnvoiBdd()
 
 void ManageDb::rechargerBddSuiteEnvoi()
 {
-    db.open();
+    if (!envoiTerminalAvantFermetureLogiciel)
+    {
+        db.open();
+    }
     emit sortirDuModeLectureSeule();
 }
 

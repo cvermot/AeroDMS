@@ -181,6 +181,7 @@ public slots:
 signals:
     void erreurOuvertureBdd();
     void signalerChargementBaseSuiteTelechargement();
+    void signalerDebutTelechargementBdd();
     void signalerBddBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,
         const QDateTime p_heureDerniereVerrou);
@@ -193,6 +194,7 @@ private:
     QString database = "";
     int delaisDeGardeBdd = 0;
     QString nomDuVerrou = "";
+    bool envoiTerminalAvantFermetureLogiciel = false;
 
     const double versionBddAttendue = 1.14;
 
