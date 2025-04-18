@@ -5388,8 +5388,13 @@ void AeroDms::verifierDispoIdentifiantsDaca()
 
 void AeroDms::verifierVersionBddSuiteChargement()
 {
+    statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
+    passerLeLogicielEnLectureSeule(false, false);
+
     if (!db->laBddEstALaVersionAttendue())
     {
+        passerLeLogicielEnLectureSeule(true, false);
+
         QMessageBox dialogueErreurVersionBdd;
         dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
@@ -5399,12 +5404,6 @@ Consultez le développeur / responsable de l'application pour plus d'information
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
         dialogueErreurVersionBdd.exec();
     }
-    else
-    {
-        passerLeLogicielEnLectureSeule(false, false);
-    }
-
-    statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
 }
 
 void AeroDms::afficherStatusDebutTelechargementBdd()
@@ -5502,14 +5501,13 @@ void AeroDms::masquerBarreDeProgressionDeLaStatusBar()
 }
 
 void AeroDms::closeEvent(QCloseEvent* event)
-{
-    if (factureRecupereeEnLigneEstNonTraitee == true)
+{   
+    //tant  qu'on est dans l'état EtapeFermeture_FERMETURE_BDD, on ignore d'éventuelles autres demandes de fermeture
+    if (etapeFermetureEnCours == EtapeFermeture_FERMETURE_BDD)
     {
-        delete pdfDocument;
-        factureRecupereeEnLigneEstNonTraitee = false;
-        QFile::remove(cheminDeLaFactureCourante);
+        event->ignore();
     }
-    
+
     //Si on est dans l'état BDD fermée, on ne doit pas intercepter le signal de fermeture
     if (etapeFermetureEnCours != EtapeFermeture_BDD_FERMEE)
     {
@@ -5517,14 +5515,28 @@ void AeroDms::closeEvent(QCloseEvent* event)
         //et si le logiciel n'est pas en lecture seule
         if (gestionnaireDonneesEnLigne->estActif() && !logicielEnModeLectureSeule)
         {
-            statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne en cours... Patientez, le logiciel fermera automatiquement une fois cette étape effecutée.."));
-            passerLeLogicielEnLectureSeule(true, true);
-            
             event->ignore();
+
+            const EtapeFermeture etapeFermeturePrecedente = etapeFermetureEnCours;
             etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;
 
-            db->libererVerrouBdd();
+            statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne en cours... Patientez, le logiciel fermera automatiquement une fois cette étape effecutée.."));
+            passerLeLogicielEnLectureSeule(true, true);
+
+            //Si on est va demander la fermeture de la BDD pour envoi, donc qu'on est dans le premier appel de cette méthode
+            //on demande la libération du verrou de BDD
+            if (etapeFermeturePrecedente == EtapeFermeture_NON_DEMANDE)
+            {
+                qDebug() << "demande liberation verrou";
+                db->libererVerrouBdd();
+            }
         }
     }
     
+    if (factureRecupereeEnLigneEstNonTraitee == true)
+    {
+        delete pdfDocument;
+        factureRecupereeEnLigneEstNonTraitee = false;
+        QFile::remove(cheminDeLaFactureCourante);
+    }
 }
