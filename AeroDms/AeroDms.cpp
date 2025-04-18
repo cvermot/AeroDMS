@@ -210,17 +210,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
     QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, QApplication::applicationName());
-    if (settingsMetier.value("parametresMetier/montantSubventionEntrainement", "") == "")
-    {
-        settingsMetier.beginGroup("parametresMetier");
-        settingsMetier.setValue("montantSubventionEntrainement", "750");
-        settingsMetier.setValue("montantCotisationPilote", "15");
-        settingsMetier.setValue("proportionRemboursementEntrainement", "0.5");
-        settingsMetier.setValue("plafondHoraireRemboursementEntrainement", "150");
-        settingsMetier.setValue("proportionRemboursementBalade", "0.875");
-        settingsMetier.setValue("proportionParticipationBalade", "0.375");
-        settingsMetier.endGroup();
-    }
 
     if (settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "") == "")
     {
@@ -229,7 +218,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
         settingsMetier.setValue("margesHautBas", "20");
         settingsMetier.setValue("margesGaucheDroite", "20");
         settingsMetier.setValue("utiliserRessourcesHtmlInternes", true);
-        settingsMetier.setValue("autoriserReglementParVirement", false);
         settingsMetier.endGroup();
     }
 
@@ -246,7 +234,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.parametresImpression.forcageImpressionRecto = settings.value("impression/forcageImpressionRecto", true).toBool();
     parametresSysteme.margesHautBas = settingsMetier.value("parametresSysteme/margesHautBas", "20").toInt();
     parametresSysteme.margesGaucheDroite = settingsMetier.value("parametresSysteme/margesGaucheDroite", "20").toInt();
-    parametresSysteme.autoriserReglementParVirement = settingsMetier.value("parametresSysteme/autoriserReglementParVirement", false).toBool();
     parametresSysteme.utiliserRessourcesHtmlInternes = settingsMetier.value("parametresSysteme/utiliserRessourcesHtmlInternes", true).toBool();
     parametresSysteme.modeFonctionnementLogiciel = static_cast<AeroDmsTypes::ModeFonctionnementLogiciel>(settings.value("modeFonctionnementLogiciel/modeFonctionnement", AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT).toInt());
     parametresSysteme.adresseServeurModeExterne = settings.value("modeFonctionnementLogiciel/adresse", "").toString();
@@ -259,12 +246,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
     valeur = settings.value("modeFonctionnementLogiciel/password", "").toString();
     parametresSysteme.motDePasseServeurModeExterne = AeroDmsServices::dechiffrerDonnees(valeur);
 
-    parametresMetiers.montantSubventionEntrainement = settingsMetier.value("parametresMetier/montantSubventionEntrainement", "750").toDouble();
-    parametresMetiers.montantCotisationPilote = settingsMetier.value("parametresMetier/montantCotisationPilote", "15").toDouble();
-    parametresMetiers.proportionRemboursementEntrainement = settingsMetier.value("parametresMetier/proportionRemboursementEntrainement", "0.5").toDouble();
-    parametresMetiers.plafondHoraireRemboursementEntrainement = settingsMetier.value("parametresMetier/plafondHoraireRemboursementEntrainement", "150").toDouble();
-    parametresMetiers.proportionRemboursementBalade = settingsMetier.value("parametresMetier/proportionRemboursementBalade", "0.875").toDouble();
-    parametresMetiers.proportionParticipationBalade = settingsMetier.value("parametresMetier/proportionParticipationBalade", "0.375").toDouble();
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
@@ -279,6 +260,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
         gestionnaireDonneesEnLigne);
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
     db->ouvrirLaBdd(database);
+    db->lireParametres(parametresMetiers, parametresSysteme);
 
     pdf = new PdfRenderer(db,
         elaborerCheminRessourcesHtml(),
@@ -769,9 +751,12 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
 
     //si on est sur le premier envoi de BDD, on vérifie si on a des
     //factures PDF qui n'existe pas en local
+    //Et on en profite pour relire les paramètres stockés en BDD
     if (!verificationDeNouvelleFacturesAChargerEnLigneEstEffectue)
     {
         verificationDeNouvelleFacturesAChargerEnLigneEstEffectue = true;
+
+        db->lireParametres(parametresMetiers, parametresSysteme);
 
         //pour chaque facture de la table "fichiersFacture",
         //on vérifie si la facture existe dans le répertoire local des factures
@@ -4250,22 +4235,16 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
     QSettings settingsMetier(QSettings::IniFormat, QSettings::SystemScope, "AeroDMS");
-    settingsMetier.beginGroup("parametresMetier");
-    settingsMetier.setValue("montantSubventionEntrainement", parametresMetiers.montantSubventionEntrainement);
-    settingsMetier.setValue("montantCotisationPilote", parametresMetiers.montantCotisationPilote);
-    settingsMetier.setValue("proportionRemboursementEntrainement", parametresMetiers.proportionRemboursementEntrainement);
-    settingsMetier.setValue("plafondHoraireRemboursementEntrainement", parametresMetiers.plafondHoraireRemboursementEntrainement);
-    settingsMetier.setValue("proportionRemboursementBalade", parametresMetiers.proportionRemboursementBalade);
-    settingsMetier.setValue("proportionParticipationBalade", parametresMetiers.proportionParticipationBalade);
-    settingsMetier.endGroup();
- 
     settingsMetier.beginGroup("parametresSysteme");
     settingsMetier.setValue("delaisDeGardeDbEnMs", parametresMetiers.delaisDeGardeBdd);
     settingsMetier.setValue("margesHautBas", parametresSysteme.margesHautBas);
     settingsMetier.setValue("margesGaucheDroite", parametresSysteme.margesGaucheDroite);
-    settingsMetier.setValue("autoriserReglementParVirement", parametresSysteme.autoriserReglementParVirement);
     settingsMetier.setValue("utiliserRessourcesHtmlInternes", parametresSysteme.utiliserRessourcesHtmlInternes);
     settingsMetier.endGroup();
+
+    //On sauvegarde les paramètres qu'on enregistre en BDD
+    db->enregistrerParametres(parametresMetiers, parametresSysteme);
+    db->demanderEnvoiBdd();
 
     //On met à jour les marges...
     pdf->mettreAJourMarges(QMarginsF(parametresSysteme.margesGaucheDroite,

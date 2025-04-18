@@ -275,6 +275,71 @@ const QString ManageDb::recupererShaSumBdd()
     return QString(hash.result().toHex());
 }
 
+void ManageDb::lireParametres(AeroDmsTypes::ParametresMetier &p_parametresMetiers, 
+    AeroDmsTypes::ParametresSysteme &p_parametresSysteme)
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = 'autoriserReglementParVirement'");
+    query.exec();
+    if (query.next())
+    {
+        p_parametresSysteme.autoriserReglementParVirement = query.value("info1").toBool();
+    }
+    else
+    {
+        p_parametresSysteme.autoriserReglementParVirement = false;
+    }
+
+    p_parametresMetiers.proportionParticipationBalade = lireParametreUnitaire("proportionParticipationBalade");
+    p_parametresMetiers.proportionRemboursementBalade = lireParametreUnitaire("proportionRemboursementBalade");
+    p_parametresMetiers.plafondHoraireRemboursementEntrainement = lireParametreUnitaire("plafondHoraireRemboursementEntrainement");
+    p_parametresMetiers.proportionRemboursementEntrainement = lireParametreUnitaire("proportionRemboursementEntrainement");
+    p_parametresMetiers.montantCotisationPilote = lireParametreUnitaire("montantCotisationPilote");
+    p_parametresMetiers.montantSubventionEntrainement = lireParametreUnitaire("montantSubventionEntrainement");   
+}
+
+const double ManageDb::lireParametreUnitaire(const QString &p_nomParametre)
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", p_nomParametre);
+    query.exec();
+    if (query.next())
+    {
+        return query.value("info1").toDouble();
+    }
+    return 0.0;
+}
+
+void ManageDb::enregistrerParametres(const AeroDmsTypes::ParametresMetier& p_parametresMetiers,
+    const AeroDmsTypes::ParametresSysteme& p_parametresSysteme)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE parametres SET info1 = :valeur WHERE nom = :nomParametre");
+    query.bindValue(":nomParametre", "autoriserReglementParVirement");
+    query.bindValue(":valeur", p_parametresSysteme.autoriserReglementParVirement);
+    query.exec();
+
+    enregistrerParametreUnitaire("proportionParticipationBalade", p_parametresMetiers.proportionParticipationBalade);
+    enregistrerParametreUnitaire("proportionRemboursementBalade", p_parametresMetiers.proportionRemboursementBalade);
+    enregistrerParametreUnitaire("plafondHoraireRemboursementEntrainement", p_parametresMetiers.plafondHoraireRemboursementEntrainement);
+    enregistrerParametreUnitaire("proportionRemboursementEntrainement", p_parametresMetiers.proportionRemboursementEntrainement);
+    enregistrerParametreUnitaire("montantCotisationPilote", p_parametresMetiers.montantCotisationPilote);
+    enregistrerParametreUnitaire("montantSubventionEntrainement", p_parametresMetiers.montantSubventionEntrainement);
+}
+
+void ManageDb::enregistrerParametreUnitaire(const QString & p_nomParametre,
+    const double p_valeur)
+{
+    QSqlQuery query;
+    query.prepare("UPDATE parametres SET info1 = :valeur WHERE nom = :nomParametre");
+    query.bindValue(":nomParametre", p_nomParametre);
+    query.bindValue(":valeur", p_valeur);
+    query.exec();
+}
+
 const AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
 {
     AeroDmsTypes::ListeAeroclubs listeDesClubs;

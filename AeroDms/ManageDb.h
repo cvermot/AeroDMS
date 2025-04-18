@@ -32,6 +32,10 @@ public:
         const QString p_nomDuVerrou,
         GestionnaireDonneesEnLigne* p_gestionnaireDonneesEnLigne);
     bool ouvrirLaBdd(const QString& p_database);
+    void lireParametres(AeroDmsTypes::ParametresMetier& p_parametresMetiers,
+        AeroDmsTypes::ParametresSysteme& p_parametresSysteme);
+    void enregistrerParametres(const AeroDmsTypes::ParametresMetier& p_parametresMetiers,
+        const AeroDmsTypes::ParametresSysteme& p_parametresSysteme);
 
     void sauvegarderLaBdd( const QString p_repertoireDeSauvegarde);
     const bool laBddEstALaVersionAttendue() const;
@@ -201,6 +205,9 @@ private:
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
         const bool p_avecFactureEtSortie = true);
+    const double lireParametreUnitaire(const QString &p_nomParametre);
+    void enregistrerParametreUnitaire(const QString& p_nomParametre,
+        const double p_valeur);
     static const QString genererClauseFiltrageActivite(const int p_options);
     void executerRequeteAvecControle(QSqlQuery& p_query,
         const QString p_nomRequete,
