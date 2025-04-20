@@ -41,6 +41,8 @@ public:
     const bool laBddEstALaVersionAttendue() const;
     const QVersionNumber recupererVersionLogicielleMinimale();
     const QString recupererNomFichierMiseAJour();
+    void enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber& p_version,
+        const QString& p_nomFichier);
 
     const AeroDmsTypes::ListePilotes recupererPilotes();
     const AeroDmsTypes::Pilote recupererPilote( const QString p_idPilote);

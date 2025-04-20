@@ -135,5 +135,6 @@
         <file>ressources/calendar-multiple.svg</file>
         <file>ressources/note-edit.svg</file>
         <file>ressources/information-slab-circle.svg</file>
+        <file>ressources/cog-clockwise.svg</file>
     </qresource>
 </RCC>

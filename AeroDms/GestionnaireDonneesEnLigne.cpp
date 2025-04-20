@@ -76,9 +76,7 @@ bool GestionnaireDonneesEnLigne::connecter()
                 //    this, &GestionnaireDonneesEnLigne::finaliserTelechargement);
 
                 // Ouvrir le fichier de destination
-                qDebug() << "enregistrement sous " << parametres.cheminStockageBdd;
                 const QString fichierDeSortie = parametres.cheminStockageBdd + "/update.zip";
-                qDebug() << "enregistrement sous " << fichierDeSortie;
                 fichierEnCoursDeTelechargement = new QFile(fichierDeSortie, this);
                 if (!fichierEnCoursDeTelechargement->open(QIODevice::WriteOnly)) {
                     qWarning() << "Impossible d'ouvrir le fichier pour écrire:" << fichierDeSortie;
@@ -95,7 +93,8 @@ bool GestionnaireDonneesEnLigne::connecter()
 
                 // Ajoutez le fichier
                 QFile* file = new QFile(cheminFichier);
-                if (!file->open(QIODevice::ReadOnly)) {
+                if (!file->open(QIODevice::ReadOnly)) 
+                {
                     qDebug() << "Erreur : Impossible d'ouvrir le fichier.";
                     delete file;
                     return false;
@@ -123,7 +122,8 @@ bool GestionnaireDonneesEnLigne::connecter()
 
                 // Ajoutez le fichier
                 QFile* file = new QFile(cheminFichier);
-                if (!file->open(QIODevice::ReadOnly)) {
+                if (!file->open(QIODevice::ReadOnly)) 
+                {
                     qDebug() << "Erreur : Impossible d'ouvrir le fichier.";
                     delete file;
                     return false;
@@ -186,21 +186,18 @@ void GestionnaireDonneesEnLigne::enregistrerDonneesRecues()
 
 void GestionnaireDonneesEnLigne::finaliserTelechargement()
 {
-    qDebug() << "entrée fin téléchargement";
     switch (demandeEnCours)
     {
         case Demande_TELECHARGER_MISE_A_JOUR:
         {
             if (fichierEnCoursDeTelechargement != nullptr) 
             {
-                qDebug() << "cloture fichier";
                 fichierEnCoursDeTelechargement->close();
                 delete fichierEnCoursDeTelechargement;
                 fichierEnCoursDeTelechargement = nullptr;
             }
             disconnect(reponseFichierEnCoursDeTelechargement);
             reponseFichierEnCoursDeTelechargement->deleteLater();
-            qDebug() << "Téléchargement terminé.";
         }
         break;
         default:
@@ -214,7 +211,6 @@ void GestionnaireDonneesEnLigne::finaliserTelechargement()
 void GestionnaireDonneesEnLigne::gererProgressionTelechargement(const qint64 p_nbOctetsRecus, const qint64 p_nbOctetsTotal)
 {
     emit notifierProgressionTelechargement(p_nbOctetsRecus, p_nbOctetsTotal);
-    qDebug() << "Téléchargement en cours:" << p_nbOctetsRecus << "/" << p_nbOctetsTotal << "octets";
 }
 
 void GestionnaireDonneesEnLigne::demandeAuthentificationProxy(const QNetworkProxy& p_proxy,
@@ -340,7 +336,6 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
             }
             else if (demandeEnCours == Demande_TELECHARGER_MISE_A_JOUR)
             {
-                qDebug() << "notification fin telechargement";
                 finaliserTelechargement();
                 emit zipMiseAJourDisponible();
                 libererMutex();

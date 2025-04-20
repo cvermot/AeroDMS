@@ -710,6 +710,66 @@ Consultez le développeur / responsable de l'application pour plus d'information
     }
 }
 
+void AeroDms::mettreAJourVersionMiniExigee()
+{
+    bool ok = false;
+    const QString numeroDeVersion = QInputDialog::getText(this, 
+        QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Numéro de version"),
+        tr("Le numéro de version saisi ici doit correspondre à un tag vX.Y(.Z) dans le dépot https://github.com/cvermot/AeroDMS. \n\n")
+            + tr("Nouvelle version X.Y(.Z) minimale d'") + QApplication::applicationName() + tr(" exigée :"),
+        QLineEdit::Normal,
+        db->recupererVersionLogicielleMinimale().toString(), 
+        &ok);
+
+    if (ok)
+    {
+        const QVersionNumber version = QVersionNumber::fromString(numeroDeVersion);
+
+        if (version.isNull())
+        {
+            QMessageBox dialogueSaisieVersionInvalide;
+            dialogueSaisieVersionInvalide.setText(tr("La saisie ne correspond pas à un numéro de version valide (nommage attendu : X.Y(.Z))."));
+            dialogueSaisieVersionInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("La saisie ne correspond pas à un numéro de version"));
+            dialogueSaisieVersionInvalide.setIcon(QMessageBox::Critical);
+            dialogueSaisieVersionInvalide.setStandardButtons(QMessageBox::Close);
+            dialogueSaisieVersionInvalide.exec();
+        }
+        else
+        {
+            const QString url = "https://github.com/cvermot/AeroDMS/releases/tag/v" + version.toString() + "/";
+
+            const QString nomDuFichier = QInputDialog::getText(this,
+                QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Nom du fichier"),
+                tr("Le nom de fichier saisi ici doit correspondre à un fichier ZIP disponible dans les assets présent<br />à l'adresse <a href=\"")
+                + url
+                + "\">"
+                + url
+                + "</a>.<br /><br />"
+                + tr("Nouveau nom du fichier ZIP à télécharger :"),
+                QLineEdit::Normal,
+                db->recupererNomFichierMiseAJour(),
+                &ok);
+            if (ok)
+            {
+                if (nomDuFichier.isEmpty())
+                {
+                    QMessageBox dialogueSaisieNomFichierInvalide;
+                    dialogueSaisieNomFichierInvalide.setText(tr("Le nom de fichier saisi est vide. <br/><br/>Les nouvelles exigences en termes de version minimales ne seront pas enregistrées."));
+                    dialogueSaisieNomFichierInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("Nom de fichier invalide"));
+                    dialogueSaisieNomFichierInvalide.setIcon(QMessageBox::Critical);
+                    dialogueSaisieNomFichierInvalide.setStandardButtons(QMessageBox::Close);
+                    dialogueSaisieNomFichierInvalide.exec();
+                }
+                else
+                {
+                    db->enregistrerNouvelleVersionLogicielleMinimale(version, nomDuFichier);
+                    db->demanderEnvoiBdd();
+                }
+            }
+        }
+    } 
+}
+
 void AeroDms::traiterZipMiseAJourDispo()
 {
 
@@ -847,6 +907,8 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
         boutonAjouterUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
         boutonGenerePdf->setEnabled(!p_lectureSeuleEstDemandee);
         facturesDaca->setEnabled(!p_lectureSeuleEstDemandee);
+
+        mettreAJourDonneesVersionMiniAction->setEnabled(!p_lectureSeuleEstDemandee);
 
         boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
         boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
@@ -1708,6 +1770,13 @@ void AeroDms::initialiserMenuAide()
     miseAJourAction->setStatusTip(tr("Vérifie la présence de mise à jour et permet d'effectuer la mise à jour le cas échéant"));
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
+
+    mettreAJourDonneesVersionMiniAction = new QAction(QIcon(":/AeroDms/ressources/cog-clockwise.svg"), tr("&Modifier les informations de version minimale"), this);
+    mettreAJourDonneesVersionMiniAction->setStatusTip(tr("Met à jour les exigences de version minimale acceptable par le logiciel"));
+    helpMenu->addAction(mettreAJourDonneesVersionMiniAction);
+    connect(mettreAJourDonneesVersionMiniAction, SIGNAL(triggered()), this, SLOT(mettreAJourVersionMiniExigee()));
+    //De base on masque : fonction accessible uniquement en mode debug
+    mettreAJourDonneesVersionMiniAction->setVisible(false);
 
     boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG), 
         texteBoutonActiverModeDebogage,
@@ -4180,6 +4249,7 @@ void AeroDms::switchModeDebug()
     vueFactures->setColumnHidden(AeroDmsTypes::FactureTableElement_ANNEE, masquageEstDemande);
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, masquageEstDemande);
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, masquageEstDemande);
+    mettreAJourDonneesVersionMiniAction->setVisible(!masquageEstDemande);
 }
 
 void AeroDms::switchOnglet()
@@ -5446,8 +5516,6 @@ void AeroDms::verifierVersionBddSuiteChargement()
     statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
     passerLeLogicielEnLectureSeule(false, false);
 
-    qDebug() << QVersionNumber::fromString(QApplication::applicationVersion()) << db->recupererVersionLogicielleMinimale();
-
     if (QVersionNumber::fromString(QApplication::applicationVersion()) < db->recupererVersionLogicielleMinimale())
     {
         passerLeLogicielEnLectureSeule(true, false, true);
@@ -5619,7 +5687,6 @@ void AeroDms::closeEvent(QCloseEvent* event)
             //on demande la libération du verrou de BDD
             if (etapeFermeturePrecedente == EtapeFermeture_NON_DEMANDE)
             {
-                qDebug() << "demande liberation verrou";
                 db->libererVerrouBdd();
             }
         }

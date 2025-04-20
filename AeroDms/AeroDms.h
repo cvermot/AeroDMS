@@ -209,6 +209,7 @@ private:
     QAction* boutonGenerePdf = nullptr;
     QAction* boutonGenerePdfRecapHdv = nullptr;
     QAction* miseAJourAction = nullptr;
+    QAction* mettreAJourDonneesVersionMiniAction = nullptr;
     QAction* boutonModeDebug = nullptr;
     QAction* boutonAjouterUnVol = nullptr;
     QAction* boutonAjouterUnAeroclub = nullptr;
@@ -443,6 +444,7 @@ public slots:
 
     //Gestion des mises à jour
     void verifierPresenceDeMiseAjour();
+    void mettreAJourVersionMiniExigee();
     void traiterZipMiseAJourDispo();
     void afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus, 
         const qint64 p_nbOctetsTotal);

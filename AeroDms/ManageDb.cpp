@@ -357,6 +357,18 @@ const QVersionNumber ManageDb::recupererVersionLogicielleMinimale()
     return version;
 }
 
+void ManageDb::enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber &p_version, 
+    const QString &p_nomFichier)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE parametres SET info1 = :version, info2 = :fichier WHERE nom = :nomParametre");
+    query.bindValue(":nomParametre", "miseAJour");
+    query.bindValue(":version", p_version.toString());
+    query.bindValue(":fichier", p_nomFichier);
+    query.exec();
+}
+
 const QString ManageDb::recupererNomFichierMiseAJour()
 {
     QSqlQuery query;
