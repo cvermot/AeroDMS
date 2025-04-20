@@ -108,7 +108,8 @@ private:
     void mettreAJourApplication(const QString p_chemin);
     void terminerMiseAJourApplication();
     void passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee,
-        const bool p_figerLesListes);
+        const bool p_figerLesListes,
+        const bool p_interdireRetourEnModeLectureEcriture = false);
     void preparerStatusBar();
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen();
@@ -313,6 +314,7 @@ private:
 
     //Etats internes application
     bool logicielEnModeLectureSeule = false;
+    bool retourEnModeLectureEcritureEstInterdit = false;
     bool miseAJourApplicationEstEnCours = false;
     bool verificationDeNouvelleFacturesAChargerEnLigneEstEffectue = false;
     enum EtapeFermeture
@@ -424,7 +426,6 @@ public slots:
     void ouvrirPdfGenere();
     void ouvrirUnFichierDeDemandeDeSubvention();
     void gererChangementOnglet();
-    void verifierPresenceDeMiseAjour();
     void initialiserGestionnaireTelechargement();
     void switchOnglet();
     void switchAffichageInfosComplementaires();
@@ -437,12 +438,20 @@ public slots:
         const AeroDmsTypes::ParametresSysteme p_parametresSysteme);
     void detruireFenetreProgressionGenerationPdf();
     void mettreAJourAerodromes();
+    void masquerBarreDeProgressionDeLaStatusBar();
+    void gererSelectionAnneeAGenerer();
+
+    //Gestion des mises à jour
+    void verifierPresenceDeMiseAjour();
+    void traiterZipMiseAJourDispo();
+    void afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus, 
+        const qint64 p_nbOctetsTotal);
+    void afficherProgressionDecompressionMaJ(uint64_t p_nbOctetsRecus,
+        uint64_t p_nbOctetsTotaux);
     void afficherProgressionMiseAJourAerodromes(int nombreTotal,
         int nombreTraite,
         int nombreCree,
         int nombreMisAJour);
-    void masquerBarreDeProgressionDeLaStatusBar();
-    void gererSelectionAnneeAGenerer();
 
     //Gestion du chargement de la BDD en ligne
     void verifierVersionBddSuiteChargement();

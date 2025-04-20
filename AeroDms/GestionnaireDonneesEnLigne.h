@@ -35,6 +35,7 @@ public:
 	void envoyerFichier(QString p_chemin);
 	void envoyerBdd(QString p_chemin);
 	void telechargerBdd();
+	void telechargerMiseAJour(const QString p_url);
 	void telechargerFacture(const QString p_nomFacture);
 
 private:
@@ -42,6 +43,8 @@ private:
 	AeroDmsTypes::ParametresSysteme parametres;
 	QUrl serviceUrl;
 	QString nomFichierEnTelechargement = "";
+	QFile* fichierEnCoursDeTelechargement = nullptr;
+	QNetworkReply* reponseFichierEnCoursDeTelechargement = nullptr;
 
 	int nombreEssais = 0;
 	bool estActive = false;
@@ -65,6 +68,7 @@ private:
 		Demande_ENVOI_FACTURE,
 		Demande_ENVOI_BDD,
 		Demande_TELECHARGER_BDD,
+		Demande_TELECHARGER_MISE_A_JOUR
 	};
 
 	Etape phaseTraitement = Etape_INITIALISATION;
@@ -89,12 +93,17 @@ private slots:
 	void demandeAuthentificationProxy(const QNetworkProxy& p_proxy,
 		QAuthenticator* p_authenticator);
 	void fournirIdentifiants(QNetworkReply* reply, QAuthenticator* authenticator);
+	void enregistrerDonneesRecues();
+	void gererProgressionTelechargement(const qint64 p_nbOctetsRecus, const qint64 p_nbOctetsTotal);
+	void finaliserTelechargement();
 
 signals:
 	void etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures);
 	void receptionSha256Bdd(QString);
 	void baseDeDonneesTelechargeeEtDisponible();
 	void finDEnvoiBdd();
+	void notifierProgressionTelechargement(const qint64 p_nbOctetsRecus, const qint64 p_nbOctetsTotal);
+	void zipMiseAJourDisponible();
 };
 
 #endif GESTIONNAIREDONNEESENLIGNE_H

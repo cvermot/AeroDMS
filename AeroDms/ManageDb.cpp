@@ -340,6 +340,39 @@ void ManageDb::enregistrerParametreUnitaire(const QString & p_nomParametre,
     query.exec();
 }
 
+const QVersionNumber ManageDb::recupererVersionLogicielleMinimale()
+{
+    QVersionNumber version(0);
+
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "miseAJour");
+    query.exec();
+    if (query.next())
+    {
+        if (!(QVersionNumber::fromString(query.value("info1").toString()).isNull()))
+            version = QVersionNumber::fromString(query.value("info1").toString());
+    }
+    return version;
+}
+
+const QString ManageDb::recupererNomFichierMiseAJour()
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "miseAJour");
+    query.exec();
+    if (query.next())
+    {
+        //On retourne la valeur de info2 en supprimant les éventuels "/" du nom du fichier (sécurité 
+        //empéchant de télécharger un zip provenant d'un autre dépot que le dépot légitime)
+        return query.value("info2").toString().replace("/", "");
+    }
+    return "";
+}
+
 const AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()
 {
     AeroDmsTypes::ListeAeroclubs listeDesClubs;

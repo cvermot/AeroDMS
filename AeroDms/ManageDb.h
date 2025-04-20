@@ -39,6 +39,8 @@ public:
 
     void sauvegarderLaBdd( const QString p_repertoireDeSauvegarde);
     const bool laBddEstALaVersionAttendue() const;
+    const QVersionNumber recupererVersionLogicielleMinimale();
+    const QString recupererNomFichierMiseAJour();
 
     const AeroDmsTypes::ListePilotes recupererPilotes();
     const AeroDmsTypes::Pilote recupererPilote( const QString p_idPilote);

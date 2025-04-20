@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfPrinter.h"
 #include "PdfDownloader.h"
 #include "AixmParser.h"
+#include "ZipExtractorWorker.h"
 
 #include "RccGenerator.h"
 
@@ -250,6 +251,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
     
     gestionnaireDonneesEnLigne = new GestionnaireDonneesEnLigne(parametresSysteme);
+    connect(gestionnaireDonneesEnLigne, SIGNAL(zipMiseAJourDisponible()), 
+        this, SLOT(traiterZipMiseAJourDispo()));
+    connect(gestionnaireDonneesEnLigne, SIGNAL(notifierProgressionTelechargement(const qint64, const qint64)),
+        this, SLOT(afficherProgressionTelechargementMaJ(const qint64, const qint64)));
 
     const QString database = settings.value("baseDeDonnees/chemin", "").toString() +
         QString("/") +
@@ -656,7 +661,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         {
         case QMessageBox::Yes:
         {
-            mettreAJourApplication(parametresSysteme.cheminStockageBdd + "/update/");
+            mettreAJourApplication(dossierAVerifier);
             miseAJourApplicationEstEnCours = true;
         }
         break;
@@ -666,8 +671,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
         {
             if (!db->laBddEstALaVersionAttendue())
             {
-                fermerSplashscreen();
-                passerLeLogicielEnLectureSeule(true, false);
+                passerLeLogicielEnLectureSeule(true, false, true);
 
                 QMessageBox dialogueErreurVersionBdd;
                 dialogueErreurVersionBdd.setText(tr("Une mise à jour de l'application est disponible et doit être réalisée\n\
@@ -693,7 +697,7 @@ L'application va passer en mode lecture seule.\
     else if (!db->laBddEstALaVersionAttendue())
     {
         fermerSplashscreen();
-        passerLeLogicielEnLectureSeule(true, false);
+        passerLeLogicielEnLectureSeule(true, false, true);
 
         QMessageBox dialogueErreurVersionBdd;
         dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
@@ -704,6 +708,63 @@ Consultez le développeur / responsable de l'application pour plus d'information
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
         dialogueErreurVersionBdd.exec();
     }
+}
+
+void AeroDms::traiterZipMiseAJourDispo()
+{
+
+    const QString zip = parametresSysteme.cheminStockageBdd + "/update.zip";
+    const QString sortie = parametresSysteme.cheminStockageBdd + "/update/";
+
+    auto* worker = new ZipExtractorWorker(zip, sortie, this);
+
+    connect(worker, &ZipExtractorWorker::progress, this, [this](int currentPage, int totalPages) {
+        afficherProgressionDecompressionMaJ(currentPage, totalPages);
+        });
+
+    connect(worker, &ZipExtractorWorker::finished, this, [this, worker]() {
+        statusBar()->showMessage(tr("Téléchargement de la mise à jour terminé"));
+        QTimer::singleShot(5000, this, &AeroDms::masquerBarreDeProgressionDeLaStatusBar);
+        verifierPresenceDeMiseAjour();
+        worker->deleteLater();
+        });
+
+    connect(worker, &ZipExtractorWorker::error, this, [this](const QString& message) {
+        QMessageBox::critical(nullptr, tr("Erreur de décompression"), message);
+        });
+
+    // Lance le thread
+    worker->start();
+
+    
+}
+
+void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
+    const qint64 p_nbOctetsTotal)
+{
+    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours... (")
+    + QString::number(p_nbOctetsRecus/1024/1024 , 'f', 2)
+    + "/"
+    + QString::number(p_nbOctetsTotal / 1024 / 1024, 'f', 2)
+    + " Mo)");
+
+    barreDeProgressionStatusBar->setMaximum(p_nbOctetsTotal);
+    barreDeProgressionStatusBar->setValue(p_nbOctetsRecus);
+    barreDeProgressionStatusBar->show();
+}
+
+void AeroDms::afficherProgressionDecompressionMaJ(uint64_t p_nbOctetsDecompresses, uint64_t p_nbOctetsTotaux)
+{
+    passerLeLogicielEnLectureSeule(true, false);
+    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Décompression en cours... (")
+        + QString::number(p_nbOctetsDecompresses / 1024 / 1024, 'f', 2)
+        + "/"
+        + QString::number(p_nbOctetsTotaux / 1024 / 1024, 'f', 2)
+        + " Mo)");
+
+    barreDeProgressionStatusBar->setMaximum(p_nbOctetsTotaux);
+    barreDeProgressionStatusBar->setValue(p_nbOctetsDecompresses);
+    barreDeProgressionStatusBar->show();
 }
 
 void AeroDms::initialiserGestionnaireTelechargement()
@@ -774,28 +835,34 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
 }
 
 void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemandee,
-    const bool p_figerLesListes)
+    const bool p_figerLesListes,
+    const bool p_interdireRetourEnModeLectureEcriture)
 {
-    boutonAjouterUnVol->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonAjouterCotisation->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonAjouterPilote->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonAjouterSortie->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonAjouterUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonGenerePdf->setEnabled(!p_lectureSeuleEstDemandee);
-    facturesDaca->setEnabled(!p_lectureSeuleEstDemandee);
+    if (!retourEnModeLectureEcritureEstInterdit)
+    {
+        boutonAjouterUnVol->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonAjouterCotisation->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonAjouterPilote->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonAjouterSortie->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonAjouterUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonGenerePdf->setEnabled(!p_lectureSeuleEstDemandee);
+        facturesDaca->setEnabled(!p_lectureSeuleEstDemandee);
 
-    boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
-    boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
 
-    listeBaladesEtSorties->setDisabled(p_figerLesListes);
-    listeDeroulanteAnnee->setDisabled(p_figerLesListes);
-    listeDeroulanteElementsSoumis->setDisabled(p_figerLesListes);
-    listeDeroulantePilote->setDisabled(p_figerLesListes);
-    listeDeroulanteStatistique->setDisabled(p_figerLesListes);
-    listeDeroulanteType->setDisabled(p_figerLesListes);
+        listeBaladesEtSorties->setDisabled(p_figerLesListes);
+        listeDeroulanteAnnee->setDisabled(p_figerLesListes);
+        listeDeroulanteElementsSoumis->setDisabled(p_figerLesListes);
+        listeDeroulantePilote->setDisabled(p_figerLesListes);
+        listeDeroulanteStatistique->setDisabled(p_figerLesListes);
+        listeDeroulanteType->setDisabled(p_figerLesListes);
 
-    logicielEnModeLectureSeule = p_lectureSeuleEstDemandee;
+        logicielEnModeLectureSeule = p_lectureSeuleEstDemandee;
+        retourEnModeLectureEcritureEstInterdit = p_interdireRetourEnModeLectureEcriture 
+            && p_lectureSeuleEstDemandee;
+    }
 
     //Hors site, on interdit la génération des demandes de subventions (fichiers PDF associés non envoyées en ligne)
     if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
@@ -4567,6 +4634,15 @@ void AeroDms::terminerMiseAJourApplication()
         QFile fichier(cheminFichier);
         fichier.remove();
     }
+
+    //Si on est en mode externe, on fait du ménage
+    if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
+    {
+        QFile::remove(parametresSysteme.cheminStockageBdd + "/update.zip");
+
+        QDir repertoire(parametresSysteme.cheminStockageBdd + "/update/");
+        repertoire.removeRecursively();
+    }
 }
 
 void AeroDms::initialiserTableauVolsDetectes(QGridLayout* p_infosVol)
@@ -5370,18 +5446,49 @@ void AeroDms::verifierVersionBddSuiteChargement()
     statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
     passerLeLogicielEnLectureSeule(false, false);
 
-    if (!db->laBddEstALaVersionAttendue())
-    {
-        passerLeLogicielEnLectureSeule(true, false);
+    qDebug() << QVersionNumber::fromString(QApplication::applicationVersion()) << db->recupererVersionLogicielleMinimale();
 
-        QMessageBox dialogueErreurVersionBdd;
-        dialogueErreurVersionBdd.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
+    if (QVersionNumber::fromString(QApplication::applicationVersion()) < db->recupererVersionLogicielleMinimale())
+    {
+        passerLeLogicielEnLectureSeule(true, false, true);
+        if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
+        {
+            statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours..."));
+
+            const QString url = "https://github.com/cvermot/AeroDMS/releases/download/v"
+                + db->recupererVersionLogicielleMinimale().toString()
+                + "/"
+                + db->recupererNomFichierMiseAJour();
+            gestionnaireDonneesEnLigne->telechargerMiseAJour(url);
+        }
+        else
+        {
+            QMessageBox dialogueMiseAJour;
+            dialogueMiseAJour.setText(tr("La version du logiciel en cours d'utilisation (")
+                + QApplication::applicationVersion()
+                + tr(") est inférieure à la version minimale autorisée (")
+                + db->recupererVersionLogicielleMinimale().toString()
+                + ").\n\n"
+                + tr("L'application va passer en mode lecture seule pour éviter tout problème.\n\n")
+                + tr("Consultez le développeur / responsable de l'application pour plus d'informations."));
+            dialogueMiseAJour.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version du logiciel"));
+            dialogueMiseAJour.setIcon(QMessageBox::Critical);
+            dialogueMiseAJour.setStandardButtons(QMessageBox::Close);
+            dialogueMiseAJour.exec();
+        }
+    }
+    else if (!db->laBddEstALaVersionAttendue())
+    {
+        QMessageBox dialogueMiseAJour;
+        dialogueMiseAJour.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
 Consultez le développeur / responsable de l'application pour plus d'informations."));
-        dialogueErreurVersionBdd.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version de base de données"));
-        dialogueErreurVersionBdd.setIcon(QMessageBox::Critical);
-        dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
-        dialogueErreurVersionBdd.exec();
+        dialogueMiseAJour.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version de base de données"));
+        dialogueMiseAJour.setIcon(QMessageBox::Critical);
+        dialogueMiseAJour.setStandardButtons(QMessageBox::Close);
+        dialogueMiseAJour.exec();
+
+        passerLeLogicielEnLectureSeule(true, false);
     }
 }
 
@@ -5491,8 +5598,14 @@ void AeroDms::closeEvent(QCloseEvent* event)
     if (etapeFermetureEnCours != EtapeFermeture_BDD_FERMEE)
     {
         //On ne renvoie la BDD en ligne que si le gestionnaire de données en ligne est actif
-        //et si le logiciel n'est pas en lecture seule
-        if (gestionnaireDonneesEnLigne->estActif() && !logicielEnModeLectureSeule)
+        //et 
+        //     si le logiciel n'est pas en lecture seule
+        //   ou
+        //     si le retour en mode lecture ecriture a été interdit (dans certains situations
+        //        dans ce cas, on a pu prendre le verrou)
+        if (gestionnaireDonneesEnLigne->estActif() 
+            && (!logicielEnModeLectureSeule
+                  || retourEnModeLectureEcritureEstInterdit))
         {
             event->ignore();
 

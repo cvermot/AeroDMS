@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. avr. 18 15:19:46 2025
+-- File generated with SQLiteStudio v3.4.4 on sam. avr. 19 23:18:41 2025
 --
 -- Text encoding used: UTF-8
 --
@@ -55,6 +55,7 @@ INSERT INTO parametres (nom, info1, info2, info3) VALUES ('plafondHoraireRembour
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('proportionRemboursementEntrainement', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantCotisationPilote', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantSubventionEntrainement', NULL, NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('miseAJour', NULL, NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));

@@ -37,9 +37,9 @@ GestionnaireDonneesEnLigne::GestionnaireDonneesEnLigne(const AeroDmsTypes::Param
 
 void GestionnaireDonneesEnLigne::fournirIdentifiants(QNetworkReply* reply, QAuthenticator* authenticator)
 {
-    Q_UNUSED(reply); // Pas utilisé ici, mais peut servir pour des cas spécifiques
-    authenticator->setUser(parametres.loginServeurModeExterne); // Remplacez par votre nom d'utilisateur
-    authenticator->setPassword(parametres.motDePasseServeurModeExterne); // Remplacez par votre mot de passe
+    Q_UNUSED(reply); // Non utilisé
+    authenticator->setUser(parametres.loginServeurModeExterne); 
+    authenticator->setPassword(parametres.motDePasseServeurModeExterne); 
 }
 
 bool GestionnaireDonneesEnLigne::connecter()
@@ -60,6 +60,31 @@ bool GestionnaireDonneesEnLigne::connecter()
             { 
                 networkManager->get(request);
                 phaseTraitement = Etape_CONNEXION;
+            }
+            break;
+            //Cas des téléchargements de gros fichiers
+            case Demande_TELECHARGER_MISE_A_JOUR :
+            {
+                reponseFichierEnCoursDeTelechargement = networkManager->get(request);
+                phaseTraitement = Etape_CONNEXION;
+
+                connect(reponseFichierEnCoursDeTelechargement, &QNetworkReply::readyRead, 
+                    this, &GestionnaireDonneesEnLigne::enregistrerDonneesRecues);
+                connect(reponseFichierEnCoursDeTelechargement, &QNetworkReply::downloadProgress, 
+                    this, &GestionnaireDonneesEnLigne::gererProgressionTelechargement);
+                //connect(reponseFichierEnCoursDeTelechargement, &QNetworkReply::finished, 
+                //    this, &GestionnaireDonneesEnLigne::finaliserTelechargement);
+
+                // Ouvrir le fichier de destination
+                qDebug() << "enregistrement sous " << parametres.cheminStockageBdd;
+                const QString fichierDeSortie = parametres.cheminStockageBdd + "/update.zip";
+                qDebug() << "enregistrement sous " << fichierDeSortie;
+                fichierEnCoursDeTelechargement = new QFile(fichierDeSortie, this);
+                if (!fichierEnCoursDeTelechargement->open(QIODevice::WriteOnly)) {
+                    qWarning() << "Impossible d'ouvrir le fichier pour écrire:" << fichierDeSortie;
+                    nombreEssais = 3;
+                    reponseFichierEnCoursDeTelechargement->abort();  
+                }
             }
             break;
             //Cas des envois de fichiers
@@ -137,6 +162,59 @@ bool GestionnaireDonneesEnLigne::connecter()
 
         return false;
     }
+}
+
+void GestionnaireDonneesEnLigne::enregistrerDonneesRecues()
+{
+    switch(demandeEnCours)
+    {
+        case Demande_TELECHARGER_MISE_A_JOUR:
+        {
+            if (fichierEnCoursDeTelechargement != nullptr)
+            {
+                fichierEnCoursDeTelechargement->write(reponseFichierEnCoursDeTelechargement->readAll());
+            }  
+        }
+        break;
+        default:
+        {
+            //rien a faire dans les autres cas de demandes
+        }
+        break;
+    }
+}
+
+void GestionnaireDonneesEnLigne::finaliserTelechargement()
+{
+    qDebug() << "entrée fin téléchargement";
+    switch (demandeEnCours)
+    {
+        case Demande_TELECHARGER_MISE_A_JOUR:
+        {
+            if (fichierEnCoursDeTelechargement != nullptr) 
+            {
+                qDebug() << "cloture fichier";
+                fichierEnCoursDeTelechargement->close();
+                delete fichierEnCoursDeTelechargement;
+                fichierEnCoursDeTelechargement = nullptr;
+            }
+            disconnect(reponseFichierEnCoursDeTelechargement);
+            reponseFichierEnCoursDeTelechargement->deleteLater();
+            qDebug() << "Téléchargement terminé.";
+        }
+        break;
+        default:
+        {
+            //rien a faire dans les autres cas de demandes
+        }
+        break;
+    }
+}
+
+void GestionnaireDonneesEnLigne::gererProgressionTelechargement(const qint64 p_nbOctetsRecus, const qint64 p_nbOctetsTotal)
+{
+    emit notifierProgressionTelechargement(p_nbOctetsRecus, p_nbOctetsTotal);
+    qDebug() << "Téléchargement en cours:" << p_nbOctetsRecus << "/" << p_nbOctetsTotal << "octets";
 }
 
 void GestionnaireDonneesEnLigne::demandeAuthentificationProxy(const QNetworkProxy& p_proxy,
@@ -260,6 +338,13 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
                 }
                 libererMutex();
             }
+            else if (demandeEnCours == Demande_TELECHARGER_MISE_A_JOUR)
+            {
+                qDebug() << "notification fin telechargement";
+                finaliserTelechargement();
+                emit zipMiseAJourDisponible();
+                libererMutex();
+            }
         }
         else
         {
@@ -353,6 +438,30 @@ void GestionnaireDonneesEnLigne::telechargerBdd()
             listeDemandes.append(demandeBufferisee);
         }
     } 
+}
+
+void GestionnaireDonneesEnLigne::telechargerMiseAJour(const QString p_url)
+{
+    if (estActive)
+    {
+        if (!uneDemandeEstEnCours)
+        {
+            uneDemandeEstEnCours = true;
+
+            serviceUrl = QUrl(p_url);
+            nombreEssais = 0;
+            demandeEnCours = Demande_TELECHARGER_MISE_A_JOUR;
+
+            connecter();
+        }
+        else
+        {
+            DemandeBufferisee demandeBufferisee;
+            demandeBufferisee.demande = Demande_TELECHARGER_MISE_A_JOUR;
+            demandeBufferisee.cheminFichier = p_url;
+            listeDemandes.append(demandeBufferisee);
+        }
+    }
 }
 
 void GestionnaireDonneesEnLigne::telechargerFacture(const QString p_nomFacture)
@@ -468,6 +577,11 @@ void GestionnaireDonneesEnLigne::libererMutex()
                 envoyerBdd(demande.cheminFichier);
             }
             break;
+            case Demande_TELECHARGER_MISE_A_JOUR:
+            {
+                telechargerMiseAJour(demande.cheminFichier);
+            }
+            break; 
         }     
         
     }
