@@ -209,6 +209,7 @@ private:
     QAction* boutonGenerePdf = nullptr;
     QAction* boutonGenerePdfRecapHdv = nullptr;
     QAction* miseAJourAction = nullptr;
+    QAction* miseAJourUpdateLocale = nullptr;
     QAction* mettreAJourDonneesVersionMiniAction = nullptr;
     QAction* boutonModeDebug = nullptr;
     QAction* boutonAjouterUnVol = nullptr;
@@ -457,6 +458,7 @@ public slots:
 
     //Gestion du chargement de la BDD en ligne
     void verifierVersionBddSuiteChargement();
+    void demanderTelechargementMiseAJourLogiciel();
     void afficherStatusDebutTelechargementBdd();
     void signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,

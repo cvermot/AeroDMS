@@ -772,7 +772,6 @@ void AeroDms::mettreAJourVersionMiniExigee()
 
 void AeroDms::traiterZipMiseAJourDispo()
 {
-
     const QString zip = parametresSysteme.cheminStockageBdd + "/update.zip";
     const QString sortie = parametresSysteme.cheminStockageBdd + "/update/";
 
@@ -794,9 +793,7 @@ void AeroDms::traiterZipMiseAJourDispo()
         });
 
     // Lance le thread
-    worker->start();
-
-    
+    worker->start();    
 }
 
 void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
@@ -1770,6 +1767,13 @@ void AeroDms::initialiserMenuAide()
     miseAJourAction->setStatusTip(tr("Vérifie la présence de mise à jour et permet d'effectuer la mise à jour le cas échéant"));
     helpMenu->addAction(miseAJourAction);
     connect(miseAJourAction, SIGNAL(triggered()), this, SLOT(verifierPresenceDeMiseAjour()));
+
+    miseAJourUpdateLocale = new QAction(QIcon(":/AeroDms/ressources/download-network.svg"), tr("&Deployer la mise à jour distante pour usages internes"), this);
+    miseAJourUpdateLocale->setStatusTip(tr("Deploie la mise à jour GitHub pour l'usage interne"));
+    helpMenu->addAction(miseAJourUpdateLocale);
+    connect(miseAJourUpdateLocale, SIGNAL(triggered()), this, SLOT(demanderTelechargementMiseAJourLogiciel()));
+    //De base on masque : fonction accessible uniquement en mode debug
+    miseAJourUpdateLocale->setVisible(false);
 
     mettreAJourDonneesVersionMiniAction = new QAction(QIcon(":/AeroDms/ressources/cog-clockwise.svg"), tr("&Modifier les informations de version minimale"), this);
     mettreAJourDonneesVersionMiniAction->setStatusTip(tr("Met à jour les exigences de version minimale acceptable par le logiciel"));
@@ -4250,6 +4254,12 @@ void AeroDms::switchModeDebug()
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, masquageEstDemande);
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, masquageEstDemande);
     mettreAJourDonneesVersionMiniAction->setVisible(!masquageEstDemande);
+
+    //fonction de mise à jour update locale non nécessaire en mode externe à l'extérieur de l'organisation
+    if (parametresSysteme.modeFonctionnementLogiciel != AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
+    {
+        miseAJourUpdateLocale->setVisible(!masquageEstDemande);
+    }
 }
 
 void AeroDms::switchOnglet()
@@ -5511,6 +5521,17 @@ void AeroDms::verifierDispoIdentifiantsDaca()
     }
 }
 
+void AeroDms::demanderTelechargementMiseAJourLogiciel()
+{
+    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours..."));
+
+    const QString url = "https://github.com/cvermot/AeroDMS/releases/download/v"
+        + db->recupererVersionLogicielleMinimale().toString()
+        + "/"
+        + db->recupererNomFichierMiseAJour();
+    gestionnaireDonneesEnLigne->telechargerMiseAJour(url);
+}
+
 void AeroDms::verifierVersionBddSuiteChargement()
 {
     statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
@@ -5521,13 +5542,7 @@ void AeroDms::verifierVersionBddSuiteChargement()
         passerLeLogicielEnLectureSeule(true, false, true);
         if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
         {
-            statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours..."));
-
-            const QString url = "https://github.com/cvermot/AeroDMS/releases/download/v"
-                + db->recupererVersionLogicielleMinimale().toString()
-                + "/"
-                + db->recupererNomFichierMiseAJour();
-            gestionnaireDonneesEnLigne->telechargerMiseAJour(url);
+            demanderTelechargementMiseAJourLogiciel();
         }
         else
         {

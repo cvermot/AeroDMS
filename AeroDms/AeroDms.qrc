@@ -136,5 +136,6 @@
         <file>ressources/note-edit.svg</file>
         <file>ressources/information-slab-circle.svg</file>
         <file>ressources/cog-clockwise.svg</file>
+        <file>ressources/download-network.svg</file>
     </qresource>
 </RCC>
