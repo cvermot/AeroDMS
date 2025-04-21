@@ -59,6 +59,10 @@ else
         $target_dir = "uploads/bdd/";
         $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+			$date = new DateTime();
+			$target_file_copy = $target_dir . pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_FILENAME) . "_" . $date->format('Y-m-d\TH-i-s') . "." . pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION);
+			//echo $target_file_copy;
+			copy($target_file, $target_file_copy);
             echo "La base de données a été téléchargée avec succès.";
         } else {
             echo "Erreur lors du téléchargement de la base de données";
