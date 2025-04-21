@@ -1807,7 +1807,6 @@ void AeroDms::initialiserMenuAide()
             + QSslSocket::sslLibraryBuildVersionString());
         });
 
-
     QAction* afficherInfosRessourcesInternes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE),
         tr("Afficher les informations sur les ressources internes"),
         this);
@@ -2980,7 +2979,6 @@ void AeroDms::recupererVolDepuisCsv()
             supprimerLeVolSelectionne->setHidden(false);
         }
     }
-
 }
 
 void AeroDms::chargerUneFacture(const QString p_fichier, const bool p_laFactureAChargerEstTelechargeeDInternet)
@@ -3564,8 +3562,7 @@ void AeroDms::peuplerListesPilotes()
     if (index != AeroDmsTypes::K_INIT_INT_INVALIDE)
     {
         listeDeroulantePilote->setCurrentIndex(index);
-    }
-    
+    }  
 }
 
 void AeroDms::peuplerListeSorties()
@@ -3601,7 +3598,6 @@ void AeroDms::peuplerListeSorties()
         sortie.nom.append(" ").append(sortie.date.toString("dd/MM/yyyy"));
         choixBaladeFacture->addItem(sortie.nom, sortie.id);
     }
-
 }
 
 void AeroDms::peuplerMenuMailDemandesSubvention()

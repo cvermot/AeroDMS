@@ -577,7 +577,6 @@ void GestionnaireDonneesEnLigne::libererMutex()
                 telechargerMiseAJour(demande.cheminFichier);
             }
             break; 
-        }     
-        
+        }         
     }
 }
