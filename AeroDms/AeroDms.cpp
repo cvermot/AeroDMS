@@ -800,9 +800,9 @@ void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
     const qint64 p_nbOctetsTotal)
 {
     statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours... (")
-    + QString::number(p_nbOctetsRecus/1024/1024 , 'f', 2)
+    + QString::number(p_nbOctetsRecus / 1024.0 / 1024.0 , 'f', 2)
     + "/"
-    + QString::number(p_nbOctetsTotal / 1024 / 1024, 'f', 2)
+    + QString::number(p_nbOctetsTotal / 1024.0 / 1024.0, 'f', 2)
     + " Mo)");
 
     barreDeProgressionStatusBar->setMaximum(p_nbOctetsTotal);
@@ -812,11 +812,10 @@ void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
 
 void AeroDms::afficherProgressionDecompressionMaJ(uint64_t p_nbOctetsDecompresses, uint64_t p_nbOctetsTotaux)
 {
-    passerLeLogicielEnLectureSeule(true, false);
     statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Décompression en cours... (")
-        + QString::number(p_nbOctetsDecompresses / 1024 / 1024, 'f', 2)
+        + QString::number(p_nbOctetsDecompresses / 1024.0 / 1024.0, 'f', 2)
         + "/"
-        + QString::number(p_nbOctetsTotaux / 1024 / 1024, 'f', 2)
+        + QString::number(p_nbOctetsTotaux / 1024.0 / 1024.0, 'f', 2)
         + " Mo)");
 
     barreDeProgressionStatusBar->setMaximum(p_nbOctetsTotaux);
@@ -3220,7 +3219,7 @@ void AeroDms::enregistrerUneFacture()
             }
             else
             {
-                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt."));
+                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt"));
                 estEnEchec = true;
             }
         }
@@ -3309,7 +3308,7 @@ void AeroDms::enregistrerUnVol()
             }
             else
             {
-                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt."));
+                statusBar()->showMessage(tr("Impossible de déplacer la facture : arrêt"));
                 estEnEchec = true;
             }
         }
@@ -4201,7 +4200,7 @@ void AeroDms::supprimerVol()
         {
             if (db->supprimerUnVol(volAEditer))
             {
-                statusBar()->showMessage(tr("Vol supprimé avec succès."));
+                statusBar()->showMessage(tr("Vol supprimé avec succès"));
 
                 peuplerTablePilotes();
                 peuplerTableVols();
@@ -5534,8 +5533,8 @@ void AeroDms::demanderTelechargementMiseAJourLogiciel()
 
 void AeroDms::verifierVersionBddSuiteChargement()
 {
-    statusBar()->showMessage(tr("Base de données locale à jour."), 10000);
     passerLeLogicielEnLectureSeule(false, false);
+    statusBar()->showMessage(tr("Base de données locale à jour"), 10000);
 
     if (QVersionNumber::fromString(QApplication::applicationVersion()) < db->recupererVersionLogicielleMinimale())
     {
@@ -5695,7 +5694,7 @@ void AeroDms::closeEvent(QCloseEvent* event)
             const EtapeFermeture etapeFermeturePrecedente = etapeFermetureEnCours;
             etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;
 
-            statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne en cours... Patientez, le logiciel fermera automatiquement une fois cette étape effecutée.."));
+            statusBar()->showMessage(tr("Libération base de données et envoi BDD en ligne en cours... Patientez, le logiciel fermera automatiquement une fois cette étape effectuée..."));
             passerLeLogicielEnLectureSeule(true, true);
 
             //Si on est va demander la fermeture de la BDD pour envoi, donc qu'on est dans le premier appel de cette méthode
