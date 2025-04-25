@@ -143,3 +143,69 @@ const AeroDmsTypes::StatsHeuresDeVolParActivite AeroDmsTypes::K_INIT_STATS_HEURE
     0.0,//double coutVolHelicoptere;
 };
 
+const QString AeroDmsTypes::recupererChaineEtapeChargementBdd(EtapeChargementBdd p_etape)
+{
+    switch (p_etape)
+    {
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256:
+    {
+        return "Demande SHA256";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256_CONNEXION:
+    {
+        return "Demande SHA256 connexion";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256_RECU:
+    {
+        return "Demande SHA256 reçu";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_CONNEXION:
+    {
+        return "Demande téléchargement BDD connexion";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_RECU:
+    {
+        return "Demande téléchargement BDD reçu";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_PRISE_EN_COMPTE_BDD_TELECHARGEE:
+    {
+        return "Demande prise en compte BDD téléchargée";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_PRISE_VERROU:
+    {
+        return "Prise verrou";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD:
+    {
+        return "Demande envoi BDD";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD_ENVOI:
+    {
+        return "Demande envoi BDD envoi";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD_FIN:
+    {
+        return "Demande envoi BDD fin";
+    }
+    break;
+    case AeroDmsTypes::EtapeChargementBdd_TERMINE:
+    {
+        return "Terminé";
+    }
+    break;
+    default:
+    {
+        return "Valeur indéterminée";
+    }
+    break;
+    }
+}

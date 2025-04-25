@@ -141,6 +141,8 @@ bool GestionnaireDonneesEnLigne::connecter()
                 // Envoyer la requête POST
                 QNetworkReply* reply = networkManager->post(request, multiPart);
                 multiPart->setParent(reply); // Le multiPart sera supprimé avec la réponse
+
+                emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD_ENVOI);
             }
             break;
         }
@@ -230,12 +232,11 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
         {
             nombreEssais = 0;
 
-            //gestion des données texte
-
             if (demandeEnCours == Demande_RECUPERER_SHA256_BDD)
             {
                 const QByteArray sdata = rep->readAll();
                 emit receptionSha256Bdd(sdata);
+                emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256_RECU);
                 libererMutex();
             }
             else if (demandeEnCours == Demande_ENVOI_FACTURE)
@@ -268,6 +269,7 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
                     dialogueErreurVersionBdd.exec();
                 }
                 
+                emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD_FIN);
                 emit finDEnvoiBdd();
                 libererMutex();
             }
@@ -295,6 +297,7 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
                         phaseTraitement = Etape_CONNECTE;
                         emit baseDeDonneesTelechargeeEtDisponible();
                     }
+                    emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_RECU);
                 }
                 libererMutex();
             }
@@ -400,6 +403,8 @@ void GestionnaireDonneesEnLigne::envoyerBdd(QString p_chemin)
             demandeEnCours = Demande_ENVOI_BDD;
             cheminFichier = p_chemin;
 
+            emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD);
+
             connecter();
         }
         else
@@ -423,6 +428,7 @@ void GestionnaireDonneesEnLigne::telechargerBdd()
             serviceUrl = QUrl(parametres.adresseServeurModeExterne + "/telechargerBdd.php");
             nombreEssais = 0;
             demandeEnCours = Demande_TELECHARGER_BDD;
+            emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_CONNEXION);
 
             connecter();
         }
@@ -511,7 +517,7 @@ void GestionnaireDonneesEnLigne::recupererSha256Bdd()
                 + QSslSocket::sslLibraryBuildVersionString()
                 + "<br />"
                 + "<br /><br />"
-                + tr("Impossible de se connecter au site du DACA. Arret."));
+                + tr("Impossible de se connecter au site de partage des données. Arret."));
         }
         else
         {
@@ -522,6 +528,7 @@ void GestionnaireDonneesEnLigne::recupererSha256Bdd()
                 serviceUrl = QUrl(parametres.adresseServeurModeExterne + "/db_sha256.php");
                 nombreEssais = 0;
                 demandeEnCours = Demande_RECUPERER_SHA256_BDD;
+                emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256_CONNEXION);
 
                 connecter();
             }

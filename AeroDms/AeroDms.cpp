@@ -263,7 +263,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
     db = new ManageDb(parametresMetiers.delaisDeGardeBdd,
         parametresMetiers.nomTresorier,
         gestionnaireDonneesEnLigne);
+
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
+    connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(gererEchecOuvertureBdd()));
+
     db->ouvrirLaBdd(database);
     db->lireParametres(parametresMetiers, parametresSysteme);
 
@@ -827,14 +830,18 @@ void AeroDms::initialiserGestionnaireTelechargement()
 {
     pdfdl = new PdfDownloader(parametresSysteme.cheminStockageFacturesATraiter, db);
     connect(pdfdl, SIGNAL(etatRecuperationDonnees(AeroDmsTypes::EtatRecuperationDonneesFactures)), this, SLOT(gererChargementDonneesSitesExternes(AeroDmsTypes::EtatRecuperationDonneesFactures)));
+}
 
+void AeroDms::verifierPresenceFacturesDaca()
+{
     const QSettings settingsDaca(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), "DACA");
     const QDate derniereVerificationDaca = settingsDaca.value("DACA/dateDerniereVerification", QDate::currentDate().toString("yyyy-MM-dd")).toDate();
 
-    //Si on a dépassé le délais entre 2 vérifications, et que l'application n'est pas en mode mise à jour,
+    //Si on a dépassé le délais entre 2 vérifications, et que l'application n'est pas en mode mise à jour ou en lecture seule,
     //on vérifie si présence de nouvelle facture sur le site du DACA.
     if (derniereVerificationDaca.daysTo(QDate::currentDate()) >= parametresSysteme.periodiciteVerificationPresenceFactures
-        && !miseAJourApplicationEstEnCours)
+        && !miseAJourApplicationEstEnCours
+        && !logicielEnModeLectureSeule)
     {
         chargerListeFacturesDaca();
     }
@@ -843,6 +850,12 @@ void AeroDms::initialiserGestionnaireTelechargement()
 void AeroDms::passerLeLogicielEnLectureSeule()
 {
     passerLeLogicielEnLectureSeule(true, true);
+}
+
+void AeroDms::gererEchecOuvertureBdd()
+{
+    //passerLeLogicielEnLectureSeule(true, true);
+    //statusBar()->showMessage(tr("Impossible de (re)charger la base de données. Relancez le logiciel."));
 }
 
 void AeroDms::sortirLeLogicielDeLectureSeule()
@@ -887,6 +900,12 @@ void AeroDms::sortirLeLogicielDeLectureSeule()
                 gestionnaireDonneesEnLigne->telechargerFacture(facture);
             }
         }
+    }
+
+    //Si on est sur un cas de chargement BDD, on indique la fin
+    if (barreDeProgressionStatusBar->maximum() == AeroDmsTypes::EtapeChargementBdd_TERMINE)
+    {
+        afficherEtapesChargementBdd(AeroDmsTypes::EtapeChargementBdd_TERMINE);
     }
 }
 
@@ -979,14 +998,28 @@ void AeroDms::gererBddDistante()
         connect(db, SIGNAL(sortirDuModeLectureSeule()), this, SLOT(sortirLeLogicielDeLectureSeule()));
         connect(db, SIGNAL(signalerBddBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)), this, SLOT(signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString, const QDateTime, const QDateTime)));
 
+        connect(db, SIGNAL(notifierEtapeChargementBdd(const AeroDmsTypes::EtapeChargementBdd)), this, SLOT(afficherEtapesChargementBdd(const AeroDmsTypes::EtapeChargementBdd)));
+        connect(gestionnaireDonneesEnLigne, SIGNAL(notifierEtapeChargementBdd(const AeroDmsTypes::EtapeChargementBdd)), this, SLOT(afficherEtapesChargementBdd(const AeroDmsTypes::EtapeChargementBdd)));
+
         //On passe systématiquement en lecture seule => si la base est identique a celle dispo en ligne,
         //on recevra le signal signalerChargementBaseSuiteTelechargement() ce qui permettra de repasse
         //le logiciel en lecture-ecriture.
         passerLeLogicielEnLectureSeule(true, false);
 
+        //On affiche la barre de progression
+        barreDeProgressionStatusBar->show();
+        barreDeProgressionStatusBar->setMaximum(AeroDmsTypes::EtapeChargementBdd_TERMINE);
+        barreDeProgressionEstAMettreAJourPourBddInitialeOuFinale = true;
+
         //On fait la demande au gestionnaire de données en ligne.
-        //La réponse sera traitée directement par le gestionnaire de BDD
+        //La réponse sera traitée directement par le gestionnaire de BDD  
+        barreDeProgressionStatusBar->setValue(AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256);
         gestionnaireDonneesEnLigne->recupererSha256Bdd();
+    }
+    //Sinon, on vérifie tout de suite la présence de factures du DACA
+    else
+    {
+        verifierPresenceFacturesDaca();
     }
 }
 
@@ -5575,11 +5608,31 @@ void AeroDms::afficherStatusDebutTelechargementBdd()
     statusBar()->showMessage(tr("Base de données locale non à jour. Téléchargement de la BDD... Patientez"));
 }
 
+void AeroDms::afficherEtapesChargementBdd(const AeroDmsTypes::EtapeChargementBdd p_etape)
+{
+    if (barreDeProgressionEstAMettreAJourPourBddInitialeOuFinale)
+    {
+        barreDeProgressionStatusBar->setValue(p_etape);
+        barreDeProgressionStatusBar->setToolTip(AeroDmsTypes::recupererChaineEtapeChargementBdd(p_etape));
+
+        if (p_etape == AeroDmsTypes::EtapeChargementBdd_TERMINE)
+        {
+            QTimer::singleShot(5000, this, &AeroDms::masquerBarreDeProgressionDeLaStatusBar);
+            barreDeProgressionEstAMettreAJourPourBddInitialeOuFinale = false;
+            //On vérifie la présence de factures du DACA :
+            verifierPresenceFacturesDaca();
+        }
+    }
+    
+}
+
 void AeroDms::signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
     const QDateTime p_heureVerrouInitial,
     const QDateTime p_heureDerniereVerrou)
 {
     passerLeLogicielEnLectureSeule(true, false);
+    barreDeProgressionStatusBar->setValue(AeroDmsTypes::EtapeChargementBdd_TERMINE);
+    QTimer::singleShot(5000, this, &AeroDms::masquerBarreDeProgressionDeLaStatusBar);
 
     QMessageBox dialogueErreurVersionBdd;
     dialogueErreurVersionBdd.setText(tr("La base de données est verrouillée par ")
@@ -5662,6 +5715,7 @@ void AeroDms::afficherProgressionMiseAJourAerodromes(int nombreTotal,
 void AeroDms::masquerBarreDeProgressionDeLaStatusBar()
 {
     barreDeProgressionStatusBar->hide();
+    barreDeProgressionStatusBar->setToolTip("");
 }
 
 void AeroDms::closeEvent(QCloseEvent* event)
@@ -5679,13 +5733,18 @@ void AeroDms::closeEvent(QCloseEvent* event)
         //et 
         //     si le logiciel n'est pas en lecture seule
         //   ou
-        //     si le retour en mode lecture ecriture a été interdit (dans certains situations
+        //     si le retour en mode lecture ecriture a été interdit (dans certaines situations
         //        dans ce cas, on a pu prendre le verrou)
         if (gestionnaireDonneesEnLigne->estActif() 
             && (!logicielEnModeLectureSeule
                   || retourEnModeLectureEcritureEstInterdit))
         {
             event->ignore();
+
+            barreDeProgressionStatusBar->show();
+            barreDeProgressionStatusBar->setMaximum(AeroDmsTypes::EtapeChargementBdd_TERMINE);
+            barreDeProgressionStatusBar->setValue(AeroDmsTypes::EtapeChargementBdd_PRISE_VERROU);
+            barreDeProgressionEstAMettreAJourPourBddInitialeOuFinale = true;
 
             const EtapeFermeture etapeFermeturePrecedente = etapeFermetureEnCours;
             etapeFermetureEnCours = EtapeFermeture_FERMETURE_BDD;

@@ -319,6 +319,7 @@ private:
     bool retourEnModeLectureEcritureEstInterdit = false;
     bool miseAJourApplicationEstEnCours = false;
     bool verificationDeNouvelleFacturesAChargerEnLigneEstEffectue = false;
+    bool barreDeProgressionEstAMettreAJourPourBddInitialeOuFinale = false;
     enum EtapeFermeture
     {
         EtapeFermeture_NON_DEMANDE,
@@ -460,13 +461,16 @@ public slots:
     void verifierVersionBddSuiteChargement();
     void demanderTelechargementMiseAJourLogiciel();
     void afficherStatusDebutTelechargementBdd();
+    void afficherEtapesChargementBdd(const AeroDmsTypes::EtapeChargementBdd p_etape);
     void signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,
         const QDateTime p_heureDerniereVerrou);
     void passerLeLogicielEnLectureSeule();
     void sortirLeLogicielDeLectureSeule();
+    void gererEchecOuvertureBdd();
 
     //Téléchargement de factures
+    void verifierPresenceFacturesDaca();
     void gererChargementDonneesSitesExternes(const AeroDmsTypes::EtatRecuperationDonneesFactures p_etatRecuperation);
     void demanderTelechargementFactureDaca();
     void demanderTelechargementPremiereFactureDaca();

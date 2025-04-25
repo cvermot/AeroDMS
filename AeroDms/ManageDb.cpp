@@ -68,6 +68,8 @@ void ManageDb::gererVerrouBdd()
     //on positionne le logiciel en lecture seule et on demande l'affichage 
     //d'un message explicatif
 
+    emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_PRISE_VERROU);
+
     QSqlQuery query;
     query.prepare("SELECT * FROM parametres WHERE nom = 'lock'");
     query.exec();
@@ -107,6 +109,8 @@ void ManageDb::gererVerrouBdd()
 
 void ManageDb::libererVerrouBdd()
 {
+    emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_PRISE_VERROU);
+
     //On ne libère le verrou que si c'est le notre
 
     QSqlQuery query;
@@ -154,7 +158,7 @@ void ManageDb::rechargerBddSuiteEnvoi()
 {
     if (!envoiTerminalAvantFermetureLogiciel)
     {
-        db.open();
+        ouvrirBdd();
     }
     emit sortirDuModeLectureSeule();
 }
@@ -177,6 +181,8 @@ const QStringList ManageDb::recupererListeFichiersPdfFactures()
 
 void ManageDb::prendreEnCompteBddTelechargee()
 {
+    notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_TELECHARGEMENT_PRISE_EN_COMPTE_BDD_TELECHARGEE);
+
     db.close();
 
     const QString nomSauvegardeBdd = db.databaseName().replace("/AeroDMS.sqlite", "/AeroDMS"+QDateTime::currentDateTime().toString("_yyyy-MM-dd_hhmm") + ".sqlite");
@@ -191,12 +197,13 @@ void ManageDb::prendreEnCompteBddTelechargee()
     gestionnaireDeFichier.rename(nomBddTelechargee,
         db.databaseName());
 
-    db.open();
+    if (ouvrirBdd())
+    {
+        //On signale le chargement d'une nouvelle BDD à destination de l'IHM notamment
+        emit signalerChargementBaseSuiteTelechargement();
 
-    //On signale le chargement d'une nouvelle BDD à destination de l'IHM notamment
-    emit signalerChargementBaseSuiteTelechargement();
-
-    gererVerrouBdd();
+        gererVerrouBdd();
+    }
 
     //On fait un peu de ménage parmis les bases de données sauvegardées. On va garder les 25 dernières
     QDir repertoireBdd(db.databaseName().replace("/AeroDMS.sqlite", ""));
@@ -234,7 +241,24 @@ bool ManageDb::ouvrirLaBdd(const QString& p_database)
     db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(p_database);
 
-    if (!db.open())
+    return ouvrirBdd();
+}
+
+const bool ManageDb::ouvrirBdd()
+{
+    bool bddEstOuverte = false;
+    int nbTentatives = 0;
+
+    while (!bddEstOuverte
+        && nbTentatives < 3)
+    {
+        if (nbTentatives != 0)
+            QThread::msleep(delaisDeGardeBdd);
+        nbTentatives++;
+        bddEstOuverte = db.open();
+    }
+
+    if (!bddEstOuverte)
     {
         emit erreurOuvertureBdd();
         QMessageBox::critical(this,
@@ -242,9 +266,9 @@ bool ManageDb::ouvrirLaBdd(const QString& p_database)
             tr("Je ne parvient pas à ouvrir la base de données car l'erreur suivante s'est produite : ") + "\n"
             + db.lastError().text()
             + "\n" + tr("Cliquez Annuler pour quitter"), QMessageBox::Cancel);
-        return false;
     }
-    return true;
+
+    return bddEstOuverte;
 }
 
 void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
@@ -254,7 +278,7 @@ void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
     QFile gestionnaireDeFichier;
     gestionnaireDeFichier.copy(db.databaseName(), p_repertoireDeSauvegarde + "AeroDms.sqlite");
 
-    db.open();
+    ouvrirBdd();
 }
 
 const QString ManageDb::recupererShaSumBdd()

@@ -131,6 +131,21 @@ public:
         Unites_EUROS
     };
 
+    enum EtapeChargementBdd {
+        EtapeChargementBdd_DEMANDE_SHA256 = 0,
+        EtapeChargementBdd_DEMANDE_SHA256_CONNEXION,
+        EtapeChargementBdd_DEMANDE_SHA256_RECU,
+        EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_CONNEXION,
+        EtapeChargementBdd_DEMANDE_TELECHARGEMENT_BDD_RECU,
+        EtapeChargementBdd_DEMANDE_TELECHARGEMENT_PRISE_EN_COMPTE_BDD_TELECHARGEE,
+        EtapeChargementBdd_PRISE_VERROU,
+        EtapeChargementBdd_DEMANDE_ENVOI_BDD,
+        EtapeChargementBdd_DEMANDE_ENVOI_BDD_ENVOI,
+        EtapeChargementBdd_DEMANDE_ENVOI_BDD_FIN,
+        EtapeChargementBdd_TERMINE,
+    };
+    static const QString recupererChaineEtapeChargementBdd(EtapeChargementBdd p_etape);
+
     enum Statistiques {                              //     RESO|STATS
         Statistiques_HEURES_ANNUELLES       = 0x1,   //     XXXX|0000 0000 0001
         Statistiques_HEURES_PAR_PILOTE      = 0x2,   //     XXXX|0000 0000 0010

@@ -195,6 +195,7 @@ signals:
         const QDateTime p_heureDerniereVerrou);
     void passerLogicielEnLectureSeuleDurantEnvoiBdd();
     void sortirDuModeLectureSeule();
+    void notifierEtapeChargementBdd(const AeroDmsTypes::EtapeChargementBdd p_etape);
 
 private:
     QSqlDatabase db;
@@ -206,6 +207,7 @@ private:
 
     const double versionBddAttendue = 1.14;
 
+    const bool ouvrirBdd();
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
         const bool p_avecFactureEtSortie = true);
