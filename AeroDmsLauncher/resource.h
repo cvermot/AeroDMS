@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // fichier Include Microsoft Visual C++.
-// Utilisé par AeroDmsLauncher.rc
+// UtilisÃ© par AeroDmsLauncher.rc
 //
 #define IDI_ICON1                       102
 
@@ -15,6 +15,6 @@
 #endif
 #endif
 
-#define VER_PRODUCTVERSION          "1.4"
+#define VER_PRODUCTVERSION          "1.5"
 #define VER_PRODUCTVERSION_STR      VER_PRODUCTVERSION "\0"
 #define VER_PRODUCTNAME_STR         "AeroDMSLauncher"

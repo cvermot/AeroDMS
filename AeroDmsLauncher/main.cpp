@@ -91,7 +91,17 @@ int main(int argc, char* argv[])
     const QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable
 
     // Définir la variable d'environnement OPENSSL_MODULES
-    qputenv("OPENSSL_MODULES", opensslModulesPath.toUtf8());
+    if (!qputenv("OPENSSL_MODULES", opensslModulesPath.toUtf8()))
+    {
+        splash->close();
+        QMessageBox::critical(nullptr,
+            QApplication::applicationName() + " - Erreur",
+            "Impossible de définir la variable d'environnement OPENSSL_MODULES comme : "
+            + opensslModulesPath
+            + ". <br /><br />"
+            + "Cette variable d'environnement est indispensable au démarrage d'AeroDms.<br />Impossible d'exécuter AeroDms.");
+        return -1;
+    }
 
     QString appName = "AeroDms.exe";
     //Si le nom du lanceur vaut AeroDms.exe, c'est que le binaire à lancer vaut Aero.exe
@@ -120,7 +130,7 @@ int main(int argc, char* argv[])
             "La DLL legacy.dll est introuvable dans : "
             + program
             + ". <br /><br />"
-            + " Cette DLL est indispensable au fonctionnement d'AeroDms.<br />Impossible d'exécuter AeroDms.");
+            + "Cette DLL est indispensable au fonctionnement d'AeroDms.<br />Impossible d'exécuter AeroDms.");
         return -1;
     }
 
