@@ -3934,8 +3934,11 @@ void AeroDms::aPropos()
         + tr("Logiciel de gestion de compta d'une section aéronautique.") + "<br/><br/>"
         + tr("Le code source de ce programme est disponible sous")
         + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
-        + tr("Ce programme utilise la libraire")
-        + " <a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3.<br />< br/>"
+        + tr("Ce programme utilise les libraires :<ul>")
+        + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() +"</li>"
+        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3</li>"
+        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.0.10</li>"
+        + "</ul>"
         + tr("Les icones sont issues de")
         + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
         + tr("L'image de démarrage est générée avec")
