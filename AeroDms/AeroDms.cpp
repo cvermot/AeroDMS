@@ -241,14 +241,22 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.loginServeurModeExterne = settings.value("modeFonctionnementLogiciel/login", "").toString();
     parametresSysteme.loginSiteDaca = settings.value("siteDaca/login", "").toString();
     parametresSysteme.periodiciteVerificationPresenceFactures = settings.value("siteDaca/periodiciteVerification", 3).toInt();
-    
-    QString valeur = settings.value("siteDaca/password", "").toString();
-    parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(valeur);
-    valeur = settings.value("modeFonctionnementLogiciel/password", "").toString();
-    parametresSysteme.motDePasseServeurModeExterne = AeroDmsServices::dechiffrerDonnees(valeur);
 
     parametresMetiers.nomTresorier = settings.value("noms/nomTresorier", "").toString();
     parametresMetiers.delaisDeGardeBdd = settingsMetier.value("parametresSysteme/delaisDeGardeDbEnMs", "50").toInt();
+
+    parametresSysteme.motDePasseSiteDaca = settings.value("siteDaca/password", "").toString();
+    parametresSysteme.motDePasseServeurModeExterne = settings.value("modeFonctionnementLogiciel/password", "").toString();
+    
+    //Permet de fournir un fichier .ini avec les mots de passe en clair pour la conf initiale
+    //Si on est pas à 1, cela veut dire que le mot de passe était chiffré => on le déchiffre
+    if (settings.value("modeFonctionnementLogiciel/motsDePasseAChiffrer", "0").toBool() == false)
+    {
+        parametresSysteme.motDePasseSiteDaca = AeroDmsServices::dechiffrerDonnees(parametresSysteme.motDePasseSiteDaca);
+        parametresSysteme.motDePasseServeurModeExterne = AeroDmsServices::dechiffrerDonnees(parametresSysteme.motDePasseServeurModeExterne);
+        
+    }
+    //Sinon, on réenregistre le fichier de conf avec le mot de passe chiffré à la fin de la méthode
     
     gestionnaireDonneesEnLigne = new GestionnaireDonneesEnLigne(parametresSysteme);
     connect(gestionnaireDonneesEnLigne, SIGNAL(zipMiseAJourDisponible()), 
@@ -276,6 +284,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
             parametresSysteme.margesHautBas,
             parametresSysteme.margesGaucheDroite,
             parametresSysteme.margesHautBas));
+
+    enregistrerParametresApplication(parametresMetiers, parametresSysteme);
 }
 
 void AeroDms::initialiserOngletPilotes()
@@ -4399,6 +4409,7 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.setValue("adresse", parametresSysteme.adresseServeurModeExterne);
     settings.setValue("login", parametresSysteme.loginServeurModeExterne);
     settings.setValue("password", AeroDmsServices::chiffrerDonnees(parametresSysteme.motDePasseServeurModeExterne));
+    settings.setValue("motsDePasseAChiffrer", 0);
     settings.endGroup();
 
     settings.beginGroup("siteDaca");
@@ -5539,16 +5550,19 @@ void AeroDms::mettreAJourBoutonsFichierSuivantPrecedent()
 
 void AeroDms::verifierDispoIdentifiantsDaca()
 {
-    if (parametresSysteme.loginSiteDaca == ""
-        || parametresSysteme.motDePasseSiteDaca == "")
+    if (facturesDaca != nullptr)
     {
-        facturesDaca->setEnabled(false);
-        facturesDaca->setStatusTip(tr("Fonction désactivée : identifiants et/ou mot de passe non fournis"));
-    }
-    else
-    {
-        facturesDaca->setEnabled(true);
-        facturesDaca->setStatusTip(tr("Chargement des factures du DACA"));
+        if (parametresSysteme.loginSiteDaca == ""
+            || parametresSysteme.motDePasseSiteDaca == "")
+        {
+            facturesDaca->setEnabled(false);
+            facturesDaca->setStatusTip(tr("Fonction désactivée : identifiants et/ou mot de passe non fournis"));
+        }
+        else
+        {
+            facturesDaca->setEnabled(true);
+            facturesDaca->setStatusTip(tr("Chargement des factures du DACA"));
+        }
     }
 }
 
