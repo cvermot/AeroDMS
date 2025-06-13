@@ -57,7 +57,9 @@ else
     {
         // Déplacer le fichier reçu dans le dossier de destination
         $target_dir = "uploads/";
-        $target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
+        $filename = basename($_FILES["fileToUpload"]["name"]);
+        $filename = preg_replace('/^factures[_\s-]*/i', '', $filename);
+        $target_file = $target_dir . $filename;
         if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
             echo "Le fichier PDF été téléchargé avec succès.";
         } else {
