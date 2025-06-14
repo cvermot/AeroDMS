@@ -44,7 +44,7 @@ Suivre [les étapes d’installation de vcpkg](https://vcpkg.io/en/getting-start
 #### Compilation et installation de PoDoFo
 Récupérer et compiler PoDoFo :
 ```
-vcpkg install podofo
+vcpkg install podofo 7zip bit7z
 ```
 Après la compilation de PoDoFo et de ses dépendances, installer PoDoFo (nécessite un accès administrateur sur la machine) :
 ```
