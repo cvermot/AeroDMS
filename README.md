@@ -23,8 +23,8 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Impression (Qt Print Support)
   - Chargement de données de sites Web (Qt Network)
   - Gestion multithread (Qt Concurrent)
-- Librairie [PoDoFo](https://github.com/podofo/podofo) (0.10.3) pour le parsing et l'assemblage des PDF
-- Librairie [Bit7z](https://github.com/rikyoz/bit7z) pour la décompression des mises à jour
+- Librairie [PoDoFo](https://github.com/podofo/podofo) (1.0.0) pour le parsing et l'assemblage des PDF
+- Librairie [Bit7z](https://github.com/rikyoz/bit7z) (4.0.10) pour la décompression des mises à jour
 - Librairie Dpapi (Win32/crypt32.lib) pour le chiffrement des mots de passe stockés en local, à défaut de support d'un mécanisme générique par Qt. Si on souhaite compiler pour Mac OS ou Linux, il sera nécessaire d'implémenter les mécanismes spécifiques à ces systèmes d'exploitation.
 
 ## Mise en place de l’environnement de développement
