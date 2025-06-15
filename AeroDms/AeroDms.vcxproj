@@ -43,7 +43,7 @@
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.9.0_msvc2022_64</QtInstall>
+    <QtInstall>6.9.1_msvc2022_64</QtInstall>
     <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>

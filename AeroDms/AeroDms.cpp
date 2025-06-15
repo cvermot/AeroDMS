@@ -2386,6 +2386,15 @@ void AeroDms::peuplerTableVols()
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(vol.immat));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
+
+            if (vol.soumissionEstDelayee)
+            {
+                for (int i = 0; i < vueVols->columnCount(); i++)
+                {
+                    vueVols->item(nbItems, i)->setBackground(QBrush(QColor(255, 140, 135, 120)));
+                    vueVols->item(nbItems, i)->setToolTip("Ce vol est marqué comme à ne pas soumettre au CSE.\nPour soumettre ce vol au CSE, faire un clic droit sur ce vol et utilisez la fonction \"Marquer/démarquer le vol comme à ne pas soumettre au CSE\".");
+                }
+            }
             nbItems++;
         }
     }
@@ -3946,7 +3955,7 @@ void AeroDms::aPropos()
         + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
         + tr("Ce programme utilise les libraires :<ul>")
         + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() +"</li>"
-        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 0.10.3</li>"
+        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 1.0.0</li>"
         + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.0.10</li>"
         + "</ul>"
         + tr("Les icones sont issues de")
@@ -4160,10 +4169,18 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         menuClicDroitVol.addAction(&supprimerLeVol);
         supprimerLeVol.setEnabled(leVolEstSupprimable);
 
+        QAction soumettreLeVolAuCsePlusTard(QIcon(":/AeroDms/ressources/airplane-remove.svg"),
+            tr("Marquer/démarquer le vol comme à ne pas soumettre au CSE"),
+            this);
+        connect(&soumettreLeVolAuCsePlusTard, SIGNAL(triggered()), this, SLOT(switchMarquageVolASoumettrePlusTard()));
+        menuClicDroitVol.addAction(&soumettreLeVolAuCsePlusTard);
+        soumettreLeVolAuCsePlusTard.setEnabled(leVolEstSupprimable);
+
         if (logicielEnModeLectureSeule)
         {
             editerLeVol.setEnabled(false);
             supprimerLeVol.setEnabled(false);
+            soumettreLeVolAuCsePlusTard.setEnabled(false);
         }
 
         //Afficher le menu sur la vue des vols
@@ -4265,6 +4282,15 @@ void AeroDms::supprimerVol()
 
     //On sort du mode suppression de vol
     volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
+}
+
+void AeroDms::switchMarquageVolASoumettrePlusTard()
+{
+    db->switcherVolANePasSoumettreAuCse(volAEditer);
+    //On sort du mode suppression de vol
+    volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
+
+    peuplerTableVols();
 }
 
 void AeroDms::switchModeDebug()

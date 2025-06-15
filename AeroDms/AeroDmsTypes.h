@@ -414,6 +414,7 @@ public:
         QString activite = K_INIT_QSTRING;
         QString estSoumisCe = K_INIT_QSTRING;
         bool estSoumis = false;
+        bool soumissionEstDelayee = false;
         double coutVol = 0.0;
         double montantRembourse = 0.0;
         int volId = K_INIT_INT_INVALIDE;

@@ -133,7 +133,17 @@ void ManageDb::libererVerrouBdd()
         QThread::msleep(delaisDeGardeBdd);
         envoiTerminalAvantFermetureLogiciel = true;
         gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
+
+        QTimer::singleShot(10000, this, &ManageDb::reitererEnvoiBddSurFermeture);
     }
+}
+
+void ManageDb::reitererEnvoiBddSurFermeture()
+{
+    gestionnaireDonneesEnLigne->rincerListeDAttente();
+    gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
+
+    QTimer::singleShot(10000, this, &ManageDb::reitererEnvoiBddSurFermeture);
 }
 
 void ManageDb::demanderEnvoiBdd()
@@ -923,13 +933,13 @@ const AeroDmsTypes::Vol ManageDb::recupererVol(const int p_idVol)
     return depilerRequeteVol(query);
 }
 
-const AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee, 
+const AeroDmsTypes::ListeVols ManageDb::recupererVols(const int p_annee,
     const QString p_piloteId)
 {
     AeroDmsTypes::ListeVols liste;
 
     QSqlQuery query;
-    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE&& p_piloteId != "*")
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE && p_piloteId != "*")
     {
         query.prepare("SELECT * FROM vols WHERE strftime('%Y', vols.date) = :annee AND pilote = :piloteId ORDER BY date");
     }
@@ -948,7 +958,7 @@ const AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     query.bindValue(":annee", QString::number(p_annee));
     query.bindValue(":piloteId", p_piloteId);
 
-    
+
     query.exec();
 
     while (query.next())
@@ -959,7 +969,7 @@ const AeroDmsTypes::ListeVols ManageDb::recupererVols( const int p_annee,
     return liste;
 }
 
-const AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
+const AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query,
     const bool p_avecFactureEtSortie)
 {
     AeroDmsTypes::Vol vol = AeroDmsTypes::K_INIT_VOL;
@@ -970,10 +980,15 @@ const AeroDmsTypes::Vol ManageDb::depilerRequeteVol( const QSqlQuery p_query,
     vol.duree = AeroDmsServices::convertirMinutesEnHeuresMinutes(vol.dureeEnMinutes);
     vol.estSoumisCe = "Oui";
     vol.estSoumis = true;
-    if (p_query.value("demandeRemboursement").isNull())
+    if (p_query.value("demandeRemboursement").isNull()
+        || p_query.value("demandeRemboursement").toInt() == -1)
     {
         vol.estSoumisCe = "Non";
         vol.estSoumis = false;
+        if (p_query.value("demandeRemboursement").toInt() == -1)
+        {
+            vol.soumissionEstDelayee = true;
+        }
     }
     vol.idPilote = p_query.value("pilote").toString();
     vol.montantRembourse = p_query.value("montantRembourse").toDouble();
@@ -1190,6 +1205,54 @@ const bool ManageDb::supprimerUnVol(const int p_volAEditer)
     query.bindValue(":volId", p_volAEditer);
 
     return query.exec();
+}
+
+void ManageDb::switcherVolANePasSoumettreAuCse(const int p_volASwitcher)
+{
+    bool demandeEstAEffectuer = true;
+
+    QSqlQuery query;
+    query.prepare("SELECT demandeRemboursement FROM 'vol' WHERE volId = :volId");
+    query.bindValue(":volId", QString::number(p_volASwitcher));
+    query.exec();
+    if (query.next())
+    {
+        if (query.value("demandeRemboursement").isNull())
+        {
+            query.prepare("UPDATE 'vol' SET 'demandeRemboursement' = :demandeRemboursement WHERE volId = :volId");
+            query.bindValue(":volId", QString::number(p_volASwitcher));
+            query.bindValue(":demandeRemboursement", -1);
+        }
+        else if (query.value("demandeRemboursement").toInt() == -1)
+        {
+            query.prepare("UPDATE 'vol' SET 'demandeRemboursement' = :demandeRemboursement WHERE volId = :volId");
+            query.bindValue(":volId", QString::number(p_volASwitcher));
+            query.bindValue(":demandeRemboursement", QVariant(QMetaType::fromType<int>()));
+        }
+        else
+        {
+            demandeEstAEffectuer = false;
+        }
+    }
+    else
+    {
+        demandeEstAEffectuer = false;
+    }
+
+    if (demandeEstAEffectuer)
+    {
+        executerRequeteAvecControle(query,
+            "selection/déselection d'un vol à soumettre au CSE",
+            "Modification du statut vol à soumettre au CSE");
+    }
+    else
+    {
+        QMessageBox::critical(
+            this,
+            QApplication::applicationName() + " - " + tr("Impossible de changer le statut du vol"),
+            tr("Une erreur s'est produite lors de la selection/déselection du vol à soumettre au CSE")
+        );
+    }
 }
 
 void ManageDb::enregistrerUneFacture( const QString& p_payeur,

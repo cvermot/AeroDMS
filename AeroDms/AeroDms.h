@@ -403,6 +403,7 @@ public slots:
     void editerCotisation();
     void editerVol();
     void supprimerVol();
+    void switchMarquageVolASoumettrePlusTard();
     void ajouterUneNoteSubvention();
     void switchModeDebug();
     void switchScanAutomatiqueDesFactures();

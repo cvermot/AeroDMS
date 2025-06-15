@@ -70,6 +70,7 @@ public:
         const QString& p_activite,
         const int p_idVolAEditer);
     const bool supprimerUnVol(const int p_volAEditer);
+    void switcherVolANePasSoumettreAuCse(const int p_volASwitcher);
     void enregistrerUneFacture( const QString& p_payeur,
         const int factureId,
         const QDate& p_date,
@@ -185,6 +186,7 @@ public slots:
     void comparerSha256BddLocale(QString p_sha256BaseEnLigne);
     void prendreEnCompteBddTelechargee();
     void rechargerBddSuiteEnvoi();
+    void reitererEnvoiBddSurFermeture();
 
 signals:
     void erreurOuvertureBdd();

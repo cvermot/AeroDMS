@@ -46,6 +46,7 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { K_INIT_QSTRING,//QString id
                                                      K_INIT_QSTRING,//QString activite;
                                                      K_INIT_QSTRING,//QString estSoumisCe;
                                                      false,//bool estSoumis
+                                                     false,//bool soumissionEstDelayee
                                                      0.0,//double coutVol;
                                                      0.0,//double montantRembourse;
                                                      K_INIT_INT,//int volId;
