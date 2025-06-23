@@ -113,6 +113,7 @@ public:
     const AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
     const AeroDmsTypes::ListeVols recupererVols( const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
         const QString p_piloteId = "*");
+    const AeroDmsTypes::ListeVols recupererVolsParDemandeDeRemboursement(const int p_idDemandeDeSubvention);
     const AeroDmsTypes::Vol recupererVol(const int p_idVol);
     
     const AeroDmsTypes::ListeDemandesRemboursementSoumises recupererDemandesRemboursementSoumises( const int p_annee,

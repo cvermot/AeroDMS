@@ -969,6 +969,22 @@ const AeroDmsTypes::ListeVols ManageDb::recupererVols(const int p_annee,
     return liste;
 }
 
+const AeroDmsTypes::ListeVols ManageDb::recupererVolsParDemandeDeRemboursement(const int p_idDemandeDeSubvention)
+{
+    AeroDmsTypes::ListeVols liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM vols WHERE demandeRemboursement = :demandeRemboursement ORDER BY date");
+    query.bindValue(":demandeRemboursement", p_idDemandeDeSubvention);
+    query.exec();
+
+    while (query.next())
+    {
+        liste.append(depilerRequeteVol(query, false));
+    }
+    return liste;
+}
+
 const AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query,
     const bool p_avecFactureEtSortie)
 {
@@ -2556,9 +2572,11 @@ const AeroDmsTypes::ListeMailsEtVirements ManageDb::recupererMailsVirements(cons
             mailEtVirements.mail = query.value("mail").toString();
             mailEtVirements.pilote = query.value("pilote").toString();
             mailEtVirements.listeMontantsVirements.clear();
+            mailEtVirements.listeIdVirements.clear();
             mail = query.value("mail").toString();
         }
         mailEtVirements.listeMontantsVirements.append(query.value("montant").toDouble());
+        mailEtVirements.listeIdVirements.append(query.value("demandeId").toInt());
     }
     listeVirements.append(mailEtVirements);
 

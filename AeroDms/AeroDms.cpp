@@ -4563,6 +4563,7 @@ void AeroDms::envoyerMail()
                 for (int pilote = 0; pilote < listeVirements.size(); pilote++)
                 {
                     QString stringListeVirement = "";
+                    QString stringListeVols = "";
                     for (int virement = 0; virement < listeVirements.at(pilote).listeMontantsVirements.size(); virement++)
                     {
                         stringListeVirement = stringListeVirement 
@@ -4571,6 +4572,12 @@ void AeroDms::envoyerMail()
                             + " : " 
                             + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement), 'f', 2)
                             + "€\n";
+                        const AeroDmsTypes::ListeVols listeVols = db->recupererVolsParDemandeDeRemboursement(listeVirements.at(pilote).listeIdVirements.at(virement));
+                        qDebug() << listeVirements.at(pilote).mail << listeVirements.at(pilote).listeIdVirements.at(virement);
+                        for (const AeroDmsTypes::Vol vol : listeVols)
+                        {
+                            stringListeVols = stringListeVols + "\t\tVol du " + vol.date.toString("dd/MM/yyyy") + " d'une durée de " + vol.duree + " pour un coût de vol de " + QString::number(vol.coutVol, 'f', 2) + "€ (subvention allouée pour ce vol : "+ QString::number(vol.montantRembourse, 'f', 2)  + "€)\n";
+                        }
                     }
                     stringListeVirement = stringListeVirement + tr("\nPour information : subvention entrainement restante pour l'année ");
                     stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
@@ -4583,7 +4590,9 @@ void AeroDms::envoyerMail()
                         stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
                         stringListeVirement = stringListeVirement + ")";
                     }
-                    stringListeVirement = stringListeVirement + ".";
+                    stringListeVirement = stringListeVirement + ".\n\n";
+
+                    stringListeVirement = stringListeVirement + "Ce remboursement couvre le ou les vol(s) suivant(s) :\n" + stringListeVols;
 
                     QString texteMail = parametresMetiers.texteMailVirementSubvention;
                     texteMail = texteMail.replace("#listeVirements", stringListeVirement);
