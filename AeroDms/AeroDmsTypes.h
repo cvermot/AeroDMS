@@ -263,6 +263,7 @@ public:
     {
         ModeDeReglement_CHEQUE,
         ModeDeReglement_VIREMENT,
+        ModeDeReglement_CARTE_BANCAIRE
     };
 
     enum Status

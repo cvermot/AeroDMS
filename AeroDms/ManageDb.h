@@ -81,7 +81,8 @@ public:
     void ajouterUneRecetteAssocieeAVol( const QStringList& p_listeVols,
         const QString& p_typeDeRecette,
         const QString& p_intitule,
-        const double p_montant);
+        const double p_montant,
+        const bool p_recetteEstPayeeParCb);
 
     const bool piloteEstAJourDeCotisation( const QString& p_piloteId,
         const int annee);

@@ -184,6 +184,7 @@ private:
     QListWidget* listeBaladesEtSorties = nullptr;
     QComboBox* typeDeRecette = nullptr;
     QLineEdit* nomEmetteurChequeRecette = nullptr;
+    QCheckBox* paiementCarteBancaire = nullptr;
     QLineEdit* banqueNumeroChequeRecette = nullptr;
     QDoubleSpinBox* montantRecette = nullptr;
     QPushButton* validerLaRecette = nullptr;
@@ -370,6 +371,7 @@ public slots:
     void genererPdfRecapHdV();
     void prevaliderDonnnesSaisies();
     void prevaliderDonnneesSaisiesRecette();
+    void changementCochePaiementCb();
     void traiterClicSurVolBaladesEtSorties();
     void changerInfosVolSurSelectionTypeVol();
     void chargerBaladesSorties();

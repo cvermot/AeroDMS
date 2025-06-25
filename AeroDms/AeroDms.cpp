@@ -606,8 +606,13 @@ void AeroDms::initialiserOngletAjoutRecettes()
 
     nomEmetteurChequeRecette = new QLineEdit(this);
     nomEmetteurChequeRecette->setToolTip(tr("Nom du titulaire du compte du chèque"));
-    QLabel* nomEmetteurChequeRecetteLabel = new QLabel(tr("Nom émetteur chèque : "), this);
+    QLabel* nomEmetteurChequeRecetteLabel = new QLabel(tr("Nom émetteur paiement : "), this);
     connect(nomEmetteurChequeRecette, &QLineEdit::textChanged, this, &AeroDms::prevaliderDonnneesSaisiesRecette);
+
+    paiementCarteBancaire = new QCheckBox(this);
+    paiementCarteBancaire->setToolTip(tr("Cocher cette case si le paiement est réalisé par carte bancaire"));
+    QLabel* paiementCarteBancaireLabel = new QLabel(tr("Paiement par carte : "), this);
+    connect(paiementCarteBancaire, &QCheckBox::checkStateChanged, this, &AeroDms::changementCochePaiementCb);
 
     banqueNumeroChequeRecette = new QLineEdit(this);
     banqueNumeroChequeRecette->setToolTip(tr("Initiales du nom de la banque et numéro du chèque"));
@@ -636,10 +641,12 @@ void AeroDms::initialiserOngletAjoutRecettes()
     infosRecette->addWidget(typeDeRecette, 0, 1);
     infosRecette->addWidget(nomEmetteurChequeRecetteLabel, 1, 0);
     infosRecette->addWidget(nomEmetteurChequeRecette, 1, 1);
-    infosRecette->addWidget(banqueNumeroChequeRecetteLabel, 2, 0);
-    infosRecette->addWidget(banqueNumeroChequeRecette, 2, 1);
-    infosRecette->addWidget(montantRecetteLabel, 3, 0);
-    infosRecette->addWidget(montantRecette, 3, 1);
+    infosRecette->addWidget(paiementCarteBancaireLabel, 2, 0);
+    infosRecette->addWidget(paiementCarteBancaire, 2, 1);
+    infosRecette->addWidget(banqueNumeroChequeRecetteLabel, 3, 0);
+    infosRecette->addWidget(banqueNumeroChequeRecette, 3, 1);
+    infosRecette->addWidget(montantRecetteLabel, 4, 0);
+    infosRecette->addWidget(montantRecette, 4, 1);
     infosRecette->addWidget(validerLaRecette, 5, 0, 2, 0);
 }
 
@@ -3558,11 +3565,13 @@ Saisie non prise en compte."));
         db->ajouterUneRecetteAssocieeAVol( volsCoches,
                                            typeDeRecette->currentText(),
                                            nomEmetteurChequeRecette->text() + " / " + banqueNumeroChequeRecette->text(),
-                                           montantRecette->value());
+                                           montantRecette->value(),
+                                           paiementCarteBancaire->isChecked());
         statusBar()->showMessage(tr("Recette ajoutée"));
 
         nomEmetteurChequeRecette->clear();
         banqueNumeroChequeRecette->clear();
+        paiementCarteBancaire->setChecked(false);
         montantRecette->clear();
 
         peuplerTableRecettes();
@@ -3889,6 +3898,17 @@ void AeroDms::prevaliderDonnneesSaisiesRecette()
          || banqueNumeroChequeRecette->text() == "")
     {
         validerLaRecette->setEnabled(false);
+    }
+}
+
+void AeroDms::changementCochePaiementCb()
+{
+    banqueNumeroChequeRecette->setDisabled(paiementCarteBancaire->isChecked());
+    banqueNumeroChequeRecette->setText("");
+
+    if (paiementCarteBancaire->isChecked())
+    {
+        banqueNumeroChequeRecette->setText("CB");
     }
 }
 

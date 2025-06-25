@@ -1327,7 +1327,8 @@ const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventione
 void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     const QString& p_typeDeRecette,
     const QString& p_intitule,
-    const double p_montant)
+    const double p_montant,
+    const bool p_recetteEstPayeeParCb)
 {
     QSqlQuery query;
     query.prepare("INSERT INTO 'recettes' ('typeDeRecette','intitule','montant') VALUES(:typeRecette, :intitule, :montant) RETURNING recetteId");
@@ -1342,6 +1343,18 @@ void ManageDb::ajouterUneRecetteAssocieeAVol( const QStringList &p_listeVols,
     const int numeroDeRecetteCree = query.value(0).toInt();
 
     QThread::msleep(delaisDeGardeBdd);
+
+    //Si la recette est perçue par CB, pas besoin de soumettre de formulaire au CSE
+    //=> on met à -1 l'identifiant de soumission au CSE
+    if (p_recetteEstPayeeParCb)
+    {
+        query.prepare("UPDATE recettes SET identifiantFormulaireSoumissionCe = -1 WHERE recetteId = :recetteId");
+        query.bindValue(":recetteId", numeroDeRecetteCree);
+        executerRequeteAvecControle(query,
+            "insertion recette / validation recette CB",
+            "Ajout recette associée à vol");
+        QThread::msleep(delaisDeGardeBdd);
+    }
 
     //On itère sur la liste des vols pour associer la recette aux vols :
     for (int i = 0 ; i < p_listeVols.size() ; i++)
