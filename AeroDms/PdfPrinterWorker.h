@@ -32,8 +32,14 @@ public:
     PdfPrinterWorker(const QString& filePath, 
         QPrinter *printer, 
         bool forceRecto, 
+        bool premieresPagesRectoVerso,
         QObject* parent = nullptr)
-        : QThread(parent), m_filePath(filePath), m_printer(printer), m_forceRecto(forceRecto) {
+        : QThread(parent), 
+            m_filePath(filePath), 
+            m_printer(printer), 
+            m_forceRecto(forceRecto), 
+            m_premieresPagesRectoVerso(premieresPagesRectoVerso)
+    {
     }
 
 signals:
@@ -49,6 +55,7 @@ private:
     QString m_filePath;
     QPrinter *m_printer;
     bool m_forceRecto;
+    bool m_premieresPagesRectoVerso = false;
 };
 
 #endif // PDFPRINTERWORKER_H

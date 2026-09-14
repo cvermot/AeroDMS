@@ -80,38 +80,63 @@ QString PdfRenderer::mergerPdf()
 
     const QString nomFichier = cheminSortieFichiersGeneres
         + demandeEnCours.nomFichier;
-    document.Load(nomFichier.toStdString());
-    
-    for (int i = 0; i < demandeEnCours.listeFactures.size(); i++)
+
+    if (!QFile::exists(nomFichier))
     {
-        const QString nomFacture = repertoireDesFactures + demandeEnCours.listeFactures.at(i);
-        if (QFile::exists(nomFacture))
-        {
-            PoDoFo::PdfMemDocument facture;
-            facture.Load(nomFacture.toStdString());
-            document.GetPages().AppendDocumentPages(facture);
-        }
-        else
-        {
-            QMessageBox::critical(this,
-                QApplication::applicationName() + " - " + tr("Fichier PDF introuvable"),
-                tr("La facture : ") +
-                demandeEnCours.listeFactures.at(i) +
-                tr(" est introuvable.\n") +
-                tr("\nImpossible de l'ajouter au fichier de demande ")
-                + demandeEnCours.nomFichier
-                + ".\n\n"
-                + tr("La demande est bien génerée mais le justificatif n'y sera pas joint."));
-        }
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Fichier introuvable"),
+            tr("Le fichier à fusionner est introuvable :\n") + nomFichier);
+        return QString();
     }
 
-    const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
-    document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
-    document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
-    document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
-    document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
+    try
+    {
+        document.Load(nomFichier.toUtf8().constData());
 
-    document.SaveUpdate(nomFichier.toStdString());
+        for (int i = 0; i < demandeEnCours.listeFactures.size(); i++)
+        {
+            const QString nomFacture = repertoireDesFactures + demandeEnCours.listeFactures.at(i);
+            if (QFile::exists(nomFacture))
+            {
+                PoDoFo::PdfMemDocument facture;
+                facture.Load(nomFacture.toUtf8().constData());
+                document.GetPages().AppendDocumentPages(facture);
+            }
+            else
+            {
+                QMessageBox::critical(this,
+                    QApplication::applicationName() + " - " + tr("Fichier PDF introuvable"),
+                    tr("La facture : ") +
+                    demandeEnCours.listeFactures.at(i) +
+                    tr(" est introuvable.\n") +
+                    tr("\nImpossible de l'ajouter au fichier de demande ")
+                    + demandeEnCours.nomFichier + ".\n\n"
+                    + tr("La demande est bien générée mais le justificatif n'y sera pas joint."));
+            }
+        }
+
+        const QString appVersion = "AeroDMS v" + QApplication::applicationVersion();
+        document.GetMetadata().SetCreator(PoDoFo::PdfString(appVersion.toStdString()));
+        document.GetMetadata().SetAuthor(PoDoFo::PdfString(demandeEnCours.nomTresorier.toStdString()));
+        document.GetMetadata().SetTitle(PoDoFo::PdfString(demandeEnCours.nomFichier.toStdString()));
+        document.GetMetadata().SetSubject(PoDoFo::PdfString("Formulaire de demande de subvention"));
+
+        document.SaveUpdate(nomFichier.toUtf8().constData());
+    }
+    catch (const PoDoFo::PdfError &e)
+    {
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Erreur PDF"),
+            tr("PoDoFo::PdfError : ") + QString::fromUtf8(e.what()));
+        return QString();
+    }
+    catch (const std::exception &e)
+    {
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Exception"),
+            tr("std::exception : ") + QString::fromUtf8(e.what()));
+        return QString();
+    }
 
     return nomFichier;
 }
@@ -448,6 +473,10 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         ligneBudget.append(QString::number(demande.annee));
         templateCeTmp.replace("xxLigneBudgetAnneeBudget", ligneBudget);
 
+       completerTemplateCeAvecVols(templateCeTmp,
+            demande.typeDeVol,
+            demande.listeVols);
+
         //On envoie le HTML en génération
         view->setHtml( templateCeTmp, 
                        ressourcesHtml);
@@ -670,6 +699,90 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
 
     return etatGenerationARetourner;
 }
+
+void PdfRenderer::completerTemplateCeAvecVols(QString& p_templateCe,
+    const QString& p_typeDeVol,
+    const AeroDmsTypes::ListeVolDemandeRemboursement& p_listeVols)
+{
+    QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauDetailsVols.html"));
+    QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauDetailsVolsItem.html"));
+    QFile rappelSortie = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("RappelRegleSubventionSortie.html"));
+    QFile rappelEntrainement = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("RappelRegleSubventionEntrainement.html"));
+    QFile rappelBalade = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("RappelRegleSubventionBalade.html"));
+
+    QString templateTable = "";
+    QString templateTableItem = "";
+    QString templateRappelSortie = "";
+    QString templateRappelEntrainement = "";
+    QString templateRappelBalade = "";
+
+    bool poursuiteTraitement = true;
+
+    if (table.open(QFile::ReadOnly | QFile::Text)
+        && tableItem.open(QFile::ReadOnly | QFile::Text)
+        && rappelSortie.open(QFile::ReadOnly | QFile::Text)
+        && rappelEntrainement.open(QFile::ReadOnly | QFile::Text)
+        && rappelBalade.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream inTable(&table);
+        QTextStream inTableItem(&tableItem);
+        QTextStream inRappelSortie(&rappelSortie);
+        QTextStream inRappelEntrainement(&rappelEntrainement);
+        QTextStream inRappelBalade(&rappelBalade);
+        templateTable = inTable.readAll();
+        templateTableItem = inTableItem.readAll();
+        templateRappelSortie = inRappelSortie.readAll();
+        templateRappelEntrainement = inRappelEntrainement.readAll();
+        templateRappelBalade = inRappelBalade.readAll();
+    }
+    else
+    {
+        poursuiteTraitement = false;
+
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Fichier template introuvable"),
+            tr("Un ou plusieurs fichiers parmi :\n")
+            + "     -\"TableauDetailsVolsItem.html\"\n"
+            + "     -\"TableauDetailsVols.html\"\n"
+            + "     -\"RappelRegleSubventionSortie.html\"\n"
+            + "     -\"RappelRegleSubventionEntrainement.html\"\n"
+            + "     -\"RappelRegleSubventionBalade.html\"\n"
+            + tr("attendus dans\n")
+            + ressourcesHtml.toString()
+            + tr("\nsont introuvables. Le détail des vols ne sera pas ajouté aux demande de subventions"));
+    }
+
+    if (poursuiteTraitement)
+    {
+        if (p_typeDeVol == "Sortie")
+        {
+            p_templateCe.replace("<!--AccrocheRappelRegleSubvention-->", templateRappelSortie);
+        }
+        else if (p_typeDeVol == "Balade")
+        {
+            p_templateCe.replace("<!--AccrocheRappelRegleSubvention-->", templateRappelBalade);
+        }
+        else
+        {
+            p_templateCe.replace("<!--AccrocheRappelRegleSubvention-->", templateRappelEntrainement);
+        }
+
+        p_templateCe.replace("<!--AccrocheTableauDetailsVols-->", templateTable);
+
+        for (AeroDmsTypes::ListeVolDemandeRemboursement::const_iterator it = p_listeVols.begin(); 
+            it != p_listeVols.end(); 
+            it++)
+        {
+            p_templateCe.replace("<!--Accroche-->", templateTableItem);
+            p_templateCe.replace("__date__", it->date.toString("dd/MM/yyyy"));
+            p_templateCe.replace("__duree__", it->duree);
+            p_templateCe.replace("__cout__", QString::number(it->cout));
+            p_templateCe.replace("__subvention__", QString::number(it->subventionDemandee));
+            p_templateCe.replace("__remarque__", it->remarque);
+        }    
+    }
+}
+
 
 AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
                                                                              const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee,

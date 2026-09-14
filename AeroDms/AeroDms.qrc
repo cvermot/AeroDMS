@@ -137,5 +137,10 @@
         <file>ressources/information-slab-circle.svg</file>
         <file>ressources/cog-clockwise.svg</file>
         <file>ressources/download-network.svg</file>
+        <file>ressources/HTML/TableauDetailsVolsItem.html</file>
+        <file>ressources/HTML/TableauDetailsVols.html</file>
+        <file>ressources/HTML/RappelRegleSubventionSortie.html</file>
+        <file>ressources/HTML/RappelRegleSubventionEntrainement.html</file>
+        <file>ressources/HTML/RappelRegleSubventionBalade.html</file>
     </qresource>
 </RCC>

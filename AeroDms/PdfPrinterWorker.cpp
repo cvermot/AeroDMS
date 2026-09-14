@@ -66,8 +66,11 @@ void PdfPrinterWorker::run()
             {
                 m_printer->newPage();
 
-                // Ajout d'une page blanche si forçage recto est activé
-                if (m_forceRecto)
+                // Ajout d'une page blanche si forçage recto est activé,
+                // et si les 2 premières pages ne sont pas demandées en recto-verso
+                if ( m_forceRecto 
+                     && ( !m_premieresPagesRectoVerso 
+                          || i > 1))
                 {
                     m_printer->newPage();
                 }

@@ -148,6 +148,8 @@ void ManageDb::reitererEnvoiBddSurFermeture()
 
 void ManageDb::demanderEnvoiBdd()
 {
+    QThread::msleep(delaisDeGardeBdd);
+
     if (gestionnaireDonneesEnLigne->estActif())
     {
         emit passerLogicielEnLectureSeuleDurantEnvoiBdd();
@@ -1397,16 +1399,20 @@ const bool ManageDb::piloteEstAJourDeCotisation(const QString& p_piloteId,
 const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsAEmettre(const int p_annee)
 {
     QSqlQuery query;
+    QSqlQuery querylisteVols;
 
-    //Recuperation de l'ID de facture
 	if (p_annee == AeroDmsTypes::K_INIT_INT_INVALIDE)
 	{
         query.prepare("SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee'");
+        querylisteVols.prepare("SELECT * FROM vols  WHERE demandeRemboursement IS NULL AND pilote = :pilote AND typeDeVol = :typeDeVol AND montantRembourse != 0");
 	}
     else
     {
         query.prepare("SELECT * FROM 'volARembourserParTypeParPiloteEtParAnnee' WHERE annee = :annee");
         query.bindValue(":annee", QString::number(p_annee));
+
+        querylisteVols.prepare("SELECT * FROM vols  WHERE demandeRemboursement IS NULL AND strftime('%Y', vols.date) = :annee AND pilote = :pilote AND typeDeVol = :typeDeVol AND montantRembourse != 0");
+        querylisteVols.bindValue(":annee", QString::number(p_annee));
     }
     AeroDmsTypes::ListeDemandeRemboursement liste;
     
@@ -1417,7 +1423,21 @@ const AeroDmsTypes::ListeDemandeRemboursement ManageDb::recupererLesSubventionsA
         demande.piloteId = query.value("pilote").toString();
         demande.montantARembourser = query.value("montantARembourser").toDouble();
         demande.annee = query.value("annee").toInt();
-        //demande.nomFichierFacture = query.value(5).toString();
+
+        querylisteVols.bindValue(":pilote", demande.piloteId);
+        querylisteVols.bindValue(":typeDeVol", demande.typeDeVol);
+        querylisteVols.exec();
+        while (querylisteVols.next())
+        {
+            const AeroDmsTypes::Vol vol = depilerRequeteVol(querylisteVols);
+            AeroDmsTypes::VolDemandeRemboursement detailVol;
+            detailVol.date = vol.date;
+            detailVol.cout = vol.coutVol;
+            detailVol.subventionDemandee = vol.montantRembourse;
+            detailVol.duree = vol.duree;
+            detailVol.remarque = vol.remarque;
+            demande.listeVols.append(detailVol);
+        }
         liste.append(demande);
     }
     

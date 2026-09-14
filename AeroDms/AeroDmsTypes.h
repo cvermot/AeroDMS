@@ -426,12 +426,21 @@ public:
     static const Vol K_INIT_VOL;
     typedef QList<Vol> ListeVols;
 
+    struct VolDemandeRemboursement {
+        QDate date = QDate();
+		QString duree = K_INIT_QSTRING;
+        double cout = 0.0;
+        double subventionDemandee = 0.0;
+        QString remarque = K_INIT_QSTRING;
+    };
+    typedef QList<VolDemandeRemboursement> ListeVolDemandeRemboursement;
+
     struct DemandeRemboursement {
         QString typeDeVol = K_INIT_QSTRING;
         QString piloteId = K_INIT_QSTRING;
         double montantARembourser = 0.0;
         int annee = K_INIT_INT_INVALIDE;
-        QString nomFichierFacture = K_INIT_QSTRING;
+		ListeVolDemandeRemboursement listeVols = QList<VolDemandeRemboursement>();
     };
     typedef QList<DemandeRemboursement> ListeDemandeRemboursement;
 

@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on sam. avr. 19 23:18:41 2025
+-- File generated with SQLiteStudio v3.4.4 on jeu. sept. 10 20:31:10 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCR
 
 -- Table: demandeRemboursementSoumises
 CREATE TABLE IF NOT EXISTS demandeRemboursementSoumises (demandeId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, dateDemande TEXT NOT NULL, montant REAL NOT NULL, nomBeneficiaire TEXT NOT NULL, typeDeDemande TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, modeDeReglement TEXT NOT NULL DEFAULT Chèque, note TEXT);
-INSERT INTO demandeRemboursementSoumises (demandeId, dateDemande, montant, nomBeneficiaire, typeDeDemande, modeDeReglement, note) VALUES (-1, '1970-01-01', 0.0, 'Demande de remboursement delayée', 'Entrainement', 'Cheque', 'Demande fictive permettant de délayer la soumission de certains vols');
+INSERT INTO demandeRemboursementSoumises (demandeId, dateDemande, montant, nomBeneficiaire, typeDeDemande, modeDeReglement, note) VALUES (-1, '1970-01-01', 0.0, 'Demande de remboursement delayée', 'Entrainement', 'Chèque', 'Demande fictive permettant de délayer la soumission de certains vols');
 
 -- Table: facturesSorties
 CREATE TABLE IF NOT EXISTS facturesSorties (id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, sortie INTEGER REFERENCES sortie (sortieId) NOT NULL, facture INTEGER REFERENCES fichiersFacture (factureId) NOT NULL, date TEXT, montant REAL NOT NULL, intitule TEXT, payeur TEXT NOT NULL REFERENCES pilote (piloteId), demandeRemboursement NUMERIC REFERENCES demandeRemboursementSoumises (demandeId));
@@ -205,7 +205,7 @@ FROM recettes
 INNER JOIN "xAssociationRecette-Vol" ON "xAssociationRecette-Vol".recetteId = recettes.recetteId
 INNER JOIN vol ON "xAssociationRecette-Vol".volId = vol.volId
 INNER JOIN sortie ON vol.sortie = sortie.sortieId
-WHERE recettes.identifiantFormulaireSoumissionCe IS NULL
+WHERE recettes.identifiantFormulaireSoumissionCe IS NULL AND Intitule NOT LIKE '%/ CB'
 GROUP BY recettes.recetteId;
 
 -- View: recettesASoumettreCeParTypeEtParAnnee
@@ -353,7 +353,9 @@ vol.pilote,
 SUM(vol.montantRembourse) AS montantARembourser, 
 strftime('%Y', vol.date) AS annee, 
 vol.facture, 
-fichiersFacture.nomFichier 
+fichiersFacture.nomFichier,
+vol.date,
+vol.remarque 
 FROM vol 
 INNER JOIN fichiersFacture ON vol.facture = fichiersFacture.factureId 
 WHERE vol.demandeRemboursement IS NULL

@@ -36,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "resource.h"
 
+#include <podofo/auxiliary/Version.h>
+
 #include <QtWidgets>
 #include <QToolBar>
 #include <QPdfPageNavigator>
@@ -3975,8 +3977,8 @@ void AeroDms::aPropos()
         + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
         + tr("Ce programme utilise les libraires :<ul>")
         + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() +"</li>"
-        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> 1.0.0</li>"
-        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.0.10</li>"
+        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "+ PODOFO_VERSION_STRING +"</li>"
+        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0</li>"
         + "</ul>"
         + tr("Les icones sont issues de")
         + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
@@ -4698,7 +4700,7 @@ void AeroDms::mettreAJourApplication(const QString p_chemin)
     const QRegularExpression ini("^.*\\.ini$");
     const QRegularExpression sqlite("^.*\\.sqlite$");
     const QRegularExpression pdf("^.*\\.pdf$");
-    const QRegularExpression signature("^.*signature\.(jpg|png|jpeg|svg)$");
+    const QRegularExpression signature("^.*signature\\.(jpg|png|jpeg|svg)$");
 
     //1) On fait du ménage : tous les fichiers locaux qui ne sont 
     //   ni .sqlite ni .ini ni .pdf ni signature.jpg/png/jpeg/svf 

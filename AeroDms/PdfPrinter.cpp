@@ -143,7 +143,15 @@ bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer,
 
 void PdfPrinter::imprimer(QPrinter &printer, const bool forcerImpressionRecto)
 {
-    auto* worker = new PdfPrinterWorker(fichierAImprimer, &printer, forcerImpressionRecto, this);
+    QRegularExpression re("^\\d{3}.*\\.HdV_.*$");
+    const QFileInfo fichier = QFileInfo(fichierAImprimer);
+    const bool premierePageEnRectoVerso = re.match(fichier.fileName()).hasMatch();
+
+    auto* worker = new PdfPrinterWorker(fichierAImprimer, 
+        &printer, 
+        forcerImpressionRecto, 
+        premierePageEnRectoVerso, 
+        this);
 
     connect(worker, &PdfPrinterWorker::progress, this, [this](int currentPage, int totalPages) {
         progressionImpression->traitementPageSuivante(currentPage, totalPages);

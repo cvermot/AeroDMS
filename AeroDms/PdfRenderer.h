@@ -75,6 +75,9 @@ private :
 	void remplirLeChampMontant( QString& p_html, 
 		                        const double p_montant) const;
 	void remplirLeChampSignature(QString& p_html) const;
+	void completerTemplateCeAvecVols( QString& p_templateCe,
+									  const QString& p_typeDeVol,
+		                              const AeroDmsTypes::ListeVolDemandeRemboursement& p_listeVols);
 
 	AeroDmsTypes::EtatGeneration imprimerLeFichierPdfDeRecapAnnuel( const int p_annee,
 		                                                            const AeroDmsTypes::ListeSubventionsParPilotes p_listePilotesDeCetteAnnee, 
