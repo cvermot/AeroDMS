@@ -776,8 +776,8 @@ void PdfRenderer::completerTemplateCeAvecVols(QString& p_templateCe,
             p_templateCe.replace("<!--Accroche-->", templateTableItem);
             p_templateCe.replace("__date__", it->date.toString("dd/MM/yyyy"));
             p_templateCe.replace("__duree__", it->duree);
-            p_templateCe.replace("__cout__", QString::number(it->cout));
-            p_templateCe.replace("__subvention__", QString::number(it->subventionDemandee));
+            p_templateCe.replace("__cout__", QString::number(it->cout, 'f', 2));
+            p_templateCe.replace("__subvention__", QString::number(it->subventionDemandee, 'f', 2));
             p_templateCe.replace("__remarque__", it->remarque);
         }    
     }

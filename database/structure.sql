@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on jeu. sept. 10 20:31:10 2026
+-- File generated with SQLiteStudio v3.4.4 on mer. sept. 16 22:40:55 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -353,9 +353,7 @@ vol.pilote,
 SUM(vol.montantRembourse) AS montantARembourser, 
 strftime('%Y', vol.date) AS annee, 
 vol.facture, 
-fichiersFacture.nomFichier,
-vol.date,
-vol.remarque 
+fichiersFacture.nomFichier
 FROM vol 
 INNER JOIN fichiersFacture ON vol.facture = fichiersFacture.factureId 
 WHERE vol.demandeRemboursement IS NULL
