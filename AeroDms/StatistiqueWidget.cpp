@@ -223,15 +223,11 @@ void StatistiqueWidget::refreshLegend()
             if (seriesColors.size() < barSets.size()) {
                 for (int i = seriesColors.size(); i < barSets.size(); ++i)
                     seriesColors.append(palette.at(i % palette.size()));
-                barSeries->setSeriesColors(seriesColors);
-                seriesColors = barSeries->seriesColors();
             }
 
             if (borderColors.size() < barSets.size()) {
                 for (int i = borderColors.size(); i < barSets.size(); ++i)
                     borderColors.append(seriesColors.at(i % seriesColors.size()).darker(125));
-                barSeries->setBorderColors(borderColors);
-                borderColors = barSeries->borderColors();
             }
 
             for (int i = 0; i < barSets.size(); ++i) {

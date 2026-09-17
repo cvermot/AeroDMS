@@ -26,11 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <podofo/podofo.h>
 
 #include <QApplication>
-#include <QEventLoop>
 #include <QFile>
 #include <QPrinter>
-#include <QQuickItem>
-#include <QQuickItemGrabResult>
 #include <QQuickWidget>
 #include <QWebEngineSettings>
 
@@ -1458,12 +1455,10 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
 
     if (auto* quickWidget = p_widget.findChild<QQuickWidget*>()) {
         if (auto* rootItem = quickWidget->rootObject()) {
-            QEventLoop loop;
-            auto grabResult = rootItem->grabToImage();
-            QObject::connect(grabResult.data(), &QQuickItemGrabResult::ready, &loop, &QEventLoop::quit);
-            loop.exec();
-
-            const QImage image = grabResult->image();
+            Q_UNUSED(rootItem);
+            quickWidget->update();
+            QApplication::processEvents();
+            const QImage image = quickWidget->grab().toImage();
             if (!image.isNull()) {
                 image.save(p_urlImage + ".png", "PNG");
                 return;
