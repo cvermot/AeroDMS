@@ -15,6 +15,11 @@ void StatistiqueDiagrammeCirculaire::changeSeries(QAbstractSeries* series)
     emit seriesChanged(series);
 }
 
+QAbstractSeries* StatistiqueDiagrammeCirculaire::currentSeries() const
+{
+    return m_currentSeries;
+}
+
 void StatistiqueDiagrammeCirculaire::handleSliceClicked(QPieSlice* slice)
 {
     auto* drilldownSlice = static_cast<StatistiqueDiagrammeCirculairePartie*>(slice);

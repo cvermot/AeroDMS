@@ -15,6 +15,7 @@ class StatistiqueDiagrammeCirculaire : public QObject
 public:
     explicit StatistiqueDiagrammeCirculaire(QObject* parent = nullptr);
     void changeSeries(QAbstractSeries* series);
+    QAbstractSeries* currentSeries() const;
 
 signals:
     void seriesChanged(QAbstractSeries* series);

@@ -430,6 +430,11 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         }
         break;
     }   
+
+    if (chart->currentSeries()) {
+        showGraphSeries(chart->currentSeries());
+        setGraphTitle(chart->currentSeries()->name());
+    }
 }
 
 AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::recupererSubventionsPilotes(ManageDb* p_db, 
