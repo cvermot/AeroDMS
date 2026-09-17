@@ -103,10 +103,6 @@ private :
 	static void copierFichierSvgDansHtml( const QString p_fichier,
 									      QString& p_html);
 
-	static void convertirEnPng(const QString p_fichierSvg,
-		const QString p_fichierPng,
-		const QSize targetSize);
-
 	void rincerInfosIban(QString& p_templateCe);
 
 signals:

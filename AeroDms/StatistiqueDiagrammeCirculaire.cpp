@@ -4,18 +4,15 @@
 #include "StatistiqueDiagrammeCirculaire.h"
 #include "StatistiqueDiagrammeCirculairePartie.h"
 
-StatistiqueDiagrammeCirculaire::StatistiqueDiagrammeCirculaire(QGraphicsItem* parent, Qt::WindowFlags wFlags)
-    : QChart(QChart::ChartTypeCartesian, parent, wFlags)
+StatistiqueDiagrammeCirculaire::StatistiqueDiagrammeCirculaire(QObject* parent)
+    : QObject(parent)
 {
 }
 
 void StatistiqueDiagrammeCirculaire::changeSeries(QAbstractSeries* series)
 {
-    if (m_currentSeries)
-        removeSeries(m_currentSeries);
     m_currentSeries = series;
-    addSeries(series);
-    setTitle(series->name());
+    emit seriesChanged(series);
 }
 
 void StatistiqueDiagrammeCirculaire::handleSliceClicked(QPieSlice* slice)

@@ -4,29 +4,29 @@
 #include "StatistiqueDonutCombine.h"
 #include "StatistiqueDonutCombineWidget.h"
 
-#include <QChart>
-#include <QPieSeries>
+#include <QtGraphs/QPieSeries>
 
 StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                               const AeroDmsTypes::Statistiques p_statistique,
                                                               QWidget* parent,
                                                               const int p_annee,
                                                               const int p_options,
-                                                              const QChart::AnimationOption p_animation,
+                                                              const bool p_animation,
                                                               const bool p_legende,
                                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
+    Q_UNUSED(p_statistique);
+    Q_UNUSED(p_animation);
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, p_options);
     setMinimumSize(p_parametres.tailleMiniImage);
 
     indiceCouleurEnCours = 0;
 
-    auto donutBreakdown = new StatistiqueDonutCombine;
+    auto donutBreakdown = new StatistiqueDonutCombine(this);
 
     QString typeCourant = "init";
-    int numeroSerie = 0;
-    auto series = new QPieSeries;
+    auto series = new QPieSeries(this);
 
     for (int i = 0; i < statsAeronefs.size(); i++)
     {
@@ -42,22 +42,16 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                 donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
             }
             typeCourant = statsAeronefs.at(i).type;
-            series = new QPieSeries;
+            series = new QPieSeries(this);
             series->setName(statsAeronefs.at(i).type);
             series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
         }
     }
     donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
 
-    
-    donutBreakdown->setAnimationOptions(p_animation);
-
-    donutBreakdown->legend()->setVisible(p_legende);
-    donutBreakdown->setTitle("Répartition des vols par aéronefs et types d'aéronefs");
-    donutBreakdown->setTitleFont(QFont("Arial", p_parametres.tailleDePolice * 1.5, QFont::Bold));
-    donutBreakdown->legend()->setAlignment(Qt::AlignRight);
-    
-    createDefaultChartView(donutBreakdown);
+    createDefaultChartView("Répartition des vols par aéronefs et types d'aéronefs", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+    for (QPieSeries* currentSeries : donutBreakdown->series())
+        addSeriesToGraph(currentSeries);
 }
 
 const Qt::GlobalColor StatistiqueDonutCombineWidget::recupererNouvelleCouleur()

@@ -4,17 +4,20 @@
 #ifndef STATISTIQUEDIAGRAMMECIRCULAIRE_H
 #define STATISTIQUEDIAGRAMMECIRCULAIRE_H
 
-#include <QChart>
+#include <QObject>
 
 QT_FORWARD_DECLARE_CLASS(QAbstractSeries);
 QT_FORWARD_DECLARE_CLASS(QPieSlice);
 
-class StatistiqueDiagrammeCirculaire : public QChart
+class StatistiqueDiagrammeCirculaire : public QObject
 {
     Q_OBJECT
 public:
-    explicit StatistiqueDiagrammeCirculaire(QGraphicsItem* parent = nullptr, Qt::WindowFlags wFlags = {});
+    explicit StatistiqueDiagrammeCirculaire(QObject* parent = nullptr);
     void changeSeries(QAbstractSeries* series);
+
+signals:
+    void seriesChanged(QAbstractSeries* series);
 
 public slots:
     void handleSliceClicked(QPieSlice* slice);

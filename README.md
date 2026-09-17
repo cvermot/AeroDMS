@@ -17,7 +17,7 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
   - Lecture PDF (Qt Pdf)
   - Écriture PDF à partir d’un template HTML via WebEngine (Qt Web Engine)
   - Accès à la BDD SQLite (Qt Sql)
-  - Affichage des statistiques (Qt Charts)
+  - Affichage des statistiques (Qt Graphs)
   - Parsing fichier AIXM (Qt Xml)
   - Export des graphiques en SVG (Qt Svg)
   - Impression (Qt Print Support)
@@ -85,5 +85,4 @@ Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de co
 
 
  
-
 

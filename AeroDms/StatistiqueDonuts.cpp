@@ -3,13 +3,8 @@
 
 #include "StatistiqueDonuts.h"
 
-#include <QChartView>
-#include <QGraphicsLayout>
-#include <QGridLayout>
-#include <QLegend>
-#include <QPieSeries>
-#include <QPieSlice>
-#include <QRandomGenerator>
+#include <QtGraphs/QPieSeries>
+#include <QtGraphs/QPieSlice>
 
 StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db, 
                                       const AeroDmsTypes::Statistiques p_statistique, 
@@ -21,10 +16,10 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
 {
     setMinimumSize(p_parametres.tailleMiniImage);
 
-    QChart::AnimationOption animation = QChart::AllAnimations;
+    bool animation = true;
     if (p_parametres.tailleMiniImage != AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES.tailleMiniImage)
     {
-        animation = QChart::NoAnimation;
+        animation = false;
     }
 
     switch (p_statistique)
@@ -45,21 +40,12 @@ StatistiqueDonuts::StatistiqueDonuts( ManageDb* p_db,
 
 void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
-                                              QChart::AnimationOption p_animation)
+                                              bool p_animation)
 {
+    Q_UNUSED(p_animation);
     QFont font("Arial", p_parametres.tailleDePolice);
 
     const AeroDmsTypes::StatsPilotes statsPilotes = p_db->recupererStatsPilotes();
-
-    auto chartView = new QChartView(this);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    QChart* chart = chartView->chart();
-    chart->legend()->setVisible(false);
-    chart->legend()->setFont(font);
-    chart->setTitle("Statistiques sur les pilotes");
-    chart->setTitleFont(QFont("Arial", p_parametres.tailleDePolice * 1.5, QFont::Bold));
-    chart->setAnimationOptions(p_animation);
-    chart->layout()->setContentsMargins(0, 0, 0, 0);
   
     qreal minSize = 0.5;
     qreal maxSize = 0.9;
@@ -72,7 +58,7 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     sliceBrevete->setLabelFont(font);
     sliceBrevete->setLabelVisible(true);
     sliceBrevete->setLabelColor(Qt::white);
-    sliceBrevete->setLabelPosition(QPieSlice::LabelInsideTangential);
+    sliceBrevete->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
     //connect(slice, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
     donutBrevete->append(sliceBrevete);
     donutBrevete->setHoleSize(minSize + niveauDuDonut * (maxSize - minSize) / donutCount);
@@ -82,13 +68,12 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     sliceNonBrevete->setLabelFont(font);
     sliceNonBrevete->setLabelVisible(true);
     sliceNonBrevete->setLabelColor(Qt::white);
-    sliceNonBrevete->setLabelPosition(QPieSlice::LabelInsideTangential);
+    sliceNonBrevete->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
     //connect(sliceNonBrevete, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
     donutBrevete->append(sliceNonBrevete);
     donutBrevete->setHoleSize(minSize + niveauDuDonut * (maxSize - minSize) / donutCount);
     donutBrevete->setPieSize(minSize + (niveauDuDonut + 1) * (maxSize - minSize) / donutCount);
     m_donuts.append(donutBrevete);
-    chartView->chart()->addSeries(donutBrevete);
 
     niveauDuDonut++;
     auto donutAyantDroit = new QPieSeries;
@@ -96,7 +81,7 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     sliceOuvrantDroit->setLabelFont(font);
     sliceOuvrantDroit->setLabelVisible(true);
     sliceOuvrantDroit->setLabelColor(Qt::white);
-    sliceOuvrantDroit->setLabelPosition(QPieSlice::LabelInsideTangential);
+    sliceOuvrantDroit->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
     //connect(sliceOuvrantDroit, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
     donutAyantDroit->append(sliceOuvrantDroit);
     donutAyantDroit->setHoleSize(minSize + niveauDuDonut * (maxSize - minSize) / donutCount);
@@ -106,34 +91,26 @@ void StatistiqueDonuts::afficherStatsPilotes( ManageDb* p_db,
     sliceAyantDroit->setLabelFont(font);
     sliceAyantDroit->setLabelVisible(true);
     sliceAyantDroit->setLabelColor(Qt::white);
-    sliceAyantDroit->setLabelPosition(QPieSlice::LabelInsideTangential);
+    sliceAyantDroit->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
     //connect(sliceAyantDroit, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
     donutAyantDroit->append(sliceAyantDroit);
     donutAyantDroit->setHoleSize(minSize + niveauDuDonut * (maxSize - minSize) / donutCount);
     donutAyantDroit->setPieSize(minSize + (niveauDuDonut + 1) * (maxSize - minSize) / donutCount);
     m_donuts.append(donutAyantDroit);
-    chartView->chart()->addSeries(donutAyantDroit);
 
-    auto mainLayout = new QGridLayout;
-    mainLayout->addWidget(chartView, 1, 1);
-    setLayout(mainLayout);
+    createDefaultChartView("Statistiques sur les pilotes", false, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+    addSeriesToGraph(donutBrevete);
+    addSeriesToGraph(donutAyantDroit);
 }
 
 void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db, 
                                                int p_annee, 
                                                const AeroDmsTypes::OptionsDonneesStatistiques p_options,
                                                const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres,
-                                               QChart::AnimationOption p_animation)
+                                               bool p_animation)
 {
+    Q_UNUSED(p_animation);
     const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, p_options);
-
-    auto chartView = new QChartView(this);
-    chartView->setRenderHint(QPainter::Antialiasing);
-    QChart* chart = chartView->chart();
-    chart->legend()->setVisible(false);
-    chart->setTitle("Statistiques sur les aéronefs");
-    chart->setAnimationOptions(p_animation);
-    chart->layout()->setContentsMargins(0, 0, 0, 0);
 
     qreal minSize = 0.5;
     qreal maxSize = 0.9;
@@ -153,7 +130,7 @@ void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db,
         auto sliceImmat = new QPieSlice(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
         sliceImmat->setLabelVisible(true);
         sliceImmat->setLabelColor(Qt::white);
-        sliceImmat->setLabelPosition(QPieSlice::LabelInsideTangential);
+        sliceImmat->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
         //connect(slice, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
         donutImmat->append(sliceImmat);
 
@@ -162,7 +139,7 @@ void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db,
             auto sliceType = new QPieSlice(typeCourant, nbMinutesType);
             sliceType->setLabelVisible(true);
             sliceType->setLabelColor(Qt::white);
-            sliceType->setLabelPosition(QPieSlice::LabelInsideTangential);
+            sliceType->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
             //connect(slice, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
             donutType->append(sliceType);
             nbMinutesType = 0;
@@ -175,7 +152,7 @@ void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db,
             auto sliceType = new QPieSlice(typeCourant, nbMinutesType);
             sliceType->setLabelVisible(true);
             sliceType->setLabelColor(Qt::white);
-            sliceType->setLabelPosition(QPieSlice::LabelInsideTangential);
+            sliceType->setLabelPosition(QPieSlice::LabelPosition::InsideTangential);
             //connect(slice, &QPieSlice::hovered, this, &StatistiqueDonuts::explodeSlice);
             donutType->append(sliceType);
         }
@@ -184,16 +161,14 @@ void StatistiqueDonuts::afficherStatsAeronefs( ManageDb* p_db,
     donutImmat->setHoleSize(minSize + niveauDonutImmat * (maxSize - minSize) / donutCount);
     donutImmat->setPieSize(minSize + (niveauDonutImmat + 1) * (maxSize - minSize) / donutCount);
     m_donuts.append(donutImmat);
-    chartView->chart()->addSeries(donutImmat);
 
     donutType->setHoleSize(minSize + niveauDonutType * (maxSize - minSize) / donutCount);
     donutType->setPieSize(minSize + (niveauDonutType + 1) * (maxSize - minSize) / donutCount);
     m_donuts.append(donutType);
-    chartView->chart()->addSeries(donutType);
-    
-    auto mainLayout = new QGridLayout;
-    mainLayout->addWidget(chartView, 1, 1);
-    setLayout(mainLayout);
+
+    createDefaultChartView("Statistiques sur les aéronefs", false, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+    addSeriesToGraph(donutImmat);
+    addSeriesToGraph(donutType);
 }
 
 void StatistiqueDonuts::explodeSlice(bool exploded)
@@ -206,14 +181,14 @@ void StatistiqueDonuts::explodeSlice(bool exploded)
         QPieSeries* donut = slice->series();
         qreal seriesIndex = m_donuts.indexOf(donut);
         for (int i = seriesIndex + 1; i < m_donuts.count(); i++) {
-            m_donuts.at(i)->setPieStartAngle(sliceEndAngle);
-            m_donuts.at(i)->setPieEndAngle(360 + sliceStartAngle);
+            m_donuts.at(i)->setStartAngle(sliceEndAngle);
+            m_donuts.at(i)->setEndAngle(360 + sliceStartAngle);
         }
     }
     else {
         for (int i = 0; i < m_donuts.count(); i++) {
-            m_donuts.at(i)->setPieStartAngle(0);
-            m_donuts.at(i)->setPieEndAngle(360);
+            m_donuts.at(i)->setStartAngle(0);
+            m_donuts.at(i)->setEndAngle(360);
         }
     }
     slice->setExploded(exploded);

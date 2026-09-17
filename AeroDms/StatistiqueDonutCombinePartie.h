@@ -4,7 +4,7 @@
 #ifndef STATISTIQUEDONUTCOMBINEPARTIE_H
 #define STATISTIQUEDONUTCOMBINEPARTIE_H
 
-#include <QPieSlice>
+#include <QtGraphs/QPieSlice>
 
 QT_FORWARD_DECLARE_CLASS(QPieSeries)
 

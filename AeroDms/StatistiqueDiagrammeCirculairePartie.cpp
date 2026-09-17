@@ -4,6 +4,8 @@
 #include "StatistiqueDiagrammeCirculairePartie.h"
 #include "AeroDmsServices.h"
 
+#include <QFont>
+
 StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal value, const QString& prefix, const int p_taillePolice, QAbstractSeries* drilldownSeries, const AeroDmsTypes::Unites p_unites)
     : m_drilldownSeries(drilldownSeries),
     m_prefix(prefix)
@@ -13,11 +15,10 @@ StatistiqueDiagrammeCirculairePartie::StatistiqueDiagrammeCirculairePartie(qreal
     if (value != 0)
     {
         setLabelVisible(true);
-    }  
+    }
     updateLabel();
     setLabelFont(QFont("Arial", p_taillePolice));
     connect(this, &StatistiqueDiagrammeCirculairePartie::percentageChanged, this, &StatistiqueDiagrammeCirculairePartie::updateLabel);
-    connect(this, &StatistiqueDiagrammeCirculairePartie::hovered, this, &StatistiqueDiagrammeCirculairePartie::showHighlight);
 }
 
 QAbstractSeries* StatistiqueDiagrammeCirculairePartie::drilldownSeries() const

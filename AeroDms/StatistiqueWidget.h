@@ -4,12 +4,14 @@
 #ifndef STATISTIQUEWIDGET_H
 #define STATISTIQUEWIDGET_H
 
+#include <QList>
 #include <QWidget>
 
 #include "ManageDb.h"
 
-QT_FORWARD_DECLARE_CLASS(QChart)
-QT_FORWARD_DECLARE_CLASS(QChartView)
+QT_FORWARD_DECLARE_CLASS(QAbstractAxis)
+QT_FORWARD_DECLARE_CLASS(QObject)
+QT_FORWARD_DECLARE_CLASS(QQuickWidget)
 
 class StatistiqueWidget : public QWidget
 {
@@ -22,14 +24,25 @@ public:
 protected:
     virtual bool doLoad();
     void resizeEvent(QResizeEvent*) override;
-    void createDefaultChartView(QChart* chart);
-    QChartView* defaultChartView() const { return m_defaultChartView; }
-    void setDefaultChartView(QChartView* view);
+    void createDefaultChartView(const QString& p_titre,
+                                bool p_legendeVisible = true,
+                                Qt::Alignment p_alignementLegende = Qt::AlignRight,
+                                int p_tailleTitre = 20);
+    QObject* defaultChartView() const { return m_defaultChartView; }
+    void setGraphTitle(const QString& p_titre);
+    void addSeriesToGraph(QObject* p_series);
+    void clearGraphSeries();
+    void setGraphAxisX(QAbstractAxis* p_axis);
+    void setGraphAxisY(QAbstractAxis* p_axis);
+    void refreshLegend();
 
     QString m_loadError;
 
 private:
-    QChartView* m_defaultChartView = nullptr;
+    QQuickWidget* m_quickWidget = nullptr;
+    QObject* m_defaultChartView = nullptr;
+    QObject* m_rootObject = nullptr;
+    QList<QObject*> m_series;
     bool m_loaded = false;
     ManageDb* db;
 };

@@ -4,23 +4,21 @@
 #include "StatistiqueHistogrammeEmpile.h"
 #include "AeroDmsTypes.h"
 
-#include <QBarCategoryAxis>
-#include <QBarSet>
-#include <QChart>
-#include <QLegend>
-#include <QStackedBarSeries>
-#include <QValueAxis>
+#include <QtGraphs/QBarCategoryAxis>
+#include <QtGraphs/QBarSeries>
+#include <QtGraphs/QBarSet>
+#include <QtGraphs/QValueAxis>
 
 StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db, 
     const int p_annee, 
     QWidget* parent,
     const int p_options,
-    const QChart::AnimationOption p_animation,
+    const bool p_animation,
     const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
+    Q_UNUSED(p_animation);
     setMinimumSize(p_parametres.tailleMiniImage);
-    QFont font("Arial", p_parametres.tailleDePolice);
 
     const AeroDmsTypes::ListeStatsHeuresDeVol heuresDeVol = p_db->recupererHeuresMensuelles(p_annee, p_options);
 
@@ -29,40 +27,40 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     auto balade = new QBarSet("Balade");
 
     QStringList mois;
+    qreal valeurMax = 0;
 
     for (int i = 0; i < heuresDeVol.size() ; i++)
     {
         const AeroDmsTypes::StatsHeuresDeVol hdv = heuresDeVol.at(i);
-        *entrainement << hdv.minutesEntrainement/60.0;
-        *sortie << hdv.minutesSortie/60.0;
-        *balade << hdv.minutesBalade/60.0;
+        const qreal heuresEntrainement = hdv.minutesEntrainement / 60.0;
+        const qreal heuresSortie = hdv.minutesSortie / 60.0;
+        const qreal heuresBalade = hdv.minutesBalade / 60.0;
+
+        *entrainement << heuresEntrainement;
+        *sortie << heuresSortie;
+        *balade << heuresBalade;
         mois.append(hdv.mois);
+        valeurMax = qMax(valeurMax, heuresEntrainement + heuresSortie + heuresBalade);
     }
 
-    auto series = new QStackedBarSeries;
+    auto series = new QBarSeries(this);
+    series->setBarsType(QBarSeries::BarsType::Stacked);
     series->append(entrainement);
     series->append(sortie);
     series->append(balade);
 
-    auto chart = new QChart;
-    chart->addSeries(series);
-    chart->setTitle("Nombre d'heures de vol par mois");
-    chart->setTitleFont(QFont("Arial", p_parametres.tailleDePolice*1.5, QFont::Bold));
-    chart->setAnimationOptions(p_animation);
-
-    auto axisX = new QBarCategoryAxis;
-    axisX->setLabelsFont(font);
+    auto axisX = new QBarCategoryAxis(this);
     axisX->append(mois);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-    auto axisY = new QValueAxis;
-    axisY->setLabelsFont(font);
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
+    axisX->setAlignment(Qt::AlignBottom);
 
-    chart->legend()->setVisible(true);
-    chart->legend()->setAlignment(Qt::AlignBottom);
-    chart->legend()->setFont(font);
+    auto axisY = new QValueAxis(this);
+    axisY->setAlignment(Qt::AlignLeft);
+    axisY->setMin(0);
+    axisY->setMax(valeurMax <= 0 ? 1 : valeurMax * 1.1);
+    axisY->setLabelDecimals(1);
 
-    createDefaultChartView(chart);
+    createDefaultChartView("Nombre d'heures de vol par mois", true, Qt::AlignBottom, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+    setGraphAxisX(axisX);
+    setGraphAxisY(axisY);
+    addSeriesToGraph(series);
 }

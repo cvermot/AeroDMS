@@ -4,8 +4,6 @@
 #ifndef STATISTIQUEDONUTCOMBINEWIDGET_H
 #define STATISTIQUEDONUTCOMBINEWIDGET_H
 
-#include <QChart>
-
 #include "StatistiqueWidget.h"
 
 class StatistiqueDonutCombineWidget : public StatistiqueWidget
@@ -17,7 +15,7 @@ public:
                                             QWidget* parent = nullptr,
                                             const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
                                             const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
-                                            const QChart::AnimationOption p_animation = QChart::AllAnimations,
+                                            const bool p_animation = true,
                                             const bool p_legende = true,
                                             const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 

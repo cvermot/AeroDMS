@@ -6,7 +6,7 @@
 
 #include "AeroDmsTypes.h"
 
-#include <QPieSlice>
+#include <QtGraphs/QPieSlice>
 
 QT_FORWARD_DECLARE_CLASS(QAbstractSeries);
 

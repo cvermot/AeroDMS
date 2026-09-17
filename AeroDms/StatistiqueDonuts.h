@@ -6,9 +6,8 @@
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
-#include <QChart>
 
-QT_FORWARD_DECLARE_CLASS(QPieSeries)
+#include <QtGraphs/QPieSeries>
 
 class StatistiqueDonuts : public StatistiqueWidget
 {
@@ -29,12 +28,12 @@ private:
 
     void afficherStatsPilotes(ManageDb* p_db, 
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
-        QChart::AnimationOption p_animation);
+        bool p_animation);
     void afficherStatsAeronefs(ManageDb* p_db, 
         int p_annee, 
         const AeroDmsTypes::OptionsDonneesStatistiques p_options,
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
-        QChart::AnimationOption p_animation);
+        bool p_animation);
 };
 
 #endif //STATISTIQUEDONUTS_H
