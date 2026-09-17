@@ -6,6 +6,7 @@
 #include <QFont>
 #include <QLabel>
 #include <QMetaObject>
+#include <QMetaMethod>
 #include <QQuickWidget>
 #include <QResizeEvent>
 #include <QUrl>
@@ -17,6 +18,23 @@
 #include <QtGraphs/QAbstractAxis>
 #include <QtGraphs/QPieSeries>
 #include <QtGraphs/QPieSlice>
+
+namespace {
+
+bool invokeSeriesMethod(QObject* target, const char* signature, QAbstractSeries* series)
+{
+    if (!target || !series)
+        return false;
+
+    const QMetaObject* metaObject = target->metaObject();
+    const int methodIndex = metaObject->indexOfMethod(signature);
+    if (methodIndex < 0)
+        return false;
+
+    return metaObject->method(methodIndex).invoke(target, Q_ARG(QAbstractSeries*, series));
+}
+
+}
 
 StatistiqueWidget::StatistiqueWidget(QWidget* parent)
     : QWidget(parent)
@@ -109,7 +127,9 @@ void StatistiqueWidget::addSeriesToGraph(QAbstractSeries* p_series)
     if (!m_defaultChartView || !p_series)
         return;
 
-    QMetaObject::invokeMethod(m_defaultChartView, "addSeries", Q_ARG(QAbstractSeries*, p_series));
+    if (!invokeSeriesMethod(m_defaultChartView, "addSeries(QAbstractSeries*)", p_series))
+        return;
+
     m_series.append(p_series);
     refreshLegend();
 }
@@ -134,7 +154,7 @@ void StatistiqueWidget::clearGraphSeries()
 
     const QList<QAbstractSeries*> series = m_series;
     for (QAbstractSeries* serie : series) {
-        QMetaObject::invokeMethod(m_defaultChartView, "removeSeries", Q_ARG(QAbstractSeries*, serie));
+        invokeSeriesMethod(m_defaultChartView, "removeSeries(QAbstractSeries*)", serie);
     }
     m_series.clear();
     m_activeSeries = nullptr;
@@ -204,12 +224,14 @@ void StatistiqueWidget::refreshLegend()
                 for (int i = seriesColors.size(); i < barSets.size(); ++i)
                     seriesColors.append(palette.at(i % palette.size()));
                 barSeries->setSeriesColors(seriesColors);
+                seriesColors = barSeries->seriesColors();
             }
 
             if (borderColors.size() < barSets.size()) {
                 for (int i = borderColors.size(); i < barSets.size(); ++i)
                     borderColors.append(seriesColors.at(i % seriesColors.size()).darker(125));
                 barSeries->setBorderColors(borderColors);
+                borderColors = barSeries->borderColors();
             }
 
             for (int i = 0; i < barSets.size(); ++i) {
