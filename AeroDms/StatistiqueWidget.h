@@ -10,6 +10,7 @@
 #include "ManageDb.h"
 
 QT_FORWARD_DECLARE_CLASS(QAbstractAxis)
+QT_FORWARD_DECLARE_CLASS(QAbstractSeries)
 QT_FORWARD_DECLARE_CLASS(QObject)
 QT_FORWARD_DECLARE_CLASS(QQuickWidget)
 
@@ -30,7 +31,7 @@ protected:
                                 int p_tailleTitre = 20);
     QObject* defaultChartView() const { return m_defaultChartView; }
     void setGraphTitle(const QString& p_titre);
-    void addSeriesToGraph(QObject* p_series);
+    void addSeriesToGraph(QAbstractSeries* p_series);
     void clearGraphSeries();
     void setGraphAxisX(QAbstractAxis* p_axis);
     void setGraphAxisY(QAbstractAxis* p_axis);
@@ -42,7 +43,7 @@ private:
     QQuickWidget* m_quickWidget = nullptr;
     QObject* m_defaultChartView = nullptr;
     QObject* m_rootObject = nullptr;
-    QList<QObject*> m_series;
+    QList<QAbstractSeries*> m_series;
     bool m_loaded = false;
     ManageDb* db;
 };

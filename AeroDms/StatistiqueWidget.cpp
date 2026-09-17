@@ -104,12 +104,12 @@ void StatistiqueWidget::setGraphTitle(const QString& p_titre)
         m_rootObject->setProperty("chartTitle", p_titre);
 }
 
-void StatistiqueWidget::addSeriesToGraph(QObject* p_series)
+void StatistiqueWidget::addSeriesToGraph(QAbstractSeries* p_series)
 {
     if (!m_defaultChartView || !p_series)
         return;
 
-    QMetaObject::invokeMethod(m_defaultChartView, "addSeries", Q_ARG(QObject*, p_series));
+    QMetaObject::invokeMethod(m_defaultChartView, "addSeries", Q_ARG(QAbstractSeries*, p_series));
     m_series.append(p_series);
     refreshLegend();
 }
@@ -119,9 +119,9 @@ void StatistiqueWidget::clearGraphSeries()
     if (!m_defaultChartView)
         return;
 
-    const QList<QObject*> series = m_series;
-    for (QObject* serie : series) {
-        QMetaObject::invokeMethod(m_defaultChartView, "removeSeries", Q_ARG(QObject*, serie));
+    const QList<QAbstractSeries*> series = m_series;
+    for (QAbstractSeries* serie : series) {
+        QMetaObject::invokeMethod(m_defaultChartView, "removeSeries", Q_ARG(QAbstractSeries*, serie));
     }
     m_series.clear();
     refreshLegend();
@@ -158,7 +158,7 @@ void StatistiqueWidget::refreshLegend()
     };
 
     QVariantList legendEntries;
-    for (QObject* serie : m_series) {
+    for (QAbstractSeries* serie : m_series) {
         if (!serie || serie->property("excludeFromLegend").toBool())
             continue;
 

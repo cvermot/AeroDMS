@@ -1452,7 +1452,7 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
 {
     Q_UNUSED(p_titre);
 
-    if (auto* quickWidget = p_widget.findChild<QQuickWidget*>()) {
+    if (auto* quickWidget = p_widget.findChild<QQuickWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
         quickWidget->update();
         QApplication::processEvents();
         const QImage image = quickWidget->grabFramebuffer();
