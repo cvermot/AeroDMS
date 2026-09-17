@@ -37,13 +37,13 @@
     <Import Project="$(QtMsBuild)\qt_defaults.props" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
-    <QtInstall>6.9.1_msvc2022_64</QtInstall>
+    <QtInstall Condition="'$(QtInstall)'==''">6.9.1_msvc2022_64</QtInstall>
     <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;webenginewidgets;pdf;pdfwidgets;quick;quickwidgets;qml;graphs</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.9.1_msvc2022_64</QtInstall>
+    <QtInstall Condition="'$(QtInstall)'==''">6.9.1_msvc2022_64</QtInstall>
     <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;graphs;webenginewidgets;pdf;pdfwidgets;quick;quickwidgets;qml</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
