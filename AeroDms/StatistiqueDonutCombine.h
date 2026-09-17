@@ -6,10 +6,11 @@
 
 #include <QColor>
 #include <QList>
+#include <QObject>
 
 #include <QtGraphs/QPieSeries>
 
-class StatistiqueDonutCombine
+class StatistiqueDonutCombine : public QObject
 {
 public:
     explicit StatistiqueDonutCombine(QObject* parent = nullptr);

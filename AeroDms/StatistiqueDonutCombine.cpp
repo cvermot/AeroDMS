@@ -8,9 +8,10 @@
 #include <QtGraphs/QPieSlice>
 
 StatistiqueDonutCombine::StatistiqueDonutCombine(QObject* parent)
+    : QObject(parent)
 {
     // create the series for main center pie
-    m_mainSeries = new QPieSeries(parent);
+    m_mainSeries = new QPieSeries(this);
     m_mainSeries->setProperty("excludeFromLegend", true);
     m_mainSeries->setPieSize(0.7);
     m_mainSeries->setHoleSize(0.25);

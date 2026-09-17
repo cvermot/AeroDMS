@@ -1455,6 +1455,7 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
 
     if (auto* quickWidget = p_widget.findChild<QQuickWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
         quickWidget->update();
+        QApplication::processEvents();
         const QImage image = quickWidget->grabFramebuffer();
         if (!image.isNull()) {
             image.save(p_urlImage + ".png", "PNG");
