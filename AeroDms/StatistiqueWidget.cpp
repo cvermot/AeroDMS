@@ -129,14 +129,14 @@ void StatistiqueWidget::clearGraphSeries()
 
 void StatistiqueWidget::setGraphAxisX(QAbstractAxis* p_axis)
 {
-    if (m_defaultChartView)
-        m_defaultChartView->setProperty("axisX", QVariant::fromValue(p_axis));
+    if (m_rootObject)
+        m_rootObject->setProperty("axisX", QVariant::fromValue(p_axis));
 }
 
 void StatistiqueWidget::setGraphAxisY(QAbstractAxis* p_axis)
 {
-    if (m_defaultChartView)
-        m_defaultChartView->setProperty("axisY", QVariant::fromValue(p_axis));
+    if (m_rootObject)
+        m_rootObject->setProperty("axisY", QVariant::fromValue(p_axis));
 }
 
 void StatistiqueWidget::refreshLegend()

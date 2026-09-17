@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QFile>
 #include <QPrinter>
+#include <QQuickWidget>
 #include <QWebEngineSettings>
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
@@ -1450,6 +1451,17 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
                                     const QString p_titre)
 {
     Q_UNUSED(p_titre);
+
+    if (auto* quickWidget = p_widget.findChild<QQuickWidget*>()) {
+        quickWidget->update();
+        QApplication::processEvents();
+        const QImage image = quickWidget->grabFramebuffer();
+        if (!image.isNull()) {
+            image.save(p_urlImage + ".png", "PNG");
+            return;
+        }
+    }
+
     p_widget.grab().save(p_urlImage + ".png", "PNG");
 }
 

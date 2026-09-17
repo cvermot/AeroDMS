@@ -47,12 +47,18 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
         color = color.lighter(115);
         slice->setColor(color);
         slice->setLabelFont(font);
+        slice->setProperty("baseLabel", slice->label());
     }
 
     m_series.append(breakdownSeries);
 
     // recalculate breakdown donut segments
     recalculateAngles();
+
+    for (QPieSlice* slice : slices) {
+        const QString baseLabel = slice->property("baseLabel").toString();
+        slice->setLabel(QString("%1 %2%").arg(baseLabel).arg(slice->percentage() * 100, 0, 'f', 2));
+    }
 }
 
 void StatistiqueDonutCombine::recalculateAngles()

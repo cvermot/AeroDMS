@@ -9,6 +9,8 @@ Item {
     property int titlePointSize: 20
     property string legendPosition: "right"
     property var legendEntries: []
+    property var axisX: null
+    property var axisY: null
 
     function rebuildLegend() {
         legendModel.clear()
@@ -43,6 +45,8 @@ Item {
             GraphsView {
                 id: graphView
                 objectName: "graphView"
+                axisX: root.axisX
+                axisY: root.axisY
                 anchors {
                     top: parent.top
                     left: parent.left
