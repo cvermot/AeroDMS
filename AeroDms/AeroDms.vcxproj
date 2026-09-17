@@ -38,7 +38,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>C:\Qt\6.9.1\msvc2022_64</QtInstall>
-    <QtModules>core;gui;widgets;printsupport;sql;webenginecore;webenginewidgets;pdf;pdfwidgets;quick;quickwidgets;qml;graphs</QtModules>
+    <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;webenginewidgets;pdf;pdfwidgets;quick;quickwidgets;qml;graphs</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>

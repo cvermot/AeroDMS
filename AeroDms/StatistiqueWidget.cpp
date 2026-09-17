@@ -114,6 +114,22 @@ void StatistiqueWidget::addSeriesToGraph(QAbstractSeries* p_series)
     refreshLegend();
 }
 
+void StatistiqueWidget::showGraphSeries(QAbstractSeries* p_series)
+{
+    if (!m_defaultChartView || !p_series)
+        return;
+
+    if (m_activeSeries == p_series && !m_series.isEmpty())
+        return;
+
+    if (m_activeSeries && m_activeSeries != p_series)
+        QMetaObject::invokeMethod(m_defaultChartView, "removeSeries", Q_ARG(QAbstractSeries*, m_activeSeries));
+
+    m_activeSeries = p_series;
+    m_series.clear();
+    addSeriesToGraph(p_series);
+}
+
 void StatistiqueWidget::clearGraphSeries()
 {
     if (!m_defaultChartView)
@@ -124,6 +140,7 @@ void StatistiqueWidget::clearGraphSeries()
         QMetaObject::invokeMethod(m_defaultChartView, "removeSeries", Q_ARG(QAbstractSeries*, serie));
     }
     m_series.clear();
+    m_activeSeries = nullptr;
     refreshLegend();
 }
 

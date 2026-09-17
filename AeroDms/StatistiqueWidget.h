@@ -32,6 +32,7 @@ protected:
     QObject* defaultChartView() const { return m_defaultChartView; }
     void setGraphTitle(const QString& p_titre);
     void addSeriesToGraph(QAbstractSeries* p_series);
+    void showGraphSeries(QAbstractSeries* p_series);
     void clearGraphSeries();
     void setGraphAxisX(QAbstractAxis* p_axis);
     void setGraphAxisY(QAbstractAxis* p_axis);
@@ -44,6 +45,7 @@ private:
     QObject* m_defaultChartView = nullptr;
     QObject* m_rootObject = nullptr;
     QList<QAbstractSeries*> m_series;
+    QAbstractSeries* m_activeSeries = nullptr;
     bool m_loaded = false;
     ManageDb* db;
 };

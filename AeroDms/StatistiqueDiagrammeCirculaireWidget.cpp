@@ -22,8 +22,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
     auto* chart = new StatistiqueDiagrammeCirculaire(this);
     createDefaultChartView("", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
     connect(chart, &StatistiqueDiagrammeCirculaire::seriesChanged, this, [this](QAbstractSeries* series) {
-        clearGraphSeries();
-        addSeriesToGraph(series);
+        showGraphSeries(series);
         setGraphTitle(series->name());
     });
     auto connecterSurbrillance = [this](QPieSeries* series) {
