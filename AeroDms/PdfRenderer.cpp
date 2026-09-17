@@ -25,12 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <podofo/podofo.h>
 
+#include <QApplication>
 #include <QFile>
-#include <QEventLoop>
 #include <QPrinter>
 #include <QQuickWidget>
-#include <QQuickWindow>
-#include <QTimer>
 #include <QWebEngineSettings>
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
@@ -1456,20 +1454,13 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
     Q_UNUSED(p_titre);
 
     if (auto* quickWidget = p_widget.findChild<QQuickWidget*>(QString(), Qt::FindDirectChildrenOnly)) {
-        if (!quickWidget->quickWindow()) {
-            p_widget.grab().save(p_urlImage + ".png", "PNG");
-            return;
-        }
-
-        QEventLoop loop;
-        QTimer timer;
-        timer.setSingleShot(true);
-        QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-        QObject::connect(quickWidget->quickWindow(), &QQuickWindow::afterRendering, &loop, &QEventLoop::quit, Qt::SingleShotConnection);
-        timer.start(1000);
-        quickWidget->update();
-        loop.exec();
+        const bool widgetVisible = p_widget.isVisible();
+        if (!widgetVisible)
+            p_widget.show();
+        QApplication::processEvents();
         const QImage image = quickWidget->grabFramebuffer();
+        if (!widgetVisible)
+            p_widget.hide();
         if (!image.isNull()) {
             image.save(p_urlImage + ".png", "PNG");
             return;

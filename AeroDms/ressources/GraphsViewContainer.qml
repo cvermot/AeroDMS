@@ -11,6 +11,7 @@ Item {
     property var legendEntries: []
     property var axisX: null
     property var axisY: null
+    onLegendEntriesChanged: rebuildLegend()
 
     function rebuildLegend() {
         legendModel.clear()

@@ -47,7 +47,8 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
             series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
         }
     }
-    donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
+    if (series->count() > 0)
+        donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
 
     createDefaultChartView("Répartition des vols par aéronefs et types d'aéronefs", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
     for (QPieSeries* currentSeries : donutBreakdown->series())
