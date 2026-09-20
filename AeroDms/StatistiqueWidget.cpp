@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <QQuickItem>
 #include <QQuickWidget>
 #include <QResizeEvent>
 #include <QUrl>

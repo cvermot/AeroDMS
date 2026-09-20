@@ -12,6 +12,7 @@
 QT_FORWARD_DECLARE_CLASS(QAbstractAxis)
 QT_FORWARD_DECLARE_CLASS(QAbstractSeries)
 QT_FORWARD_DECLARE_CLASS(QObject)
+QT_FORWARD_DECLARE_CLASS(QQuickItem)
 QT_FORWARD_DECLARE_CLASS(QQuickWidget)
 
 class StatistiqueWidget : public QWidget
@@ -43,7 +44,7 @@ protected:
 private:
     QQuickWidget* m_quickWidget = nullptr;
     QObject* m_defaultChartView = nullptr;
-    QObject* m_rootObject = nullptr;
+    QQuickItem* m_rootObject = nullptr;
     QList<QAbstractSeries*> m_series;
     QAbstractSeries* m_activeSeries = nullptr;
     bool m_loaded = false;
