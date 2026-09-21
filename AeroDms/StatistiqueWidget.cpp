@@ -148,8 +148,25 @@ void StatistiqueWidget::showGraphSeries(QAbstractSeries* p_series)
     if (!m_defaultChartView || !p_series)
         return;
 
-    if (m_activeSeries == p_series && !m_series.isEmpty())
+    if (m_series.contains(p_series)) {
+        if (m_activeSeries == p_series)
+            return;
+
+        const QList<QAbstractSeries*> trackedSeries = m_series;
+        for (QAbstractSeries* serie : trackedSeries)
+            serie->setVisible(serie == p_series);
+
+        p_series->setOpacity(0.0);
+        auto* animation = new QPropertyAnimation(p_series, "opacity", this);
+        animation->setDuration(250);
+        animation->setStartValue(0.0);
+        animation->setEndValue(1.0);
+        animation->start(QAbstractAnimation::DeleteWhenStopped);
+
+        m_activeSeries = p_series;
+        refreshLegend();
         return;
+    }
 
     clearGraphSeries();
     m_activeSeries = p_series;
@@ -188,21 +205,21 @@ void StatistiqueWidget::refreshLegend()
         return;
 
     const QList<QColor> palette = {
-        QColor("#1f77b4"),
-        QColor("#ff7f0e"),
-        QColor("#2ca02c"),
-        QColor("#d62728"),
-        QColor("#9467bd"),
-        QColor("#8c564b"),
-        QColor("#e377c2"),
-        QColor("#7f7f7f"),
-        QColor("#bcbd22"),
-        QColor("#17becf")
+        QColor("#d7eefb"),
+        QColor("#bfdff6"),
+        QColor("#a3d0ef"),
+        QColor("#84bfe8"),
+        QColor("#66addf"),
+        QColor("#499bd5"),
+        QColor("#2f89ca"),
+        QColor("#266fa7"),
+        QColor("#1b567f"),
+        QColor("#113b59")
     };
 
     QVariantList legendEntries;
     for (QAbstractSeries* serie : m_series) {
-        if (!serie || serie->property("excludeFromLegend").toBool())
+        if (!serie || !serie->isVisible() || serie->property("excludeFromLegend").toBool())
             continue;
 
         if (auto* pieSeries = qobject_cast<QPieSeries*>(serie)) {
