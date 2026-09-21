@@ -4,6 +4,8 @@
 #include "StatistiqueDiagrammeCirculaire.h"
 #include "StatistiqueDiagrammeCirculairePartie.h"
 
+#include <QMetaObject>
+
 StatistiqueDiagrammeCirculaire::StatistiqueDiagrammeCirculaire(QObject* parent)
     : QObject(parent)
 {
@@ -12,7 +14,9 @@ StatistiqueDiagrammeCirculaire::StatistiqueDiagrammeCirculaire(QObject* parent)
 void StatistiqueDiagrammeCirculaire::changeSeries(QAbstractSeries* series)
 {
     m_currentSeries = series;
-    emit seriesChanged(series);
+    QMetaObject::invokeMethod(this, [this, series]() {
+        emit seriesChanged(series);
+    }, Qt::QueuedConnection);
 }
 
 QAbstractSeries* StatistiqueDiagrammeCirculaire::currentSeries() const
