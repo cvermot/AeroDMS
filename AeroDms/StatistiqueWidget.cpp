@@ -22,7 +22,7 @@
 
 namespace {
 
-bool invokeSeriesMethod(QObject* target, const char* signature, QAbstractSeries* series)
+bool invokeSeriesMethod(QObject* target, const char* signature, QObject* series)
 {
     if (!target || !series)
         return false;
@@ -32,7 +32,7 @@ bool invokeSeriesMethod(QObject* target, const char* signature, QAbstractSeries*
     if (methodIndex < 0)
         return false;
 
-    return metaObject->method(methodIndex).invoke(target, Q_ARG(QAbstractSeries*, series));
+    return metaObject->method(methodIndex).invoke(target, Q_ARG(QObject*, series));
 }
 
 }
@@ -44,10 +44,10 @@ StatistiqueWidget::StatistiqueWidget(QWidget* parent)
 
 void StatistiqueWidget::load()
 {
-    if (m_loaded || layout())
+    if (m_loaded)
         return;
 
-    if (!doLoad()) {
+    if (!m_loadError.isEmpty() || !doLoad()) {
         auto errorLabel = new QLabel(this);
         auto errorLayout = new QVBoxLayout(this);
         errorLabel->setText(tr("Erreur de chargement :\n%1").arg(m_loadError));
@@ -128,7 +128,7 @@ void StatistiqueWidget::addSeriesToGraph(QAbstractSeries* p_series)
     if (!m_defaultChartView || !p_series)
         return;
 
-    if (!invokeSeriesMethod(m_defaultChartView, "addSeries(QAbstractSeries*)", p_series))
+    if (!invokeSeriesMethod(m_defaultChartView, "addSeries(QObject*)", p_series))
         return;
 
     m_series.append(p_series);
@@ -155,7 +155,7 @@ void StatistiqueWidget::clearGraphSeries()
 
     const QList<QAbstractSeries*> series = m_series;
     for (QAbstractSeries* serie : series) {
-        invokeSeriesMethod(m_defaultChartView, "removeSeries(QAbstractSeries*)", serie);
+        invokeSeriesMethod(m_defaultChartView, "removeSeries(QObject*)", serie);
     }
     m_series.clear();
     m_activeSeries = nullptr;
