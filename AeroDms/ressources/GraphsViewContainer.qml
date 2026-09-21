@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import QtGraphs
 
 Item {
@@ -24,12 +23,16 @@ Item {
         id: legendModel
     }
 
-    ColumnLayout {
+    Item {
         anchors.fill: parent
-        spacing: 8
 
         Text {
-            Layout.fillWidth: true
+            id: chartTitle
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
             visible: root.chartTitle.length > 0
             horizontalAlignment: Text.AlignHCenter
             wrapMode: Text.WordWrap
@@ -40,8 +43,13 @@ Item {
         }
 
         Item {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            anchors {
+                top: chartTitle.visible ? chartTitle.bottom : parent.top
+                topMargin: chartTitle.visible ? 8 : 0
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
 
             GraphsView {
                 id: graphView
