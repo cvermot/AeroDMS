@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QMetaObject>
 #include <QMetaMethod>
+#include <QPropertyAnimation>
 #include <QQuickItem>
 #include <QQuickWidget>
 #include <QResizeEvent>
@@ -131,8 +132,15 @@ void StatistiqueWidget::addSeriesToGraph(QAbstractSeries* p_series)
     if (!invokeSeriesMethod(m_defaultChartView, "addSeries(QObject*)", p_series))
         return;
 
+    p_series->setOpacity(0.0);
     m_series.append(p_series);
     refreshLegend();
+
+    auto* animation = new QPropertyAnimation(p_series, "opacity", this);
+    animation->setDuration(250);
+    animation->setStartValue(0.0);
+    animation->setEndValue(1.0);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void StatistiqueWidget::showGraphSeries(QAbstractSeries* p_series)

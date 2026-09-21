@@ -29,6 +29,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         setGraphTitle(series->name());
     });
     auto connecterSurbrillance = [this](QPieSeries* series) {
+        series->setSelectable(true);
         series->setHoverable(true);
         QObject::connect(series, &QPieSeries::pressed, this, [](QPieSlice* slice) {
             if (auto* part = qobject_cast<StatistiqueDiagrammeCirculairePartie*>(slice))
