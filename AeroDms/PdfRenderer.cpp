@@ -1249,7 +1249,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures annuelles ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1271,7 +1271,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1293,7 +1293,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1316,7 +1316,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1339,7 +1339,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1362,7 +1362,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1385,7 +1385,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1408,7 +1408,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1430,7 +1430,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Aéronefs ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".png", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1441,7 +1441,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     return html;
 }
 
-void PdfRenderer::copierFichierSvgDansHtml(const QString p_fichier, QString &p_html)
+void PdfRenderer::ajouterImageDansHtml(const QString p_fichier, QString &p_html)
 {
     const QString imageUrl = QUrl::fromLocalFile(p_fichier).toString();
     p_html += "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">"
@@ -1456,9 +1456,9 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
     Q_UNUSED(p_titre);
 
     if (auto* quickWidget = p_widget.findChild<QQuickWidget*>())
-        quickWidget->update();
+        quickWidget->repaint();
 
-    p_widget.update();
+    p_widget.repaint();
     const QImage widgetImage = p_widget.grab().toImage();
     if (!widgetImage.isNull()) {
         widgetImage.save(p_urlImage + ".png", "PNG");

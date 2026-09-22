@@ -100,8 +100,8 @@ private :
 	static void enregistrerImage( QWidget &p_widget,
 						          const QString p_urlImage,
 							      const QString p_titre);
-	static void copierFichierSvgDansHtml( const QString p_fichier,
-									      QString& p_html);
+	static void ajouterImageDansHtml( const QString p_fichier,
+									  QString& p_html);
 
 	void rincerInfosIban(QString& p_templateCe);
 
