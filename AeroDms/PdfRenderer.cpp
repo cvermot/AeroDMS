@@ -1455,22 +1455,18 @@ void PdfRenderer::enregistrerImage( QWidget &p_widget,
 {
     Q_UNUSED(p_titre);
 
-    if (auto* quickWidget = p_widget.findChild<QQuickWidget*>())
-        quickWidget->repaint();
-
-    p_widget.repaint();
-    const QImage widgetImage = p_widget.grab().toImage();
-    if (!widgetImage.isNull()) {
-        widgetImage.save(p_urlImage + ".png", "PNG");
-        return;
-    }
-
     if (auto* quickWidget = p_widget.findChild<QQuickWidget*>()) {
-        const QImage quickImage = quickWidget->grab().toImage();
+        const QImage quickImage = quickWidget->grabFramebuffer();
         if (!quickImage.isNull()) {
             quickImage.save(p_urlImage + ".png", "PNG");
             return;
         }
+    }
+
+    const QImage widgetImage = p_widget.grab().toImage();
+    if (!widgetImage.isNull()) {
+        widgetImage.save(p_urlImage + ".png", "PNG");
+        return;
     }
 
     p_widget.grab().save(p_urlImage + ".png", "PNG");

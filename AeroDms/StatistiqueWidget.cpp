@@ -265,21 +265,35 @@ void StatistiqueWidget::refreshLegend()
         return;
 
     const QList<QColor> barPalette = createBarPalette();
+    int totalAutoPieSlices = 0;
+    for (QAbstractSeries* serie : m_series) {
+        if (!serie || !serie->isVisible() || serie->property("excludeFromLegend").toBool())
+            continue;
+
+        if (auto* pieSeries = qobject_cast<QPieSeries*>(serie)) {
+            for (QPieSlice* slice : pieSeries->slices()) {
+                if (!slice->property("customColor").toBool())
+                    totalAutoPieSlices++;
+            }
+        }
+    }
 
     QVariantList legendEntries;
+    const QList<QColor> piePalette = createBluePiePalette(totalAutoPieSlices);
+    int pieColorIndex = 0;
     for (QAbstractSeries* serie : m_series) {
         if (!serie || !serie->isVisible() || serie->property("excludeFromLegend").toBool())
             continue;
 
         if (auto* pieSeries = qobject_cast<QPieSeries*>(serie)) {
             const auto slices = pieSeries->slices();
-            const QList<QColor> palette = createBluePiePalette(slices.size());
             for (int i = 0; i < slices.size(); ++i) {
                 QPieSlice* slice = slices.at(i);
                 QColor color = slice->color();
                 if (!slice->property("customColor").toBool()) {
-                    color = palette.at(i % palette.size());
+                    color = piePalette.at(pieColorIndex % piePalette.size());
                     slice->setColor(color);
+                    pieColorIndex++;
                 }
                 slice->setBorderColor(Qt::white);
                 slice->setLabelColor(preferredLabelColor(color));
