@@ -290,7 +290,7 @@ void StatistiqueWidget::refreshLegend()
             for (int i = 0; i < slices.size(); ++i) {
                 QPieSlice* slice = slices.at(i);
                 QColor color = slice->color();
-                if (!slice->property("customColor").toBool()) {
+                if (!slice->property("customColor").toBool() && !piePalette.isEmpty()) {
                     color = piePalette.at(pieColorIndex % piePalette.size());
                     slice->setColor(color);
                     pieColorIndex++;
