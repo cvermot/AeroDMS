@@ -208,6 +208,11 @@ void StatistiqueWidget::showGraphSeries(QAbstractSeries* p_series)
     if (!m_defaultChartView || !p_series)
         return;
 
+    if (auto* pieSeries = qobject_cast<QPieSeries*>(p_series)) {
+        if (pieSeries->count() == 0 || pieSeries->sum() <= 0)
+            return;
+    }
+
     if (m_series.contains(p_series)) {
         if (m_activeSeries == p_series)
             return;
@@ -312,16 +317,10 @@ void StatistiqueWidget::refreshLegend()
 
             for (int i = 0; i < barSets.size(); ++i) {
                 QBarSet* barSet = barSets.at(i);
-                QColor color = barSet->color();
-                if (!color.isValid()) {
-                    color = barPalette.at(i % barPalette.size());
-                    barSet->setColor(color);
-                }
-                QColor borderColor = barSet->borderColor();
-                if (!borderColor.isValid()) {
-                    borderColor = color.darker(125);
-                    barSet->setBorderColor(borderColor);
-                }
+                const QColor color = barPalette.at(i % barPalette.size());
+                const QColor borderColor = color.darker(125);
+                barSet->setColor(color);
+                barSet->setBorderColor(borderColor);
 
                 QVariantMap entry;
                 entry.insert("legendColor", color);
