@@ -21,6 +21,8 @@
 #include <QtGraphs/QPieSeries>
 #include <QtGraphs/QPieSlice>
 
+#include <cmath>
+
 namespace {
 
 bool invokeSeriesMethod(QObject* target, const char* signature, QObject* series)
@@ -34,6 +36,63 @@ bool invokeSeriesMethod(QObject* target, const char* signature, QObject* series)
         return false;
 
     return metaObject->method(methodIndex).invoke(target, Q_ARG(QObject*, series));
+}
+
+QColor interpolateColor(const QColor& start, const QColor& end, qreal ratio)
+{
+    return QColor::fromRgbF(start.redF() + (end.redF() - start.redF()) * ratio,
+                            start.greenF() + (end.greenF() - start.greenF()) * ratio,
+                            start.blueF() + (end.blueF() - start.blueF()) * ratio,
+                            start.alphaF() + (end.alphaF() - start.alphaF()) * ratio);
+}
+
+QList<QColor> createBluePiePalette(int count)
+{
+    const QList<QColor> anchors = {
+        QColor("#0f3b5b"),
+        QColor("#145277"),
+        QColor("#1b6994"),
+        QColor("#227fb1"),
+        QColor("#2f95c9"),
+        QColor("#46a8d9"),
+        QColor("#67b9e1"),
+        QColor("#8ccae9")
+    };
+
+    QList<QColor> palette;
+    if (count <= 0)
+        return palette;
+
+    if (count == 1) {
+        palette.append(anchors.at(3));
+        return palette;
+    }
+
+    for (int i = 0; i < count; ++i) {
+        const qreal t = static_cast<qreal>(i) / static_cast<qreal>(count - 1);
+        const qreal scaled = t * static_cast<qreal>(anchors.size() - 1);
+        const int lowerIndex = static_cast<int>(std::floor(scaled));
+        const int upperIndex = qMin(lowerIndex + 1, anchors.size() - 1);
+        const qreal ratio = scaled - static_cast<qreal>(lowerIndex);
+        palette.append(interpolateColor(anchors.at(lowerIndex), anchors.at(upperIndex), ratio));
+    }
+
+    return palette;
+}
+
+QList<QColor> createBarPalette()
+{
+    return {
+        QColor("#2f89ca"),
+        QColor("#f28e2b"),
+        QColor("#59a14f")
+    };
+}
+
+QColor preferredLabelColor(const QColor& color)
+{
+    const double darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
+    return darkness > 0.6 ? Qt::black : Qt::white;
 }
 
 }
@@ -88,6 +147,7 @@ void StatistiqueWidget::createDefaultChartView(const QString& p_titre,
 
     m_quickWidget = new QQuickWidget(this);
     m_quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    m_quickWidget->setClearColor(Qt::white);
     m_quickWidget->setSource(QUrl("qrc:/AeroDms/ressources/GraphsViewContainer.qml"));
 
     m_rootObject = m_quickWidget->rootObject();
@@ -204,18 +264,7 @@ void StatistiqueWidget::refreshLegend()
     if (!m_rootObject)
         return;
 
-    const QList<QColor> palette = {
-        QColor("#d7eefb"),
-        QColor("#bfdff6"),
-        QColor("#a3d0ef"),
-        QColor("#84bfe8"),
-        QColor("#66addf"),
-        QColor("#499bd5"),
-        QColor("#2f89ca"),
-        QColor("#266fa7"),
-        QColor("#1b567f"),
-        QColor("#113b59")
-    };
+    const QList<QColor> barPalette = createBarPalette();
 
     QVariantList legendEntries;
     for (QAbstractSeries* serie : m_series) {
@@ -224,13 +273,16 @@ void StatistiqueWidget::refreshLegend()
 
         if (auto* pieSeries = qobject_cast<QPieSeries*>(serie)) {
             const auto slices = pieSeries->slices();
+            const QList<QColor> palette = createBluePiePalette(slices.size());
             for (int i = 0; i < slices.size(); ++i) {
                 QPieSlice* slice = slices.at(i);
                 QColor color = slice->color();
-                if (!color.isValid()) {
+                if (!slice->property("customColor").toBool()) {
                     color = palette.at(i % palette.size());
                     slice->setColor(color);
                 }
+                slice->setBorderColor(Qt::white);
+                slice->setLabelColor(preferredLabelColor(color));
 
                 QVariantMap entry;
                 entry.insert("legendColor", color);
@@ -242,25 +294,25 @@ void StatistiqueWidget::refreshLegend()
         }
 
         if (auto* barSeries = qobject_cast<QBarSeries*>(serie)) {
-            QList<QColor> seriesColors = barSeries->seriesColors();
-            QList<QColor> borderColors = barSeries->borderColors();
             const auto barSets = barSeries->barSets();
 
-            if (seriesColors.size() < barSets.size()) {
-                for (int i = seriesColors.size(); i < barSets.size(); ++i)
-                    seriesColors.append(palette.at(i % palette.size()));
-            }
-
-            if (borderColors.size() < barSets.size()) {
-                for (int i = borderColors.size(); i < barSets.size(); ++i)
-                    borderColors.append(seriesColors.at(i % seriesColors.size()).darker(125));
-            }
-
             for (int i = 0; i < barSets.size(); ++i) {
+                QBarSet* barSet = barSets.at(i);
+                QColor color = barSet->color();
+                if (!color.isValid()) {
+                    color = barPalette.at(i % barPalette.size());
+                    barSet->setColor(color);
+                }
+                QColor borderColor = barSet->borderColor();
+                if (!borderColor.isValid()) {
+                    borderColor = color.darker(125);
+                    barSet->setBorderColor(borderColor);
+                }
+
                 QVariantMap entry;
-                entry.insert("legendColor", seriesColors.at(i));
-                entry.insert("legendBorderColor", borderColors.at(i));
-                entry.insert("legendLabel", barSets.at(i)->label());
+                entry.insert("legendColor", color);
+                entry.insert("legendBorderColor", borderColor);
+                entry.insert("legendLabel", barSet->label());
                 legendEntries.append(entry);
             }
         }

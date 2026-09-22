@@ -1263,7 +1263,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false, 
+            true,
             tailleImage);
         const QString urlImage = cheminSortie + "pilote";
 
@@ -1285,7 +1285,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false,
+            true,
             tailleImage);
         const QString urlImage = cheminSortie + "subventionPilote";
 
@@ -1307,7 +1307,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false, 
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "typeVol";
@@ -1330,7 +1330,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "subventionTypeVol";
@@ -1353,7 +1353,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "activite";
@@ -1376,7 +1376,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "subventionActivite";
@@ -1399,7 +1399,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
             false,
-            false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "aeronef";
@@ -1420,7 +1420,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_STATUTS_PILOTES,
             m_contentArea,
             0,
-            tailleImage);
+            tailleImage,
+            AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+            true);
 
         const QString urlImage = cheminSortie + "statutsPilotes";
 

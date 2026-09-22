@@ -6,6 +6,8 @@
 
 #include "StatistiqueWidget.h"
 
+#include <QColor>
+
 class StatistiqueDonutCombineWidget : public StatistiqueWidget
 {
     Q_OBJECT
@@ -20,7 +22,7 @@ public:
                                             const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 
 private:
-    const Qt::GlobalColor recupererNouvelleCouleur();
+    QColor recupererNouvelleCouleur();
 
     int indiceCouleurEnCours = 0;
 };

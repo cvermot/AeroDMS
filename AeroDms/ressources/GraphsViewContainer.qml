@@ -23,6 +23,11 @@ Item {
         id: legendModel
     }
 
+    Rectangle {
+        anchors.fill: parent
+        color: "white"
+    }
+
     Item {
         anchors.fill: parent
 

@@ -26,6 +26,13 @@ StatistiqueHistogrammeEmpile::StatistiqueHistogrammeEmpile( ManageDb* p_db,
     auto sortie = new QBarSet("Sortie");
     auto balade = new QBarSet("Balade");
 
+    entrainement->setColor(QColor("#2f89ca"));
+    entrainement->setBorderColor(QColor("#226799"));
+    sortie->setColor(QColor("#f28e2b"));
+    sortie->setBorderColor(QColor("#c96e14"));
+    balade->setColor(QColor("#59a14f"));
+    balade->setBorderColor(QColor("#3f7a37"));
+
     QStringList mois;
     qreal valeurMax = 0;
 

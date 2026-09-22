@@ -30,6 +30,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
 
     // customize the slice
     mainSlice->setColor(color);
+    mainSlice->setProperty("customColor", true);
     mainSlice->setLabelVisible();
     const double darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
     if(darkness > 0.5)
@@ -37,6 +38,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     else
         mainSlice->setLabelColor(Qt::white);
     mainSlice->setLabelPosition(QPieSlice::LabelPosition::InsideNormal);
+    mainSlice->setBorderColor(Qt::white);
     mainSlice->setLabelFont(font);
 
     // position and customize the breakdown series
@@ -46,7 +48,12 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
     const auto slices = breakdownSeries->slices();
     for (QPieSlice* slice : slices) {
         color = color.lighter(115);
+        const double sliceDarkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
         slice->setColor(color);
+        slice->setProperty("customColor", true);
+        slice->setLabelColor(sliceDarkness > 0.5 ? Qt::black : Qt::white);
+        slice->setLabelPosition(QPieSlice::LabelPosition::InsideNormal);
+        slice->setBorderColor(Qt::white);
         slice->setLabelFont(font);
         slice->setProperty("baseLabel", slice->label());
     }

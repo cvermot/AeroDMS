@@ -55,49 +55,20 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         addSeriesToGraph(currentSeries);
 }
 
-const Qt::GlobalColor StatistiqueDonutCombineWidget::recupererNouvelleCouleur()
+QColor StatistiqueDonutCombineWidget::recupererNouvelleCouleur()
 {
-    int nbCouleur = 11;
+    const QList<QColor> palette = {
+        QColor("#2f89ca"),
+        QColor("#f28e2b"),
+        QColor("#59a14f"),
+        QColor("#af7aa1"),
+        QColor("#76b7b2"),
+        QColor("#e15759"),
+        QColor("#4e79a7"),
+        QColor("#edc948")
+    };
 
-    Qt::GlobalColor couleur = Qt::red;
-
-    switch (indiceCouleurEnCours % nbCouleur)
-    {
-        case 0:
-            couleur = Qt::red;
-            break;
-        case 1:
-            couleur = Qt::green;
-            break;
-        case 2:
-            couleur = Qt::blue;
-            break;
-        case 3:
-            couleur = Qt::cyan;
-            break;
-        case 4:
-            couleur = Qt::magenta;
-            break;
-        case 5:
-            couleur = Qt::darkRed;
-            break;
-        case 6:
-            couleur = Qt::darkGreen;
-            break;
-        case 7:
-            couleur = Qt::darkBlue;
-            break;
-        case 8:
-            couleur = Qt::darkCyan;
-            break;
-        case 9:
-            couleur = Qt::darkMagenta;
-            break;
-        case 10:
-            couleur = Qt::darkYellow;
-            break;
-    }
-
+    const QColor couleur = palette.at(indiceCouleurEnCours % palette.size());
     indiceCouleurEnCours++;
     return couleur;
 }
