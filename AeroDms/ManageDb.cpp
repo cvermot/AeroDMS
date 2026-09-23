@@ -2479,6 +2479,23 @@ const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventionsVerseesParVir
     return listeDemandes;
 }
 
+const QList<QDate> ManageDb::recupererDatesDesDemandesDeSubventionsVerseesParCheque()
+{
+    QList<QDate> listeDemandes;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM demandesRembousementVolsSoumises WHERE modeDeReglement = 'Chèque' GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 5");
+    query.exec();
+
+    while (query.next())
+    {
+        QDate date = QDate::fromString(query.value("dateDemande").toString(), "yyyy-MM-dd");
+        listeDemandes.append(date);
+    }
+
+    return listeDemandes;
+}
+
 const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande)
 {
     AeroDmsTypes::ListeAerodromes aerodromes;
@@ -2512,7 +2529,7 @@ const AeroDmsTypes::ListeAerodromes ManageDb::recupererAerodromesAvecPilotesActi
     return aerodromes;
 }
 
-const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date)
+const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p_date, const bool p_chequeSeulement)
 {
     QStringList listeMail;
 
@@ -2522,6 +2539,10 @@ const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p
     if (p_date == "")
     {   
         query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
+        if (p_chequeSeulement)
+        {
+            query.prepare("SELECT dateDemande FROM mailParDateDeDemandeDeSubvention WHERE modeDeReglement = 'Chèque' GROUP BY dateDemande ORDER BY dateDemande DESC LIMIT 1");
+        }
         query.exec();
         if (query.next())
         {
@@ -2536,6 +2557,10 @@ const QString ManageDb::recupererMailDerniereDemandeDeSubvention(const QString p
     if (date != "")
     {
         query.prepare("SELECT mail FROM mailParDateDeDemandeDeSubvention WHERE dateDemande = :dateDemande");
+        if (p_chequeSeulement)
+        {
+            query.prepare("SELECT mail FROM mailParDateDeDemandeDeSubvention WHERE dateDemande = :dateDemande AND modeDeReglement = 'Chèque'");
+        }
         query.bindValue(":dateDemande", date);
         query.exec();
 

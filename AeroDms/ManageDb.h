@@ -161,8 +161,9 @@ public:
         const int p_options);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();
+    const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParCheque();
     const AeroDmsTypes::ListeAerodromes recupererAerodromesAvecPilotesActifs(const AeroDmsTypes::DonnesMailingType p_demande);
-    const QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "");
+    const QString recupererMailDerniereDemandeDeSubvention(const QString p_date = "", const bool p_chequeSeulement = false);
     const QString recupererMailPilotesDUnAerodrome(const QString p_codeOaci, 
         const AeroDmsTypes::DonnesMailingType p_demande);
     const AeroDmsTypes::ListeMailsEtVirements recupererMailsVirements(const QString p_dateDemande);

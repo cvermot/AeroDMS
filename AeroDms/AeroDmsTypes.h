@@ -277,6 +277,7 @@ public:
     {
         DonnesMailingType_DEMANDE_DE_SUBVENTION,
         DonnesMailingType_SUBVENTION_VERSEE_PAR_VIREMENT,
+        DonnesMailingType_SUBVENTION_VERSEE_PAR_CHEQUE,
         DonnesMailingType_PILOTES_ACTIFS_D_UN_AERODROME,
         DonnesMailingType_PILOTES_ACTIFS_BREVETES_VOL_MOTEUR_D_UN_AERODROME
     };

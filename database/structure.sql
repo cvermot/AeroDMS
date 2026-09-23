@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. sept. 16 22:40:55 2026
+-- File generated with SQLiteStudio v3.4.4 on jeu. sept. 24 00:15:26 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -181,7 +181,7 @@ INNER JOIN aeroclub ON pilote.aeroclubId = aeroclub.aeroclubId
 INNER JOIN aerodrome ON aerodrome.identifiantOaci = aeroclub.aerodrome;
 
 -- View: mailParDateDeDemandeDeSubvention
-CREATE VIEW IF NOT EXISTS mailParDateDeDemandeDeSubvention AS SELECT dateDemande, mail, pilote
+CREATE VIEW IF NOT EXISTS mailParDateDeDemandeDeSubvention AS SELECT dateDemande, mail, pilote, modeDeReglement
 FROM demandeRemboursementSoumises 
 INNER JOIN vol ON demandeRemboursementSoumises.demandeId = vol.demandeRemboursement
 INNER JOIN pilote on vol.pilote = pilote.piloteId

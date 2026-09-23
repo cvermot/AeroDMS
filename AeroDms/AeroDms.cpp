@@ -1749,6 +1749,8 @@ void AeroDms::initialiserMenuOutils()
     mailing->addAction(mailingPilotesDerniereDemandeSubvention);
     menuMailDemandesSubvention = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par une demande de &subvention"));
+    menuMailPilotesSubventionVerseeParCheque = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+        tr("Envoyer un mail aux pilotes concernés par un &cheque"));
     menuMailPilotesSubventionVerseeParVirement = mailing->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Envoyer un mail aux pilotes concernés par un &virement"));
     peuplerMenuMailDemandesSubvention();
@@ -3666,8 +3668,6 @@ void AeroDms::peuplerListeSorties()
 void AeroDms::peuplerMenuMailDemandesSubvention()
 {
     menuMailDemandesSubvention->clear();
-    menuMailPilotesSubventionVerseeParVirement->clear();
-
     QList<QDate> datesDemandes = db->recupererDatesDesDemandesDeSubventions();
     for (int i = 0; i < datesDemandes.size(); i++)
     {
@@ -3682,6 +3682,7 @@ void AeroDms::peuplerMenuMailDemandesSubvention()
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     }
 
+    menuMailPilotesSubventionVerseeParVirement->clear();
     datesDemandes = db->recupererDatesDesDemandesDeSubventionsVerseesParVirement();
     for (int i = 0; i < datesDemandes.size(); i++)
     {
@@ -3693,6 +3694,21 @@ void AeroDms::peuplerMenuMailDemandesSubvention()
         data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
         action->setData(QVariant::fromValue(data));
         menuMailPilotesSubventionVerseeParVirement->addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
+    }
+
+    menuMailPilotesSubventionVerseeParCheque->clear();
+    datesDemandes = db->recupererDatesDesDemandesDeSubventionsVerseesParCheque();
+    for (int i = 0; i < datesDemandes.size(); i++)
+    {
+        QAction* action = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
+            tr("Demande du ") + datesDemandes.at(i).toString("dd/MM/yyyy"),
+            this);
+        AeroDmsTypes::DonneesMailing data;
+        data.typeMailing = AeroDmsTypes::DonnesMailingType_SUBVENTION_VERSEE_PAR_CHEQUE;
+        data.donneeComplementaire = datesDemandes.at(i).toString("yyyy-MM-dd");
+        action->setData(QVariant::fromValue(data));
+        menuMailPilotesSubventionVerseeParCheque->addAction(action);
         connect(action, SIGNAL(triggered()), this, SLOT(envoyerMail()));
     }
 
@@ -4559,6 +4575,14 @@ void AeroDms::envoyerMail()
             {
                 QDesktopServices::openUrl(QUrl("mailto:"
                     + db->recupererMailDerniereDemandeDeSubvention(donnnesMailing.donneeComplementaire)
+                    + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
+                    + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
+            }
+            break;
+            case AeroDmsTypes::DonnesMailingType_SUBVENTION_VERSEE_PAR_CHEQUE:
+            {
+                QDesktopServices::openUrl(QUrl("mailto:"
+                    + db->recupererMailDerniereDemandeDeSubvention(donnnesMailing.donneeComplementaire, true)
                     + "?subject=" + parametresMetiers.objetMailDispoCheques + "&body="
                     + parametresMetiers.texteMailDispoCheques, QUrl::TolerantMode));
             }
