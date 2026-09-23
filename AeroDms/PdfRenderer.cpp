@@ -25,12 +25,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <podofo/podofo.h>
 
+#include <QApplication>
 #include <QFile>
 #include <QPrinter>
-#include <QChart>
-#include <QSvgGenerator>
-#include <QSvgRenderer>
-#include <QtConcurrent>
+#include <QQuickWidget>
 #include <QWebEngineSettings>
 
 PdfRenderer::PdfRenderer( ManageDb *p_db, 
@@ -195,7 +193,7 @@ void PdfRenderer::impressionTerminee( const QString& filePath,
     //Si la demande ne concerne pas un document unique, on fait les demandes suivantes
     if (!laDemandeEstPourUnDocumentUnique)
     {
-        imprimerLaProchaineDemandeDeSubvention();
+        const AeroDmsTypes::EtatGeneration etatGeneration = imprimerLaProchaineDemandeDeSubvention();
     }
     //Sinon on émet directement la fin d'impression
     else
@@ -887,6 +885,12 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
     {
         view->setHtml(templateTable,
             ressourcesHtml);
+
+        /*QFile f("test.html");
+        f.open(QIODevice::ReadWrite | QIODevice::Text);
+            QTextStream outputStream(&f);
+            outputStream << templateTable;
+            f.close();*/
     }  
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
@@ -1242,7 +1246,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             p_annee,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation, 
+            false, 
             tailleImage );
 
         const QString urlImage = cheminSortie + "heuresAnnuelles";
@@ -1251,7 +1255,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures annuelles ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1264,8 +1268,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
-            false, 
+            false,
+            true,
             tailleImage);
         const QString urlImage = cheminSortie + "pilote";
 
@@ -1273,7 +1277,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1286,8 +1290,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
             false,
+            true,
             tailleImage);
         const QString urlImage = cheminSortie + "subventionPilote";
 
@@ -1295,7 +1299,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1308,8 +1312,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
-            false, 
+            false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "typeVol";
@@ -1318,7 +1322,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1331,8 +1335,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
             false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "subventionTypeVol";
@@ -1341,7 +1345,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1354,8 +1358,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
             false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "activite";
@@ -1364,7 +1368,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1377,8 +1381,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
             m_contentArea,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
             false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "subventionActivite";
@@ -1387,7 +1391,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1400,8 +1404,8 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             m_contentArea,
             p_annee,
             AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            QChart::NoAnimation,
             false,
+            true,
             tailleImage);
 
         const QString urlImage = cheminSortie + "aeronef";
@@ -1410,7 +1414,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1422,7 +1426,9 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             AeroDmsTypes::Statistiques_STATUTS_PILOTES,
             m_contentArea,
             0,
-            tailleImage);
+            tailleImage,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            true);
 
         const QString urlImage = cheminSortie + "statutsPilotes";
 
@@ -1430,7 +1436,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Aéronefs ") + QString::number(p_annee));
 
-        copierFichierSvgDansHtml(urlImage + ".svg", html);
+        ajouterImageDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1443,46 +1449,48 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
 
 void PdfRenderer::copierFichierSvgDansHtml(const QString p_fichier, QString &p_html)
 {
-    QFile fichier(p_fichier);
-    fichier.open(QFile::ReadOnly);
-    p_html = p_html + "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">\n" + fichier.readAll() + "</div></center>\n";
-    fichier.close();
+    const QString imageUrl = QUrl::fromLocalFile(p_fichier).toString();
+    p_html += "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">"
+              "<img style=\"max-width: 100%; height: auto;\" src=\"" + imageUrl + "\" />"
+              "</div></center>\n";
+}
+
+void PdfRenderer::ajouterImageDansHtml(const QString p_fichier, QString &p_html)
+{
+    qDebug() << "Image URL" << p_fichier;
+
+    QFile file(p_fichier);
+
+    if (file.open(QIODevice::ReadOnly)) {
+        QByteArray image = file.readAll();
+        file.close();
+        p_html += "<center><div style=\"width: 100%; height: 100%; overflow: hidden;\">" 
+            "<img style=\"max-width: 100%; height: auto;\" src=\"data:image/png;charset=utf-8;base64, " + image.toBase64() + " \" />"
+            "</div></center>\n";
+    }
 }
 
 void PdfRenderer::enregistrerImage( QWidget &p_widget,
                                     const QString p_urlImage,
                                     const QString p_titre)
 {
-    QSvgGenerator generator;
-    generator.setFileName(p_urlImage + ".svg");
-    generator.setSize(p_widget.size());
-    generator.setViewBox(p_widget.rect());
-    generator.setTitle(p_titre);
-    generator.setDescription(tr("Image générée avec ")+ QApplication::applicationName() +" v" + QApplication::applicationVersion());
-    p_widget.render(&generator);
+    Q_UNUSED(p_titre);
 
-    QSize taille = p_widget.size();
-    auto future = QtConcurrent::run([=]() {
-        convertirEnPng(p_urlImage + ".svg", 
-            p_urlImage + ".png", 
-            taille);
-        });
-}
+    QImage quickImage;
+    if (auto* quickWidget = p_widget.findChild<QQuickWidget*>()) {
+        if (auto* rootItem = quickWidget->rootObject()) {
+            Q_UNUSED(rootItem);
+            quickWidget->update();
+            QApplication::processEvents();
+            const QImage image = quickWidget->grab().toImage();
+            if (!image.isNull()) {
+                image.save(p_urlImage + ".png", "PNG");
+                return;
+            }
+        }
+    }
 
-void PdfRenderer::convertirEnPng(const QString p_fichierSvg, 
-    const QString p_fichierPng, 
-    const QSize targetSize) 
-{
-    QSvgRenderer renderer(p_fichierSvg);
-
-    QImage image(targetSize, QImage::Format_ARGB32);
-    image.fill(Qt::transparent);
-
-    QPainter painter(&image);
-    renderer.render(&painter);
-    painter.end();
-
-    image.save(p_fichierPng, "PNG");
+    p_widget.grab().save(p_urlImage + ".png", "PNG");
 }
 
 AeroDmsTypes::ResolutionEtParametresStatistiques PdfRenderer::convertirResolution(const int p_resolution, const QMarginsF p_marges)

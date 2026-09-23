@@ -1203,3 +1203,9 @@ void AeroDmsServices::afficherErreur(const QNetworkReply* p_reponse)
     break;
     }
 }
+
+const QColor AeroDmsServices::preferredLabelColor(const QColor& color)
+{
+    const double darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
+    return darkness > 0.6 ? Qt::black : Qt::white;
+}

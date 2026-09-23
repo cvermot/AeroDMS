@@ -56,6 +56,8 @@ public:
     static QString dechiffrerDonnees(QString& encryptedData);
 
     static void afficherErreur(const QNetworkReply* p_reponse);
+
+    static const QColor preferredLabelColor(const QColor& color);
 };
 
 #endif // AERODMSSERVICES_H

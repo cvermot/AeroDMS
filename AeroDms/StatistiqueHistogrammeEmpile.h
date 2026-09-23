@@ -6,7 +6,6 @@
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
-#include <QChart>
 
 class StatistiqueHistogrammeEmpile : public StatistiqueWidget
 {
@@ -16,7 +15,7 @@ public:
         const int p_annee,
         QWidget* parent = nullptr,
         const int p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
-        const QChart::AnimationOption p_animation = QChart::AllAnimations,
+        const bool p_animation = true,
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES);
 };
 

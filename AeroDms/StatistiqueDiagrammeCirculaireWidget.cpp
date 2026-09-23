@@ -5,35 +5,45 @@
 #include "StatistiqueDiagrammeCirculairePartie.h"
 #include "StatistiqueDiagrammeCirculaireWidget.h"
 
-#include <QChart>
-#include <QLegend>
-#include <QPieSeries>
-#include <QRandomGenerator>
+#include <QtGraphs/QPieSeries>
 
 StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( ManageDb* p_db, 
                                                                             const int p_annee, 
                                                                             const AeroDmsTypes::Statistiques p_statistique, 
                                                                             QWidget* parent,
                                                                             const int p_options,
-                                                                            const QChart::AnimationOption p_animation, 
+                                                                            const bool p_animation, 
                                                                             const bool p_legende,
                                                                             const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
     setMinimumSize(p_parametres.tailleMiniImage);
-    QFont font("Arial", p_parametres.tailleDePolice);
 
-    auto* chart = new StatistiqueDiagrammeCirculaire;
-    chart->setTheme(QChart::ChartThemeLight);
-    chart->setAnimationOptions(p_animation);
-    chart->legend()->setVisible(p_legende);
-    chart->legend()->setAlignment(Qt::AlignRight);
-    chart->legend()->setFont(font);
-    chart->setFont(font);
+    auto* chart = new StatistiqueDiagrammeCirculaire(this);
+    createDefaultChartView("", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+    connect(chart, &StatistiqueDiagrammeCirculaire::seriesChanged, this, [this](QAbstractSeries* series) {
+        if (!series)
+            return;
 
-    font.setBold(true);
-    font.setPointSizeF(p_parametres.tailleDePolice * 1.5);
-    chart->setTitleFont(font);
+        showGraphSeries(series);
+        setGraphTitle(series->name());
+    });
+    auto enregistrerSerie = [this](QPieSeries* series) {
+        addSeriesToGraph(series);
+        series->setVisible(false);
+    };
+    auto connecterSurbrillance = [this](QPieSeries* series) {
+        series->setSelectable(true);
+        series->setHoverable(true);
+        QObject::connect(series, &QPieSeries::pressed, this, [](QPieSlice* slice) {
+            if (auto* part = qobject_cast<StatistiqueDiagrammeCirculairePartie*>(slice))
+                part->showHighlight(true);
+        });
+        QObject::connect(series, &QPieSeries::released, this, [](QPieSlice* slice) {
+            if (auto* part = qobject_cast<StatistiqueDiagrammeCirculairePartie*>(slice))
+                part->showHighlight(false);
+        });
+    };
 
     switch (p_statistique)
     {
@@ -44,7 +54,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                 p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Temps de vol par pilote (cliquez pour le détail par pilote)");
             }
@@ -56,6 +68,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             for (int i = 0; i < subventionParPilote.size(); i++)
             {
                 auto detailParPilote = new QPieSeries(this);
+                connecterSurbrillance(detailParPilote);
+                enregistrerSerie(detailParPilote);
                 detailParPilote->setName("Détails par type de vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.tempsDeVolEnMinutes, "Entrainement", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).sortie.tempsDeVolEnMinutes, "Sorties", p_parametres.tailleDePolice, donneesTypeDeVolParPilote);
@@ -79,7 +93,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                 p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Subvention par pilote (cliquez pour le détail par pilote)");
             }
@@ -91,6 +107,8 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             for (int i = 0; i < subventionParPilote.size(); i++)
             {
                 auto detailParPilote = new QPieSeries(this);
+                connecterSurbrillance(detailParPilote);
+                enregistrerSerie(detailParPilote);
                 detailParPilote->setName("Détails par type de vol pour " + subventionParPilote.at(i).prenom + " " + subventionParPilote.at(i).nom);
                 *detailParPilote << new StatistiqueDiagrammeCirculairePartie(subventionParPilote.at(i).entrainement.montantRembourse, 
                     "Entrainement", p_parametres.tailleDePolice, donneesTypeDeVolParPilote, AeroDmsTypes::Unites_EUROS);
@@ -116,7 +134,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee, p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Temps de vol par activité (cliquez pour le détail des heures par pilote dans l'activité)");
             }
@@ -126,14 +146,24 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             }        
 
             auto detailAvion = new QPieSeries(this);
+            connecterSurbrillance(detailAvion);
+            enregistrerSerie(detailAvion);
             detailAvion->setName("Avion");
             auto detailAvionElectrique = new QPieSeries(this);
+            connecterSurbrillance(detailAvionElectrique);
+            enregistrerSerie(detailAvionElectrique);
             detailAvionElectrique->setName("Avion électrique");
             auto detailUlm = new QPieSeries(this);
+            connecterSurbrillance(detailUlm);
+            enregistrerSerie(detailUlm);
             detailUlm->setName("ULM");
             auto detailPlaneur = new QPieSeries(this);
+            connecterSurbrillance(detailPlaneur);
+            enregistrerSerie(detailPlaneur);
             detailPlaneur->setName("Planeur");
             auto detailHelicoptere = new QPieSeries(this);
+            connecterSurbrillance(detailHelicoptere);
+            enregistrerSerie(detailHelicoptere);
             detailHelicoptere->setName("Hélicoptère");
 
             for (int i = 0; i < subventionParActivite.size(); i++)
@@ -171,7 +201,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                     *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).minutesVolHelicoptere, 
                         subventionParActivite.at(i).nomPrenomPilote, 
                         p_parametres.tailleDePolice,
-                        detailHelicoptere);
+                        donneesTypeDeVolParPilote);
                 }
             }
             if (detailAvion->sum() != 0)
@@ -216,7 +246,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             AeroDmsTypes::ListeStatsHeuresDeVolParActivite subventionParActivite = p_db->recupererHeuresParActivite(p_annee, p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Subvention par activité (cliquez pour le détail des heures par pilote dans l'activité)");
             }
@@ -226,14 +258,24 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             }
 
             auto detailAvion = new QPieSeries(this);
+            connecterSurbrillance(detailAvion);
+            enregistrerSerie(detailAvion);
             detailAvion->setName("Avion");
             auto detailAvionElectrique = new QPieSeries(this);
+            connecterSurbrillance(detailAvionElectrique);
+            enregistrerSerie(detailAvionElectrique);
             detailAvionElectrique->setName("Avion électrique");
             auto detailUlm = new QPieSeries(this);
+            connecterSurbrillance(detailUlm);
+            enregistrerSerie(detailUlm);
             detailUlm->setName("ULM");
             auto detailPlaneur = new QPieSeries(this);
+            connecterSurbrillance(detailPlaneur);
+            enregistrerSerie(detailPlaneur);
             detailPlaneur->setName("Planeur");
             auto detailHelicoptere = new QPieSeries(this);
+            connecterSurbrillance(detailHelicoptere);
+            enregistrerSerie(detailHelicoptere);
             detailHelicoptere->setName("Hélicoptère");
 
             for (int i = 0; i < subventionParActivite.size(); i++)
@@ -275,7 +317,7 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                     *detailHelicoptere << new StatistiqueDiagrammeCirculairePartie(subventionParActivite.at(i).subventionVolHelicoptere,
                         subventionParActivite.at(i).nomPrenomPilote,
                         p_parametres.tailleDePolice,
-                        detailHelicoptere, 
+                        donneesTypeDeVolParPilote,
                         AeroDmsTypes::Unites_EUROS);
                 }
             }
@@ -323,7 +365,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                 p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Temps de vol par type de vol (cliquez pour le détail des heures par pilote dans la catégorie)");
             }
@@ -333,10 +377,16 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             }
 
             auto detailEntrainement = new QPieSeries(this);
+            connecterSurbrillance(detailEntrainement);
+            enregistrerSerie(detailEntrainement);
             detailEntrainement->setName("Vols d'entrainement");
             auto detailSortie = new QPieSeries(this);
+            connecterSurbrillance(detailSortie);
+            enregistrerSerie(detailSortie);
             detailSortie->setName("Sorties");
             auto detailBalade = new QPieSeries(this);
+            connecterSurbrillance(detailBalade);
+            enregistrerSerie(detailBalade);
             detailBalade->setName("Balades");
 
             for (int i = 0; i < subventionParPilote.size(); i++)
@@ -366,7 +416,9 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
                 p_options);
 
             auto donneesTypeDeVolParPilote = new QPieSeries(this);
-            if (p_animation != QChart::NoAnimation)
+            connecterSurbrillance(donneesTypeDeVolParPilote);
+            enregistrerSerie(donneesTypeDeVolParPilote);
+            if (p_animation)
             {
                 donneesTypeDeVolParPilote->setName("Subventions par type de vol (cliquez pour le détail des subventions par pilote dans la catégorie)");
             }
@@ -376,10 +428,16 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
             }
 
             auto detailEntrainement = new QPieSeries(this);
+            connecterSurbrillance(detailEntrainement);
+            enregistrerSerie(detailEntrainement);
             detailEntrainement->setName("Vols d'entrainement");
             auto detailSortie = new QPieSeries(this);
+            connecterSurbrillance(detailSortie);
+            enregistrerSerie(detailSortie);
             detailSortie->setName("Sorties");
             auto detailBalade = new QPieSeries(this);
+            connecterSurbrillance(detailBalade);
+            enregistrerSerie(detailBalade);
             detailBalade->setName("Balades");
 
             for (int i = 0; i < subventionParPilote.size(); i++)
@@ -404,7 +462,11 @@ StatistiqueDiagrammeCirculaireWidget::StatistiqueDiagrammeCirculaireWidget( Mana
         }
         break;
     }   
-    createDefaultChartView(chart);
+
+    if (chart->currentSeries()) {
+        showGraphSeries(chart->currentSeries());
+        setGraphTitle(chart->currentSeries()->name());
+    }
 }
 
 AeroDmsTypes::ListeSubventionsParPilotes StatistiqueDiagrammeCirculaireWidget::recupererSubventionsPilotes(ManageDb* p_db, 

@@ -34,6 +34,7 @@ public:
 	void recupererSha256Bdd();
 	void envoyerFichier(QString p_chemin);
 	void envoyerBdd(QString p_chemin);
+	void rincerListeDAttente();
 	void telechargerBdd();
 	void telechargerMiseAJour(const QString p_url);
 	void telechargerFacture(const QString p_nomFacture);
@@ -104,6 +105,7 @@ signals:
 	void finDEnvoiBdd();
 	void notifierProgressionTelechargement(const qint64 p_nbOctetsRecus, const qint64 p_nbOctetsTotal);
 	void zipMiseAJourDisponible();
+	void notifierEtapeChargementBdd(const AeroDmsTypes::EtapeChargementBdd p_etape);
 };
 
 #endif GESTIONNAIREDONNEESENLIGNE_H

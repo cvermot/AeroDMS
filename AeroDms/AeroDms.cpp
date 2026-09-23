@@ -1055,7 +1055,7 @@ void AeroDms::verifierSignatureNumerisee()
 
         RCCResourceLibrary library;
         library.readFiles(AeroDmsServices::recupererCheminFichierImageSignature());
-        library.output(cheminOut);
+        const bool generationRccEstOk = library.output(cheminOut);
 
         if (QResource::registerResource(cheminOut))
         {

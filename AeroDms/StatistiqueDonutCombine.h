@@ -4,22 +4,25 @@
 #ifndef STATISTIQUEDONUTCOMBINE_H
 #define STATISTIQUEDONUTCOMBINE_H
 
-#include <QChart>
+#include <QColor>
+#include <QList>
+#include <QObject>
 
-QT_FORWARD_DECLARE_CLASS(QPieSeries)
+#include <QtGraphs/QPieSeries>
 
-class StatistiqueDonutCombine : public QChart
+class StatistiqueDonutCombine : public QObject
 {
 public:
-    StatistiqueDonutCombine(QGraphicsItem* parent = nullptr, Qt::WindowFlags wFlags = {});
+    explicit StatistiqueDonutCombine(QObject* parent = nullptr);
     void addBreakdownSeries(QPieSeries* series, QColor color, int tailleDePolice);
+    QList<QPieSeries*> series() const;
 
 private:
     void recalculateAngles();
-    void updateLegendMarkers(QFont p_font);
 
 private:
     QPieSeries* m_mainSeries = nullptr;
+    QList<QPieSeries*> m_series;
 };
 
 #endif //STATISTIQUEDONUTCOMBINE_H

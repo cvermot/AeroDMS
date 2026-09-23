@@ -38,13 +38,13 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
     <QtInstall>C:\Qt\6.6.1\msvc2019_64</QtInstall>
-    <QtModules>core;gui;widgets;printsupport;sql;webenginecore;webenginewidgets;pdf;pdfwidgets</QtModules>
+    <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;webenginewidgets;pdf;pdfwidgets;quick;quickwidgets;qml;graphs</QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.9.1_msvc2022_64</QtInstall>
-    <QtModules>core;gui;network;widgets;concurrent;printsupport;sql;svg;webenginecore;xml;charts;webenginewidgets;pdf;pdfwidgets</QtModules>
+    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtModules>core;gui;network;quick;widgets;concurrent;printsupport;quickwidgets;sql;svg;webenginecore;xml;webenginewidgets;pdf;pdfwidgets;graphs</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>

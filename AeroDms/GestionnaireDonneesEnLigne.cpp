@@ -417,6 +417,12 @@ void GestionnaireDonneesEnLigne::envoyerBdd(QString p_chemin)
     }
 }
 
+void GestionnaireDonneesEnLigne::rincerListeDAttente()
+{
+    uneDemandeEstEnCours = false;
+    listeDemandes.clear();
+}
+
 void GestionnaireDonneesEnLigne::telechargerBdd()
 {
     if (estActive)

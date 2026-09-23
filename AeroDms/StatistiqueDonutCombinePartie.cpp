@@ -3,6 +3,8 @@
 
 #include "StatistiqueDonutCombinePartie.h"
 
+#include <QFont>
+
 StatistiqueDonutCombinePartie::StatistiqueDonutCombinePartie(QPieSeries* breakdownSeries, QObject* parent)
     : QPieSlice(parent),
     m_breakdownSeries(breakdownSeries)

@@ -6,9 +6,8 @@
 
 #include "StatistiqueWidget.h"
 #include "ManageDb.h"
-#include <QChart>
 
-QT_FORWARD_DECLARE_CLASS(QPieSeries)
+#include <QtGraphs/QPieSeries>
 
 class StatistiqueDonuts : public StatistiqueWidget
 {
@@ -19,7 +18,8 @@ public:
                        QWidget* parent = nullptr,
                        int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
                        const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres = AeroDmsTypes::K_INIT_RESOLUTION_ET_PARAMETRES_STATISTIQUES,
-                       const AeroDmsTypes::OptionsDonneesStatistiques p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS);
+                       const AeroDmsTypes::OptionsDonneesStatistiques p_options = AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+                       const bool p_legende = false);
 
 public slots:
     void explodeSlice(bool exploded);
@@ -29,12 +29,14 @@ private:
 
     void afficherStatsPilotes(ManageDb* p_db, 
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
-        QChart::AnimationOption p_animation);
+        bool p_animation,
+        bool p_legende);
     void afficherStatsAeronefs(ManageDb* p_db, 
         int p_annee, 
         const AeroDmsTypes::OptionsDonneesStatistiques p_options,
         const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres, 
-        QChart::AnimationOption p_animation);
+        bool p_animation,
+        bool p_legende);
 };
 
 #endif //STATISTIQUEDONUTS_H
