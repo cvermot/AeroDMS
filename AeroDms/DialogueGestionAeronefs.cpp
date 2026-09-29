@@ -1,6 +1,6 @@
 /******************************************************************************\
 <QUas : a Free Software logbook for UAS operators>
-Copyright (C) 2023 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,15 +27,18 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db,
     database = db;
 
     QGridLayout* mainLayout = new QGridLayout(this);
-    mainLayout->setSizeConstraint(QLayout::SetFixedSize);
+    resize(400, 450);
 
     setLayout(mainLayout);
 
     setWindowTitle(QApplication::applicationName() + " - " + tr("Gestion des aéronefs"));
 
+    listeCompensationCarbone = new QVector<QCheckBox*>();
+
     vueAeronefs = new QTableWidget(0, AeroDmsTypes::AeronefTableElement_NB_COLONNES, this);
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_TYPE, new QTableWidgetItem("Type"));
+    vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_COMPENSATION_CARBONE, new QTableWidgetItem(tr("Compensation CO₂")));
     vueAeronefs->setEditTriggers(QAbstractItemView::DoubleClicked);
 
     connect(vueAeronefs, &QTableWidget::cellChanged, this, &DialogueGestionAeronefs::sauvegarderDonneesSaisies);
@@ -45,6 +48,13 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db,
 
 void DialogueGestionAeronefs::peuplerListeAeronefs()
 {
+    QVectorIterator<QCheckBox*> itCc(*listeCompensationCarbone);
+    while (itCc.hasNext())
+    {
+        QCheckBox* cb = itCc.next();
+        delete cb;
+    }
+    listeCompensationCarbone->clear();
     vueAeronefs->clearContents();
 
     const AeroDmsTypes::ListeAeronefs listeAeronefs = database->recupererListeAeronefs();
@@ -59,6 +69,15 @@ void DialogueGestionAeronefs::peuplerListeAeronefs()
         itemImmat->setFlags(itemImmat->flags() & ~Qt::ItemIsEditable);
         vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_IMMAT, itemImmat);
         vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_TYPE, new QTableWidgetItem(aeronef.type));
+
+        QCheckBox* compensationCarbone = new QCheckBox();
+        compensationCarbone->setChecked(aeronef.emissionsSontCompensees);
+        compensationCarbone->setToolTip(tr("Permet d'indiquer si l'exploitant compense les émissions du CO2 pour cet avion"));
+        compensationCarbone->setProperty("immat", aeronef.immatriculation);
+        connect(compensationCarbone, &QCheckBox::checkStateChanged, this, &DialogueGestionAeronefs::changementCompensationCarbone);
+        listeCompensationCarbone->append(compensationCarbone);
+        vueAeronefs->setCellWidget(i, AeroDmsTypes::AeronefTableElement_COMPENSATION_CARBONE,
+            listeCompensationCarbone->last());
     }
     vueAeronefs->resizeColumnsToContents();
 
@@ -68,14 +87,14 @@ void DialogueGestionAeronefs::peuplerListeAeronefs()
 void DialogueGestionAeronefs::sauvegarderDonneesSaisies(const int p_ligne, 
     const int p_colonne)
 {
-    AeroDmsTypes::AeronefTableElement elementEdite = AeroDmsTypes::AeronefTableElement_TYPE;
+    database->mettreAJourTypeAeronef( vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_IMMAT)->data(Qt::DisplayRole).toString(),
+                                      vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_TYPE)->data(Qt::DisplayRole).toString());
+}
 
-    if (p_colonne == AeroDmsTypes::AeronefTableElement_TYPE)
-    {
-        elementEdite = AeroDmsTypes::AeronefTableElement_TYPE;
-    }
+void DialogueGestionAeronefs::changementCompensationCarbone()
+{
+    QCheckBox* cb = static_cast<QCheckBox*>(sender());
 
-    database->mettreAJourDonneesAeronefs( vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_IMMAT)->data(Qt::DisplayRole).toString(),
-                                          vueAeronefs->item(p_ligne, p_colonne)->data(Qt::DisplayRole).toString(),
-                                          elementEdite );
+    database->mettreAJourCompensationCarboneAeronef(cb->property("immat").toString(),
+        cb->isChecked());
 }

@@ -23,6 +23,8 @@ public:
 
 private:
     QColor recupererNouvelleCouleur();
+    const double recupererFacteurDEmissions(const AeroDmsTypes::UniteTypeConsommation p_uniteTypeConsommation,
+        const AeroDmsTypes::ParametresEmissionsCo2 p_parametresEmissionsCo2);
 
     int indiceCouleurEnCours = 0;
 };

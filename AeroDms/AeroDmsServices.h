@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtWidgets>
 #include <QNetworkReply>
+#include <QWheelEvent>
 #include "AeroDmsTypes.h"
 
 class AeroDmsServices
@@ -58,6 +59,31 @@ public:
     static void afficherErreur(const QNetworkReply* p_reponse);
 
     static const QColor preferredLabelColor(const QColor& color);
+};
+
+// Sous-classes pour ignorer les événements de molette
+class NoWheelComboBox : public QComboBox
+{
+public:
+    using QComboBox::QComboBox;
+protected:
+    void wheelEvent(QWheelEvent* event) override
+    {
+        // Empêche le changement de valeur par la molette lorsque le combo n'a pas le focus prévu
+        event->ignore();
+    }
+};
+
+class NoWheelDoubleSpinBox : public QDoubleSpinBox
+{
+public:
+    using QDoubleSpinBox::QDoubleSpinBox;
+protected:
+    void wheelEvent(QWheelEvent* event) override
+    {
+        // Empêche le changement de valeur par la molette lorsque le combo n'a pas le focus prévu
+        event->ignore();
+    }
 };
 
 #endif // AERODMSSERVICES_H

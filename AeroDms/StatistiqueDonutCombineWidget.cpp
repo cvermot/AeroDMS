@@ -16,43 +16,208 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                               const AeroDmsTypes::ResolutionEtParametresStatistiques p_parametres)
     : StatistiqueWidget(parent)
 {
-    Q_UNUSED(p_statistique);
     Q_UNUSED(p_animation);
-    const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, p_options);
+    
     setMinimumSize(p_parametres.tailleMiniImage);
 
-    indiceCouleurEnCours = 0;
-
-    auto donutBreakdown = new StatistiqueDonutCombine(this);
-
-    QString typeCourant = "init";
-    auto series = new QPieSeries(this);
-
-    for (int i = 0; i < statsAeronefs.size(); i++)
+    switch (p_statistique)
     {
-        if (typeCourant == statsAeronefs.at(i).type)
+        case AeroDmsTypes::Statistiques_AERONEFS:
+        default:
         {
-            QPieSlice* pieSlice = new QPieSlice(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
-            series->append(pieSlice);
-        }
-        else
-        {
-            if (typeCourant != "init")
-            {
-                donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
-            }
-            typeCourant = statsAeronefs.at(i).type;
-            series = new QPieSeries(this);
-            series->setName(statsAeronefs.at(i).type);
-            series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
-        }
-    }
-    if (series->count() > 0)
-        donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
+            const AeroDmsTypes::StatsAeronefs statsAeronefs = p_db->recupererStatsAeronefs(p_annee, 
+                p_options);
+            indiceCouleurEnCours = 0;
 
-    createDefaultChartView("Répartition des vols par aéronefs et types d'aéronefs", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
-    for (QPieSeries* currentSeries : donutBreakdown->series())
-        addSeriesToGraph(currentSeries);
+            auto donutBreakdown = new StatistiqueDonutCombine(this);
+
+            QString typeCourant = "init";
+            auto series = new QPieSeries(this);
+
+            for (int i = 0; i < statsAeronefs.size(); i++)
+            {
+                if (typeCourant == statsAeronefs.at(i).type)
+                {
+                    QPieSlice* pieSlice = new QPieSlice(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
+                    series->append(pieSlice);
+                }
+                else
+                {
+                    if (typeCourant != "init")
+                    {
+                        donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
+                    }
+                    typeCourant = statsAeronefs.at(i).type;
+                    series = new QPieSeries(this);
+                    series->setName(statsAeronefs.at(i).type);
+                    series->append(statsAeronefs.at(i).immat, statsAeronefs.at(i).nombreMinutesVol);
+                }
+            }
+            if (series->count() > 0)
+                donutBreakdown->addBreakdownSeries(series, recupererNouvelleCouleur(), p_parametres.tailleDePolice);
+
+            createDefaultChartView("Répartition des vols par aéronefs et types d'aéronefs", p_legende, Qt::AlignRight, static_cast<int>(p_parametres.tailleDePolice * 1.5));
+            for (QPieSeries* currentSeries : donutBreakdown->series())
+                addSeriesToGraph(currentSeries);
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
+        {
+            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissionsParTypeDeVol( p_annee, 
+                                                                                                             p_options, 
+                                                                                                             p_statistique );
+            indiceCouleurEnCours = 0;
+
+            auto donutBreakdown = new StatistiqueDonutCombine(this);
+
+            QString typeCourant = "init";
+            auto series = new QPieSeries(this);
+
+            for (int i = 0; i < statsCo2.liste.size(); i++)
+            {
+                if (typeCourant == statsCo2.liste.at(i).activiteOuTypeDeVol)
+                {
+                    QString unite = " L";
+                    if (statsCo2.liste.at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
+                    {
+                        unite = " kWh";
+                    }
+                    QPieSlice* pieSlice = new QPieSlice( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres(), 'f', 0) + unite + ", ",
+                                                         statsCo2.liste.at(i).consommationEnLitres());
+                    series->append(pieSlice);
+                }
+                else
+                {
+                    if (typeCourant != "init")
+                    {
+                        donutBreakdown->addBreakdownSeries( series, 
+                                                            recupererNouvelleCouleur(), 
+                                                            p_parametres.tailleDePolice );
+                    }
+                    typeCourant = statsCo2.liste.at(i).activiteOuTypeDeVol;
+                    series = new QPieSeries(this);
+                    series->setName(typeCourant);
+                    QString unite = " L";
+                    if (statsCo2.liste.at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
+                    {
+                        unite = " kWh";
+                    }
+                    series->append( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres(), 'f', 0) + unite + ", ",
+                                    statsCo2.liste.at(i).consommationEnLitres());
+                }
+            }
+            if (series->count() > 0)
+            {
+                donutBreakdown->addBreakdownSeries( series, 
+                                                    recupererNouvelleCouleur(), 
+                                                    p_parametres.tailleDePolice);
+            }
+
+            createDefaultChartView( "Consommation d'énergie", 
+                                    p_legende, 
+                                    Qt::AlignRight, 
+                                    static_cast<int>(p_parametres.tailleDePolice * 1.5));
+            
+            for (QPieSeries* currentSeries : donutBreakdown->series())
+            {
+                addSeriesToGraph(currentSeries);
+            }
+                
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
+        case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
+        {
+            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissionsParTypeDeVol(p_annee,
+                p_options,
+                p_statistique);
+
+            const AeroDmsTypes::ParametresEmissionsCo2 parametresEmissionsCo2 = p_db->lireParametresEmissionsCo2();
+
+            indiceCouleurEnCours = 0;
+
+            auto donutBreakdown = new StatistiqueDonutCombine(this);
+
+            QString typeCourant = "init";
+            auto series = new QPieSeries(this);
+
+            for (int i = 0; i < statsCo2.liste.size(); i++)
+            {
+                if (typeCourant == statsCo2.liste.at(i).activiteOuTypeDeVol)
+                {
+                    const double facteurDemission = recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation, 
+                                                                                parametresEmissionsCo2 );
+
+                    QPieSlice* pieSlice = new QPieSlice(statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres()*facteurDemission, 'f', 0) + " kgCO₂, ",
+                        statsCo2.liste.at(i).consommationEnLitres());
+                    series->append(pieSlice);
+                }
+                else
+                {
+                    if (typeCourant != "init")
+                    {
+                        donutBreakdown->addBreakdownSeries(series,
+                            recupererNouvelleCouleur(),
+                            p_parametres.tailleDePolice);
+                    }
+                    typeCourant = statsCo2.liste.at(i).activiteOuTypeDeVol;
+                    series = new QPieSeries(this);
+                    series->setName(typeCourant);
+
+                    const double facteurDemission = recupererFacteurDEmissions(statsCo2.liste.at(i).uniteTypeConsommation,
+                                                                               parametresEmissionsCo2);
+
+                    series->append(statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres() * facteurDemission, 'f', 0) + " kgCO₂, ",
+                        statsCo2.liste.at(i).consommationEnLitres());
+                }
+            }
+            if (series->count() > 0)
+            {
+                donutBreakdown->addBreakdownSeries(series,
+                    recupererNouvelleCouleur(),
+                    p_parametres.tailleDePolice);
+            }
+
+            createDefaultChartView("Répartition des émissions de CO₂",
+                p_legende,
+                Qt::AlignRight,
+                static_cast<int>(p_parametres.tailleDePolice * 1.5));
+
+            for (QPieSeries* currentSeries : donutBreakdown->series())
+            {
+                addSeriesToGraph(currentSeries);
+            }
+
+        }
+        break;
+    }  
+}
+
+const double StatistiqueDonutCombineWidget::recupererFacteurDEmissions(const AeroDmsTypes::UniteTypeConsommation p_uniteTypeConsommation, 
+    const AeroDmsTypes::ParametresEmissionsCo2 p_parametresEmissionsCo2)
+{
+    switch (p_uniteTypeConsommation)
+    {
+    case AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParLitreEssence;
+    }
+    break;
+    case AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParLitreGasoil;
+    }
+    break;
+    case AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParKwh;
+    }
+    break;
+    }
+    return 0;
 }
 
 QColor StatistiqueDonutCombineWidget::recupererNouvelleCouleur()

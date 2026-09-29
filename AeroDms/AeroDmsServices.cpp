@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -338,13 +338,11 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/information-slab-circle.svg");
         }
         break;
-
         case AeroDmsTypes::Icone_RATIO:
         {
             return QIcon(":/AeroDms/ressources/aspect-ratio.svg");
         }
         break;
-
         case AeroDmsTypes::Icone_STATS_BARRES_EMPILEES:
         {
             return QIcon(":/AeroDms/ressources/chart-bar-stacked.svg");
@@ -363,6 +361,36 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
         case AeroDmsTypes::Icone_STATS:
         {
             return QIcon(":/AeroDms/ressources/chart-areaspline.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_CO2:
+        {
+            return QIcon(":/AeroDms/ressources/molecule-co2.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_HORAIRE:
+        {
+            return QIcon(":/AeroDms/ressources/clock-outline.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_UNITAIRE:
+        {
+            return QIcon(":/AeroDms/ressources/numeric-1-circle-outline.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_ESSENCE:
+        {
+            return QIcon(":/AeroDms/ressources/barrel-outline.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_GASOIL_KEROSENE:
+        {
+            return QIcon(":/AeroDms/ressources/barrel.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_CARBURANT:
+        {
+            return QIcon(":/AeroDms/ressources/fuel.svg");
         }
         break;
 

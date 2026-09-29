@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -332,7 +332,21 @@ void ManageDb::lireParametres(AeroDmsTypes::ParametresMetier &p_parametresMetier
     p_parametresMetiers.plafondHoraireRemboursementEntrainement = lireParametreUnitaire("plafondHoraireRemboursementEntrainement");
     p_parametresMetiers.proportionRemboursementEntrainement = lireParametreUnitaire("proportionRemboursementEntrainement");
     p_parametresMetiers.montantCotisationPilote = lireParametreUnitaire("montantCotisationPilote");
-    p_parametresMetiers.montantSubventionEntrainement = lireParametreUnitaire("montantSubventionEntrainement");   
+    p_parametresMetiers.montantSubventionEntrainement = lireParametreUnitaire("montantSubventionEntrainement");
+
+    p_parametresMetiers.emissionsCo2 = lireParametresEmissionsCo2();
+}
+
+AeroDmsTypes::ParametresEmissionsCo2 ManageDb::lireParametresEmissionsCo2()
+{
+    AeroDmsTypes::ParametresEmissionsCo2 parametresCo2;
+
+    parametresCo2.kgCo2ParLitreEssence = lireParametreUnitaire("kgCo2ParLitreEssence");
+    parametresCo2.kgCo2ParLitreGasoil = lireParametreUnitaire("kgCo2ParLitreGasoil");
+    parametresCo2.kgCo2ParKwh = lireParametreUnitaire("kgCo2ParKwh");
+    parametresCo2.kgCo2IndirectsParHdv = lireParametreUnitaire("kgCo2IndirectsParHdv");
+
+    return parametresCo2;
 }
 
 const double ManageDb::lireParametreUnitaire(const QString &p_nomParametre)
@@ -364,6 +378,11 @@ void ManageDb::enregistrerParametres(const AeroDmsTypes::ParametresMetier& p_par
     enregistrerParametreUnitaire("proportionRemboursementEntrainement", p_parametresMetiers.proportionRemboursementEntrainement);
     enregistrerParametreUnitaire("montantCotisationPilote", p_parametresMetiers.montantCotisationPilote);
     enregistrerParametreUnitaire("montantSubventionEntrainement", p_parametresMetiers.montantSubventionEntrainement);
+
+    enregistrerParametreUnitaire("kgCo2ParLitreEssence", p_parametresMetiers.emissionsCo2.kgCo2ParLitreEssence);
+    enregistrerParametreUnitaire("kgCo2ParLitreGasoil", p_parametresMetiers.emissionsCo2.kgCo2ParLitreGasoil);
+    enregistrerParametreUnitaire("kgCo2ParKwh", p_parametresMetiers.emissionsCo2.kgCo2ParKwh);
+    enregistrerParametreUnitaire("kgCo2IndirectsParHdv", p_parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv);
 }
 
 void ManageDb::enregistrerParametreUnitaire(const QString & p_nomParametre,
@@ -1817,11 +1836,35 @@ const AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
         {
             aeronef.immatriculation = query.value("immatriculation").toString();
             aeronef.type = query.value("type").toString();
+            aeronef.emissionsSontCompensees = query.value("compensationCarbone").toBool();
             listeAeronefs.append(aeronef);
         }  
     }
 
     return listeAeronefs;
+}
+
+const AeroDmsTypes::ListeTypesAeronefs ManageDb::recupererListeTypesAeronefs()
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM aeronefTypes ORDER BY type");
+
+    query.exec();
+
+    AeroDmsTypes::ListeTypesAeronefs listeTypesAeronefs;
+
+    while (query.next())
+    {
+        AeroDmsTypes::TypeAeronef typeAeronef;
+        typeAeronef.type = query.value("type").toString();
+        typeAeronef.marque = query.value("marque").toString();
+		typeAeronef.consommation = query.value("consommation").toDouble();
+		typeAeronef.uniteTypeConsommation = AeroDmsTypes::uniteTypeConsommation(query.value("unite").toInt());
+        typeAeronef.typeDecompte = AeroDmsTypes::typeDecompte(query.value("decompte").toInt());
+        listeTypesAeronefs.append(typeAeronef);
+    }
+
+    return listeTypesAeronefs;
 }
 
 const QList<int> ManageDb::recupererAnnees()
@@ -2687,7 +2730,101 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
     return statsPilotes;
 }
 
-const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee, 
+const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissionsParTypeDeVol(const int p_annee,
+    const int p_options,
+    const AeroDmsTypes::Statistiques p_statDemandee)
+{
+    //TODO
+    AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2;
+    statsCo2.caracteristiqueDuChampActiviteOuTypeDeVol = p_statDemandee;
+
+    QString nomVue = "stats_emissionsCo2";
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        //TODO
+        nomVue = "stats_emissionsCo2";
+    }
+
+    QString clauseGroupBy = "";
+    QString clauseSelect = "";
+
+    switch (p_statDemandee)
+    {
+        case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
+        {
+            clauseGroupBy = " GROUP BY type, activite ORDER BY activite, type";
+            clauseSelect = "activite ";
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
+        default:
+        {
+            clauseGroupBy = " GROUP BY type, typeDeVol ORDER BY typeDeVol, type";
+            clauseSelect = "typeDeVol ";
+        }
+        break;
+    }
+
+    QString filtre = genererClauseFiltrageActivite(p_options);
+
+    QSqlQuery query;
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
+    {
+        query.prepare("SELECT "
+            + clauseSelect + "AS activiteOuTypeDeVol, "
+            "type, "
+            "consommation, "
+            "decompte, "
+            "unite, "
+            "SUM(tempsDeVol) AS tempsDeVol, "
+            "SUM(nbVols) AS nbVols "
+            "FROM " + nomVue + " "
+            "WHERE annee = :annee "
+            + (filtre != "" ? " AND " : "")
+            + filtre
+            + clauseGroupBy);
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT "
+            + clauseSelect + "AS activiteOuTypeDeVol, "
+            "type, "
+            "consommation, "
+            "decompte, "
+            "unite, "
+            "SUM(tempsDeVol) AS tempsDeVol, "
+            "SUM(nbVols) AS nbVols "
+            "FROM " + nomVue + " "
+            + (filtre != "" ? " WHERE " : "") 
+            + filtre
+            + clauseGroupBy);
+    }
+    
+    query.exec();
+
+    while (query.next())
+    {
+        AeroDmsTypes::StatsEmissionsCo2 stats;
+
+        stats.type = query.value("type").toString();
+        stats.nombreMinutesVol = query.value("tempsDeVol").toInt();
+        stats.nombreDeVols = query.value("nbVols").toInt();
+        stats.consommation = query.value("consommation").toInt();
+        stats.activiteOuTypeDeVol = query.value("activiteOuTypeDeVol").toString();
+        stats.uniteTypeConsommation = static_cast<AeroDmsTypes::UniteTypeConsommation>(query.value("unite").toInt());
+        stats.typeDecompte = static_cast<AeroDmsTypes::TypeDecompte>(query.value("decompte").toInt());
+
+        statsCo2.liste.append(stats);
+    }
+
+    return statsCo2;
+}
+
+const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee,
     const int p_options)
 {
     AeroDmsTypes::StatsAeronefs statsAeronefs;
@@ -2724,12 +2861,12 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
             "activite, "
             "SUM(tempsDeVol) AS tempsDeVol "
             "FROM " + nomVue + " "
-            + (filtre != "" ? " WHERE " : "") 
+            + (filtre != "" ? " WHERE " : "")
             + filtre +
             "GROUP BY immatriculation "
             "ORDER BY activite, type, immatriculation");
     }
-    
+
     query.exec();
 
     while (query.next())
@@ -2746,33 +2883,85 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
     return statsAeronefs;
 }
 
-void ManageDb::mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
-    const QString p_nouvelleValeur,
-    const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour )
+void ManageDb::mettreAJourTypeAeronef( const QString p_immatAeronefAMettreAJour,
+    const QString p_nouveauType )
 {
     QSqlQuery query;
-    bool requeteAExecuter = true;
 
-    switch (p_donneeAMettreAJour)
-    {
-        case AeroDmsTypes::AeronefTableElement_TYPE:
-        {
-            query.prepare("UPDATE aeronef SET type = :nouvelleValeur WHERE immatriculation = :immat");
-            break;
-        }
-        default:
-        {
-            requeteAExecuter = false;
-            break;
-        }
-    }
+    //On vérifie si le type existe
+    query.prepare("SELECT * FROM aeronefTypes WHERE type = :type");
+    query.bindValue(":type", p_nouveauType);
+    query.exec();
 
-    if (requeteAExecuter)
+    if (!query.next())
     {
-        query.bindValue(":nouvelleValeur", p_nouvelleValeur);
-        query.bindValue(":immat", p_immatAeronefAMettreAJour);
+        //Le type n'existe pas => on le créé
+        query.prepare("INSERT INTO aeronefTypes (type) VALUES (:type)");
+        query.bindValue(":type", p_nouveauType);
         query.exec();
+
+        QThread::msleep(delaisDeGardeBdd);
     }
+    
+    query.prepare("UPDATE aeronef SET type = :type WHERE immatriculation = :immat");
+    query.bindValue(":type", p_nouveauType);
+    query.bindValue(":immat", p_immatAeronefAMettreAJour);
+    query.exec();
+}
+
+void ManageDb::mettreAJourCompensationCarboneAeronef(const QString p_immatAeronefAMettreAJour,
+    const bool p_nouvelleCompensationCarbone)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE aeronef SET compensationCarbone = :compensationCarbone WHERE immatriculation = :immat");
+    query.bindValue(":compensationCarbone", p_nouvelleCompensationCarbone);
+    query.bindValue(":immat", p_immatAeronefAMettreAJour);
+    query.exec();
+}
+
+void ManageDb::mettreAJourConsommationTypeAeronef(const QString p_typeAeronefAMettreAJour,
+    const double p_nouvelleConsommation)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE aeronefTypes SET consommation = :consommation WHERE type = :type");
+    query.bindValue(":consommation", p_nouvelleConsommation);
+    query.bindValue(":type", p_typeAeronefAMettreAJour);
+    query.exec();
+}
+
+void ManageDb::mettreAJourUniteTypeAeronef(const QString p_typeAeronefAMettreAJour,
+    const AeroDmsTypes::UniteTypeConsommation p_nouvelleUnite)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE aeronefTypes SET unite = :unite WHERE type = :type");
+    query.bindValue(":unite", p_nouvelleUnite);
+    query.bindValue(":type", p_typeAeronefAMettreAJour);
+    query.exec();
+}
+
+void ManageDb::mettreAJourDecompteTypeAeronef(const QString p_typeAeronefAMettreAJour,
+    const AeroDmsTypes::TypeDecompte p_nouveauDecompte)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE aeronefTypes SET decompte = :decompte WHERE type = :type");
+    query.bindValue(":decompte", p_nouveauDecompte);
+    query.bindValue(":type", p_typeAeronefAMettreAJour);
+    query.exec();
+}
+
+void ManageDb::mettreAJourMarqueAeronef(const QString p_typeAeronefAMettreAJour,
+    const QString p_nouvelleMarque)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE aeronefTypes SET marque = :marque WHERE type = :type");
+    query.bindValue(":marque", p_nouvelleMarque);
+    query.bindValue(":type", p_typeAeronefAMettreAJour);
+    query.exec();
 }
 
 const AeroDmsTypes::ListeDetailsBaladesEtSorties ManageDb::recupererListeDetailsBaladesEtSorties(const int p_annee)

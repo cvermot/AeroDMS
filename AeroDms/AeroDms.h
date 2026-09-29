@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueAjouterCotisation.h"
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
+#include "DialogueGestionTypesAeronefs.h"
 #include "DialogueProgressionGenerationPdf.h"
 #include "StatistiqueWidget.h"
 
@@ -143,6 +144,7 @@ private:
     DialogueAjouterCotisation* dialogueAjouterCotisation = nullptr;
     DialogueAjouterSortie* dialogueAjouterSortie = nullptr;
     DialogueGestionAeronefs* dialogueGestionAeronefs = nullptr;
+    DialogueGestionTypesAeronefs* dialogueGestionTypesAeronefs = nullptr;
 
     QPdfDocument* pdfDocument = nullptr;
     QPdfView* pdfView = nullptr;
@@ -247,8 +249,10 @@ private:
     QAction* boutonGraphRecapAnnuelEurosParPilote = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol = nullptr;
     QAction* boutonGraphRecapAnnuelEurosParTypeDeVol = nullptr;
+    QAction* boutonGraphRecapAnnuelCo2ParTypeDeVol = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresParActivite = nullptr;
     QAction* boutonGraphRecapAnnuelEurosParActivite = nullptr;
+    QAction* boutonGraphRecapAnnuelCo2ParActivite = nullptr;
     QAction* boutonGraphRecapAnnuelStatutsDesPilotes = nullptr;
     QAction* boutonGraphRecapAnnuelAeronefs = nullptr;
     QAction* boutonGraphRecapAnnuelSelectionnerTousLesGraphs = nullptr;
@@ -298,6 +302,7 @@ private:
 
     QAction* boutonEditerLePiloteSelectionne = nullptr;
     QAction* boutonEditerUnAeroclub = nullptr;
+    QAction* boutonGestionTypesAeronefs = nullptr;
     QAction* boutonGestionAeronefs = nullptr;
     QAction* boutonMettreAJourAerodromes = nullptr;
 
@@ -384,6 +389,7 @@ public slots:
     void ajouterUneCotisation();
     void ajouterUneCotisationEnBdd();
     void ajouterUnAeroclub();
+    void ouvrirGestionTypesAeronefs();
     void ouvrirGestionAeronefs();
     void peuplerListesEtTables();
     void peuplerTablePilotes();

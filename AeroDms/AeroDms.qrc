@@ -143,5 +143,11 @@
         <file>ressources/HTML/RappelRegleSubventionSortie.html</file>
         <file>ressources/HTML/RappelRegleSubventionEntrainement.html</file>
         <file>ressources/HTML/RappelRegleSubventionBalade.html</file>
+        <file>ressources/numeric-1-circle-outline.svg</file>
+        <file>ressources/barrel-outline.svg</file>
+        <file>ressources/barrel.svg</file>
+        <file>ressources/clock-outline.svg</file>
+        <file>ressources/molecule-co2.svg</file>
+        <file>ressources/fuel.svg</file>
     </qresource>
 </RCC>

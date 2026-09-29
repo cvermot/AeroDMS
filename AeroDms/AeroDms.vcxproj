@@ -119,6 +119,7 @@
     <ClCompile Include="DialogueEditionParametres.cpp" />
     <ClCompile Include="DialogueGestionAeroclub.cpp" />
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
+    <ClCompile Include="DialogueGestionTypesAeronefs.cpp" />
     <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="DialogueProgressionImpression.cpp" />
     <ClCompile Include="GestionnaireDonneesEnLigne.cpp" />
@@ -169,6 +170,7 @@
     <QtMoc Include="DialogueGestionAeroclub.h" />
     <QtMoc Include="AixmParser.h" />
     <QtMoc Include="GestionnaireDonneesEnLigne.h" />
+    <QtMoc Include="DialogueGestionTypesAeronefs.h" />
     <ClInclude Include="RccGenerator.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />

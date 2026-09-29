@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on jeu. sept. 24 00:15:26 2026
+-- File generated with SQLiteStudio v3.4.4 on mer. sept. 30 00:49:13 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -23,13 +23,12 @@ CREATE TABLE IF NOT EXISTS aerodrome (identifiantOaci TEXT PRIMARY KEY NOT NULL 
 INSERT INTO aerodrome (identifiantOaci, nomAerodrome) VALUES ('LF', '  Aérodrome Inconnu');
 
 -- Table: aeronef
-CREATE TABLE IF NOT EXISTS aeronef (
-    immatriculation TEXT PRIMARY KEY
-                         UNIQUE,
-    type            TEXT DEFAULT Inconnu
-                         NOT NULL
-);
-INSERT INTO aeronef (immatriculation, type) VALUES (NULL, 'Inconnu');
+CREATE TABLE IF NOT EXISTS aeronef (immatriculation TEXT PRIMARY KEY UNIQUE, type TEXT DEFAULT Inconnu NOT NULL REFERENCES aeronefTypes (type), compensationCarbone NUMERIC DEFAULT (0));
+INSERT INTO aeronef (immatriculation, type, compensationCarbone) VALUES (NULL, 'Inconnu', 0);
+
+-- Table: aeronefTypes
+CREATE TABLE IF NOT EXISTS aeronefTypes (type TEXT PRIMARY KEY NOT NULL UNIQUE, marque TEXT, consommation NUMERIC DEFAULT (0), unite NUMERIC DEFAULT (0), decompte NUMERIC DEFAULT (0));
+INSERT INTO aeronefTypes (type, marque, consommation, unite, decompte) VALUES ('Inconnu', NULL, NULL, NULL, NULL);
 
 -- Table: cotisation
 CREATE TABLE IF NOT EXISTS cotisation (cotisationId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, annee INTEGER NOT NULL, montantSubventionAnnuelleEntrainement REAL, idRecette REFERENCES recettes (recetteId) UNIQUE NOT NULL, remarque TEXT);
@@ -57,6 +56,10 @@ INSERT INTO parametres (nom, info1, info2, info3) VALUES ('proportionRembourseme
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantCotisationPilote', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantSubventionEntrainement', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('miseAJour', NULL, NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreEssence', '0', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreGasoil', '0', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParKwh', '0', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2IndirectsParHdv', '0', NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -270,6 +273,23 @@ INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 WHERE vol.montantRembourse != 0
 GROUP BY vol.immatriculation, annee
 ORDER BY annee, activite, type, vol.immatriculation;
+
+-- View: stats_emissionsCo2
+CREATE VIEW IF NOT EXISTS stats_emissionsCo2 AS SELECT 
+vol.typeDeVol,
+vol.activite,
+aeronef.type,
+aeronefTypes.consommation,
+aeronefTypes.decompte,
+aeronefTypes.unite,
+COUNT(vol.volId) AS nbVols,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
+ORDER BY annee, aeronefTypes.type;
 
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 

@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,6 +35,10 @@ public:
         QWidget* parent = nullptr);
 
 private:
+    const int K_COLONNE_LABEL = 0;
+    const int K_COLONNE_CHAMP = 1;
+    const int K_COLONNE_BOUTON = 2;
+
     QTabWidget* onglets = nullptr;
     QLineEdit* imprimante = nullptr;
     QLineEdit* objetChequeDispo = nullptr;
@@ -76,6 +80,20 @@ private:
     QPushButton* boutonSelectionFactureATraiter = nullptr;
     QPushButton* boutonSelectionFacturesSaisies = nullptr;
     QPushButton* boutonSelectionSortieFichiersGeneres = nullptr;
+
+	QDoubleSpinBox* emissionsCo2ParLitreEssence = nullptr;
+    QDoubleSpinBox* emissionsCo2ParLitreGazole = nullptr;
+    QDoubleSpinBox* emissionsCo2ParKwh = nullptr;
+    QDoubleSpinBox* emissionsCo2IndirectesParHdV = nullptr;
+
+    void initialiserOngletMailing(const AeroDmsTypes::ParametresMetier & p_parametresMetiers);
+    void initialiserOngletFinancier(const AeroDmsTypes::ParametresMetier & p_parametresMetiers,
+        const AeroDmsTypes::ParametresSysteme & p_parametresSysteme);
+    void initialiserOngletImpression(const AeroDmsTypes::ParametresSysteme & p_parametresSysteme);
+    void initialiserOngletSysteme(const AeroDmsTypes::ParametresMetier & p_parametresMetiers, 
+        const AeroDmsTypes::ParametresSysteme & p_parametresSysteme,
+        const bool p_editionParametresCritiques);
+    void initialiserOngletEmissions(const AeroDmsTypes::ParametresMetier& p_parametresMetiers);
     
     void peuplerResolutionImpression(const int p_resolutionMax);
 

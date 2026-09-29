@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,31 +15,35 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /******************************************************************************/
-#ifndef DIALOGUEGESTIONAERONEFS_H
-#define DIALOGUEGESTIONAERONEFS_H
+#ifndef DIALOGUEGESTIONTYPESAERONEFS_H
+#define DIALOGUEGESTIONTYPESAERONEFS_H
 #include <QDialog>
 #include "ManageDb.h"
 
-class DialogueGestionAeronefs : public QDialog
+class DialogueGestionTypesAeronefs : public QDialog
 {
     Q_OBJECT
 
 public:
-    DialogueGestionAeronefs(ManageDb* db, 
+    DialogueGestionTypesAeronefs(ManageDb* db,
         QWidget* parent = nullptr);
 
-    void peuplerListeAeronefs();
+    void peuplerListeTypesAeronefs();
 
 private:
     ManageDb* database = nullptr;
 
-    QTableWidget* vueAeronefs = nullptr;
-    QVector<QCheckBox*>* listeCompensationCarbone = nullptr;
+    QTableWidget* vueTypesAeronefs = nullptr;
+    QVector<QComboBox*> *listeUniteTypeConso = nullptr;
+    QVector<QComboBox*> *listeTypeDecompte = nullptr;
+    QVector<QDoubleSpinBox*> *listeConsommation = nullptr;
 
 private slots:
-    void sauvegarderDonneesSaisies(const int p_ligne, 
+    void changementConsommation();
+    void changementUnite();
+    void changementRecurrence();
+    void changementDonneesTexte(const int p_ligne,
         const int p_colonne);
-    void changementCompensationCarbone();
 };
 
-#endif // DIALOGUEGESTIONAERONEFS_H
+#endif // DIALOGUEGESTIONTYPESAERONEFS_H

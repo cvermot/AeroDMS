@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -945,6 +945,7 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
         mettreAJourDonneesVersionMiniAction->setEnabled(!p_lectureSeuleEstDemandee);
 
         boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
+        boutonGestionTypesAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
         boutonGestionAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
         boutonMettreAJourAerodromes->setEnabled(!p_lectureSeuleEstDemandee);
 
@@ -1273,6 +1274,18 @@ void AeroDms::initialiserBarreDeFiltres()
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT),
         tr("Types d'aéronefs"),
         AeroDmsTypes::Statistiques_AERONEFS);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CARBURANT),
+        tr("Consommation par type de vol"),
+        AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CARBURANT),
+        tr("Consommation par activité"),
+        AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
+        tr("CO₂ par type de vol"),
+        AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL);
+    listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
+        tr("CO₂ par activité"),
+        AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE);
 
     connect(listeDeroulanteStatistique, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerStatistiques);
     actionListeDeroulanteStatistique = selectionToolBar->addWidget(listeDeroulanteStatistique);
@@ -1298,6 +1311,7 @@ void AeroDms::initialiserBoitesDeDialogues()
     connect(dialogueAjouterSortie, SIGNAL(accepted()), this, SLOT(ajouterUneSortieEnBdd()));
 
     dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
+    dialogueGestionTypesAeronefs = new DialogueGestionTypesAeronefs(db, this);
 
     //Gestion des signaux liés à la génération PDF
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
@@ -1459,6 +1473,12 @@ void AeroDms::initialiserMenuOptions()
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParTypeDeVol);
     boutonGraphRecapAnnuelEurosParTypeDeVol->setCheckable(true);
 
+    boutonGraphRecapAnnuelCo2ParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
+        tr("Émissions CO₂ par type de vol"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelCo2ParTypeDeVol);
+    boutonGraphRecapAnnuelCo2ParTypeDeVol->setCheckable(true);
+
     boutonGraphRecapAnnuelHeuresParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_CAMEMBERT), 
         tr("Heures par &activité"), 
         this);
@@ -1470,6 +1490,12 @@ void AeroDms::initialiserMenuOptions()
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParActivite);
     boutonGraphRecapAnnuelEurosParActivite->setCheckable(true);
+
+    boutonGraphRecapAnnuelCo2ParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
+        tr("Émissions CO₂ par activité"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelCo2ParActivite);
+    boutonGraphRecapAnnuelCo2ParActivite->setCheckable(true);
 
     boutonGraphRecapAnnuelStatutsDesPilotes = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_DONUT), 
         tr("&Statuts des pilotes"), 
@@ -1489,8 +1515,10 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphRecapAnnuelEurosParPilote, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelHeuresParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelEurosParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelCo2ParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelHeuresParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelEurosParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelCo2ParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelStatutsDesPilotes, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelAeronefs, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
         
@@ -1785,6 +1813,11 @@ void AeroDms::initialiserMenuOutils()
 
     menuOutils->addSeparator();
 
+    boutonGestionTypesAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les types d'aéronefs"), this);
+    boutonGestionTypesAeronefs->setStatusTip(tr("Permet de gérer les types d'aéronefs connus par le logiciel (à des fins statistiques, notamment calcul CO₂)"));
+    menuOutils->addAction(boutonGestionTypesAeronefs);
+    connect(boutonGestionTypesAeronefs, SIGNAL(triggered()), this, SLOT(ouvrirGestionTypesAeronefs()));
+
     boutonGestionAeronefs = new QAction(QIcon(":/AeroDms/ressources/airplane-cog.svg"), tr("Gérer les aé&ronefs"), this);
     boutonGestionAeronefs->setStatusTip(tr("Permet d'indiquer le type associé à chaque immatriculation connue par le logiciel (à des fins statistiques)"));
     menuOutils->addAction(boutonGestionAeronefs);
@@ -2036,8 +2069,10 @@ void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
     boutonGraphRecapAnnuelEurosParPilote->setChecked(true);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelEurosParTypeDeVol->setChecked(true);
+    boutonGraphRecapAnnuelCo2ParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelHeuresParActivite->setChecked(true);
     boutonGraphRecapAnnuelEurosParActivite->setChecked(true);
+    boutonGraphRecapAnnuelCo2ParActivite->setChecked(true);
     boutonGraphRecapAnnuelStatutsDesPilotes->setChecked(true);
     boutonGraphRecapAnnuelAeronefs->setChecked(true);
 }
@@ -2135,42 +2170,22 @@ void AeroDms::peuplerStatistiques()
                 options);
             break;
         }
+
         case AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE:
-        {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
-                listeDeroulanteAnnee->currentData().toInt(), 
-                AeroDmsTypes::Statistiques_HEURES_PAR_PILOTE, 
-                m_contentArea,
-                options);
-            break;
-        }
+        case AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL:
         case AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE:
-        {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
-                listeDeroulanteAnnee->currentData().toInt(),
-                AeroDmsTypes::Statistiques_EUROS_PAR_PILOTE,
-                m_contentArea,
-                options);
-            break;
-        }
         case AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
                 listeDeroulanteAnnee->currentData().toInt(), 
-                AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE, 
+                static_cast<AeroDmsTypes::Statistiques>(listeDeroulanteStatistique->currentData().toInt()),
                 m_contentArea,
                 options);
             break;
         }
-        case AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE:
-        {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
-                listeDeroulanteAnnee->currentData().toInt(),
-                AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE,
-                m_contentArea,
-                options);
-            break;
-        }
+        
         case AeroDmsTypes::Statistiques_STATUTS_PILOTES:
         {
             m_activeWidget = new StatistiqueDonuts( db,
@@ -2178,25 +2193,21 @@ void AeroDms::peuplerStatistiques()
                 m_contentArea);
             break;
         }
+
         case AeroDmsTypes::Statistiques_AERONEFS:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
+        case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
         {
             m_activeWidget = new StatistiqueDonutCombineWidget( db,
-                AeroDmsTypes::Statistiques_AERONEFS,
+                static_cast<AeroDmsTypes::Statistiques>(listeDeroulanteStatistique->currentData().toInt()),
                 m_contentArea,
                 listeDeroulanteAnnee->currentData().toInt(),
                 options);
             break;
         }
-        case AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL:
-        {
-            m_activeWidget = new StatistiqueDiagrammeCirculaireWidget( db, 
-                listeDeroulanteAnnee->currentData().toInt(), 
-                AeroDmsTypes::Statistiques_HEURES_PAR_TYPE_DE_VOL, 
-                m_contentArea,
-                options);
-            break;
-        }
-        case AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL:
+        
         default:
         {
             m_activeWidget = new StatistiqueDiagrammeCirculaireWidget(db,
@@ -3976,6 +3987,12 @@ void AeroDms::ouvrirGestionAeronefs()
     dialogueGestionAeronefs->exec();
 }
 
+void AeroDms::ouvrirGestionTypesAeronefs()
+{
+    dialogueGestionTypesAeronefs->peuplerListeTypesAeronefs();
+    dialogueGestionTypesAeronefs->exec();
+}
+
 void AeroDms::aPropos()
 {
     QDate date = QDate::fromString(__DATE__, "MMM dd yyyy");
@@ -5222,6 +5239,10 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL;
     }
+    if (boutonGraphRecapAnnuelCo2ParTypeDeVol->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE;
+    }
     if (boutonGraphRecapAnnuelHeuresParActivite->isChecked())
     {
         valeur = valeur + AeroDmsTypes::Statistiques_HEURES_PAR_ACTIVITE;
@@ -5229,6 +5250,10 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     if (boutonGraphRecapAnnuelEurosParActivite->isChecked())
     {
         valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE;
+    }
+    if (boutonGraphRecapAnnuelCo2ParActivite->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE;
     }
     if (boutonGraphRecapAnnuelStatutsDesPilotes->isChecked())
     {
@@ -5238,6 +5263,7 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Statistiques_AERONEFS;
     }
+    //TODO ajouter les graphs CO2
 
     if (boutonGraphResolutionFullHd->isChecked())
     {

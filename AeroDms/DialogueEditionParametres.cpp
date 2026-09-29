@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -28,10 +28,6 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     const bool p_editionParametresCritiques,
     QWidget* parent) : QDialog(parent)
 {
-    const int K_COLONNE_LABEL = 0;
-    const int K_COLONNE_CHAMP = 1;
-    const int K_COLONNE_BOUTON = 2;
-
     setWindowTitle(QApplication::applicationName() + " - " + tr("Paramètres"));
 
     QGridLayout* mainLayout = new QGridLayout(this);
@@ -40,12 +36,37 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     onglets = new QTabWidget(this);
     mainLayout->addWidget(onglets, 0, 0, 10, 2);
 
+    initialiserOngletMailing(p_parametresMetiers);
+	initialiserOngletFinancier(p_parametresMetiers, p_parametresSysteme);
+    initialiserOngletImpression(p_parametresSysteme);
+    initialiserOngletSysteme(p_parametresMetiers, p_parametresSysteme, p_editionParametresCritiques);
+    initialiserOngletEmissions(p_parametresMetiers);
+
+    QPushButton *cancelButton = new QPushButton(tr("&Annuler"), this);
+    cancelButton->setDefault(false);
+    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+
+    QPushButton* okButton = new QPushButton(tr("&Enregistrer"), this);
+    okButton->setDefault(true);
+    connect(okButton, SIGNAL(clicked()), this, SLOT(enregistrerParametres()));
+
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
+    buttonBox->addButton(cancelButton, QDialogButtonBox::ActionRole);
+    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
+
+    mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
+
+    resize(800, onglets->widget(0)->sizeHint().height());
+}
+
+void DialogueEditionParametres::initialiserOngletMailing(const AeroDmsTypes::ParametresMetier & p_parametresMetiers)
+{
     //Mailing
     QGridLayout* mailingLayout = new QGridLayout();
     QWidget* mailingWidget = new QWidget(this);
     mailingWidget->setLayout(mailingLayout);
-    onglets->addTab(mailingWidget, 
-        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING), 
+    onglets->addTab(mailingWidget,
+        AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MAILING),
         tr("Mailing"));
 
     int ligneActuelle = mailingLayout->rowCount();
@@ -103,14 +124,18 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     mailingLayout->addWidget(objetAutresMailings, ligneActuelle, K_COLONNE_CHAMP);
 
     objetAutresMailings->setText(p_parametresMetiers.objetMailAutresMailings);
+}
 
+void DialogueEditionParametres::initialiserOngletFinancier(const AeroDmsTypes::ParametresMetier& p_parametresMetiers,
+    const AeroDmsTypes::ParametresSysteme& p_parametresSysteme)
+{
     //Eléments financiers
     QGridLayout* financeLayout = new QGridLayout();
     QWidget* financeWidget = new QWidget(this);
     financeWidget->setLayout(financeLayout);
-    onglets->addTab(financeWidget, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER), "Financiers");
+    onglets->addTab(financeWidget, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_FINANCIER), "Financier");
 
-    ligneActuelle = financeLayout->rowCount();
+    int ligneActuelle = financeLayout->rowCount();
     montantCotisationPilote = new QDoubleSpinBox(this);
     montantCotisationPilote->setSuffix(" €");
     financeLayout->addWidget(new QLabel(tr("Montant cotisation pilote : "), this), ligneActuelle, K_COLONNE_LABEL);
@@ -143,7 +168,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     financeLayout->addWidget(new QLabel(tr("Proportion remboursement entraînement : "), this), ligneActuelle, K_COLONNE_LABEL);
     financeLayout->addWidget(proportionRemboursementEntrainement, ligneActuelle, K_COLONNE_CHAMP);
 
-    proportionRemboursementEntrainement->setValue(p_parametresMetiers.proportionRemboursementEntrainement*100);  
+    proportionRemboursementEntrainement->setValue(p_parametresMetiers.proportionRemboursementEntrainement * 100);
 
     ligneActuelle = financeLayout->rowCount();
     proportionRemboursementBalade = new QDoubleSpinBox(this);
@@ -153,7 +178,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     financeLayout->addWidget(new QLabel(tr("Proportion remboursement balades : "), this), ligneActuelle, K_COLONNE_LABEL);
     financeLayout->addWidget(proportionRemboursementBalade, ligneActuelle, K_COLONNE_CHAMP);
 
-    proportionRemboursementBalade->setValue(p_parametresMetiers.proportionRemboursementBalade *100);
+    proportionRemboursementBalade->setValue(p_parametresMetiers.proportionRemboursementBalade * 100);
 
     ligneActuelle = financeLayout->rowCount();
     proportionParticipationBalade = new QDoubleSpinBox(this);
@@ -181,13 +206,19 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     autoriserVirement->setChecked(p_parametresSysteme.autoriserReglementParVirement);
 
+    ligneActuelle = financeLayout->rowCount();
+    financeLayout->setRowStretch(ligneActuelle, 1);
+}
+
+void DialogueEditionParametres::initialiserOngletImpression(const AeroDmsTypes::ParametresSysteme& p_parametresSysteme)
+{
     //Eléments impression
     QGridLayout* impressionLayout = new QGridLayout();
     QWidget* impressionWidget = new QWidget(this);
     impressionWidget->setLayout(impressionLayout);
     onglets->addTab(impressionWidget, QIcon(":/AeroDms/ressources/printer-pos-cog.svg"), "Impression");
 
-    ligneActuelle = impressionLayout->rowCount();
+    int ligneActuelle = impressionLayout->rowCount();
     imprimante = new QLineEdit(this);
     imprimante->setEnabled(false);
     imprimante->setToolTip(tr("Imprimante par défaut qui sera sélectionnée par le logiciel lors des demandes d'impression."));
@@ -259,6 +290,14 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     margesGaucheDroite->setValue(p_parametresSysteme.margesGaucheDroite);
 
+    ligneActuelle = impressionLayout->rowCount();
+    impressionLayout->setRowStretch(ligneActuelle, 1);
+}
+
+void DialogueEditionParametres::initialiserOngletSysteme(const AeroDmsTypes::ParametresMetier& p_parametresMetiers, 
+    const AeroDmsTypes::ParametresSysteme& p_parametresSysteme,
+    const bool p_editionParametresCritiques)
+{
     //Paramètres système
     const QString texteToolTipChampSecurise = "Ce champ n'est pas éditable par sécurité.\nPour le rendre éditable, passer en mode débogage (menu Aide/Activer le mode débogage).";
 
@@ -266,6 +305,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
     QWidget* systemeWidget = new QWidget(this);
     systemeWidget->setLayout(systemeLayout);
     onglets->addTab(systemeWidget, QIcon(":/AeroDms/ressources/database-cog.svg"), "Système");
+    int ligneActuelle = systemeLayout->rowCount();
 
     cheminBdd = new QLineEdit(this);
     cheminBdd->setToolTip(tr("Localisation de la base de données SQLite utilisée par le logiciel.\n\n") + texteToolTipChampSecurise);
@@ -329,7 +369,7 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     ligneActuelle = systemeLayout->rowCount();
     modeFonctionnementLogiciel = new QComboBox(this);
-    modeFonctionnementLogiciel->setToolTip(tr("Ce parametre permet d'utiliser le logiciel en mode interne pur ou en mode externe. En mode externe, les données et base de données sont uploadées sur un serveur distant, ce qui permet d'acceder aux données du logiciel en dehors de l'entreprise") );
+    modeFonctionnementLogiciel->setToolTip(tr("Ce parametre permet d'utiliser le logiciel en mode interne pur ou en mode externe. En mode externe, les données et base de données sont uploadées sur un serveur distant, ce qui permet d'acceder aux données du logiciel en dehors de l'entreprise"));
     systemeLayout->addWidget(new QLabel(tr("Mode de fonctionnement : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(modeFonctionnementLogiciel, ligneActuelle, K_COLONNE_CHAMP);
     modeFonctionnementLogiciel->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE_EXTERNE), tr("Mode interne uniquement"), AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT);
@@ -409,21 +449,54 @@ DialogueEditionParametres::DialogueEditionParametres(const AeroDmsTypes::Paramet
 
     periodiciteVerificationNouvellesFactures->setValue(p_parametresSysteme.periodiciteVerificationPresenceFactures);
 
-    QPushButton *cancelButton = new QPushButton(tr("&Annuler"), this);
-    cancelButton->setDefault(false);
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
+    ligneActuelle = systemeLayout->rowCount();
+    systemeLayout->setRowStretch(ligneActuelle, 1);
+}
 
-    QPushButton* okButton = new QPushButton(tr("&Enregistrer"), this);
-    okButton->setDefault(true);
-    connect(okButton, SIGNAL(clicked()), this, SLOT(enregistrerParametres()));
+void DialogueEditionParametres::initialiserOngletEmissions(const AeroDmsTypes::ParametresMetier& p_parametresMetiers)
+{
+    QGridLayout* emissionsLayout = new QGridLayout();
+    QWidget* emissionsWidget = new QWidget(this);
+    emissionsWidget->setLayout(emissionsLayout);
+    onglets->addTab(emissionsWidget, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2), "Émissions");
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(Qt::Horizontal, this);
-    buttonBox->addButton(cancelButton, QDialogButtonBox::ActionRole);
-    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
+    int ligneActuelle = emissionsLayout->rowCount();
+    emissionsCo2ParLitreEssence = new QDoubleSpinBox(this);
+    emissionsCo2ParLitreEssence->setSuffix(" kgCO₂/L");
+    emissionsLayout->addWidget(new QLabel(tr("Émissions de CO₂ liées à la combustion d'un litre d'essence : "), this), ligneActuelle, K_COLONNE_LABEL);
+    emissionsLayout->addWidget(emissionsCo2ParLitreEssence, ligneActuelle, K_COLONNE_CHAMP);
 
-    mainLayout->addWidget(buttonBox, mainLayout->rowCount(), 0, 1, 2);
+    emissionsCo2ParLitreEssence->setValue(p_parametresMetiers.emissionsCo2.kgCo2ParLitreEssence);
 
-    resize(800, onglets->widget(0)->sizeHint().height());
+    ligneActuelle = emissionsLayout->rowCount();
+    emissionsCo2ParLitreGazole = new QDoubleSpinBox(this);
+    emissionsCo2ParLitreGazole->setSuffix(" kgCO₂/L");
+    emissionsLayout->addWidget(new QLabel(tr("Émissions de CO₂ liées à la combustion d'un litre de gasoil/kérosène : "), this), ligneActuelle, K_COLONNE_LABEL);
+    emissionsLayout->addWidget(emissionsCo2ParLitreGazole, ligneActuelle, K_COLONNE_CHAMP);
+
+    emissionsCo2ParLitreGazole->setValue(p_parametresMetiers.emissionsCo2.kgCo2ParLitreGasoil);
+
+    ligneActuelle = emissionsLayout->rowCount();
+    emissionsCo2ParKwh = new QDoubleSpinBox(this);
+    emissionsCo2ParKwh->setSuffix(" kgCO₂/kWh");
+    emissionsLayout->addWidget(new QLabel(tr("Émissions de CO₂ liées à la production d'un kWh d'éléctricité : "), this), ligneActuelle, K_COLONNE_LABEL);
+    emissionsCo2ParKwh->setDecimals(3);
+    emissionsLayout->addWidget(emissionsCo2ParKwh, ligneActuelle, K_COLONNE_CHAMP);
+
+    emissionsCo2ParKwh->setValue(p_parametresMetiers.emissionsCo2.kgCo2ParKwh);
+
+    ligneActuelle = emissionsLayout->rowCount();
+    emissionsCo2IndirectesParHdV = new QDoubleSpinBox(this);
+    emissionsCo2IndirectesParHdV->setSuffix(" kgCO₂/heure de vol");
+    emissionsCo2IndirectesParHdV->setDecimals(3);
+    emissionsCo2IndirectesParHdV->setToolTip(tr("Cette valeur permet de prendre en compte les émissions indirectes liées\nà la fabrication des aéronefs, la maintanence, la déplacement des équipages\net passagers."));
+    emissionsLayout->addWidget(new QLabel(tr("Émissions de CO₂ indirectes par HdV : "), this), ligneActuelle, K_COLONNE_LABEL);
+    emissionsLayout->addWidget(emissionsCo2IndirectesParHdV, ligneActuelle, K_COLONNE_CHAMP);
+
+    emissionsCo2IndirectesParHdV->setValue(p_parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv);
+
+    ligneActuelle = emissionsLayout->rowCount();
+    emissionsLayout->setRowStretch(ligneActuelle, 1);
 }
 
 void DialogueEditionParametres::selectionnerImprimante()
@@ -524,6 +597,10 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresMetiers.proportionRemboursementBalade = proportionRemboursementBalade->value()/100;
     parametresMetiers.plafondHoraireRemboursementEntrainement = plafondHoraireRemboursementEntrainement->value();
     parametresMetiers.proportionParticipationBalade = proportionParticipationBalade->value()/100;
+    parametresMetiers.emissionsCo2.kgCo2ParLitreEssence = emissionsCo2ParLitreEssence->value();
+    parametresMetiers.emissionsCo2.kgCo2ParLitreGasoil = emissionsCo2ParLitreGazole->value();
+    parametresMetiers.emissionsCo2.kgCo2ParKwh = emissionsCo2ParKwh->value();
+    parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv = emissionsCo2IndirectesParHdV->value();
     parametresMetiers.nomTresorier = nomTresorier->text();
     parametresMetiers.delaisDeGardeBdd = delaisGardeBdd->value();
     parametresMetiers.objetMailDispoCheques = objetChequeDispo->text();

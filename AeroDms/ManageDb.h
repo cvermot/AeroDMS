@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ public:
     bool ouvrirLaBdd(const QString& p_database);
     void lireParametres(AeroDmsTypes::ParametresMetier& p_parametresMetiers,
         AeroDmsTypes::ParametresSysteme& p_parametresSysteme);
+    AeroDmsTypes::ParametresEmissionsCo2 lireParametresEmissionsCo2();
     void enregistrerParametres(const AeroDmsTypes::ParametresMetier& p_parametresMetiers,
         const AeroDmsTypes::ParametresSysteme& p_parametresSysteme);
 
@@ -130,6 +131,7 @@ public:
         const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE);
 
     const AeroDmsTypes::ListeAeronefs recupererListeAeronefs();
+    const AeroDmsTypes::ListeTypesAeronefs recupererListeTypesAeronefs();
     const QList<int> recupererAnnees();
     const QList<int> recupererAnneesAvecVolNonSoumis(const int p_annee);
     const AeroDmsTypes::ListeSortie recupererListeSorties();
@@ -159,6 +161,9 @@ public:
         const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
+    const AeroDmsTypes::ListeStatsEmissionsCo2 recupererStatsEmissionsParTypeDeVol(const int p_annee,
+        const int p_options,
+        const AeroDmsTypes::Statistiques p_statDemandee);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParCheque();
@@ -172,9 +177,21 @@ public:
 
     const AeroDmsTypes::StatsPilotes recupererStatsPilotes();
 
-    void mettreAJourDonneesAeronefs( const QString p_immatAeronefAMettreAJour,
-        const QString p_nouvelleValeur,
-        const AeroDmsTypes::AeronefTableElement p_donneeAMettreAJour);
+    //méthodes de mise à jour des champs de la table aeronef
+    void mettreAJourTypeAeronef( const QString p_immatAeronefAMettreAJour,
+        const QString p_nouveauType);
+    void mettreAJourCompensationCarboneAeronef(const QString p_immatAeronefAMettreAJour,
+        const bool p_nouvelleCompensationCarbone);
+
+    //méthodes de mise à jour des champs de la table aeronefTypes
+    void mettreAJourConsommationTypeAeronef(const QString p_typeAeronefAMettreAJour,
+        const double p_nouvelleConsommation);
+    void mettreAJourUniteTypeAeronef(const QString p_typeAeronefAMettreAJour,
+        const AeroDmsTypes::UniteTypeConsommation p_nouvelleUnite);
+    void mettreAJourDecompteTypeAeronef(const QString p_typeAeronefAMettreAJour,
+        const AeroDmsTypes::TypeDecompte p_nouveauDecompte);
+    void mettreAJourMarqueAeronef(const QString p_typeAeronefAMettreAJour,
+        const QString p_nouvelleMarque);
 
     const bool volSembleExistantEnBdd(const QString p_idPilote,
         const int p_duree, 

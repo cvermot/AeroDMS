@@ -1,6 +1,6 @@
 /******************************************************************************\
 <AeroDms : logiciel de gestion compta section aéronautique>
-Copyright (C) 2023-2025 Clément VERMOT-DESROCHES (clement@vermot.net)
+Copyright (C) 2023-2026 Clément VERMOT-DESROCHES (clement@vermot.net)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ class AeroDmsTypes
 {
 public:
 
-    enum PiloteTableElement {
+    enum PiloteTableElement 
+    {
         PiloteTableElement_NOM = 0x0,
         PiloteTableElement_PRENOM = 0x1,
         PiloteTableElement_AEROCLUB = 0x2,
@@ -44,7 +45,8 @@ public:
         PiloteTableElement_NB_COLONNES = 0xE,
     };
 
-    enum VolsDetectesTableElement {
+    enum VolsDetectesTableElement 
+    {
         VolsDetectesTableElement_DATE = 0x0,
         VolsDetectesTableElement_DUREE = 0x1,
         VolsDetectesTableElement_MONTANT = 0x2,
@@ -53,7 +55,8 @@ public:
         VolsDetectesTableElement_NB_COLONNES = 0x5,
     };
 
-    enum VolTableElement {
+    enum VolTableElement 
+    {
         VolTableElement_PILOTE = 0x0,
         VolTableElement_DATE = 0x1,
         VolTableElement_TYPE_DE_VOL = 0x2,
@@ -69,7 +72,8 @@ public:
         VolTableElement_NB_COLONNES = 0xC,
     };
 
-    enum FactureTableElement {
+    enum FactureTableElement 
+    {
         FactureTableElement_INTITULE = 0x0,
         FactureTableElement_MONTANT = 0x1,
         FactureTableElement_PAYEUR = 0x2,
@@ -83,7 +87,8 @@ public:
         FactureTableElement_NB_COLONNES = 0xA,
     };
 
-    enum SubventionDemandeeTableElement {
+    enum SubventionDemandeeTableElement 
+    {
         SubventionDemandeeTableElement_DATE = 0x0,
         SubventionDemandeeTableElement_PILOTE = 0x1,
         SubventionDemandeeTableElement_BENEFICIAIRE = 0x2,
@@ -96,7 +101,8 @@ public:
         SubventionDemandeeTableElementTableElement_NB_COLONNES = 0x9,
     };
 
-    enum RecetteTableElement {
+    enum RecetteTableElement 
+    {
         RecetteTableElement_DATE = 0x0,
         RecetteTableElement_TYPE_DE_RECETTE = 0x1,
         RecetteTableElement_INTITULE = 0x2,
@@ -106,19 +112,33 @@ public:
         RecetteTableElement_NB_COLONNES = 0x6,
     };
 
-    enum AeronefTableElement {
+    enum AeronefTableElement 
+    {
         AeronefTableElement_IMMAT = 0x0,
         AeronefTableElement_TYPE = 0x1,
-        AeronefTableElement_NB_COLONNES = 0x2,
+        AeronefTableElement_COMPENSATION_CARBONE = 0x2,
+        AeronefTableElement_NB_COLONNES = 0x3,
     };
 
-    enum ResultatCreationBdd {
+    enum AeronefTypeTableElement 
+    {
+        AeronefTypeTableElement_TYPE_AERONEF = 0x0,
+        AeronefTypeTableElement_MARQUE_AERONEF = 0x1,
+        AeronefTypeTableElement_CONSOMMATION = 0x2,
+        AeronefTypeTableElement_UNITE_TYPE_CONSOMMATION = 0x3,
+        AeronefTypeTableElement_TYPE_DECOMPTE = 0x4,
+        AeronefTypeTableElement_NB_COLONNES = 0x5,
+    };
+
+    enum ResultatCreationBdd 
+    {
         ResultatCreationBdd_SUCCES = 0x0,
         ResultatCreationBdd_ELEMENT_EXISTE = 0x1,
         ResultatCreationBdd_AUTRE = 0x2
     };
 
-    enum PdfTypeDeDemande {
+    enum PdfTypeDeDemande 
+    {
         PdfTypeDeDemande_RECAP_ANNUEL,
         PdfTypeDeDemande_HEURE_DE_VOL,
         PdfTypeDeDemande_COTISATION,
@@ -126,12 +146,14 @@ public:
         PdfTypeDeDemande_FACTURE
     };
 
-    enum Unites {
+    enum Unites 
+    {
         Unites_HEURES,
         Unites_EUROS
     };
 
-    enum EtapeChargementBdd {
+    enum EtapeChargementBdd 
+    {
         EtapeChargementBdd_DEMANDE_SHA256 = 0,
         EtapeChargementBdd_DEMANDE_SHA256_CONNEXION,
         EtapeChargementBdd_DEMANDE_SHA256_RECU,
@@ -146,29 +168,34 @@ public:
     };
     static const QString recupererChaineEtapeChargementBdd(EtapeChargementBdd p_etape);
 
-    enum Statistiques {                              //     RESO|STATS
-        Statistiques_HEURES_ANNUELLES       = 0x1,   //     XXXX|0000 0000 0001
-        Statistiques_HEURES_PAR_PILOTE      = 0x2,   //     XXXX|0000 0000 0010
-        Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,   //     XXXX|0000 0000 0100
-        Statistiques_HEURES_PAR_ACTIVITE    = 0x8,   //     XXXX|0000 0000 1000
-        Statistiques_STATUTS_PILOTES        = 0x10,  //     XXXX|0000 0001 0000
-        Statistiques_AERONEFS               = 0x20,  //     XXXX|0000 0010 0000
-        Statistiques_EUROS_PAR_PILOTE       = 0x40,  //     XXXX|0000 0100 0000
-        Statistiques_EUROS_PAR_TYPE_DE_VOL  = 0x80,  //     XXXX|0000 1000 0000
-        Statistiques_EUROS_PAR_ACTIVITE     = 0x100  //     XXXX|0001 0000 0000
+    enum Statistiques {                              //    RESO|STATS
+        Statistiques_HEURES_ANNUELLES       = 0x1,   //     XXX|0 0000 0000 0001
+        Statistiques_HEURES_PAR_PILOTE      = 0x2,   //     XXX|0 0000 0000 0010
+        Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,   //     XXX|0 0000 0000 0100
+        Statistiques_HEURES_PAR_ACTIVITE    = 0x8,   //     XXX|0 0000 0000 1000
+        Statistiques_STATUTS_PILOTES        = 0x10,  //     XXX|0 0000 0001 0000
+        Statistiques_AERONEFS               = 0x20,  //     XXX|0 0000 0010 0000
+        Statistiques_EUROS_PAR_PILOTE       = 0x40,  //     XXX|0 0000 0100 0000
+        Statistiques_EUROS_PAR_TYPE_DE_VOL  = 0x80,  //     XXX|0 0000 1000 0000
+        Statistiques_EUROS_PAR_ACTIVITE     = 0x100, //     XXX|0 0001 0000 0000
+        Statistiques_CONSO_PAR_TYPE_DE_VOL  = 0x200, //     XXX|0 0010 0000 0000
+        Statistiques_CONSO_PAR_ACTIVITE     = 0x400, //     XXX|0 0100 0000 0000
+        Statistiques_CO2_PAR_TYPE_DE_VOL    = 0x800, //     XXX|0 1000 0000 0000
+        Statistiques_CO2_PAR_ACTIVITE       = 0x1000 //     XXX|1 0000 0000 0000
     };
 
                                      //Encodage vers PdrRenderer : 4 bits pour la résolution puis 12 bits pour la stats
-    enum Resolution {                //                     RESO|STATS
-        Resolution_Full_HD           = 0x4000, //1920x1080  0100|XXXX XXXX XXXX
-        Resolution_QHD               = 0x8000, //2560x1440  1000|XXXX XXXX XXXX
-        Resolution_4K                = 0xC000, //3840x2160  1100|XXXX XXXX XXXX
-        Resolution_RATIO_16_9        = 0x2000, //           0010|XXXX XXXX XXXX
-        Resolution_MASQUE_RESOLUTION = 0xC000, //           1100|0000 0000 0000
-        Resolution_MASQUE_RATIO      = 0x2000  //           0010|0000 0000 0000
+    enum Resolution {                //                    RESO|STATS
+        Resolution_Full_HD           = 0x4000, //1920x1080  010|X XXXX XXXX XXXX
+        Resolution_QHD               = 0x8000, //2560x1440  100|X XXXX XXXX XXXX
+        Resolution_4K                = 0xC000, //3840x2160  110|X XXXX XXXX XXXX
+        Resolution_RATIO_16_9        = 0x2000, //           001|X XXXX XXXX XXXX
+        Resolution_MASQUE_RESOLUTION = 0xC000, //           110|X XXXX XXXX XXXX
+        Resolution_MASQUE_RATIO      = 0x2000  //           001|X XXXX XXXX XXXX
     };
 
-    enum OptionsDonneesStatistiques {
+    enum OptionsDonneesStatistiques 
+    {
         OptionsDonneesStatistiques_TOUS_LES_VOLS                   = 0x0,
         OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT   = 0x1,
         OptionsDonneesStatistiques_EXCLURE_PLANEUR                 = 0x2,
@@ -177,25 +204,29 @@ public:
         OptionsDonneesStatistiques_EXCLURE_AVION                   = 0x10,
     };
 
-    enum ElementSoumis {
+    enum ElementSoumis 
+    {
         ElementSoumis_TOUS_LES_ELEMENTS,
         ElementSoumis_ELEMENTS_SOUMIS,
         ElementSoumis_ELEMENTS_NON_SOUMIS
     };
 
-    enum Signature {
+    enum Signature 
+    {
         Signature_SANS,
         Signature_MANUSCRITE_IMAGE,
         Signature_NUMERIQUE_LEX_COMMUNITY
     };
 
-    enum TypeGenerationPdf {
+    enum TypeGenerationPdf 
+    {
         TypeGenerationPdf_TOUTES,
         TypeGenerationPdf_RECETTES_SEULEMENT,
         TypeGenerationPdf_DEPENSES_SEULEMENT
     };
 
-    enum Aeroclub {
+    enum Aeroclub 
+    {
         Aeroclub_INCONNU,
         Aeroclub_Generique_OpenFlyer,
         Aeroclub_Generique_Aerogest,
@@ -211,7 +242,8 @@ public:
         Aeroclub_GENERIQUE_1_PASSE
     };
 
-    enum Onglet {
+    enum Onglet 
+    {
         Onglet_PILOTES,
         Onglet_VOLS,
         Onglet_FACTURES,
@@ -230,6 +262,70 @@ public:
         MailPilotes_BREVETES,
         MailPilotes_SUBVENTION_NON_CONSOMMEE
     };
+
+    enum UniteTypeConsommation
+    {
+        UniteTypeConsommation_INDEFINI = 0,
+        UniteTypeConsommation_LITRES_ESSENCE = 1,
+        UniteTypeConsommation_LITRES_GASOIL_KEROSENE = 2,
+        UniteTypeConsommation_KILOWATTHEURES = 3
+	};
+    static const UniteTypeConsommation uniteTypeConsommation(int p_unite)
+    {
+        switch (p_unite)
+        {
+            case UniteTypeConsommation_LITRES_ESSENCE:
+            {
+                return UniteTypeConsommation_LITRES_ESSENCE;
+            }
+            break;
+            case UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
+            {
+                return UniteTypeConsommation_LITRES_GASOIL_KEROSENE;
+            }
+            break;
+            case UniteTypeConsommation_KILOWATTHEURES:
+            {
+                return UniteTypeConsommation_KILOWATTHEURES;
+            }
+            break;
+            case UniteTypeConsommation_INDEFINI:
+            default:
+            {
+                return UniteTypeConsommation_INDEFINI;
+            }
+            break;
+        }
+    }
+    
+    enum TypeDecompte
+    {
+        TypeDecompte_INDEFINI = 0,
+        TypeDecompte_HORAIRE = 1,
+        TypeDecompte_UNITAIRE = 2
+    };
+    static const TypeDecompte typeDecompte(int p_unite)
+    {
+        switch (p_unite)
+        {
+        case TypeDecompte_HORAIRE:
+        {
+            return TypeDecompte_HORAIRE;
+        }
+        break;
+        case TypeDecompte_UNITAIRE:
+        {
+            return TypeDecompte_UNITAIRE;
+        }
+        break;
+        case TypeDecompte_INDEFINI:
+        default:
+        {
+            return TypeDecompte_INDEFINI;
+        }
+        break;
+        }
+    }
 
     enum EtatGeneration
     {
@@ -496,8 +592,18 @@ public:
     struct Aeronef {
         QString immatriculation = K_INIT_QSTRING;
         QString type = K_INIT_QSTRING;
+		bool emissionsSontCompensees = false;
     };
     typedef QList<Aeronef> ListeAeronefs;
+
+    struct TypeAeronef {
+        QString type = K_INIT_QSTRING;
+        QString marque = K_INIT_QSTRING;
+		double consommation = 0.0;
+		AeroDmsTypes::UniteTypeConsommation uniteTypeConsommation = AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE;
+		AeroDmsTypes::TypeDecompte typeDecompte = AeroDmsTypes::TypeDecompte_HORAIRE;
+    };
+    typedef QList<TypeAeronef> ListeTypesAeronefs;
 
     struct CotisationAnnuelle {
         QString idPilote = K_INIT_QSTRING;
@@ -562,6 +668,13 @@ public:
     static const StatsHeuresDeVolParActivite K_INIT_STATS_HEURES_DE_VOL_PAR_ACTIVITES;
     typedef QList< StatsHeuresDeVolParActivite> ListeStatsHeuresDeVolParActivite;
 
+    struct ParametresEmissionsCo2 {
+        double kgCo2ParLitreEssence = 0.0;
+        double kgCo2ParLitreGasoil = 0.0;
+        double kgCo2ParKwh = 0.0;
+        double kgCo2IndirectsParHdv = 0.0;
+    };
+
     struct ParametresMetier {
         double montantSubventionEntrainement = 0.0;
         double montantCotisationPilote = 0.0;
@@ -578,6 +691,8 @@ public:
         QString objetMailVirementSubvention = K_INIT_QSTRING;
         QString texteMailVirementSubvention = K_INIT_QSTRING;
         QString objetMailAutresMailings = K_INIT_QSTRING;
+
+        ParametresEmissionsCo2 emissionsCo2;
     };
 
     struct ParametresImpression {
@@ -651,6 +766,49 @@ public:
     };
     static const StatsAeronef K_INIT_STAT_AERONEF;
     typedef QList<StatsAeronef> StatsAeronefs;
+
+    class StatsEmissionsCo2
+    {
+    public:
+        QString type = K_INIT_QSTRING;
+        QString activiteOuTypeDeVol = K_INIT_QSTRING;
+        double consommation = 0.0;
+        int nombreMinutesVol = K_INIT_INT;
+        int nombreDeVols = K_INIT_INT;
+        UniteTypeConsommation uniteTypeConsommation = UniteTypeConsommation_INDEFINI ;
+        TypeDecompte typeDecompte = TypeDecompte_INDEFINI ;
+
+        //Retourne la consommation en litres selon la durée du vol ou en unitaire selon le cas
+        const double consommationEnLitres() const
+        {
+            switch (typeDecompte)
+            {
+                case TypeDecompte_HORAIRE:
+                {
+                    return consommation * nombreMinutesVol / 60.0;
+                }
+                break;
+                case TypeDecompte_UNITAIRE:
+                {
+                    qDebug() << "unitaire " << consommation * nombreDeVols << nombreDeVols;
+                    return consommation * nombreDeVols;
+                }
+                break;
+                case TypeDecompte_INDEFINI:
+                default:
+                {
+
+                }
+                break;
+            }
+            return 0.0;
+        };
+    };
+    struct ListeStatsEmissionsCo2
+    {
+        QVector<StatsEmissionsCo2> liste;
+        Statistiques caracteristiqueDuChampActiviteOuTypeDeVol = Statistiques_CO2_PAR_TYPE_DE_VOL;
+    };
 
     struct DetailsBaladesEtSorties
     {
@@ -850,6 +1008,13 @@ public:
         Icone_TOUS,
         Icone_TOUT_COCHER,
         Icone_MOINS_1,
+
+        Icone_CO2,
+        Icone_HORAIRE,
+        Icone_UNITAIRE,
+        Icone_ESSENCE,
+        Icone_GASOIL_KEROSENE,
+        Icone_CARBURANT,
 
         Icone_ICONE_APPLICATION,
 
