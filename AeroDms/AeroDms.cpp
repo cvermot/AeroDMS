@@ -4037,7 +4037,7 @@ void AeroDms::aPropos()
         + tr("Le code source de ce programme est disponible sous")
         + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
         + tr("Ce programme utilise les libraires :<ul>")
-        + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() +"</li>"
+        + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() + " (Compilé avec Qt " + QT_VERSION_STR + ")</li>"
         + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "+ PODOFO_VERSION_STRING +"</li>"
         + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0</li>"
         + "<li><a href = \"https://wiki.qt.io/QtWebEngine/ChromiumVersions\">Chromium (Qt WebEngine)</a> "+ qWebEngineChromiumVersion() + "</li>"
