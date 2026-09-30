@@ -34,6 +34,34 @@ ManageDb::ManageDb(const int p_delaisDeGardeBdd,
     
 }
 
+const QString ManageDb::recupererVersionSQLite()
+{
+    QSqlQuery query;
+    query.prepare("SELECT sqlite_version() AS version;");
+    query.exec();
+    query.next();
+
+    if (query.value("version").toString() != "")
+    {
+        return query.value("version").toString();
+    }
+    return "Iconnue";
+}
+
+const QString ManageDb::recupererVerificationClesEtrangereActif()
+{
+    QSqlQuery query;
+    query.prepare("PRAGMA foreign_keys;");
+    query.exec();
+    query.next();
+
+    if (query.value("version").toInt() == 1)
+    {
+        return "Controle clé étrangères actif";
+    }
+    return "Controle clé étrangères inactif";
+}
+
 void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
 {
     if (p_sha256BaseEnLigne != recupererShaSumBdd())

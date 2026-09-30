@@ -32,6 +32,8 @@ public:
         const QString p_nomDuVerrou,
         GestionnaireDonneesEnLigne* p_gestionnaireDonneesEnLigne);
     bool ouvrirLaBdd(const QString& p_database);
+    const QString recupererVersionSQLite();
+    const QString recupererVerificationClesEtrangereActif();
     void lireParametres(AeroDmsTypes::ParametresMetier& p_parametresMetiers,
         AeroDmsTypes::ParametresSysteme& p_parametresSysteme);
     AeroDmsTypes::ParametresEmissionsCo2 lireParametresEmissionsCo2();

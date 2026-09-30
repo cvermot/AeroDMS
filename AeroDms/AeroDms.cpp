@@ -4012,6 +4012,8 @@ void AeroDms::aPropos()
         + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() +"</li>"
         + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "+ PODOFO_VERSION_STRING +"</li>"
         + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0</li>"
+        + "<li><a href = \"https://wiki.qt.io/QtWebEngine/ChromiumVersions\">Chromium (Qt WebEngine)</a> "+ qWebEngineChromiumVersion() + "</li>"
+        + "<li><a href = \"https://www.sqlite.org/\">SQLite</a> "+ db->recupererVersionSQLite() + " ("+ db->recupererVerificationClesEtrangereActif() + ")< / li>"
         + "</ul>"
         + tr("Les icones sont issues de")
         + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
