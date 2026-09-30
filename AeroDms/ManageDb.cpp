@@ -2769,15 +2769,13 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissionsParT
     const int p_options,
     const AeroDmsTypes::Statistiques p_statDemandee)
 {
-    //TODO
     AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2;
     statsCo2.caracteristiqueDuChampActiviteOuTypeDeVol = p_statDemandee;
 
     QString nomVue = "stats_emissionsCo2";
     if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
     {
-        //TODO
-        nomVue = "stats_emissionsCo2";
+        nomVue = "stats_emissionsCo2_volsAvecSubventionUniquement";
     }
 
     QString clauseGroupBy = "";

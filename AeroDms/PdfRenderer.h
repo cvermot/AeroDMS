@@ -43,6 +43,7 @@ public:
 		const bool p_mergerTousLesPdf,
 		const bool p_recapHdVAvecRecettes,
 		const bool p_recapHdvAvecBaladesEtSorties,
+		const bool p_recapHdvAvecConsommationsEtEmissions,
 		const bool p_virementEstAutorise,
 		const int p_valeurGraphAGenerer,
 		const int p_annee);
@@ -102,8 +103,8 @@ private :
 							      const QString p_titre);
 	static void copierFichierSvgDansHtml( const QString p_fichier,
 									      QString& p_html);
-	static void ajouterImageDansHtml( const QString p_fichier,
-									  QString& p_html);
+	static void copierFichierPngDansHtml( const QString p_fichier,
+									      QString& p_html);
 	void rincerInfosIban(QString& p_templateCe);
 
 signals:

@@ -14,7 +14,7 @@ class StatistiqueDonutCombine : public QObject
 {
 public:
     explicit StatistiqueDonutCombine(QObject* parent = nullptr);
-    void addBreakdownSeries(QPieSeries* series, QColor color, int tailleDePolice);
+    void addBreakdownSeries(QPieSeries* series, QColor color, int tailleDePolice, QString p_supplementLegende = "");
     QList<QPieSeries*> series() const;
 
 private:

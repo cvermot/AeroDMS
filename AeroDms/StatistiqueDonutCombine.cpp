@@ -19,7 +19,7 @@ StatistiqueDonutCombine::StatistiqueDonutCombine(QObject* parent)
     m_series.append(m_mainSeries);
 }
 
-void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QColor color, int tailleDePolice)
+void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QColor color, int tailleDePolice, QString p_supplementLegende)
 {
     QFont font("Arial", tailleDePolice);
 
@@ -61,7 +61,7 @@ void StatistiqueDonutCombine::addBreakdownSeries(QPieSeries* breakdownSeries, QC
 
     for (QPieSlice* slice : slices) {
         const QString baseLabel = slice->property("baseLabel").toString();
-        slice->setLabel(QString("%1 %2%").arg(baseLabel).arg(slice->percentage() * 100, 0, 'f', 2));
+        slice->setLabel(QString("%1 %2% %3").arg(baseLabel).arg(slice->percentage() * 100, 0, 'f', 2).arg(p_supplementLegende));
     }
 }
 

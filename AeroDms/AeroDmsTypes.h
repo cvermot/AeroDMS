@@ -411,6 +411,7 @@ public:
         bool mergerTousLesPdf = false;
         bool recapHdVAvecRecettes = false;
         bool recapHdVAvecBaladesEtSorties = false;
+        bool recapHdVAvecConsommationsEtEmissions = false;
         bool virementEstAutorise = false;
         int recapHdvGraphAGenerer = K_INIT_INT;
         //int idFacture;

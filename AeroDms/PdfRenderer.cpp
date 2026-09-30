@@ -270,6 +270,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     const bool p_mergerTousLesPdf,
     const bool p_recapHdVAvecRecettes,
     const bool p_recapHdvAvecBaladesEtSorties,
+    const bool p_recapHdvAvecConsommationsEtEmissions,
     const bool p_virementEstAutorise,
     const int p_valeurGraphAGenerer,
     const int p_annee)
@@ -281,6 +282,7 @@ void PdfRenderer::imprimerLesDemandesDeSubvention( const QString p_nomTresorier,
     demandeEnCours.mergerTousLesPdf = p_mergerTousLesPdf;
     demandeEnCours.recapHdVAvecBaladesEtSorties = p_recapHdvAvecBaladesEtSorties;
     demandeEnCours.recapHdVAvecRecettes = p_recapHdVAvecRecettes;
+    demandeEnCours.recapHdVAvecConsommationsEtEmissions = p_recapHdvAvecConsommationsEtEmissions;
     demandeEnCours.virementEstAutorise = p_virementEstAutorise;
     demandeEnCours.recapHdvGraphAGenerer = p_valeurGraphAGenerer;
 	demandeEnCours.anneeATraiter = p_annee;
@@ -872,6 +874,13 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
         templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
+    if (demandeEnCours.recapHdVAvecConsommationsEtEmissions)
+    {
+        //TODO
+        //const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee, etatGenerationARetourner);
+        //templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
+    }
+
     const QString images = genererImagesStatistiques(p_annee);
     templateTable.replace("<!--AccrocheGraphiques-->", images);
 
@@ -1255,7 +1264,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures annuelles ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1277,7 +1286,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1299,7 +1308,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Heures par pilote ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1322,7 +1331,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1345,7 +1354,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Type de vol ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1368,7 +1377,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1391,7 +1400,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Activités ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1414,7 +1423,99 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
                           urlImage,
                           tr("Aéronefs ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE)
+    {
+        StatistiqueDonutCombineWidget stats(db,
+            AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE,
+            m_contentArea,
+            p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            false,
+            true,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "consoParActivite";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Consommation par activité ") + QString::number(p_annee));
+
+        copierFichierPngDansHtml(urlImage + ".png", html);
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL)
+    {
+        StatistiqueDonutCombineWidget stats(db,
+            AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL,
+            m_contentArea,
+            p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            false,
+            true,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "consoParTypeDeVol";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Consommation par type de vol ") + QString::number(p_annee));
+
+        copierFichierPngDansHtml(urlImage + ".png", html);
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE)
+    {
+        StatistiqueDonutCombineWidget stats(db,
+            AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE,
+            m_contentArea,
+            p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            false,
+            true,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "co2ParActivite";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Émissions de CO2 par activité ") + QString::number(p_annee));
+
+        copierFichierPngDansHtml(urlImage + ".png", html);
+
+        nombreEtapesEffectuees++;
+        emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
+    }
+
+    if ((demandeEnCours.recapHdvGraphAGenerer & AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL)
+    {
+        StatistiqueDonutCombineWidget stats(db,
+            AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL,
+            m_contentArea,
+            p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            false,
+            true,
+            tailleImage);
+
+        const QString urlImage = cheminSortie + "co2ParTypeDeVol";
+
+        enregistrerImage(stats,
+            urlImage,
+            tr("Émissions de CO2 par type de vol ") + QString::number(p_annee));
+
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1436,7 +1537,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
             urlImage,
             tr("Aéronefs ") + QString::number(p_annee));
 
-        ajouterImageDansHtml(urlImage + ".png", html);
+        copierFichierPngDansHtml(urlImage + ".png", html);
 
         nombreEtapesEffectuees++;
         emit mettreAJourNombreFacturesTraitees(nombreEtapesEffectuees);
@@ -1455,10 +1556,8 @@ void PdfRenderer::copierFichierSvgDansHtml(const QString p_fichier, QString &p_h
               "</div></center>\n";
 }
 
-void PdfRenderer::ajouterImageDansHtml(const QString p_fichier, QString &p_html)
+void PdfRenderer::copierFichierPngDansHtml(const QString p_fichier, QString &p_html)
 {
-    qDebug() << "Image URL" << p_fichier;
-
     QFile file(p_fichier);
 
     if (file.open(QIODevice::ReadOnly)) {
@@ -1562,6 +1661,22 @@ int PdfRenderer::calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer)
         nbGraph++;
     }
     if ((p_graphAGenerer & AeroDmsTypes::Statistiques_AERONEFS) == AeroDmsTypes::Statistiques_AERONEFS)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE) == AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE)
+    {
+        nbGraph++;
+    }
+    if ((p_graphAGenerer & AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL) == AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL)
     {
         nbGraph++;
     }

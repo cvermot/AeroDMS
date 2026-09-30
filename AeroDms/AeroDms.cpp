@@ -1432,12 +1432,21 @@ void AeroDms::initialiserMenuOptions()
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelRecettes);
     boutonOptionRecapAnnuelRecettes->setCheckable(true);
     boutonOptionRecapAnnuelRecettes->setStatusTip(tr("Permet d'ajouter le récapitulatif des recettes dans le récap des heures de vol"));
+
     boutonOptionRecapAnnuelBaladesSorties = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_SCAN_AUTO_VOL),
         tr("Récapitulatif des &balades et sorties"), 
         this);
     menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelBaladesSorties);
     boutonOptionRecapAnnuelBaladesSorties->setCheckable(true);
     boutonOptionRecapAnnuelBaladesSorties->setStatusTip(tr("Permet d'ajouter le récapitulatif des balades et sorties (dates, durées, noms des passagers, couts et recettes...) dans le récap des heures de vol"));
+
+    boutonOptionRecapAnnuelConsommationsEmissions = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
+        tr("Récapitulatif des consommation et émissions de CO₂"),
+        this);
+    menuOptionsRecapAnnuel->addAction(boutonOptionRecapAnnuelConsommationsEmissions);
+    boutonOptionRecapAnnuelConsommationsEmissions->setCheckable(true);
+    boutonOptionRecapAnnuelConsommationsEmissions->setStatusTip(tr("Permet d'ajouter le récapitulatif des consommations d'énergies/carburants et d'émissions de CO₂ dans le récap des heures de vol"));
+
     //Génération des graphiques
     graphiquesDuRecapAnnuel = menuOptionsRecapAnnuel->addMenu(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS), 
         tr("&Graphiques"));
@@ -1473,6 +1482,12 @@ void AeroDms::initialiserMenuOptions()
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParTypeDeVol);
     boutonGraphRecapAnnuelEurosParTypeDeVol->setCheckable(true);
 
+    boutonGraphRecapAnnuelConsommationParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CARBURANT),
+        tr("Consommation par type de vol"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelConsommationParTypeDeVol);
+    boutonGraphRecapAnnuelConsommationParTypeDeVol->setCheckable(true);
+
     boutonGraphRecapAnnuelCo2ParTypeDeVol = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
         tr("Émissions CO₂ par type de vol"),
         this);
@@ -1490,6 +1505,12 @@ void AeroDms::initialiserMenuOptions()
         this);
     graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelEurosParActivite);
     boutonGraphRecapAnnuelEurosParActivite->setCheckable(true);
+
+    boutonGraphRecapAnnuelConsommationParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CARBURANT),
+        tr("Consommation par activité"),
+        this);
+    graphiquesDuRecapAnnuel->addAction(boutonGraphRecapAnnuelConsommationParActivite);
+    boutonGraphRecapAnnuelConsommationParActivite->setCheckable(true);
 
     boutonGraphRecapAnnuelCo2ParActivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_CO2),
         tr("Émissions CO₂ par activité"),
@@ -1515,9 +1536,11 @@ void AeroDms::initialiserMenuOptions()
     connect(boutonGraphRecapAnnuelEurosParPilote, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelHeuresParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelEurosParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelConsommationParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelCo2ParTypeDeVol, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelHeuresParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelEurosParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
+    connect(boutonGraphRecapAnnuelConsommationParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelCo2ParActivite, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelStatutsDesPilotes, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
     connect(boutonGraphRecapAnnuelAeronefs, SIGNAL(triggered()), this, SLOT(maintenirMenuSelectionGraphsOuvert()));
@@ -2062,6 +2085,7 @@ void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
     {
         boutonOptionRecapAnnuelRecettes->setChecked(true);
         boutonOptionRecapAnnuelBaladesSorties->setChecked(true);
+        boutonOptionRecapAnnuelConsommationsEmissions->setChecked(true);
     }
 
     boutonGraphRecapAnnuelHeuresAnnuelles->setChecked(true);
@@ -2069,9 +2093,11 @@ void AeroDms::selectionnerTousLesGraphsPourRecapAnnuel()
     boutonGraphRecapAnnuelEurosParPilote->setChecked(true);
     boutonGraphRecapAnnuelHeuresParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelEurosParTypeDeVol->setChecked(true);
+    boutonGraphRecapAnnuelConsommationParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelCo2ParTypeDeVol->setChecked(true);
     boutonGraphRecapAnnuelHeuresParActivite->setChecked(true);
     boutonGraphRecapAnnuelEurosParActivite->setChecked(true);
+    boutonGraphRecapAnnuelConsommationParActivite->setChecked(true);
     boutonGraphRecapAnnuelCo2ParActivite->setChecked(true);
     boutonGraphRecapAnnuelStatutsDesPilotes->setChecked(true);
     boutonGraphRecapAnnuelAeronefs->setChecked(true);
@@ -3168,6 +3194,7 @@ void AeroDms::genererPdf()
     {
         recapHdv = "Heures annuelles,<br />balades et sorties";
     }
+    //TODO ajouter le traitement de boutonOptionRecapAnnuelConsommationsEmissions
 
     QMessageBox demandeConfirmationGeneration;
     demandeConfirmationGeneration.setText(QString("Voulez vous générer les PDF de demande de subventions ? <br /><br />")
@@ -3209,6 +3236,7 @@ void AeroDms::genererPdf()
                 boutonFusionnerLesPdf->font().bold(),
                 boutonOptionRecapAnnuelRecettes->isChecked(),
                 boutonOptionRecapAnnuelBaladesSorties->isChecked(),
+                boutonOptionRecapAnnuelConsommationsEmissions->isChecked(),
                 parametresSysteme.autoriserReglementParVirement,
                 calculerValeurGraphAGenererPdf(),
                 anneeAGenerer);
@@ -5241,9 +5269,13 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_TYPE_DE_VOL;
     }
+    if(boutonGraphRecapAnnuelConsommationParTypeDeVol->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL;
+    }
     if (boutonGraphRecapAnnuelCo2ParTypeDeVol->isChecked())
     {
-        valeur = valeur + AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE;
+        valeur = valeur + AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL;
     }
     if (boutonGraphRecapAnnuelHeuresParActivite->isChecked())
     {
@@ -5252,6 +5284,10 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     if (boutonGraphRecapAnnuelEurosParActivite->isChecked())
     {
         valeur = valeur + AeroDmsTypes::Statistiques_EUROS_PAR_ACTIVITE;
+    }
+    if (boutonGraphRecapAnnuelConsommationParActivite->isChecked())
+    {
+        valeur = valeur + AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE;
     }
     if (boutonGraphRecapAnnuelCo2ParActivite->isChecked())
     {

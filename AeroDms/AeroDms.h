@@ -244,14 +244,17 @@ private:
     QAction* boutonParametresDuLogiciel = nullptr;
     QAction* boutonOptionRecapAnnuelRecettes = nullptr;
     QAction* boutonOptionRecapAnnuelBaladesSorties = nullptr;
+    QAction* boutonOptionRecapAnnuelConsommationsEmissions = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresAnnuelles = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresParPilote = nullptr;
     QAction* boutonGraphRecapAnnuelEurosParPilote = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresParTypeDeVol = nullptr;
     QAction* boutonGraphRecapAnnuelEurosParTypeDeVol = nullptr;
+    QAction* boutonGraphRecapAnnuelConsommationParTypeDeVol = nullptr;
     QAction* boutonGraphRecapAnnuelCo2ParTypeDeVol = nullptr;
     QAction* boutonGraphRecapAnnuelHeuresParActivite = nullptr;
     QAction* boutonGraphRecapAnnuelEurosParActivite = nullptr;
+    QAction* boutonGraphRecapAnnuelConsommationParActivite = nullptr;
     QAction* boutonGraphRecapAnnuelCo2ParActivite = nullptr;
     QAction* boutonGraphRecapAnnuelStatutsDesPilotes = nullptr;
     QAction* boutonGraphRecapAnnuelAeronefs = nullptr;
