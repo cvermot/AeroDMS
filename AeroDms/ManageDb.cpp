@@ -55,7 +55,7 @@ const QString ManageDb::recupererVerificationClesEtrangereActif()
     query.exec();
     query.next();
 
-    if (query.value("version").toInt() == 1)
+    if (query.value(0).toInt() == 1)
     {
         return "Controle clé étrangères actif";
     }
@@ -298,7 +298,14 @@ const bool ManageDb::ouvrirBdd()
         bddEstOuverte = db.open();
     }
 
-    if (!bddEstOuverte)
+    if (bddEstOuverte)
+    {
+        //active le contrôle des clés étrangères
+        QSqlQuery query;
+        query.prepare("PRAGMA foreign_keys = ON;");
+        query.exec();
+    }
+    else
     {
         emit erreurOuvertureBdd();
         QMessageBox::critical(this,
