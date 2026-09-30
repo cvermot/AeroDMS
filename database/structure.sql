@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. sept. 30 00:49:13 2026
+-- File generated with SQLiteStudio v3.4.4 on mer. sept. 30 23:57:07 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -288,6 +288,24 @@ SUM(vol.duree) as tempsDeVol
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
+ORDER BY annee, aeronefTypes.type;
+
+-- View: stats_emissionsCo2_volsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS stats_emissionsCo2_volsAvecSubventionUniquement AS SELECT 
+vol.typeDeVol,
+vol.activite,
+aeronef.type,
+aeronefTypes.consommation,
+aeronefTypes.decompte,
+aeronefTypes.unite,
+COUNT(vol.volId) AS nbVols,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+WHERE vol.montantRembourse != 0
 GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
 ORDER BY annee, aeronefTypes.type;
 
