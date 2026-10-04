@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. sept. 30 23:57:07 2026
+-- File generated with SQLiteStudio v3.4.4 on dim. oct. 4 10:45:47 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -309,6 +309,42 @@ WHERE vol.montantRembourse != 0
 GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
 ORDER BY annee, aeronefTypes.type;
 
+-- View: stats_emissionsCo2Compense
+CREATE VIEW IF NOT EXISTS stats_emissionsCo2Compense AS SELECT 
+vol.typeDeVol,
+vol.activite,
+aeronef.type,
+aeronefTypes.consommation,
+aeronefTypes.decompte,
+aeronefTypes.unite,
+COUNT(vol.volId) AS nbVols,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+WHERE aeronef.compensationCarbone = TRUE
+GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
+ORDER BY annee, aeronefTypes.type;
+
+-- View: stats_emissionsCo2Compense_volsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS stats_emissionsCo2Compense_volsAvecSubventionUniquement AS SELECT 
+vol.typeDeVol,
+vol.activite,
+aeronef.type,
+aeronefTypes.consommation,
+aeronefTypes.decompte,
+aeronefTypes.unite,
+COUNT(vol.volId) AS nbVols,
+strftime('%Y', vol.date) AS annee,
+SUM(vol.duree) as tempsDeVol
+FROM vol
+INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+WHERE vol.montantRembourse != 0 AND aeronef.compensationCarbone = TRUE
+GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
+ORDER BY annee, aeronefTypes.type;
+
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
 strftime('%m', vol.date) AS mois,
@@ -459,6 +495,23 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis AS SELECT
 FROM vol
 INNER JOIN pilote ON vol.pilote = pilote.piloteId
 WHERE vol.demandeRemboursement IS NOT NULL
+GROUP BY vol.pilote, vol.typeDeVol, annee
+ORDER BY annee, vol.pilote, typeDeVol;
+
+-- View: volParTypeParAnEtParPiloteSoumis_VolsAvecSubventionUniquement
+CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis_VolsAvecSubventionUniquement AS SELECT 
+    vol.pilote,
+    vol.typeDeVol,
+    vol.activite,
+    pilote.nom,
+    pilote.prenom,
+    strftime('%Y', vol.date) AS annee,
+    SUM(vol.montantRembourse) AS montantRembourse,
+    SUM(vol.cout) AS cout,
+    SUM(vol.duree) AS tempsDeVol
+FROM vol
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+WHERE vol.demandeRemboursement IS NOT NULL AND vol.montantRembourse != 0
 GROUP BY vol.pilote, vol.typeDeVol, annee
 ORDER BY annee, vol.pilote, typeDeVol;
 

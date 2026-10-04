@@ -31,6 +31,9 @@ public:
     static const QTime convertirMinutesEnQTime(const int p_minutes);
     static const QTime convertirHeuresDecimalesEnQTime(const double p_heureDecimale);
 
+    static const double recupererFacteurDEmissions(const AeroDmsTypes::UniteTypeConsommation p_uniteTypeConsommation,
+        const AeroDmsTypes::ParametresEmissionsCo2 p_parametresEmissionsCo2);
+
     static const QIcon recupererIcone(const QString& p_icone);
     static const QIcon recupererIcone(const QChar p_caractere);
     static const QIcon recupererIcone(const AeroDmsTypes::Icone p_icone);

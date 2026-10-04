@@ -928,7 +928,8 @@ const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererSubventionsPil
 }
 
 const AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const int p_annee,
-    const bool p_volsSoumisUniquement)
+    const bool p_volsSoumisUniquement,
+    const int p_options)
 {
     AeroDmsTypes::SubventionsParPilote totaux = AeroDmsTypes::K_INIT_SUBVENTION_PAR_PILOTE;
     totaux.idPilote = "";
@@ -939,12 +940,20 @@ const AeroDmsTypes::SubventionsParPilote ManageDb::recupererTotauxAnnuel( const 
     int heuresDeVolEnMinutes = 0;
 
     QSqlQuery query;
-    query.prepare("SELECT typeDeVol, annee, SUM(montantRembourse) AS subventionTotale, SUM(cout) AS coutTotal, SUM(tempsDeVol) AS tempsDeVolTotal FROM volParTypeParAnEtParPilote WHERE annee = :annee GROUP BY annee, typeDeVol");
+    QString requete = "SELECT typeDeVol, annee, SUM(montantRembourse) AS subventionTotale, SUM(cout) AS coutTotal, SUM(tempsDeVol) AS tempsDeVolTotal FROM volParTypeParAnEtParPilote WHERE annee = :annee GROUP BY annee, typeDeVol";
+    
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPilote_VolsAvecSubventionUniquement");
+    }
     //Si on veut uniquement les totaux des vols déjà soumis au CSE, on remplace la vue volParTypeParAnEtParPilote par volParTypeParAnEtParPiloteSoumis
     if (p_volsSoumisUniquement)
     {
-        query.prepare("SELECT typeDeVol, annee, SUM(montantRembourse) AS subventionTotale, SUM(cout) AS coutTotal, SUM(tempsDeVol) AS tempsDeVolTotal FROM volParTypeParAnEtParPiloteSoumis WHERE annee = :annee GROUP BY annee, typeDeVol");
+        requete.replace("volParTypeParAnEtParPilote", "volParTypeParAnEtParPiloteSoumis");
+        //le cas vol subventionné uniquement est geré automatique parceque la vue volParTypeParAnEtParPiloteSoumis 
+        //pour les vols avec sub uniquement est aussi suffixée _VolsAvecSubventionUniquement
     }
+    query.prepare(requete);
     query.bindValue(":annee", QString::number(p_annee));
     query.exec();
 
@@ -1376,7 +1385,8 @@ const AeroDmsTypes::ListeSubventionsParPilotes ManageDb::recupererLesSubventione
 {
     return recupererSubventionsPilotes( p_annee, 
         "*",
-        AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+        //TODO a voir si on fait en soret que ça soit parametrable AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
+        AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
         true);
 }
 
@@ -2765,7 +2775,7 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
     return statsPilotes;
 }
 
-const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissionsParTypeDeVol(const int p_annee,
+const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissions(const int p_annee,
     const int p_options,
     const AeroDmsTypes::Statistiques p_statDemandee)
 {
@@ -2781,26 +2791,7 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissionsParT
     QString clauseGroupBy = "";
     QString clauseSelect = "";
 
-    switch (p_statDemandee)
-    {
-        case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
-        case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
-        {
-            clauseGroupBy = " GROUP BY type, activite ORDER BY activite, type";
-            clauseSelect = "activite ";
-        }
-        break;
-
-        case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
-        case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
-        default:
-        {
-            clauseGroupBy = " GROUP BY type, typeDeVol ORDER BY typeDeVol, type";
-            clauseSelect = "typeDeVol ";
-        }
-        break;
-    }
-
+    genererClauseGroupementSelonStatDemandee(p_statDemandee, clauseGroupBy, clauseSelect);
     QString filtre = genererClauseFiltrageActivite(p_options);
 
     QSqlQuery query;
@@ -2841,20 +2832,94 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissionsParT
 
     while (query.next())
     {
-        AeroDmsTypes::StatsEmissionsCo2 stats;
-
-        stats.type = query.value("type").toString();
-        stats.nombreMinutesVol = query.value("tempsDeVol").toInt();
-        stats.nombreDeVols = query.value("nbVols").toInt();
-        stats.consommation = query.value("consommation").toInt();
-        stats.activiteOuTypeDeVol = query.value("activiteOuTypeDeVol").toString();
-        stats.uniteTypeConsommation = static_cast<AeroDmsTypes::UniteTypeConsommation>(query.value("unite").toInt());
-        stats.typeDecompte = static_cast<AeroDmsTypes::TypeDecompte>(query.value("decompte").toInt());
-
-        statsCo2.liste.append(stats);
+        statsCo2.liste.append(deplierRequeteEmissions(query));
     }
 
     return statsCo2;
+}
+
+const AeroDmsTypes::StatsEmissionsCo2 ManageDb::recupererEmissionsCompensees(const int p_annee,
+    const int p_options,
+    const AeroDmsTypes::Statistiques p_statDemandee,
+    const QString & p_type,
+    const QString & p_activite)
+{
+    QString nomVue = "stats_emissionsCo2Compense";
+    if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
+    {
+        nomVue = "stats_emissionsCo2Compense_volsAvecSubventionUniquement";
+    }
+
+    QString clauseGroupBy = "";
+    QString clauseSelect = "";
+
+    genererClauseGroupementSelonStatDemandee(p_statDemandee, clauseGroupBy, clauseSelect);
+    QString filtre = genererClauseFiltrageActivite(p_options);
+
+    QSqlQuery query;
+    if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
+    {
+        query.prepare("SELECT "
+            + clauseSelect + "AS activiteOuTypeDeVol, "
+            "type, "
+            "consommation, "
+            "decompte, "
+            "unite, "
+            "SUM(tempsDeVol) AS tempsDeVol, "
+            "SUM(nbVols) AS nbVols "
+            "FROM " + nomVue + " "
+            "WHERE annee = :annee "
+            "AND typeDeVol = :typeDeVol "
+            "AND type = :type "
+            + (filtre != "" ? " AND " : "")
+            + filtre
+            + clauseGroupBy);
+        query.bindValue(":annee", QString::number(p_annee));
+    }
+    else
+    {
+        query.prepare("SELECT "
+            + clauseSelect + "AS activiteOuTypeDeVol, "
+            "type, "
+            "consommation, "
+            "decompte, "
+            "unite, "
+            "SUM(tempsDeVol) AS tempsDeVol, "
+            "SUM(nbVols) AS nbVols "
+            "FROM " + nomVue + " "
+            "WHERE typeDeVol = :typeDeVol "
+            "AND type = :type "
+            + (filtre != "" ? " AND " : "")
+            + filtre
+            + clauseGroupBy);
+    }
+    query.bindValue(":typeDeVol", p_activite);
+    query.bindValue(":type", p_type);
+
+    query.exec();
+
+    AeroDmsTypes::StatsEmissionsCo2 emissionsCompensees;
+    if (query.next())
+    {
+        emissionsCompensees = deplierRequeteEmissions(query);
+    }
+
+    return emissionsCompensees;
+}
+
+AeroDmsTypes::StatsEmissionsCo2 ManageDb::deplierRequeteEmissions(const QSqlQuery& p_query)
+{
+    AeroDmsTypes::StatsEmissionsCo2 stats;
+
+    stats.type = p_query.value("type").toString();
+    stats.nombreMinutesVol = p_query.value("tempsDeVol").toInt();
+    stats.nombreDeVols = p_query.value("nbVols").toInt();
+    stats.consommationHoraireDuType = p_query.value("consommation").toInt();
+    stats.activiteOuTypeDeVol = p_query.value("activiteOuTypeDeVol").toString();
+    stats.uniteTypeConsommation = static_cast<AeroDmsTypes::UniteTypeConsommation>(p_query.value("unite").toInt());
+    stats.typeDecompte = static_cast<AeroDmsTypes::TypeDecompte>(p_query.value("decompte").toInt());
+
+    return stats;
 }
 
 const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee,
@@ -3047,6 +3112,31 @@ const bool ManageDb::volSembleExistantEnBdd(const QString p_idPilote,
     query.exec();
 
     return query.next();
+}
+
+void ManageDb::genererClauseGroupementSelonStatDemandee(const AeroDmsTypes::Statistiques p_statDemandee, 
+    QString & p_clauseGroupBy, 
+    QString & p_clauseSelect)
+{
+    switch (p_statDemandee)
+    {
+        case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
+        {
+            p_clauseGroupBy = " GROUP BY type, activite ORDER BY activite, type";
+            p_clauseSelect = "activite ";
+        }
+        break;
+
+        case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
+        case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
+        default:
+        {
+            p_clauseGroupBy = " GROUP BY type, typeDeVol ORDER BY typeDeVol, type";
+            p_clauseSelect = "typeDeVol ";
+        }
+        break;
+    }
 }
 
 const QString ManageDb::genererClauseFiltrageActivite(const int p_options)

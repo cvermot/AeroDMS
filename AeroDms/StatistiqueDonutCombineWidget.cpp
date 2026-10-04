@@ -3,6 +3,7 @@
 
 #include "StatistiqueDonutCombine.h"
 #include "StatistiqueDonutCombineWidget.h"
+#include "AeroDmsServices.h"
 
 #include <QtGraphs/QPieSeries>
 
@@ -65,9 +66,9 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
         case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
         {
-            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissionsParTypeDeVol( p_annee, 
-                                                                                                             p_options, 
-                                                                                                             p_statistique );
+            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions( p_annee, 
+                                                                                                 p_options, 
+                                                                                                 p_statistique );
             indiceCouleurEnCours = 0;
 
             auto donutBreakdown = new StatistiqueDonutCombine(this);
@@ -84,8 +85,8 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                     {
                         unite = " kWh";
                     }
-                    QPieSlice* pieSlice = new QPieSlice( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres(), 'f', 0) + unite + ", ",
-                                                         statsCo2.liste.at(i).consommationEnLitres());
+                    QPieSlice* pieSlice = new QPieSlice( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
+                                                         statsCo2.liste.at(i).consommationDEnergie());
                     series->append(pieSlice);
                 }
                 else
@@ -104,8 +105,8 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                     {
                         unite = " kWh";
                     }
-                    series->append( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationEnLitres(), 'f', 0) + unite + ", ",
-                                    statsCo2.liste.at(i).consommationEnLitres());
+                    series->append( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
+                                    statsCo2.liste.at(i).consommationDEnergie());
                 }
             }
             if (series->count() > 0)
@@ -131,7 +132,7 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
         case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
         {
-            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissionsParTypeDeVol(p_annee,
+            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions(p_annee,
                 p_options,
                 p_statistique);
 
@@ -149,10 +150,10 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
             {
                 if (typeCourant == statsCo2.liste.at(i).activiteOuTypeDeVol)
                 {
-                    const double facteurDemission = recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation, 
-                                                                                parametresEmissionsCo2 );
+                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation, 
+                                                                                                 parametresEmissionsCo2 );
 
-                    const double emissionsCo2 = statsCo2.liste.at(i).consommationEnLitres() * facteurDemission;
+                    const double emissionsCo2 = statsCo2.liste.at(i).consommationDEnergie() * facteurDemission;
                     emissionsDuGroupe = emissionsDuGroupe + emissionsCo2;
                     QPieSlice* pieSlice = new QPieSlice(statsCo2.liste.at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
                         emissionsCo2);
@@ -171,10 +172,10 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                     typeCourant = statsCo2.liste.at(i).activiteOuTypeDeVol;
                     series = new QPieSeries(this);
 
-                    const double facteurDemission = recupererFacteurDEmissions(statsCo2.liste.at(i).uniteTypeConsommation,
-                                                                               parametresEmissionsCo2);
+                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation,
+                                                                                                 parametresEmissionsCo2);
 
-                    const double emissionsCo2 = statsCo2.liste.at(i).consommationEnLitres() * facteurDemission;
+                    const double emissionsCo2 = statsCo2.liste.at(i).consommationDEnergie() * facteurDemission;
                     emissionsDuGroupe = emissionsCo2;
                     series->append(statsCo2.liste.at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
                         emissionsCo2);
@@ -201,30 +202,6 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         }
         break;
     }  
-}
-
-const double StatistiqueDonutCombineWidget::recupererFacteurDEmissions(const AeroDmsTypes::UniteTypeConsommation p_uniteTypeConsommation, 
-    const AeroDmsTypes::ParametresEmissionsCo2 p_parametresEmissionsCo2)
-{
-    switch (p_uniteTypeConsommation)
-    {
-    case AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE:
-    {
-        return p_parametresEmissionsCo2.kgCo2ParLitreEssence;
-    }
-    break;
-    case AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
-    {
-        return p_parametresEmissionsCo2.kgCo2ParLitreGasoil;
-    }
-    break;
-    case AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES:
-    {
-        return p_parametresEmissionsCo2.kgCo2ParKwh;
-    }
-    break;
-    }
-    return 0;
 }
 
 QColor StatistiqueDonutCombineWidget::recupererNouvelleCouleur()

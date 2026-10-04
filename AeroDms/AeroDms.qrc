@@ -149,5 +149,7 @@
         <file>ressources/clock-outline.svg</file>
         <file>ressources/molecule-co2.svg</file>
         <file>ressources/fuel.svg</file>
+        <file>ressources/HTML/TableauEmissions.html</file>
+        <file>ressources/HTML/TableauEmissionsItem.html</file>
     </qresource>
 </RCC>

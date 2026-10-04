@@ -1237,3 +1237,27 @@ const QColor AeroDmsServices::preferredLabelColor(const QColor& color)
     const double darkness = 0.2126 * color.redF() + 0.7152 * color.greenF() + 0.0722 * color.blueF();
     return darkness > 0.6 ? Qt::black : Qt::white;
 }
+
+const double AeroDmsServices::recupererFacteurDEmissions(const AeroDmsTypes::UniteTypeConsommation p_uniteTypeConsommation,
+    const AeroDmsTypes::ParametresEmissionsCo2 p_parametresEmissionsCo2)
+{
+    switch (p_uniteTypeConsommation)
+    {
+    case AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParLitreEssence;
+    }
+    break;
+    case AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParLitreGasoil;
+    }
+    break;
+    case AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES:
+    {
+        return p_parametresEmissionsCo2.kgCo2ParKwh;
+    }
+    break;
+    }
+    return 0;
+}

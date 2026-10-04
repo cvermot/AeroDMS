@@ -218,6 +218,7 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
 
     demandeEnCours.recapHdVAvecBaladesEtSorties = true;
     demandeEnCours.recapHdVAvecRecettes = true;
+    demandeEnCours.recapHdVAvecConsommationsEtEmissions = true;
 
     demandeEnCours.recapHdvGraphAGenerer = p_graphAGenerer;
 
@@ -235,10 +236,12 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
         listeDesFichiers.clear();
 
         const AeroDmsTypes::ListeSubventionsParPilotes listePilotesDeCetteAnnee = db->recupererSubventionsPilotes( p_annee,
-            "*",
-            AeroDmsTypes::OptionsDonneesStatistiques_TOUS_LES_VOLS,
-            false);
-        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel(p_annee, false);
+                                                                                                                   "*",
+                                                                                                                    AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+                                                                                                                    false);
+        const AeroDmsTypes::SubventionsParPilote totaux = db->recupererTotauxAnnuel( p_annee, 
+                                                                                     false, 
+                                                                                     AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT);
         const AeroDmsTypes::EtatGeneration generationRecapAnnuel = imprimerLeFichierPdfDeRecapAnnuel( p_annee, 
                                                                                                       listePilotesDeCetteAnnee, 
                                                                                                       totaux);
@@ -876,9 +879,8 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
 
     if (demandeEnCours.recapHdVAvecConsommationsEtEmissions)
     {
-        //TODO
-        //const QString htmlRecapBaladesSorties = genererHtmlRecapBaladesSorties(p_annee, etatGenerationARetourner);
-        //templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
+        const QString htmlRecapEmissionsCo2 = genererHtmlRecapEmissionsCo2(p_annee, etatGenerationARetourner);
+        templateTable.replace("<!--AccrocheCo2-->", htmlRecapEmissionsCo2);
     }
 
     const QString images = genererImagesStatistiques(p_annee);
@@ -908,6 +910,8 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
 
     return etatGenerationARetourner;
 }
+
+
 
 const QString PdfRenderer::produireFichierPdfGlobal()
 {
@@ -1235,6 +1239,209 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
     }
 
     return html;
+}
+
+QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
+    AeroDmsTypes::EtatGeneration& p_etatGenerationARetourner)
+{
+    QString html = "";
+
+    QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissions.html"));
+    QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsItem.html"));
+
+    QString templateTable = "";
+    QString templateTableItem = "";
+    if (table.open(QFile::ReadOnly | QFile::Text)
+        && tableItem.open(QFile::ReadOnly | QFile::Text))
+    {
+        QTextStream inTable(&table);
+        QTextStream inTableItem(&tableItem);
+        templateTable = inTable.readAll();
+        templateTableItem = inTableItem.readAll();
+    }
+    else
+    {
+        QMessageBox::critical(this,
+            QApplication::applicationName() + " - " + tr("Fichier template introuvable"),
+            tr("Un ou plusieurs fichiers parmi :\n")
+            + "     -\"TableauEmissions.html\"\n"
+            + "     -\"TableauEmissionsItem.html\"\n"
+            + tr("attendus dans\n")
+            + ressourcesHtml.toString()
+            + tr("\nsont introuvables. Impossible de générer les récapitulatifs annuels.\n\n Arrêt"));
+
+        p_etatGenerationARetourner = AeroDmsTypes::EtatGeneration_FICHIER_ABSENT;
+        return html ;
+    }
+
+    html = templateTable;
+    
+    const AeroDmsTypes::ListeStatsEmissionsCo2 listeConsommations = db->recupererStatsEmissions(p_annee,
+        AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+        AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL);
+    const AeroDmsTypes::ParametresEmissionsCo2 parametresEmissionsCo2 = db->lireParametresEmissionsCo2();
+
+   
+    AeroDmsTypes::TotauxConsoEmissionsCo2 totauxEmissionsCo2;
+
+    QString typeVol = "";
+    int compteurTypesAeronefDansLeTypeDeVol = -1;
+
+    for (int i = 0; i < listeConsommations.liste.size(); i++)
+    {
+
+        QString item = templateTableItem;
+
+        if (typeVol != listeConsommations.liste.at(i).activiteOuTypeDeVol)
+        {
+            typeVol = listeConsommations.liste.at(i).activiteOuTypeDeVol;
+            
+            //Si compteur vaut -1, on est au premier tour, on ne fait rien. Sinon, on a déjà des items =>
+            //on met les totaux, et on renseigne le rowspan de la première ligne du type de vol
+            if (compteurTypesAeronefDansLeTypeDeVol != -1)
+            {  
+                completerTotauxRecapEmissionsCo2(html, 
+                    item, 
+                    totauxEmissionsCo2.getTotal(), 
+                    compteurTypesAeronefDansLeTypeDeVol+1);
+
+                item = templateTableItem;         
+            }
+            //puis on rince 
+            compteurTypesAeronefDansLeTypeDeVol = 0; 
+            totauxEmissionsCo2.rincerTotal();
+        }
+
+        //On fait les différentes sommes
+        AeroDmsTypes::StatsEmissionsCo2 consoSansCo2 = db->recupererEmissionsCompensees(p_annee,
+            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+            AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL,
+            listeConsommations.liste.at(i).type,
+            listeConsommations.liste.at(i).activiteOuTypeDeVol);
+
+        totauxEmissionsCo2.calculerEmissions(listeConsommations.liste.at(i), 
+            consoSansCo2, 
+            parametresEmissionsCo2);
+
+        //Si on est sur le premier tour, on renseigne la ligne type de vol
+        //sinon, on la retire !
+        if (compteurTypesAeronefDansLeTypeDeVol == 0)
+        {
+            item.replace("__Activite__", listeConsommations.liste.at(i).activiteOuTypeDeVol);
+        }
+        else
+        {
+            item.replace("<td class=\"tg-73oq\" <!--span-->>__Activite__</td>", "");
+        }
+
+        item.replace("__TypeAvion__", listeConsommations.liste.at(i).type);
+        completerChampsCommunsRecapEmissionsCo2(item, totauxEmissionsCo2.getCourant());
+
+        compteurTypesAeronefDansLeTypeDeVol++;
+
+        html.replace("<!--AccrocheEmissions-->", item);
+    }
+    
+    //A la fin du dernier tour on met le dernier sous total
+    QString item = templateTableItem;
+    completerTotauxRecapEmissionsCo2(html, 
+        item, 
+        totauxEmissionsCo2.getTotal(), 
+        compteurTypesAeronefDansLeTypeDeVol + 1);
+
+    //On remplit le total général
+    html.replace("__Totaux", "__");
+    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+    //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
+    html.replace("__ConsoEnergie__", totauxEmissionsCo2.getTotalGeneral().consoAvecUnites(true));
+    completerChampsCommunsRecapEmissionsCo2(html, 
+        totauxEmissionsCo2.getTotalGeneral());
+    completerChampsLegendeEmissions(html,
+        parametresEmissionsCo2);
+
+    return html;
+}
+
+void PdfRenderer::completerChampsCommunsRecapEmissionsCo2(QString &p_item, const AeroDmsTypes::TotalConsoEmissionsCo2 & p_totaux)
+{
+    QString HdV = AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.quantite);
+    if (p_totaux.dureeDesVolsEnMinute.dontCompense != 0.0)
+    {
+        HdV = HdV + "<br />(" + AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.dontCompense) + ")";
+    }
+
+    p_item.replace("__NbVol__", p_totaux.nbVols());
+    p_item.replace("__DureeVol__", HdV);
+    p_item.replace("__ConsoEnergie__", p_totaux.consoAvecUnites());
+    p_item.replace("__EmissionsDirectes__", p_totaux.emissionsAvecUnite(AeroDmsTypes::TotalConsoEmissionsCo2::TypeEmissionsDemande_DIRECTES));
+    p_item.replace("__EmissionsIndirectes__", p_totaux.emissionsAvecUnite(AeroDmsTypes::TotalConsoEmissionsCo2::TypeEmissionsDemande_INDIRECTES));
+    p_item.replace("__EmissionsTotales__", p_totaux.emissionsAvecUnite(AeroDmsTypes::TotalConsoEmissionsCo2::TypeEmissionsDemande_TOTALES));
+
+    //On rempli la couleur de la case type selon le type de décompte
+    if (p_totaux.typeDecompte == AeroDmsTypes::TypeDecompte_HORAIRE)
+    {
+        //rouge
+        p_item.replace("__CouleurTypeAvion__", "tg-feht");
+    }
+    else if (p_totaux.typeDecompte == AeroDmsTypes::TypeDecompte_UNITAIRE)
+    {
+        //violet
+        p_item.replace("__CouleurTypeAvion__", "tg-cg1m");
+    }
+    else
+    {
+        //Sinon vaut indéfini => c'est un sous_total ou un total général, on le met en gris
+        p_item.replace("__CouleurTypeAvion__", "tg-npz6");
+    }
+
+    //On rempli la couleur de la case type selon le type de décompte
+    if (p_totaux.unite == AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE)
+    {
+        //bleu comme la 100LL
+        p_item.replace("__CouleurEnergie__", "tg-xso2");
+    }
+    else if (p_totaux.unite == AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE)
+    {
+        //jaune comme la légère couleur du Jet A1
+        p_item.replace("__CouleurEnergie__", "tg-tqgz");
+    }
+    else if (p_totaux.unite == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
+    {
+        //vert comme de l'éléctricité française peu carbonnée...
+        p_item.replace("__CouleurEnergie__", "tg-1a9d");
+    }
+    else
+    {
+        //Sinon vaut indéfini => c'est un sous_total ou un total général, on le met en gris
+        p_item.replace("__CouleurEnergie__", "tg-npz6");
+    }
+}
+
+void PdfRenderer::completerTotauxRecapEmissionsCo2(QString & p_html, 
+    QString& p_item, 
+    const AeroDmsTypes::TotalConsoEmissionsCo2& p_totaux, 
+    const int p_nbLignes)
+{
+    p_item.replace("<td class=\"tg-73oq\" <!--span-->>__Activite__</td>", "");
+    p_item.replace("tg-73oq", "tg-npz6");
+    p_item.replace("__TypeAvion__", "Totaux");
+    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+    //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
+    p_item.replace("__ConsoEnergie__", p_totaux.consoAvecUnites(true));
+
+    completerChampsCommunsRecapEmissionsCo2(p_item, p_totaux);
+
+    p_html.replace("<!--AccrocheEmissions-->", p_item);
+    p_html.replace("<!--span-->", "rowspan=\"" + QString::number(p_nbLignes, 'f', 0) + "\"");
+}
+
+void PdfRenderer::completerChampsLegendeEmissions(QString& p_html, 
+    const AeroDmsTypes::ParametresEmissionsCo2 & p_parametresEmissionsCo2)
+{
+    p_html.replace("__kgCo2CombustionLEssence__", QString::number(p_parametresEmissionsCo2.kgCo2ParLitreEssence, 'f', 3));
+    p_html.replace("__kgCo2CombustionLKerosene__", QString::number(p_parametresEmissionsCo2.kgCo2ParLitreGasoil, 'f', 3));
+    p_html.replace("__kgCo2kWh__", QString::number(p_parametresEmissionsCo2.kgCo2ParKwh, 'f', 3));
+    p_html.replace("__kgCo2Indirectes__", QString::number(p_parametresEmissionsCo2.kgCo2IndirectsParHdv, 'f', 3)); 
 }
 
 QString PdfRenderer::genererImagesStatistiques(const int p_annee)

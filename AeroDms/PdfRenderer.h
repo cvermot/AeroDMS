@@ -89,6 +89,16 @@ private :
 
 	QString genererHtmlRecapBaladesSorties( const int p_annee, 
 		                                    AeroDmsTypes::EtatGeneration& p_etatGenerationARetourner);
+	QString genererHtmlRecapEmissionsCo2( const int p_annee,
+		                                  AeroDmsTypes::EtatGeneration& p_etatGenerationARetourner);
+	void completerChampsCommunsRecapEmissionsCo2(QString& p_item, 
+		const AeroDmsTypes::TotalConsoEmissionsCo2& p_totaux);
+	void completerTotauxRecapEmissionsCo2(QString& p_html, 
+		QString& p_item, 
+		const AeroDmsTypes::TotalConsoEmissionsCo2& p_totaux, 
+		const int p_nbLignes);
+	void completerChampsLegendeEmissions(QString& p_html,
+		const AeroDmsTypes::ParametresEmissionsCo2& p_parametresEmissionsCo2);
 
 	QString mergerPdf();
 

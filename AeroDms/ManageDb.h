@@ -113,7 +113,8 @@ public:
         const int p_options,
         const bool p_volsSoumisUniquement);
     const AeroDmsTypes::SubventionsParPilote recupererTotauxAnnuel( const int p_annee,
-        const bool p_volsSoumisUniquement = false);
+        const bool p_volsSoumisUniquement = false,
+        const int p_options = 0);
     const AeroDmsTypes::ListeSubventionsParPilotes recupererLesSubventionesDejaAllouees(const int annee);
     const AeroDmsTypes::ListeVols recupererVols( const int p_annee = AeroDmsTypes::K_INIT_INT_INVALIDE,
         const QString p_piloteId = "*");
@@ -163,9 +164,15 @@ public:
         const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
-    const AeroDmsTypes::ListeStatsEmissionsCo2 recupererStatsEmissionsParTypeDeVol(const int p_annee,
+    const AeroDmsTypes::ListeStatsEmissionsCo2 recupererStatsEmissions(const int p_annee,
         const int p_options,
         const AeroDmsTypes::Statistiques p_statDemandee);
+    const AeroDmsTypes::StatsEmissionsCo2 recupererEmissionsCompensees(const int p_annee,
+        const int p_options,
+        const AeroDmsTypes::Statistiques p_statDemandee,
+        const QString& p_type,
+        const QString& p_activite);
+    AeroDmsTypes::StatsEmissionsCo2 deplierRequeteEmissions(const QSqlQuery& p_query);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParCheque();
@@ -239,6 +246,9 @@ private:
     void enregistrerParametreUnitaire(const QString& p_nomParametre,
         const double p_valeur);
     static const QString genererClauseFiltrageActivite(const int p_options);
+    void genererClauseGroupementSelonStatDemandee(const AeroDmsTypes::Statistiques p_statDemandee,
+        QString& p_clauseGroupBy,
+        QString& p_clauseSelect);
     void executerRequeteAvecControle(QSqlQuery& p_query,
         const QString p_nomRequete,
         const QString p_texteDetailErreur);

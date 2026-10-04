@@ -4666,7 +4666,6 @@ void AeroDms::envoyerMail()
                             + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement), 'f', 2)
                             + "€\n";
                         const AeroDmsTypes::ListeVols listeVols = db->recupererVolsParDemandeDeRemboursement(listeVirements.at(pilote).listeIdVirements.at(virement));
-                        qDebug() << listeVirements.at(pilote).mail << listeVirements.at(pilote).listeIdVirements.at(virement);
                         for (const AeroDmsTypes::Vol vol : listeVols)
                         {
                             stringListeVols = stringListeVols + "\t\tVol du " + vol.date.toString("dd/MM/yyyy") + " d'une durée de " + vol.duree + " pour un coût de vol de " + QString::number(vol.coutVol, 'f', 2) + "€ (subvention allouée pour ce vol : "+ QString::number(vol.montantRembourse, 'f', 2)  + "€)\n";
@@ -5301,7 +5300,6 @@ const int AeroDms::calculerValeurGraphAGenererPdf()
     {
         valeur = valeur + AeroDmsTypes::Statistiques_AERONEFS;
     }
-    //TODO ajouter les graphs CO2
 
     if (boutonGraphResolutionFullHd->isChecked())
     {

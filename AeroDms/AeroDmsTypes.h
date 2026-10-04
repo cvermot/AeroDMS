@@ -773,26 +773,25 @@ public:
     public:
         QString type = K_INIT_QSTRING;
         QString activiteOuTypeDeVol = K_INIT_QSTRING;
-        double consommation = 0.0;
+        double consommationHoraireDuType = 0.0;
         int nombreMinutesVol = K_INIT_INT;
         int nombreDeVols = K_INIT_INT;
         UniteTypeConsommation uniteTypeConsommation = UniteTypeConsommation_INDEFINI ;
         TypeDecompte typeDecompte = TypeDecompte_INDEFINI ;
 
-        //Retourne la consommation en litres selon la durée du vol ou en unitaire selon le cas
-        const double consommationEnLitres() const
+        //Retourne la consommation en litres ou en KWh selon la durée du vol ou en unitaire selon le cas
+        const double consommationDEnergie() const
         {
             switch (typeDecompte)
             {
                 case TypeDecompte_HORAIRE:
                 {
-                    return consommation * nombreMinutesVol / 60.0;
+                    return consommationHoraireDuType * nombreMinutesVol / 60.0;
                 }
                 break;
                 case TypeDecompte_UNITAIRE:
                 {
-                    qDebug() << "unitaire " << consommation * nombreDeVols << nombreDeVols;
-                    return consommation * nombreDeVols;
+                    return consommationHoraireDuType * nombreDeVols;
                 }
                 break;
                 case TypeDecompte_INDEFINI:
@@ -809,6 +808,78 @@ public:
     {
         QVector<StatsEmissionsCo2> liste;
         Statistiques caracteristiqueDuChampActiviteOuTypeDeVol = Statistiques_CO2_PAR_TYPE_DE_VOL;
+    };
+
+    class QuantiteDontCompense
+    {
+        public:
+            double quantite = 0.0;
+            double dontCompense = 0.0;
+            QString unite = "";
+            QString typeDEnergie = "";
+
+            const QString consoAvecUnites(const bool p_total) const;
+    };
+    static const QuantiteDontCompense K_INIT_QUANTITE_DONT_COMPENSE;
+
+    struct QuantiteDontCompenseInt
+    {
+        int quantite = 0;
+        int dontCompense = 0;
+    };
+    static const QuantiteDontCompenseInt K_INIT_QUANTITE_DONT_COMPENSE_INT;
+
+
+    class TotalConsoEmissionsCo2
+    {
+        public :
+            QuantiteDontCompense litresEssence = K_INIT_QUANTITE_DONT_COMPENSE;
+            QuantiteDontCompense litreKerosene = K_INIT_QUANTITE_DONT_COMPENSE;
+            QuantiteDontCompense kwhElectricite = K_INIT_QUANTITE_DONT_COMPENSE;
+            QuantiteDontCompense co2Direct = K_INIT_QUANTITE_DONT_COMPENSE;
+            double co2Indirect = 0.0;
+            QuantiteDontCompenseInt dureeDesVolsEnMinute = K_INIT_QUANTITE_DONT_COMPENSE_INT;
+            QuantiteDontCompenseInt nombreDeVols = K_INIT_QUANTITE_DONT_COMPENSE_INT;
+            TypeDecompte typeDecompte = TypeDecompte_INDEFINI;
+            UniteTypeConsommation unite = UniteTypeConsommation_INDEFINI;
+
+            enum TypeEmissionsDemande
+            {
+                TypeEmissionsDemande_DIRECTES,
+                TypeEmissionsDemande_INDIRECTES,
+                TypeEmissionsDemande_TOTALES
+            };
+
+            TotalConsoEmissionsCo2();
+            //Cette méthode retourne la consommation avec les unités.
+            //Si le type contient plusieurs types de consommation (des litres et des kWh par exemple,
+            //possible sur les totaux généraux, le string retournée inclu l'ensemble avec les unités 
+            // associées ("76L + 32 kWh", par exemple)
+            const QString consoAvecUnites(const bool p_total = false) const;
+            //Le total donne la somme émissions directes + indirectes
+            const QString emissionsAvecUnite(const TypeEmissionsDemande) const;
+            const QString nbVols() const;
+    };
+
+    class TotauxConsoEmissionsCo2
+    {
+        public:
+
+            //Calcules les émissions pour un nouveau type et réaliser les sommes
+            void calculerEmissions( const StatsEmissionsCo2 & p_statsDuType, 
+                                    const StatsEmissionsCo2 & p_dontCompense,
+                                    const ParametresEmissionsCo2 & p_parametresEmissionsCo2);
+            //Rince la donnée total
+            void rincerTotal();
+
+            const TotalConsoEmissionsCo2& getCourant();
+            const TotalConsoEmissionsCo2& getTotal();
+            const TotalConsoEmissionsCo2& getTotalGeneral();
+
+        private:
+            TotalConsoEmissionsCo2 courant;
+            TotalConsoEmissionsCo2 total;
+            TotalConsoEmissionsCo2 totalGeneral;
     };
 
     struct DetailsBaladesEtSorties
