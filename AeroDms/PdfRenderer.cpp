@@ -1331,7 +1331,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
         }
         else
         {
-            item.replace("<td class=\"tg-73oq\" <!--span-->>__Activite__</td>", "");
+            item.replace("<td class=\"tg-nkdd\" <!--span-->>__Activite__</td>", "");
         }
 
         item.replace("__TypeAvion__", listeConsommations.liste.at(i).type);
@@ -1422,7 +1422,7 @@ void PdfRenderer::completerTotauxRecapEmissionsCo2(QString & p_html,
     const AeroDmsTypes::TotalConsoEmissionsCo2& p_totaux, 
     const int p_nbLignes)
 {
-    p_item.replace("<td class=\"tg-73oq\" <!--span-->>__Activite__</td>", "");
+    p_item.replace("<td class=\"tg-nkdd\" <!--span-->>__Activite__</td>", "");
     p_item.replace("tg-73oq", "tg-npz6");
     p_item.replace("__TypeAvion__", "Totaux");
     //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici

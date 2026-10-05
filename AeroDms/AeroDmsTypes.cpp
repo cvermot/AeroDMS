@@ -331,11 +331,10 @@ const QString AeroDmsTypes::TotalConsoEmissionsCo2::emissionsAvecUnite(TypeEmiss
         break;
         case TypeEmissionsDemande_TOTALES:
         {
-            emissions = QString::number(co2Direct.quantite, 'f', 0) + co2Direct.unite;
-            const double emissionsTotales = co2Direct.dontCompense + co2Indirect;
-            if (emissionsTotales != 0.0)
+            emissions = QString::number(co2Direct.quantite + co2Indirect, 'f', 0) + co2Direct.unite;
+            if (co2Direct.dontCompense != 0.0)
             {
-                emissions = emissions + "<br />(" + QString::number(emissionsTotales, 'f', 0) + co2Direct.unite + ")";
+                emissions = emissions + "<br />(" + QString::number(co2Direct.dontCompense, 'f', 0) + co2Direct.unite + ")";
             }
         }
         break;
