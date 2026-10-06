@@ -1364,10 +1364,10 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
 void PdfRenderer::completerChampsCommunsRecapEmissionsCo2(QString &p_item, const AeroDmsTypes::TotalConsoEmissionsCo2 & p_totaux)
 {
-    QString HdV = AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.quantite);
+    QString HdV = AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.quantite - p_totaux.dureeDesVolsEnMinute.dontCompense);
     if (p_totaux.dureeDesVolsEnMinute.dontCompense != 0.0)
     {
-        HdV = HdV + "<br />(" + AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.dontCompense) + ")";
+        HdV = HdV + "<br />(" + AeroDmsServices::convertirMinutesEnHeuresMinutes(p_totaux.dureeDesVolsEnMinute.quantite) + ")";
     }
 
     p_item.replace("__NbVol__", p_totaux.nbVols());

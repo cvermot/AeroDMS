@@ -255,10 +255,10 @@ const QString AeroDmsTypes::QuantiteDontCompense::consoAvecUnites(const bool p_t
             conso = typeDEnergie + " :<br />";
         }
 
-        conso = conso + QString::number(quantite, 'f', 0) + unite;
+        conso = conso + QString::number(quantite - dontCompense, 'f', 0) + unite;
         if (dontCompense != 0.0)
         {
-            conso = conso + "<br />(" + QString::number(dontCompense, 'f', 0) + unite + ")";
+            conso = conso + "<br />(" + QString::number(quantite, 'f', 0) + unite + ")";
         }
     }
 
@@ -270,10 +270,10 @@ const QString AeroDmsTypes::TotalConsoEmissionsCo2::nbVols() const
     QString nbVols = "";
 
 
-    nbVols = QString::number(nombreDeVols.quantite, 'f', 0);
+    nbVols = QString::number(nombreDeVols.quantite - nombreDeVols.dontCompense, 'f', 0);
     if (nombreDeVols.dontCompense != 0.0)
     {
-        nbVols = nbVols + "<br />(" + QString::number(nombreDeVols.dontCompense, 'f', 0) + ")";
+        nbVols = nbVols + "<br />(" + QString::number(nombreDeVols.quantite, 'f', 0) + ")";
     }
 
     return nbVols;
@@ -331,10 +331,10 @@ const QString AeroDmsTypes::TotalConsoEmissionsCo2::emissionsAvecUnite(TypeEmiss
         break;
         case TypeEmissionsDemande_TOTALES:
         {
-            emissions = QString::number(co2Direct.quantite + co2Indirect, 'f', 0) + co2Direct.unite;
+            emissions = QString::number(co2Direct.quantite - co2Direct.dontCompense + co2Indirect, 'f', 0) + co2Direct.unite;
             if (co2Direct.dontCompense != 0.0)
             {
-                emissions = emissions + "<br />(" + QString::number(co2Direct.dontCompense, 'f', 0) + co2Direct.unite + ")";
+                emissions = emissions + "<br />(" + QString::number(co2Direct.quantite + co2Indirect, 'f', 0) + co2Direct.unite + ")";
             }
         }
         break;
