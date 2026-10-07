@@ -45,15 +45,24 @@ const AeroDmsTypes::Vol AeroDmsTypes::K_INIT_VOL = { K_INIT_QSTRING,//QString id
                                                      K_INIT_QSTRING,//QString immat;
                                                      K_INIT_QSTRING,//QString activite;
                                                      K_INIT_QSTRING,//QString estSoumisCe;
-                                                     false,//bool estSoumis
-                                                     false,//bool soumissionEstDelayee
+                                                     false,//bool estSoumis;
+                                                     false,//bool soumissionEstDelayee;
                                                      0.0,//double coutVol;
                                                      0.0,//double montantRembourse;
                                                      K_INIT_INT,//int volId;
                                                      K_INIT_INT,//int dureeEnMinutes;
                                                      K_INIT_INT_INVALIDE,//int baladeId;
-                                                     K_INIT_INT_INVALIDE//int facture
+                                                     K_INIT_INT_INVALIDE,//int factureId;
+                                                     K_INIT_QSTRING,//QString imputation;
+													 K_INIT_QSTRING//QString descriptionImputation;
 };
+
+const AeroDmsTypes::Imputation AeroDmsTypes::K_INIT_IMPUTATION = {
+    K_INIT_INT_INVALIDE,
+    K_INIT_QSTRING,
+    K_INIT_QSTRING
+};
+
 
 const AeroDmsTypes::DonneesFacture AeroDmsTypes::K_INIT_DONNEES_FACTURE = { QDate(),
                                                                             QTime(),

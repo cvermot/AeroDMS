@@ -360,6 +360,9 @@ void AeroDms::initialiserOngletVols()
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(tr("Immatriculation")));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(tr("Activité")));
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(tr("Durée en minutes")));
+    QTableWidgetItem* imputationTwi = new QTableWidgetItem(tr("Imputation"));
+	imputationTwi->setToolTip(tr("Imputation du vol en termes d'émissions CO₂ (modifiable via clic droit sur le vol)"));
+    vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_IMPUTATION, imputationTwi);
     vueVols->setHorizontalHeaderItem(AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(tr("ID")));
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_VOL_ID, true);
     vueVols->setColumnHidden(AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, true);
@@ -1312,6 +1315,10 @@ void AeroDms::initialiserBoitesDeDialogues()
 
     dialogueGestionAeronefs = new DialogueGestionAeronefs(db, this);
     dialogueGestionTypesAeronefs = new DialogueGestionTypesAeronefs(db, this);
+
+    dialogueModifierImputation = new DialogueModifierImputation(db,
+        this);
+    connect(dialogueModifierImputation, SIGNAL(accepted()), this, SLOT(prendreEnCompteModifImputation()));
 
     //Gestion des signaux liés à la génération PDF
     connect(pdf, SIGNAL(mettreAJourNombreFacturesATraiter(int)), this, SLOT(ouvrirFenetreProgressionGenerationPdf(int)));
@@ -2422,9 +2429,9 @@ void AeroDms::peuplerTableVols()
             vueVols->setRowCount(nbItems + 1);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
-            QTableWidgetItem *twSoumisCe = new QTableWidgetItem(vol.estSoumisCe);
-            twSoumisCe->setIcon(AeroDmsServices::recupererIcone(vol.estSoumisCe));
-            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, twSoumisCe);
+            //QTableWidgetItem *twSoumisCe = new QTableWidgetItem(vol.estSoumisCe);
+            //twSoumisCe->setIcon(AeroDmsServices::recupererIcone(vol.estSoumisCe));
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol, 'f', 2).append(" €")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SUBVENTION, new QTableWidgetItem(QString::number(vol.montantRembourse, 'f', 2).append(" €")));
@@ -2433,6 +2440,8 @@ void AeroDms::peuplerTableVols()
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_ACTIVITE, new QTableWidgetItem(vol.activite));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_IMMAT, new QTableWidgetItem(vol.immat));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE_EN_MINUTES, new QTableWidgetItem(QString::number(vol.dureeEnMinutes)));
+            QTableWidgetItem* twImputation = new QTableWidgetItem(vol.imputation);
+            vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_IMPUTATION, twImputation);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_VOL_ID, new QTableWidgetItem(QString::number(vol.volId)));
 
             if (vol.soumissionEstDelayee)
@@ -2440,9 +2449,14 @@ void AeroDms::peuplerTableVols()
                 for (int i = 0; i < vueVols->columnCount(); i++)
                 {
                     vueVols->item(nbItems, i)->setBackground(QBrush(QColor(255, 140, 135, 120)));
-                    vueVols->item(nbItems, i)->setToolTip("Ce vol est marqué comme à ne pas soumettre au CSE.\nPour soumettre ce vol au CSE, faire un clic droit sur ce vol et utilisez la fonction \"Marquer/démarquer le vol comme à ne pas soumettre au CSE\".");
+                    vueVols->item(nbItems, i)->setToolTip(tr("Ce vol est marqué comme à ne pas soumettre au CSE.\nPour soumettre ce vol au CSE, faire un clic droit sur ce vol et utilisez la fonction \"Marquer/démarquer le vol comme à ne pas soumettre au CSE\"."));
                 }
             }
+
+            twImputation->setToolTip(vol.descriptionImputation);
+
+            mettreAJourIconesTableVols(nbItems);
+
             nbItems++;
         }
     }
@@ -2456,6 +2470,27 @@ void AeroDms::peuplerTableVols()
     {
         boutonGenerePdfRecapHdv->setEnabled(false);
         mailingPilotesAyantCotiseCetteAnnee->setEnabled(false);
+    }
+}
+
+void AeroDms::mettreAJourIconesTableVols(const int p_ligne)
+{
+    vueVols->item(p_ligne, 
+        AeroDmsTypes::VolTableElement_SOUMIS_CE)->setIcon(AeroDmsServices::recupererIcone(vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_SOUMIS_CE)->text()));
+
+    vueVols->item(p_ligne,
+        AeroDmsTypes::VolTableElement_ACTIVITE)->setIcon(AeroDmsServices::recupererIcone(vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_ACTIVITE)->text()));
+
+    vueVols->item(p_ligne,
+        AeroDmsTypes::VolTableElement_TYPE_DE_VOL)->setIcon(AeroDmsServices::recupererIcone(vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_TYPE_DE_VOL)->text()));
+
+    if (vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_IMPUTATION)->text() == "Section aéro")
+    {
+        vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_IMPUTATION)->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_IMPUTATION_SECTION));
+    }
+    else
+    {
+        vueVols->item(p_ligne, AeroDmsTypes::VolTableElement_IMPUTATION)->setIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_IMPUTATION_AUTRE_SECTION));
     }
 }
 
@@ -4261,11 +4296,18 @@ void AeroDms::menuContextuelVols(const QPoint& pos)
         menuClicDroitVol.addAction(&soumettreLeVolAuCsePlusTard);
         soumettreLeVolAuCsePlusTard.setEnabled(leVolEstSupprimable);
 
+        QAction imputerLeVol(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_MODIFIER_IMPUTATION),
+            tr("Modifier l'imputation du vol"),
+			this);
+		connect(&imputerLeVol, SIGNAL(triggered()), this, SLOT(imputerVol()));
+        menuClicDroitVol.addAction(&imputerLeVol);
+
         if (logicielEnModeLectureSeule)
         {
             editerLeVol.setEnabled(false);
             supprimerLeVol.setEnabled(false);
             soumettreLeVolAuCsePlusTard.setEnabled(false);
+            imputerLeVol.setEnabled(false);
         }
 
         //Afficher le menu sur la vue des vols
@@ -4375,6 +4417,13 @@ void AeroDms::switchMarquageVolASoumettrePlusTard()
     //On sort du mode suppression de vol
     volAEditer = AeroDmsTypes::K_INIT_INT_INVALIDE;
 
+    peuplerTableVols();
+}
+
+void AeroDms::imputerVol()
+{
+    dialogueModifierImputation->modifierImputation(volAEditer);
+    dialogueModifierImputation->exec();
     peuplerTableVols();
 }
 

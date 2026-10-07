@@ -151,5 +151,9 @@
         <file>ressources/fuel.svg</file>
         <file>ressources/HTML/TableauEmissions.html</file>
         <file>ressources/HTML/TableauEmissionsItem.html</file>
+        <file>ressources/link-plus.svg</file>
+        <file>ressources/link-edit.svg</file>
+        <file>ressources/link-circle-outline.svg</file>
+        <file>ressources/link-circle.svg</file>
     </qresource>
 </RCC>

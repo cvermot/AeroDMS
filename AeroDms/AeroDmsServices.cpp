@@ -393,6 +393,26 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/fuel.svg");
         }
         break;
+        case AeroDmsTypes::Icone_IMPUTATION_SECTION:
+        {
+            return QIcon(":/AeroDms/ressources/link-circle-outline.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_IMPUTATION_AUTRE_SECTION:
+        {
+            return QIcon(":/AeroDms/ressources/link-circle.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_MODIFIER_IMPUTATION:
+        {
+            return QIcon(":/AeroDms/ressources/link-edit.svg");
+        }
+        break;
+        case AeroDmsTypes::Icone_NOUVELLE_IMPUTATION:
+        {
+            return QIcon(":/AeroDms/ressources/link-plus.svg");
+        }
+        break;
 
         case AeroDmsTypes::Icone_A:
         case AeroDmsTypes::Icone_A_MINUSCULE:

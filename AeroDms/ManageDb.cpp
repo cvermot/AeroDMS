@@ -1092,6 +1092,8 @@ const AeroDmsTypes::Vol ManageDb::depilerRequeteVol(const QSqlQuery p_query,
             vol.baladeId = p_query.value("sortie").toInt();
         }
     }
+	vol.imputation = p_query.value("nomImputation").toString();
+    vol.descriptionImputation = p_query.value("descriptionImputation").toString();
 
     return vol;
 }
@@ -3213,4 +3215,86 @@ const AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indica
 	}
 
     return AeroDmsTypes::Status_AUCUNE_ACTION_EFFECTUEE;
+}
+
+const AeroDmsTypes::Imputation ManageDb::recupererDetailsImputationVol(const int p_idVol)
+{
+    QSqlQuery query;
+    query.prepare("SELECT imputation FROM vol WHERE volId = :volId");
+    query.bindValue(":volId", QString::number(p_idVol));
+    query.exec();
+
+    if (query.next())
+    {
+        const int idImputation = query.value("imputation").toInt();
+
+        query.prepare("SELECT * FROM imputation WHERE id = :id");
+        query.bindValue(":id", QString::number(idImputation));
+
+        query.exec();
+        if (query.next())
+        {
+            return depilerRequeteImputation(query);
+        }
+    }
+
+    return AeroDmsTypes::K_INIT_IMPUTATION;
+}
+
+const AeroDmsTypes::ListeImputations ManageDb::recupereListeImputations()
+{
+    AeroDmsTypes::ListeImputations liste;
+
+    QSqlQuery query;
+    query.prepare("SELECT * FROM imputation");
+
+    query.exec();
+    while (query.next())
+    {
+        liste.append(depilerRequeteImputation(query));
+    }
+
+    return liste;
+}
+
+const AeroDmsTypes::Imputation ManageDb::depilerRequeteImputation(const QSqlQuery& p_query)
+{
+    AeroDmsTypes::Imputation imputation = AeroDmsTypes::K_INIT_IMPUTATION;
+
+    imputation.id = p_query.value("id").toInt();
+    imputation.nom = p_query.value("nom").toString();
+    imputation.description = p_query.value("description").toString();
+
+    return imputation;
+}
+
+void ManageDb::enregistrerImputation( const AeroDmsTypes::Imputation p_imputation, 
+                                      const int p_idVol)
+{
+    QSqlQuery query;
+
+    int id = p_imputation.id;
+
+    //Si id de l'imputation vaut INVALIDE, c'est qu'on est sur une nouvelle imputation => on la créé en BDD
+    if (id == AeroDmsTypes::K_INIT_INT_INVALIDE)
+    {
+        query.prepare("INSERT INTO imputation (nom, description) VALUES (:nom, :description) RETURNING id");
+        query.bindValue(":description", p_imputation.description);
+        query.bindValue(":nom", p_imputation.nom);
+        query.exec();
+        query.next();
+        id = query.value("id").toInt();
+    }
+
+    //On met à jour la description de l'imputation
+    query.prepare("UPDATE imputation SET description = :description WHERE id = :id");
+    query.bindValue(":description", p_imputation.description);
+    query.bindValue(":id", id);
+    query.exec();
+
+    //On met à jour l'imputation du vol
+    query.prepare("UPDATE vol SET imputation = :imputation WHERE volId = :volId");
+    query.bindValue(":imputation", id);
+    query.bindValue(":volId", p_idVol);
+    query.exec();
 }

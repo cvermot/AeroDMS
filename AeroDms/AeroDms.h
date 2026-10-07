@@ -34,6 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueAjouterSortie.h"
 #include "DialogueGestionAeronefs.h"
 #include "DialogueGestionTypesAeronefs.h"
+#include "DialogueModifierImputation.h"
 #include "DialogueProgressionGenerationPdf.h"
 #include "StatistiqueWidget.h"
 
@@ -145,6 +146,7 @@ private:
     DialogueAjouterSortie* dialogueAjouterSortie = nullptr;
     DialogueGestionAeronefs* dialogueGestionAeronefs = nullptr;
     DialogueGestionTypesAeronefs* dialogueGestionTypesAeronefs = nullptr;
+    DialogueModifierImputation* dialogueModifierImputation = nullptr;
 
     QPdfDocument* pdfDocument = nullptr;
     QPdfView* pdfView = nullptr;
@@ -400,6 +402,7 @@ public slots:
     void peuplerTableFactures();
     void peuplerTableRecettes();
     void peuplerTableSubventionsDemandees();
+    void mettreAJourIconesTableVols(const int p_ligne);
     void ajusterTableSubventionsDemandeesAuContenu();
     void ouvrirFenetreProgressionGenerationPdf(const int p_nombreDeFacturesATraiter);
     void mettreAJourFenetreProgressionGenerationPdf(const int p_nombreDeFacturesTraitees);
@@ -415,6 +418,7 @@ public slots:
     void editerCotisation();
     void editerVol();
     void supprimerVol();
+    void imputerVol();
     void switchMarquageVolASoumettrePlusTard();
     void ajouterUneNoteSubvention();
     void switchModeDebug();

@@ -69,7 +69,8 @@ public:
         VolTableElement_ACTIVITE = 0x9,
         VolTableElement_VOL_ID = 0xA,
         VolTableElement_DUREE_EN_MINUTES = 0xB,
-        VolTableElement_NB_COLONNES = 0xC,
+        VolTableElement_IMPUTATION = 0xC,
+        VolTableElement_NB_COLONNES = 0xD,
     };
 
     enum FactureTableElement 
@@ -520,9 +521,19 @@ public:
         int dureeEnMinutes = K_INIT_INT;
         int baladeId = K_INIT_INT_INVALIDE;
         int facture = K_INIT_INT_INVALIDE;
+		QString imputation = K_INIT_QSTRING;
+        QString descriptionImputation = K_INIT_QSTRING;
     };
     static const Vol K_INIT_VOL;
     typedef QList<Vol> ListeVols;
+
+    struct Imputation {
+        int id = K_INIT_INT_INVALIDE;
+        QString nom = K_INIT_QSTRING;
+        QString description = K_INIT_QSTRING;
+    };
+    static const Imputation K_INIT_IMPUTATION;
+    typedef QVector<Imputation> ListeImputations;
 
     struct VolDemandeRemboursement {
         QDate date = QDate();
@@ -1087,6 +1098,11 @@ public:
         Icone_ESSENCE,
         Icone_GASOIL_KEROSENE,
         Icone_CARBURANT,
+
+        Icone_IMPUTATION_SECTION,
+        Icone_IMPUTATION_AUTRE_SECTION,
+        Icone_MODIFIER_IMPUTATION,
+        Icone_NOUVELLE_IMPUTATION,
 
         Icone_ICONE_APPLICATION,
 

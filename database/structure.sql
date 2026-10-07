@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on dim. oct. 4 10:45:47 2026
+-- File generated with SQLiteStudio v3.4.4 on mer. oct. 7 23:07:27 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS facturesSorties (id INTEGER PRIMARY KEY AUTOINCREMENT
 CREATE TABLE IF NOT EXISTS fichiersFacture (factureId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, nomFichier TEXT UNIQUE NOT NULL);
 INSERT INTO fichiersFacture (factureId, nomFichier) VALUES (0, 'FactureFictivePourInit');
 
+-- Table: imputation
+CREATE TABLE IF NOT EXISTS imputation (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, nom TEXT NOT NULL, description TEXT);
+INSERT INTO imputation (id, nom, description) VALUES (0, 'Section aéro', 'Vols réalisés pour le compte propre de la section aéronautique DMS');
+
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.14', NULL, NULL);
@@ -81,7 +85,7 @@ INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, est
 INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Fonctionnement', 6, 0, 1, 0);
 
 -- Table: vol
-CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), activite TEXT REFERENCES activite (nom) NOT NULL, sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT, immatriculation TEXT REFERENCES aeronef (immatriculation));
+CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), activite TEXT REFERENCES activite (nom) NOT NULL, sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT, immatriculation TEXT REFERENCES aeronef (immatriculation), imputation REFERENCES imputation (id) NOT NULL DEFAULT (0));
 
 -- Table: xAssociationRecette-Vol
 CREATE TABLE IF NOT EXISTS "xAssociationRecette-Vol" (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE, recetteId INTEGER REFERENCES recettes (recetteId) NOT NULL, volId INTEGER REFERENCES vol (volId) NOT NULL);
@@ -529,9 +533,12 @@ CREATE VIEW IF NOT EXISTS vols AS SELECT
     vol.remarque,
     vol.immatriculation,
     vol.demandeRemboursement,
-    vol.activite
+    vol.activite,
+    imputation.nom AS nomImputation,
+    imputation.description AS descriptionImputation
 FROM vol
-INNER JOIN pilote ON vol.pilote = pilote.piloteId;
+INNER JOIN pilote ON vol.pilote = pilote.piloteId
+INNER JOIN imputation ON vol.imputation = imputation.id;
 
 -- View: volsBaladesEtSorties
 CREATE VIEW IF NOT EXISTS volsBaladesEtSorties AS SELECT 

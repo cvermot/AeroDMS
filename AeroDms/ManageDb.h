@@ -207,6 +207,11 @@ public:
         const QString p_date, 
         const double p_coutDuVol);
 
+    const AeroDmsTypes::Imputation recupererDetailsImputationVol(const int p_idVol);
+    const AeroDmsTypes::ListeImputations recupereListeImputations();
+    void enregistrerImputation(const AeroDmsTypes::Imputation p_imputation, 
+        const int p_idVol);
+
     void demanderEnvoiBdd();
     const QStringList recupererListeFichiersPdfFactures();
     void libererVerrouBdd();
@@ -242,6 +247,7 @@ private:
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
     const AeroDmsTypes::Vol depilerRequeteVol(const QSqlQuery p_query,
         const bool p_avecFactureEtSortie = true);
+    static const AeroDmsTypes::Imputation depilerRequeteImputation(const QSqlQuery& p_query);
     const double lireParametreUnitaire(const QString &p_nomParametre);
     void enregistrerParametreUnitaire(const QString& p_nomParametre,
         const double p_valeur);
