@@ -66,7 +66,7 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
         case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
         {
-            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions( p_annee, 
+            const AeroDmsTypes::ListesStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions( p_annee, 
                                                                                                  p_options, 
                                                                                                  p_statistique );
             indiceCouleurEnCours = 0;
@@ -76,17 +76,17 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
             QString typeCourant = "init";
             auto series = new QPieSeries(this);
 
-            for (int i = 0; i < statsCo2.liste.size(); i++)
+            for (int i = 0; i < statsCo2.listes.at(0).size(); i++)
             {
-                if (typeCourant == statsCo2.liste.at(i).activiteOuTypeDeVol)
+                if (typeCourant == statsCo2.listes.at(0).at(i).activiteOuTypeDeVol)
                 {
                     QString unite = " L";
-                    if (statsCo2.liste.at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
+                    if (statsCo2.listes.at(0).at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
                     {
                         unite = " kWh";
                     }
-                    QPieSlice* pieSlice = new QPieSlice( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
-                                                         statsCo2.liste.at(i).consommationDEnergie());
+                    QPieSlice* pieSlice = new QPieSlice( statsCo2.listes.at(0).at(i).type + ", " + QString::number(statsCo2.listes.at(0).at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
+                                                         statsCo2.listes.at(0).at(i).consommationDEnergie());
                     series->append(pieSlice);
                 }
                 else
@@ -97,16 +97,16 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                                                             recupererNouvelleCouleur(), 
                                                             p_parametres.tailleDePolice );
                     }
-                    typeCourant = statsCo2.liste.at(i).activiteOuTypeDeVol;
+                    typeCourant = statsCo2.listes.at(0).at(i).activiteOuTypeDeVol;
                     series = new QPieSeries(this);
                     series->setName(typeCourant);
                     QString unite = " L";
-                    if (statsCo2.liste.at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
+                    if (statsCo2.listes.at(0).at(i).uniteTypeConsommation == AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES)
                     {
                         unite = " kWh";
                     }
-                    series->append( statsCo2.liste.at(i).type + ", " + QString::number(statsCo2.liste.at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
-                                    statsCo2.liste.at(i).consommationDEnergie());
+                    series->append( statsCo2.listes.at(0).at(i).type + ", " + QString::number(statsCo2.listes.at(0).at(i).consommationDEnergie(), 'f', 0) + unite + ", ",
+                                    statsCo2.listes.at(0).at(i).consommationDEnergie());
                 }
             }
             if (series->count() > 0)
@@ -132,7 +132,7 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
         case AeroDmsTypes::Statistiques_CO2_PAR_TYPE_DE_VOL:
         case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
         {
-            const AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions(p_annee,
+            const AeroDmsTypes::ListesStatsEmissionsCo2 statsCo2 = p_db->recupererStatsEmissions(p_annee,
                 p_options,
                 p_statistique);
 
@@ -146,16 +146,16 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
             double emissionsDuGroupe = 0.0;
             auto series = new QPieSeries(this);
 
-            for (int i = 0; i < statsCo2.liste.size(); i++)
+            for (int i = 0; i < statsCo2.listes.at(0).size(); i++)
             {
-                if (typeCourant == statsCo2.liste.at(i).activiteOuTypeDeVol)
+                if (typeCourant == statsCo2.listes.at(0).at(i).activiteOuTypeDeVol)
                 {
-                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation, 
+                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.listes.at(0).at(i).uniteTypeConsommation,
                                                                                                  parametresEmissionsCo2 );
 
-                    const double emissionsCo2 = statsCo2.liste.at(i).consommationDEnergie() * facteurDemission;
+                    const double emissionsCo2 = statsCo2.listes.at(0).at(i).consommationDEnergie() * facteurDemission;
                     emissionsDuGroupe = emissionsDuGroupe + emissionsCo2;
-                    QPieSlice* pieSlice = new QPieSlice(statsCo2.liste.at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
+                    QPieSlice* pieSlice = new QPieSlice(statsCo2.listes.at(0).at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
                         emissionsCo2);
                     series->append(pieSlice);
                     series->setName(typeCourant + " (" + QString::number(emissionsDuGroupe, 'f', 0) + "\nkgCO₂)");
@@ -169,15 +169,15 @@ StatistiqueDonutCombineWidget::StatistiqueDonutCombineWidget( ManageDb* p_db,
                             p_parametres.tailleDePolice);
                     }
                     
-                    typeCourant = statsCo2.liste.at(i).activiteOuTypeDeVol;
+                    typeCourant = statsCo2.listes.at(0).at(i).activiteOuTypeDeVol;
                     series = new QPieSeries(this);
 
-                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.liste.at(i).uniteTypeConsommation,
+                    const double facteurDemission = AeroDmsServices::recupererFacteurDEmissions( statsCo2.listes.at(0).at(i).uniteTypeConsommation,
                                                                                                  parametresEmissionsCo2);
 
-                    const double emissionsCo2 = statsCo2.liste.at(i).consommationDEnergie() * facteurDemission;
+                    const double emissionsCo2 = statsCo2.listes.at(0).at(i).consommationDEnergie() * facteurDemission;
                     emissionsDuGroupe = emissionsCo2;
-                    series->append(statsCo2.liste.at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
+                    series->append(statsCo2.listes.at(0).at(i).type + ", " + QString::number(emissionsCo2, 'f', 0) + " kgCO₂, ",
                         emissionsCo2);
                     series->setName(typeCourant + " (" + QString::number(emissionsDuGroupe, 'f', 0) + "\nkgCO₂)");
                 }

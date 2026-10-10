@@ -2777,11 +2777,11 @@ const AeroDmsTypes::StatsPilotes ManageDb::recupererStatsPilotes()
     return statsPilotes;
 }
 
-const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissions(const int p_annee,
+const AeroDmsTypes::ListesStatsEmissionsCo2 ManageDb::recupererStatsEmissions(const int p_annee,
     const int p_options,
     const AeroDmsTypes::Statistiques p_statDemandee)
 {
-    AeroDmsTypes::ListeStatsEmissionsCo2 statsCo2;
+    AeroDmsTypes::ListesStatsEmissionsCo2 statsCo2;
     statsCo2.caracteristiqueDuChampActiviteOuTypeDeVol = p_statDemandee;
 
     QString nomVue = "stats_emissionsCo2";
@@ -2806,7 +2806,10 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissions(con
             "decompte, "
             "unite, "
             "SUM(tempsDeVol) AS tempsDeVol, "
-            "SUM(nbVols) AS nbVols "
+            "SUM(nbVols) AS nbVols, "
+            "idImputation, "
+            "nomImputation, "
+            "descriptionImputation "
             "FROM " + nomVue + " "
             "WHERE annee = :annee "
             + (filtre != "" ? " AND " : "")
@@ -2823,7 +2826,10 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissions(con
             "decompte, "
             "unite, "
             "SUM(tempsDeVol) AS tempsDeVol, "
-            "SUM(nbVols) AS nbVols "
+            "SUM(nbVols) AS nbVols, "
+            "idImputation, "
+            "nomImputation, "
+            "descriptionImputation "
             "FROM " + nomVue + " "
             + (filtre != "" ? " WHERE " : "") 
             + filtre
@@ -2832,10 +2838,23 @@ const AeroDmsTypes::ListeStatsEmissionsCo2 ManageDb::recupererStatsEmissions(con
     
     query.exec();
 
+    AeroDmsTypes::ListeStatsEmissionsCo2 liste;
+    int idImputationCourant = 0; //on commence à 0 car celui de la section est toujours 0
     while (query.next())
     {
-        statsCo2.liste.append(deplierRequeteEmissions(query));
+        AeroDmsTypes::StatsEmissionsCo2 stats = deplierRequeteEmissions(query);
+
+        if (idImputationCourant != stats.idImputation)
+        {
+            //Si on est sur une nouvelle imputation, on met la liste temporaire dans la structure de sortie
+            //et on rince la liste temporaire pour la suite
+            statsCo2.listes.append(liste);
+            idImputationCourant = stats.idImputation;
+            liste.clear();
+        }
+        liste.append(stats);
     }
+    statsCo2.listes.append(liste);
 
     return statsCo2;
 }
@@ -2844,7 +2863,8 @@ const AeroDmsTypes::StatsEmissionsCo2 ManageDb::recupererEmissionsCompensees(con
     const int p_options,
     const AeroDmsTypes::Statistiques p_statDemandee,
     const QString & p_type,
-    const QString & p_activite)
+    const QString & p_activite,
+    const int p_idImputation)
 {
     QString nomVue = "stats_emissionsCo2Compense";
     if ((p_options & AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT) == AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT)
@@ -2868,11 +2888,15 @@ const AeroDmsTypes::StatsEmissionsCo2 ManageDb::recupererEmissionsCompensees(con
             "decompte, "
             "unite, "
             "SUM(tempsDeVol) AS tempsDeVol, "
-            "SUM(nbVols) AS nbVols "
+            "SUM(nbVols) AS nbVols, "
+            "idImputation, "
+            "nomImputation, "
+            "descriptionImputation "
             "FROM " + nomVue + " "
             "WHERE annee = :annee "
             "AND typeDeVol = :typeDeVol "
             "AND type = :type "
+            "AND idImputation = :idImputation "
             + (filtre != "" ? " AND " : "")
             + filtre
             + clauseGroupBy);
@@ -2887,16 +2911,21 @@ const AeroDmsTypes::StatsEmissionsCo2 ManageDb::recupererEmissionsCompensees(con
             "decompte, "
             "unite, "
             "SUM(tempsDeVol) AS tempsDeVol, "
-            "SUM(nbVols) AS nbVols "
+            "SUM(nbVols) AS nbVols, "
+            "idImputation, "
+            "nomImputation, "
+            "descriptionImputation "
             "FROM " + nomVue + " "
             "WHERE typeDeVol = :typeDeVol "
             "AND type = :type "
+            "AND idImputation = :idImputation "
             + (filtre != "" ? " AND " : "")
             + filtre
             + clauseGroupBy);
     }
     query.bindValue(":typeDeVol", p_activite);
     query.bindValue(":type", p_type);
+    query.bindValue(":idImputation", p_idImputation);
 
     query.exec();
 
@@ -2920,6 +2949,9 @@ AeroDmsTypes::StatsEmissionsCo2 ManageDb::deplierRequeteEmissions(const QSqlQuer
     stats.activiteOuTypeDeVol = p_query.value("activiteOuTypeDeVol").toString();
     stats.uniteTypeConsommation = static_cast<AeroDmsTypes::UniteTypeConsommation>(p_query.value("unite").toInt());
     stats.typeDecompte = static_cast<AeroDmsTypes::TypeDecompte>(p_query.value("decompte").toInt());
+    stats.idImputation = p_query.value("idImputation").toInt();
+    stats.nomImputation = p_query.value("nomImputation").toString();
+    stats.descriptionImputation = p_query.value("descriptionImputation").toString();
 
     return stats;
 }
@@ -3125,7 +3157,7 @@ void ManageDb::genererClauseGroupementSelonStatDemandee(const AeroDmsTypes::Stat
         case AeroDmsTypes::Statistiques_CO2_PAR_ACTIVITE:
         case AeroDmsTypes::Statistiques_CONSO_PAR_ACTIVITE:
         {
-            p_clauseGroupBy = " GROUP BY type, activite ORDER BY activite, type";
+            p_clauseGroupBy = " GROUP BY type, activite, idImputation ORDER BY idImputation, activite, type";
             p_clauseSelect = "activite ";
         }
         break;
@@ -3134,7 +3166,7 @@ void ManageDb::genererClauseGroupementSelonStatDemandee(const AeroDmsTypes::Stat
         case AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL:
         default:
         {
-            p_clauseGroupBy = " GROUP BY type, typeDeVol ORDER BY typeDeVol, type";
+            p_clauseGroupBy = " GROUP BY type, typeDeVol, idImputation ORDER BY idImputation, typeDeVol, type";
             p_clauseSelect = "typeDeVol ";
         }
         break;

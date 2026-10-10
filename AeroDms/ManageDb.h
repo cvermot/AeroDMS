@@ -164,14 +164,15 @@ public:
         const AeroDmsTypes::MailPilotes p_mailingDemande = AeroDmsTypes::MailPilotes_AYANT_COTISE);
     const AeroDmsTypes::StatsAeronefs recupererStatsAeronefs(const int p_annee,
         const int p_options);
-    const AeroDmsTypes::ListeStatsEmissionsCo2 recupererStatsEmissions(const int p_annee,
+    const AeroDmsTypes::ListesStatsEmissionsCo2 recupererStatsEmissions(const int p_annee,
         const int p_options,
         const AeroDmsTypes::Statistiques p_statDemandee);
     const AeroDmsTypes::StatsEmissionsCo2 recupererEmissionsCompensees(const int p_annee,
         const int p_options,
         const AeroDmsTypes::Statistiques p_statDemandee,
         const QString& p_type,
-        const QString& p_activite);
+        const QString& p_activite,
+        const int p_idImputation);
     AeroDmsTypes::StatsEmissionsCo2 deplierRequeteEmissions(const QSqlQuery& p_query);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();

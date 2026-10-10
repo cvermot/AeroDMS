@@ -787,8 +787,11 @@ public:
         double consommationHoraireDuType = 0.0;
         int nombreMinutesVol = K_INIT_INT;
         int nombreDeVols = K_INIT_INT;
-        UniteTypeConsommation uniteTypeConsommation = UniteTypeConsommation_INDEFINI ;
-        TypeDecompte typeDecompte = TypeDecompte_INDEFINI ;
+        UniteTypeConsommation uniteTypeConsommation = UniteTypeConsommation_INDEFINI;
+        TypeDecompte typeDecompte = TypeDecompte_INDEFINI;
+        int idImputation = K_INIT_INT_INVALIDE;
+        QString nomImputation = "";
+        QString descriptionImputation = "";
 
         //Retourne la consommation en litres ou en KWh selon la durée du vol ou en unitaire selon le cas
         const double consommationDEnergie() const
@@ -815,9 +818,10 @@ public:
             return 0.0;
         };
     };
-    struct ListeStatsEmissionsCo2
+    typedef QVector<StatsEmissionsCo2> ListeStatsEmissionsCo2;
+    struct ListesStatsEmissionsCo2
     {
-        QVector<StatsEmissionsCo2> liste;
+        QVector<ListeStatsEmissionsCo2> listes;
         Statistiques caracteristiqueDuChampActiviteOuTypeDeVol = Statistiques_CO2_PAR_TYPE_DE_VOL;
     };
 
@@ -882,15 +886,18 @@ public:
                                     const ParametresEmissionsCo2 & p_parametresEmissionsCo2);
             //Rince la donnée total
             void rincerTotal();
+            void rincerTotalGeneral();
 
             const TotalConsoEmissionsCo2& getCourant();
             const TotalConsoEmissionsCo2& getTotal();
             const TotalConsoEmissionsCo2& getTotalGeneral();
+            const TotalConsoEmissionsCo2& getGrandTotalGeneral();
 
         private:
             TotalConsoEmissionsCo2 courant;
             TotalConsoEmissionsCo2 total;
             TotalConsoEmissionsCo2 totalGeneral;
+            TotalConsoEmissionsCo2 grandTotalGeneral;
     };
 
     struct DetailsBaladesEtSorties

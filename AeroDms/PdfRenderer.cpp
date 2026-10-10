@@ -1247,16 +1247,21 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
     QString html = "";
 
     QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissions.html"));
+    QFile tableBase = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsBase.html"));
     QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsItem.html"));
 
     QString templateTable = "";
+    QString templateTableBase = "";
     QString templateTableItem = "";
     if (table.open(QFile::ReadOnly | QFile::Text)
+        && tableBase.open(QFile::ReadOnly | QFile::Text)
         && tableItem.open(QFile::ReadOnly | QFile::Text))
     {
         QTextStream inTable(&table);
+        QTextStream inTableBase(&tableBase);
         QTextStream inTableItem(&tableItem);
         templateTable = inTable.readAll();
+        templateTableBase = inTableBase.readAll();
         templateTableItem = inTableItem.readAll();
     }
     else
@@ -1265,6 +1270,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
             QApplication::applicationName() + " - " + tr("Fichier template introuvable"),
             tr("Un ou plusieurs fichiers parmi :\n")
             + "     -\"TableauEmissions.html\"\n"
+            + "     -\"TableauEmissionsBase.html\"\n"
             + "     -\"TableauEmissionsItem.html\"\n"
             + tr("attendus dans\n")
             + ressourcesHtml.toString()
@@ -1276,7 +1282,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
     html = templateTable;
     
-    const AeroDmsTypes::ListeStatsEmissionsCo2 listeConsommations = db->recupererStatsEmissions(p_annee,
+    const AeroDmsTypes::ListesStatsEmissionsCo2 listeConsommations = db->recupererStatsEmissions(p_annee,
         AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
         AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL);
     const AeroDmsTypes::ParametresEmissionsCo2 parametresEmissionsCo2 = db->lireParametresEmissionsCo2();
@@ -1284,78 +1290,102 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
    
     AeroDmsTypes::TotauxConsoEmissionsCo2 totauxEmissionsCo2;
 
-    QString typeVol = "";
-    int compteurTypesAeronefDansLeTypeDeVol = -1;
-
-    for (int i = 0; i < listeConsommations.liste.size(); i++)
+    for (int imputation = 0; imputation < listeConsommations.listes.size(); imputation++)
     {
+        //Debut pour une imputation
+        QString typeVol = "";
+        int compteurTypesAeronefDansLeTypeDeVol = -1;
+        html.replace("<!--AccrocheTableauEmissions-->", templateTableBase);
+        totauxEmissionsCo2.rincerTotalGeneral();
 
-        QString item = templateTableItem;
+        //Par convention, on utilise le nom et la description présente dans la première case mais ça pourrait être
+        //n'importe laquelle
+        html.replace("__NomImputation__", listeConsommations.listes.at(imputation).at(0).nomImputation);
+        html.replace("__DescriptionImputation__", listeConsommations.listes.at(imputation).at(0).descriptionImputation);    
 
-        if (typeVol != listeConsommations.liste.at(i).activiteOuTypeDeVol)
+        for (int i = 0; i < listeConsommations.listes.at(imputation).size(); i++)
         {
-            typeVol = listeConsommations.liste.at(i).activiteOuTypeDeVol;
-            
-            //Si compteur vaut -1, on est au premier tour, on ne fait rien. Sinon, on a déjà des items =>
-            //on met les totaux, et on renseigne le rowspan de la première ligne du type de vol
-            if (compteurTypesAeronefDansLeTypeDeVol != -1)
-            {  
-                completerTotauxRecapEmissionsCo2(html, 
-                    item, 
-                    totauxEmissionsCo2.getTotal(), 
-                    compteurTypesAeronefDansLeTypeDeVol+1);
 
-                item = templateTableItem;         
+            QString item = templateTableItem;
+
+            if (typeVol != listeConsommations.listes.at(imputation).at(i).activiteOuTypeDeVol)
+            {
+                typeVol = listeConsommations.listes.at(imputation).at(i).activiteOuTypeDeVol;
+
+                //Si compteur vaut -1, on est au premier tour, on ne fait rien. Sinon, on a déjà des items =>
+                //on met les totaux, et on renseigne le rowspan de la première ligne du type de vol
+                if (compteurTypesAeronefDansLeTypeDeVol != -1)
+                {
+                    completerTotauxRecapEmissionsCo2(html,
+                        item,
+                        totauxEmissionsCo2.getTotal(),
+                        compteurTypesAeronefDansLeTypeDeVol + 1);
+
+                    item = templateTableItem;
+                }
+                //puis on rince 
+                compteurTypesAeronefDansLeTypeDeVol = 0;
+                totauxEmissionsCo2.rincerTotal();
             }
-            //puis on rince 
-            compteurTypesAeronefDansLeTypeDeVol = 0; 
-            totauxEmissionsCo2.rincerTotal();
+
+            //On fait les différentes sommes
+            AeroDmsTypes::StatsEmissionsCo2 consoSansCo2 = db->recupererEmissionsCompensees(p_annee,
+                AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
+                AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL,
+                listeConsommations.listes.at(imputation).at(i).type,
+                listeConsommations.listes.at(imputation).at(i).activiteOuTypeDeVol,
+                listeConsommations.listes.at(imputation).at(i).idImputation);
+
+            totauxEmissionsCo2.calculerEmissions(listeConsommations.listes.at(imputation).at(i),
+                consoSansCo2,
+                parametresEmissionsCo2);
+
+            //Si on est sur le premier tour, on renseigne la ligne type de vol
+            //sinon, on la retire !
+            if (compteurTypesAeronefDansLeTypeDeVol == 0)
+            {
+                item.replace("__Activite__", listeConsommations.listes.at(imputation).at(i).activiteOuTypeDeVol);
+            }
+            else
+            {
+                item.replace("<td class=\"tg-nkdd\" <!--span-->>__Activite__</td>", "");
+            }
+
+            item.replace("__TypeAvion__", listeConsommations.listes.at(imputation).at(i).type);
+            completerChampsCommunsRecapEmissionsCo2(item, totauxEmissionsCo2.getCourant());
+
+            compteurTypesAeronefDansLeTypeDeVol++;
+
+            html.replace("<!--AccrocheEmissions-->", item);
         }
 
-        //On fait les différentes sommes
-        AeroDmsTypes::StatsEmissionsCo2 consoSansCo2 = db->recupererEmissionsCompensees(p_annee,
-            AeroDmsTypes::OptionsDonneesStatistiques_VOLS_SUBVENTIONNES_UNIQUEMENT,
-            AeroDmsTypes::Statistiques_CONSO_PAR_TYPE_DE_VOL,
-            listeConsommations.liste.at(i).type,
-            listeConsommations.liste.at(i).activiteOuTypeDeVol);
+        //A la fin du dernier tour on met le dernier sous total
+        QString item = templateTableItem;
+        completerTotauxRecapEmissionsCo2(html,
+            item,
+            totauxEmissionsCo2.getTotal(),
+            compteurTypesAeronefDansLeTypeDeVol + 1);
 
-        totauxEmissionsCo2.calculerEmissions(listeConsommations.liste.at(i), 
-            consoSansCo2, 
-            parametresEmissionsCo2);
+        //On remplit le total général
+        html.replace("__Totaux", "__");
+        //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+        //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
+        html.replace("__ConsoEnergie__", totauxEmissionsCo2.getTotalGeneral().consoAvecUnites(true));
+        completerChampsCommunsRecapEmissionsCo2(html,
+            totauxEmissionsCo2.getTotalGeneral());
 
-        //Si on est sur le premier tour, on renseigne la ligne type de vol
-        //sinon, on la retire !
-        if (compteurTypesAeronefDansLeTypeDeVol == 0)
-        {
-            item.replace("__Activite__", listeConsommations.liste.at(i).activiteOuTypeDeVol);
-        }
-        else
-        {
-            item.replace("<td class=\"tg-nkdd\" <!--span-->>__Activite__</td>", "");
-        }
-
-        item.replace("__TypeAvion__", listeConsommations.liste.at(i).type);
-        completerChampsCommunsRecapEmissionsCo2(item, totauxEmissionsCo2.getCourant());
-
-        compteurTypesAeronefDansLeTypeDeVol++;
-
-        html.replace("<!--AccrocheEmissions-->", item);
+        //On supprime le dernier tag d'accroche d'item pour éviter les doublons suite à l'ajout des imputations suivantes
+        html.replace("<!--AccrocheEmissions-->", "");
     }
-    
-    //A la fin du dernier tour on met le dernier sous total
-    QString item = templateTableItem;
-    completerTotauxRecapEmissionsCo2(html, 
-        item, 
-        totauxEmissionsCo2.getTotal(), 
-        compteurTypesAeronefDansLeTypeDeVol + 1);
 
-    //On remplit le total général
-    html.replace("__Totaux", "__");
+    //Fin des tableaux de chaque imputations => on remplit les grands totaux, et la légende
+    //On remplit le grand total
+    html.replace("__GrandTotaux", "__");
     //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
     //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
-    html.replace("__ConsoEnergie__", totauxEmissionsCo2.getTotalGeneral().consoAvecUnites(true));
-    completerChampsCommunsRecapEmissionsCo2(html, 
-        totauxEmissionsCo2.getTotalGeneral());
+    html.replace("__ConsoEnergie__", totauxEmissionsCo2.getGrandTotalGeneral().consoAvecUnites(true));
+    completerChampsCommunsRecapEmissionsCo2(html,
+        totauxEmissionsCo2.getGrandTotalGeneral());
     completerChampsLegendeEmissions(html,
         parametresEmissionsCo2);
 

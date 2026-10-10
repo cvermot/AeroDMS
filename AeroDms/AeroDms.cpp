@@ -2429,8 +2429,6 @@ void AeroDms::peuplerTableVols()
             vueVols->setRowCount(nbItems + 1);
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DATE, new QTableWidgetItem(vol.date.toString("dd/MM/yyyy")));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_PILOTE, new QTableWidgetItem(QString(vol.prenomPilote).append(" ").append(vol.nomPilote)));
-            //QTableWidgetItem *twSoumisCe = new QTableWidgetItem(vol.estSoumisCe);
-            //twSoumisCe->setIcon(AeroDmsServices::recupererIcone(vol.estSoumisCe));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_SOUMIS_CE, new QTableWidgetItem(vol.estSoumisCe));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_DUREE, new QTableWidgetItem(vol.duree));
             vueVols->setItem(nbItems, AeroDmsTypes::VolTableElement_COUT, new QTableWidgetItem(QString::number(vol.coutVol, 'f', 2).append(" €")));

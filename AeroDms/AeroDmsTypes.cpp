@@ -377,11 +377,13 @@ void AeroDmsTypes::TotauxConsoEmissionsCo2::calculerEmissions(const StatsEmissio
             courant.co2Direct.quantite = conso * p_parametresEmissionsCo2.kgCo2ParLitreEssence;
             total.litresEssence.quantite = total.litresEssence.quantite + conso;
             totalGeneral.litresEssence.quantite = totalGeneral.litresEssence.quantite + conso;
+            grandTotalGeneral.litresEssence.quantite = grandTotalGeneral.litresEssence.quantite + conso;
 
             courant.litresEssence.dontCompense = consoCompense;
             courant.co2Direct.dontCompense = consoCompense * p_parametresEmissionsCo2.kgCo2ParLitreEssence;
             total.litresEssence.dontCompense = total.litresEssence.dontCompense + consoCompense;
             totalGeneral.litresEssence.dontCompense = totalGeneral.litresEssence.dontCompense + consoCompense;
+            grandTotalGeneral.litresEssence.dontCompense = grandTotalGeneral.litresEssence.dontCompense + consoCompense;
         }
         break;
         case AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
@@ -390,11 +392,13 @@ void AeroDmsTypes::TotauxConsoEmissionsCo2::calculerEmissions(const StatsEmissio
             courant.co2Direct.quantite = conso * p_parametresEmissionsCo2.kgCo2ParLitreGasoil;
             total.litreKerosene.quantite = total.litreKerosene.quantite + conso;
             totalGeneral.litreKerosene.quantite = totalGeneral.litreKerosene.quantite + conso;
+            grandTotalGeneral.litreKerosene.quantite = grandTotalGeneral.litreKerosene.quantite + conso;
 
             courant.litreKerosene.dontCompense = consoCompense;
             courant.co2Direct.dontCompense = consoCompense * p_parametresEmissionsCo2.kgCo2ParLitreGasoil;
             total.litreKerosene.dontCompense = total.litreKerosene.dontCompense + consoCompense;
             totalGeneral.litreKerosene.dontCompense = totalGeneral.litreKerosene.dontCompense + consoCompense;
+            grandTotalGeneral.litreKerosene.dontCompense = grandTotalGeneral.litreKerosene.dontCompense + consoCompense;
         }
         break;
         case AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES:
@@ -403,28 +407,33 @@ void AeroDmsTypes::TotauxConsoEmissionsCo2::calculerEmissions(const StatsEmissio
             courant.co2Direct.quantite = conso * p_parametresEmissionsCo2.kgCo2ParKwh;
             total.kwhElectricite.quantite = total.kwhElectricite.quantite + conso;
             totalGeneral.kwhElectricite.quantite = totalGeneral.kwhElectricite.quantite + conso;
+            grandTotalGeneral.kwhElectricite.quantite = grandTotalGeneral.kwhElectricite.quantite + conso;
 
             courant.kwhElectricite.dontCompense = consoCompense;
             courant.co2Direct.dontCompense = consoCompense * p_parametresEmissionsCo2.kgCo2ParKwh;
             total.kwhElectricite.dontCompense = total.kwhElectricite.dontCompense + consoCompense;
             totalGeneral.kwhElectricite.dontCompense = totalGeneral.kwhElectricite.dontCompense + consoCompense;
+            grandTotalGeneral.kwhElectricite.dontCompense = grandTotalGeneral.kwhElectricite.dontCompense + consoCompense;
         }
         break;
         default:
             break;
     }
 
-    //On sommes les émissions directes dans les 2 autres structures :
+    //On sommes les émissions directes dans les 3 autres structures :
     total.co2Direct.quantite = total.co2Direct.quantite + courant.co2Direct.quantite;
     totalGeneral.co2Direct.quantite = totalGeneral.co2Direct.quantite + courant.co2Direct.quantite;
+    grandTotalGeneral.co2Direct.quantite = grandTotalGeneral.co2Direct.quantite + courant.co2Direct.quantite;
     total.co2Direct.dontCompense = total.co2Direct.dontCompense + courant.co2Direct.dontCompense;
     totalGeneral.co2Direct.dontCompense = totalGeneral.co2Direct.dontCompense + courant.co2Direct.dontCompense;
+    grandTotalGeneral.co2Direct.dontCompense = grandTotalGeneral.co2Direct.dontCompense + courant.co2Direct.dontCompense;
 
     //les emissions indirectes sont toujours calculées sur une base horaire
     courant.co2Indirect = p_parametresEmissionsCo2.kgCo2IndirectsParHdv * p_statsDuType.nombreMinutesVol / 60.0;
-    //On somme dans les 2 autres structures :
+    //On somme dans les 3 autres structures :
     total.co2Indirect = total.co2Indirect + courant.co2Indirect;
     totalGeneral.co2Indirect = totalGeneral.co2Indirect + courant.co2Indirect;
+    grandTotalGeneral.co2Indirect = grandTotalGeneral.co2Indirect + courant.co2Indirect;
 
     courant.dureeDesVolsEnMinute.quantite = p_statsDuType.nombreMinutesVol;
     courant.dureeDesVolsEnMinute.dontCompense = p_dontCompense.nombreMinutesVol;
@@ -432,6 +441,8 @@ void AeroDmsTypes::TotauxConsoEmissionsCo2::calculerEmissions(const StatsEmissio
     total.dureeDesVolsEnMinute.dontCompense = total.dureeDesVolsEnMinute.dontCompense + courant.dureeDesVolsEnMinute.dontCompense;
     totalGeneral.dureeDesVolsEnMinute.quantite = totalGeneral.dureeDesVolsEnMinute.quantite + courant.dureeDesVolsEnMinute.quantite;
     totalGeneral.dureeDesVolsEnMinute.dontCompense = totalGeneral.dureeDesVolsEnMinute.dontCompense + courant.dureeDesVolsEnMinute.dontCompense;
+    grandTotalGeneral.dureeDesVolsEnMinute.quantite = grandTotalGeneral.dureeDesVolsEnMinute.quantite + courant.dureeDesVolsEnMinute.quantite;
+    grandTotalGeneral.dureeDesVolsEnMinute.dontCompense = grandTotalGeneral.dureeDesVolsEnMinute.dontCompense + courant.dureeDesVolsEnMinute.dontCompense;
 
     courant.nombreDeVols.quantite = p_statsDuType.nombreDeVols;
     courant.nombreDeVols.dontCompense = p_dontCompense.nombreDeVols;
@@ -439,11 +450,18 @@ void AeroDmsTypes::TotauxConsoEmissionsCo2::calculerEmissions(const StatsEmissio
     total.nombreDeVols.dontCompense = total.nombreDeVols.dontCompense + courant.nombreDeVols.dontCompense;
     totalGeneral.nombreDeVols.quantite = totalGeneral.nombreDeVols.quantite + courant.nombreDeVols.quantite;
     totalGeneral.nombreDeVols.dontCompense = totalGeneral.nombreDeVols.dontCompense + courant.nombreDeVols.dontCompense;
+    grandTotalGeneral.nombreDeVols.quantite = grandTotalGeneral.nombreDeVols.quantite + courant.nombreDeVols.quantite;
+    grandTotalGeneral.nombreDeVols.dontCompense = grandTotalGeneral.nombreDeVols.dontCompense + courant.nombreDeVols.dontCompense;
 }
 
 void AeroDmsTypes::TotauxConsoEmissionsCo2::rincerTotal()
 {
     total = TotalConsoEmissionsCo2();
+}
+void AeroDmsTypes::TotauxConsoEmissionsCo2::rincerTotalGeneral()
+{
+    rincerTotal();
+    totalGeneral = TotalConsoEmissionsCo2();
 }
 
 const AeroDmsTypes::TotalConsoEmissionsCo2& AeroDmsTypes::TotauxConsoEmissionsCo2::getCourant()
@@ -457,4 +475,8 @@ const AeroDmsTypes::TotalConsoEmissionsCo2& AeroDmsTypes::TotauxConsoEmissionsCo
 const AeroDmsTypes::TotalConsoEmissionsCo2 & AeroDmsTypes::TotauxConsoEmissionsCo2::getTotalGeneral()
 {
     return totalGeneral;
+}
+const AeroDmsTypes::TotalConsoEmissionsCo2& AeroDmsTypes::TotauxConsoEmissionsCo2::getGrandTotalGeneral()
+{
+    return grandTotalGeneral;
 }
