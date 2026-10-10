@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. oct. 7 23:07:27 2026
+-- File generated with SQLiteStudio v3.4.4 on dim. oct. 11 00:11:33 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -288,12 +288,16 @@ aeronefTypes.decompte,
 aeronefTypes.unite,
 COUNT(vol.volId) AS nbVols,
 strftime('%Y', vol.date) AS annee,
-SUM(vol.duree) as tempsDeVol
+SUM(vol.duree) as tempsDeVol,
+imputation.id AS idImputation,
+imputation.nom AS nomImputation,
+imputation.description AS descriptionImputation
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
-GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
-ORDER BY annee, aeronefTypes.type;
+INNER JOIN imputation ON vol.imputation = imputation.id
+GROUP BY vol.activite, vol.typeDeVol, imputation.id, aeronefTypes.type, annee
+ORDER BY annee, imputation.id, aeronefTypes.type;
 
 -- View: stats_emissionsCo2_volsAvecSubventionUniquement
 CREATE VIEW IF NOT EXISTS stats_emissionsCo2_volsAvecSubventionUniquement AS SELECT 
@@ -305,13 +309,17 @@ aeronefTypes.decompte,
 aeronefTypes.unite,
 COUNT(vol.volId) AS nbVols,
 strftime('%Y', vol.date) AS annee,
-SUM(vol.duree) as tempsDeVol
+SUM(vol.duree) as tempsDeVol,
+imputation.id AS idImputation,
+imputation.nom AS nomImputation,
+imputation.description AS descriptionImputation
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+INNER JOIN imputation ON vol.imputation = imputation.id
 WHERE vol.montantRembourse != 0
-GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
-ORDER BY annee, aeronefTypes.type;
+GROUP BY vol.activite, vol.typeDeVol, imputation.id, aeronefTypes.type, annee
+ORDER BY annee, imputation.id, aeronefTypes.type;
 
 -- View: stats_emissionsCo2Compense
 CREATE VIEW IF NOT EXISTS stats_emissionsCo2Compense AS SELECT 
@@ -323,13 +331,17 @@ aeronefTypes.decompte,
 aeronefTypes.unite,
 COUNT(vol.volId) AS nbVols,
 strftime('%Y', vol.date) AS annee,
-SUM(vol.duree) as tempsDeVol
+SUM(vol.duree) as tempsDeVol,
+imputation.id AS idImputation,
+imputation.nom AS nomImputation,
+imputation.description AS descriptionImputation
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+INNER JOIN imputation ON vol.imputation = imputation.id
 WHERE aeronef.compensationCarbone = TRUE
-GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
-ORDER BY annee, aeronefTypes.type;
+GROUP BY vol.activite, vol.typeDeVol, imputation.id, aeronefTypes.type, annee
+ORDER BY annee, imputation.id, aeronefTypes.type;
 
 -- View: stats_emissionsCo2Compense_volsAvecSubventionUniquement
 CREATE VIEW IF NOT EXISTS stats_emissionsCo2Compense_volsAvecSubventionUniquement AS SELECT 
@@ -341,13 +353,17 @@ aeronefTypes.decompte,
 aeronefTypes.unite,
 COUNT(vol.volId) AS nbVols,
 strftime('%Y', vol.date) AS annee,
-SUM(vol.duree) as tempsDeVol
+SUM(vol.duree) as tempsDeVol,
+imputation.id AS idImputation,
+imputation.nom AS nomImputation,
+imputation.description AS descriptionImputation
 FROM vol
 INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
 INNER JOIN aeronefTypes ON aeronef.type = aeronefTypes.type
+INNER JOIN imputation ON vol.imputation = imputation.id
 WHERE vol.montantRembourse != 0 AND aeronef.compensationCarbone = TRUE
-GROUP BY vol.activite, vol.typeDeVol, aeronefTypes.type, annee
-ORDER BY annee, aeronefTypes.type;
+GROUP BY vol.activite, vol.typeDeVol, imputation.id, aeronefTypes.type, annee
+ORDER BY annee, imputation.id, aeronefTypes.type;
 
 -- View: stats_heuresDeVolParMois
 CREATE VIEW IF NOT EXISTS stats_heuresDeVolParMois AS SELECT 
