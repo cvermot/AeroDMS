@@ -46,6 +46,13 @@ svg {
     max-height: 98%;
     height: auto;
 }
+
+.last-page-footer {
+        margin-top: auto;
+        page-break-inside: avoid; /* Évite que le footer soit coupé sur deux pages */
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+      }
 </style>
 <table class="tg">
 <thead>
@@ -102,6 +109,20 @@ svg {
 <!--AccrocheGraphiques-->
 <br />
 <!--Signature-->
+
+<footer class="last-page-footer">
+<table>
+    <tr>
+        <td>
+            <img width="180px" src="qrc:/AeroDms/ressources/splash.webp" onerror="this.onerror=null; this.src='./ressources/splash.webp'" alt="Logo AeroDms">
+        </td>
+        <td>
+            Rapport généré avec AeroDms version __VersionAeroDms__
+        </td>
+    </tr>
+</table>
+</footer>
+
 </body>
 
 </html>

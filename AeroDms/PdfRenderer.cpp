@@ -892,6 +892,9 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
         templateTable.replace("<!--Signature-->", "<p>[SignatureField#1]</p>");
     }
 
+    //On renseigne la version
+    templateTable.replace("__VersionAeroDms__", QApplication::applicationVersion());
+
     if (etatGenerationARetourner == AeroDmsTypes::EtatGeneration_OK)
     {
         view->setHtml(templateTable,

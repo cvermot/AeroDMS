@@ -57,9 +57,9 @@ const QString ManageDb::recupererVerificationClesEtrangereActif()
 
     if (query.value(0).toInt() == 1)
     {
-        return tr("Controle clé étrangères actif");
+        return tr("Contrôle clés étrangères actif");
     }
-    return tr("Controle clé étrangères inactif");
+    return tr("Contrôle clés étrangères inactif");
 }
 
 void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
