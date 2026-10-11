@@ -114,8 +114,9 @@ void DialogueAjouterCotisation::peuplerListePilote()
     for (int i = 0; i < listePilotes.size(); i++)
     {
         AeroDmsTypes::Pilote pilote = listePilotes.at(i);
-        AeroDmsServices::normaliser(pilote.prenom);
-        listePilote->addItem( AeroDmsServices::recupererIcone(pilote.prenom.at(0)),
+        QString prenomPourIcone = pilote.prenom;
+        AeroDmsServices::normaliser(prenomPourIcone);
+        listePilote->addItem( AeroDmsServices::recupererIcone(prenomPourIcone.at(0)),
                               QString(pilote.prenom).append(" ").append(pilote.nom),
                               listePilotes.at(i).idPilote);
     }
