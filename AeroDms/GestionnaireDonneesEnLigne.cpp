@@ -106,7 +106,7 @@ bool GestionnaireDonneesEnLigne::connecter()
                     QVariant("form-data; name=\"fileToUpload\"; filename=\"" +
                         file->fileName() + "\""));
                 filePart.setBodyDevice(file); // Attache le fichier au multipart
-                file->setParent(multiPart);   // Permet au multiPart de gérer la suppression de l'objet file
+                //file->setParent(multiPart);   // Permet au multiPart de gérer la suppression de l'objet file
                 multiPart->append(filePart);
 
                 // Envoyer la requête POST
@@ -121,11 +121,12 @@ bool GestionnaireDonneesEnLigne::connecter()
                 QHttpMultiPart* multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
                 // Ajoutez le fichier
-                QFile* file = new QFile(cheminFichier);
-                if (!file->open(QIODevice::ReadOnly)) 
+                bddEnEnvoi = new QFile(cheminFichier);
+                if (!bddEnEnvoi->open(QIODevice::ReadOnly))
                 {
                     qDebug() << "Erreur : Impossible d'ouvrir le fichier.";
-                    delete file;
+                    delete bddEnEnvoi;
+                    bddEnEnvoi = nullptr;
                     return false;
                 }
 
@@ -133,9 +134,9 @@ bool GestionnaireDonneesEnLigne::connecter()
                 request.setHeader(QNetworkRequest::ContentTypeHeader, "multipart/form-data; boundary=" + multiPart->boundary());
                 filePart.setHeader(QNetworkRequest::ContentDispositionHeader,
                     QVariant("form-data; name=\"fileToUpload\"; filename=\"" +
-                        file->fileName() + "\""));
-                filePart.setBodyDevice(file); // Attache le fichier au multipart
-                file->setParent(multiPart);   // Permet au multiPart de gérer la suppression de l'objet file
+                        bddEnEnvoi->fileName() + "\""));
+                filePart.setBodyDevice(bddEnEnvoi); // Attache le fichier au multipart
+                //bddEnEnvoi->setParent(multiPart);   // Permet au multiPart de gérer la suppression de l'objet file
                 multiPart->append(filePart);
 
                 // Envoyer la requête POST
@@ -271,6 +272,14 @@ void GestionnaireDonneesEnLigne::serviceRequestFinished(QNetworkReply* rep)
                 
                 emit notifierEtapeChargementBdd(AeroDmsTypes::EtapeChargementBdd_DEMANDE_ENVOI_BDD_FIN);
                 emit finDEnvoiBdd();
+
+                if (bddEnEnvoi != nullptr)
+                {
+                    bddEnEnvoi->close();
+                    delete bddEnEnvoi;
+                    bddEnEnvoi = nullptr;
+                }
+
                 libererMutex();
             }
             else if (demandeEnCours == Demande_TELECHARGER_BDD)

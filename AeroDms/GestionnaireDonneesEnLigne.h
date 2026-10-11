@@ -45,6 +45,7 @@ private:
 	QUrl serviceUrl;
 	QString nomFichierEnTelechargement = "";
 	QFile* fichierEnCoursDeTelechargement = nullptr;
+	QFile* bddEnEnvoi = nullptr;
 	QNetworkReply* reponseFichierEnCoursDeTelechargement = nullptr;
 
 	int nombreEssais = 0;

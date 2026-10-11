@@ -276,6 +276,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
 
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(gererEchecOuvertureBdd()));
+    connect(db, SIGNAL(demanderFermetureSplashScreenSurErreurNoFatale()), this, SLOT(fermerSplashscreen()));
 
     db->ouvrirLaBdd(database);
     db->lireParametres(parametresMetiers, parametresSysteme);

@@ -213,7 +213,7 @@ public:
     void enregistrerImputation(const AeroDmsTypes::Imputation p_imputation, 
         const int p_idVol);
 
-    void demanderEnvoiBdd();
+    void demanderEnvoiBdd(const bool p_envoiFinal = false);
     const QStringList recupererListeFichiersPdfFactures();
     void libererVerrouBdd();
 
@@ -226,6 +226,7 @@ public slots:
 signals:
     void erreurOuvertureBdd();
     void signalerChargementBaseSuiteTelechargement();
+    void demanderFermetureSplashScreenSurErreurNonFatale();
     void signalerDebutTelechargementBdd();
     void signalerBddBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,
@@ -242,7 +243,7 @@ private:
     QString nomDuVerrou = "";
     bool envoiTerminalAvantFermetureLogiciel = false;
 
-    const double versionBddAttendue = 1.14;
+    const double versionBddAttendue = 1.15;
 
     const bool ouvrirBdd();
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);

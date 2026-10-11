@@ -682,7 +682,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_FACTURE;
         //L'année n'est pas utile pour la facture => on fourni directement l'ID facture
         demandeEnCours.annee = demandeRembousement.id;
-        demandeEnCours.typeDeVol = demandeRembousement.intitule;
+        demandeEnCours.typeDeVol = demandeRembousement.typeDeSortie;
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
         demandeEnCours.montant = demandeRembousement.montant;
         demandeEnCours.nomFichier = QString(".DemandeRemboursementFacturePayeeParPilote");

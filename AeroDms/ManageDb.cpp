@@ -57,9 +57,9 @@ const QString ManageDb::recupererVerificationClesEtrangereActif()
 
     if (query.value(0).toInt() == 1)
     {
-        return "Controle clé étrangères actif";
+        return tr("Controle clé étrangères actif");
     }
-    return "Controle clé étrangères inactif";
+    return tr("Controle clé étrangères inactif");
 }
 
 void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
@@ -76,7 +76,7 @@ void ManageDb::comparerSha256BddLocale(QString p_sha256BaseEnLigne)
     {
         //base distante et locale identique => on ne retélécharge pas
         //mais on emet le signal signalerChargementBaseSuiteTelechargement()
-        //pour repasse l'IHM en lecture-ecriture
+        //pour repasser l'IHM en lecture-ecriture
         emit signalerChargementBaseSuiteTelechargement();
         gererVerrouBdd();
     }
@@ -156,6 +156,13 @@ void ManageDb::libererVerrouBdd()
         query.exec();
         //On demande l'envoi de la BDD en ligne avec le verrou à jour
         QThread::msleep(delaisDeGardeBdd);
+        //On fait un peu de ménage...
+        query.prepare("VACUUM");
+        query.exec();
+        //... puis on optimise
+        query.prepare("PRAGMA optimize");
+        query.exec();
+        //Et enfin on clos.
         db.close();
 
         QThread::msleep(delaisDeGardeBdd);
@@ -174,23 +181,49 @@ void ManageDb::reitererEnvoiBddSurFermeture()
     QTimer::singleShot(10000, this, &ManageDb::reitererEnvoiBddSurFermeture);
 }
 
-void ManageDb::demanderEnvoiBdd()
+void ManageDb::demanderEnvoiBdd(const bool p_envoiFinal)
 {
     QThread::msleep(delaisDeGardeBdd);
+    QString cheminBddAEnvoyer = db.databaseName();
 
     if (gestionnaireDonneesEnLigne->estActif())
     {
-        emit passerLogicielEnLectureSeuleDurantEnvoiBdd();
-
         QSqlQuery query;
         query.prepare("UPDATE 'parametres' SET 'info3' = :derniereDateVerrou WHERE nom = 'lock'");
         query.bindValue(":derniereDateVerrou", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
         query.exec();
 
-        QThread::msleep(delaisDeGardeBdd);
-        db.close();
+        if (p_envoiFinal)
+        {
+            emit passerLogicielEnLectureSeuleDurantEnvoiBdd();
+            QThread::msleep(delaisDeGardeBdd);
+            db.close();
+        }
+        else
+        {
+            QFileInfo nomBdd(db.databaseName());
+            cheminBddAEnvoyer = nomBdd.path() + "/envoiBdd";
+            QFileInfo dossierEnvoi(cheminBddAEnvoyer);
+            //S'il n'existe pas, on le créé !
+            if (!dossierEnvoi.exists())
+            {
+                QDir dossier;
+                dossier.mkdir(cheminBddAEnvoyer);
+            }
+            cheminBddAEnvoyer = cheminBddAEnvoyer + "/" + nomBdd.fileName();
 
-        gestionnaireDonneesEnLigne->envoyerBdd(db.databaseName());
+            QFile baseAEnvoyer(cheminBddAEnvoyer);
+            if (baseAEnvoyer.exists())
+            {
+                baseAEnvoyer.remove();
+            }
+
+            query.prepare("VACUUM INTO :chemin");
+            query.bindValue(":chemin", cheminBddAEnvoyer);
+            query.exec();
+        }
+
+        gestionnaireDonneesEnLigne->envoyerBdd(cheminBddAEnvoyer);
     }  
 }
 
@@ -286,7 +319,7 @@ bool ManageDb::ouvrirLaBdd(const QString& p_database)
 
 const bool ManageDb::ouvrirBdd()
 {
-    bool bddEstOuverte = false;
+    bool bddEstOuverte = db.isOpen();
     int nbTentatives = 0;
 
     while (!bddEstOuverte
@@ -298,14 +331,61 @@ const bool ManageDb::ouvrirBdd()
         bddEstOuverte = db.open();
     }
 
-    if (bddEstOuverte)
+    //On vérifie si le nombre de tentatives vaut 0, sinon cela veut dire que la méthode a été appelée sans fermeture de la
+    //BDD donc nul besoin de réactiver les clés étrangères ni de réaliser les checks.
+    if (bddEstOuverte 
+        && nbTentatives != 0)
     {
         //active le contrôle des clés étrangères
         QSqlQuery query;
         query.prepare("PRAGMA foreign_keys = ON;");
         query.exec();
+
+        //On fait quelques vérifications
+        query.prepare("PRAGMA integrity_check");
+        query.exec();
+        if (!query.next() 
+            || query.value("integrity_check").toString() != "ok")
+        {
+            emit demanderFermetureSplashScreenSurErreurNonFatale();
+            QMessageBox::critical(
+                this,
+                QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
+                tr("Une erreur dans la base de données a été détectée par integrity_check.\n")
+                + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
+                + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.")
+            );
+        }
+
+        query.prepare("PRAGMA foreign_key_check");
+        query.exec();
+        
+        int nombreDeLignes = 0;
+        QString chaineForeignKeyCheck = "";
+        while (query.next())
+        {
+            nombreDeLignes++;
+            chaineForeignKeyCheck = chaineForeignKeyCheck + query.value("table").toString() + " / "
+                + query.value("rowid").toString() + " / "
+                + query.value("parent").toString() + " / "
+                + query.value("fkid").toString() + "\n";
+        }
+
+        if (nombreDeLignes != 0)
+        {
+            emit demanderFermetureSplashScreenSurErreurNonFatale();
+            QMessageBox::critical(
+                this,
+                QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
+                tr("Une erreur dans la base de données a été détectée par foreign_key_check.\n")
+                + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
+                + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.\n")
+                + tr("Erreurs remontées par SQLite : \n")
+                + chaineForeignKeyCheck
+            );
+        }
     }
-    else
+    else if (!bddEstOuverte)
     {
         emit erreurOuvertureBdd();
         QMessageBox::critical(this,
@@ -320,12 +400,17 @@ const bool ManageDb::ouvrirBdd()
 
 void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
 {
-    db.close();
+    //db.close();
 
-    QFile gestionnaireDeFichier;
-    gestionnaireDeFichier.copy(db.databaseName(), p_repertoireDeSauvegarde + "AeroDms.sqlite");
+    //QFile gestionnaireDeFichier;
+    //gestionnaireDeFichier.copy(db.databaseName(), p_repertoireDeSauvegarde + "AeroDms.sqlite");
 
-    ouvrirBdd();
+    //ouvrirBdd();
+
+    QSqlQuery query;
+    query.prepare("VACUUM INTO :chemin");
+    query.bindValue(":chemin", p_repertoireDeSauvegarde + "AeroDms.sqlite");
+    query.exec();
 }
 
 const QString ManageDb::recupererShaSumBdd()
@@ -1775,7 +1860,7 @@ const QList<QString> ManageDb::recupererListeRecettesNonSoumisesCse( const int p
 
 const AeroDmsTypes::ListeDemandeRemboursementFacture ManageDb::recupererLesDemandesDeRembousementAEmettre(const int p_annee)
 {
-    //Récupérationd des demandes de remboursement à soumettre au CE
+    //Récupération des demandes de remboursement à soumettre au CE
     AeroDmsTypes::ListeDemandeRemboursementFacture liste;
     QSqlQuery query;
 	if (p_annee != AeroDmsTypes::K_INIT_INT_INVALIDE)
