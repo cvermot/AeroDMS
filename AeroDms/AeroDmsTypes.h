@@ -170,6 +170,7 @@ public:
     static const QString recupererChaineEtapeChargementBdd(EtapeChargementBdd p_etape);
 
     enum Statistiques {                              //    RESO|STATS
+		Statistiques_AUCUNES                = 0x0,   //     XXX|0 0000 0000 0000
         Statistiques_HEURES_ANNUELLES       = 0x1,   //     XXX|0 0000 0000 0001
         Statistiques_HEURES_PAR_PILOTE      = 0x2,   //     XXX|0 0000 0000 0010
         Statistiques_HEURES_PAR_TYPE_DE_VOL = 0x4,   //     XXX|0 0000 0000 0100
@@ -415,6 +416,7 @@ public:
         bool recapHdVAvecConsommationsEtEmissions = false;
         bool virementEstAutorise = false;
         int recapHdvGraphAGenerer = K_INIT_INT;
+        bool activerSortieHtml = false;
         //int idFacture;
     };
 
@@ -685,6 +687,7 @@ public:
         double kgCo2ParLitreGasoil = 0.0;
         double kgCo2ParKwh = 0.0;
         double kgCo2IndirectsParHdv = 0.0;
+        QString texte = "";
     };
 
     struct ParametresMetier {

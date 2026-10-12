@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on dim. oct. 11 00:11:33 2026
+-- File generated with SQLiteStudio v3.4.4 on lun. oct. 12 00:07:43 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -50,7 +50,7 @@ INSERT INTO imputation (id, nom, description) VALUES (0, 'Section aéro', 'Vols 
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.14', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.15', NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('lock', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('autoriserReglementParVirement', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('proportionParticipationBalade', NULL, NULL, NULL);
@@ -60,10 +60,11 @@ INSERT INTO parametres (nom, info1, info2, info3) VALUES ('proportionRembourseme
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantCotisationPilote', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('montantSubventionEntrainement', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('miseAJour', NULL, NULL, NULL);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreEssence', '0', NULL, NULL);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreGasoil', '0', NULL, NULL);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParKwh', '0', NULL, NULL);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2IndirectsParHdv', '0', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreEssence', '2.2', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreGasoil', '2.55', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParKwh', '0.015', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2IndirectsParHdv', '2.3', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('texteAccompagnementCo2', NULL, NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));

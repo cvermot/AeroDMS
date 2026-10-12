@@ -207,7 +207,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
                                                          const QString p_cheminStockageFactures,
                                                          const AeroDmsTypes::Signature p_signature,
                                                          const int p_graphAGenerer,
-                                                         const QString p_nomTresorier)
+                                                         const QString p_nomTresorier,
+                                                         const bool p_activerSortieHtml)
 {
     nombreEtapesEffectuees = 0;
     indiceFichier = 0;
@@ -223,6 +224,8 @@ void PdfRenderer::imprimerLeRecapitulatifDesHeuresDeVol( const int p_annee,
     demandeEnCours.recapHdvGraphAGenerer = p_graphAGenerer;
 
     demandeEnCours.nomTresorier = p_nomTresorier;
+
+	demandeEnCours.activerSortieHtml = p_activerSortieHtml;
 
     cheminSortieFichiersGeneres = QString(p_cheminSortieFichiersGeneres).append(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmm"));
     repertoireDesFactures = p_cheminStockageFactures;
@@ -877,14 +880,27 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
         templateTable.replace("<!--AccrocheRecapBaladesSorties-->", htmlRecapBaladesSorties);
     }
 
+    const QString images = genererImagesStatistiques(p_annee);
+    templateTable.replace("<!--AccrocheGraphiques-->", images);
+   
     if (demandeEnCours.recapHdVAvecConsommationsEtEmissions)
     {
         const QString htmlRecapEmissionsCo2 = genererHtmlRecapEmissionsCo2(p_annee, etatGenerationARetourner);
         templateTable.replace("<!--AccrocheCo2-->", htmlRecapEmissionsCo2);
+		
+        //Si on a ajouté les tableaux des émissions, on doit décider ou se termine le div de passage en portrait.
+        //1) si on a pas inseré les images des graphiques, on ferme le div portrait à la fin du fichier
+        //2) si on a inséré les images des graphiques, on ferme le div portrait après les émissions CO2, 
+        //   pour que les graphiques soient en mode paysage
+        if (demandeEnCours.recapHdvGraphAGenerer == AeroDmsTypes::Statistiques_AUCUNES)
+        {
+            templateTable.replace("<!--AccrocheFermetureDivPortraitApresCo2-->", "</div>");
+        }
+        else
+        {
+            templateTable.replace("<!--AccrocheFermetureDivPortraitFinDeFichier-->", "</div>");
+        }
     }
-
-    const QString images = genererImagesStatistiques(p_annee);
-    templateTable.replace("<!--AccrocheGraphiques-->", images);
 
     if ( demandeEnCours.mergerTousLesPdf
          && demandeEnCours.typeDeSignatureDemandee == AeroDmsTypes::Signature_NUMERIQUE_LEX_COMMUNITY)
@@ -900,11 +916,17 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
         view->setHtml(templateTable,
             ressourcesHtml);
 
-        /*QFile f("test.html");
-        f.open(QIODevice::ReadWrite | QIODevice::Text);
+        if (demandeEnCours.activerSortieHtml)
+        {
+            QFile f(cheminSortieFichiersGeneres + "/rapport.html");
+            f.open(QIODevice::ReadWrite | QIODevice::Text);
             QTextStream outputStream(&f);
             outputStream << templateTable;
-            f.close();*/
+            f.close();
+
+            QFile::copy(":/AeroDms/ressources/splash.webp", cheminSortieFichiersGeneres+"/img/splash.webp");
+        }
+            
     }  
 
     demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_RECAP_ANNUEL;
@@ -1304,7 +1326,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
         //Par convention, on utilise le nom et la description présente dans la première case mais ça pourrait être
         //n'importe laquelle
         html.replace("__NomImputation__", listeConsommations.listes.at(imputation).at(0).nomImputation);
-        html.replace("__DescriptionImputation__", listeConsommations.listes.at(imputation).at(0).descriptionImputation);    
+        html.replace("__DescriptionImputation__", nettoyerHtml(listeConsommations.listes.at(imputation).at(0).descriptionImputation));
 
         for (int i = 0; i < listeConsommations.listes.at(imputation).size(); i++)
         {
@@ -1474,7 +1496,20 @@ void PdfRenderer::completerChampsLegendeEmissions(QString& p_html,
     p_html.replace("__kgCo2CombustionLEssence__", QString::number(p_parametresEmissionsCo2.kgCo2ParLitreEssence, 'f', 3));
     p_html.replace("__kgCo2CombustionLKerosene__", QString::number(p_parametresEmissionsCo2.kgCo2ParLitreGasoil, 'f', 3));
     p_html.replace("__kgCo2kWh__", QString::number(p_parametresEmissionsCo2.kgCo2ParKwh, 'f', 3));
-    p_html.replace("__kgCo2Indirectes__", QString::number(p_parametresEmissionsCo2.kgCo2IndirectsParHdv, 'f', 3)); 
+    p_html.replace("__kgCo2Indirectes__", QString::number(p_parametresEmissionsCo2.kgCo2IndirectsParHdv, 'f', 3));
+
+    p_html.replace("__VerbatimEmissions__", nettoyerHtml(p_parametresEmissionsCo2.texte));
+}
+
+const QString PdfRenderer::nettoyerHtml(const QString p_html)
+{
+    QRegularExpression re(
+        R"(^.*?<body[^>]*>(.*)</body>.*$)",
+        QRegularExpression::DotMatchesEverythingOption |
+        QRegularExpression::CaseInsensitiveOption);
+
+    QRegularExpressionMatch m = re.match(p_html);
+    return m.hasMatch() ? m.captured(1).trimmed() : p_html;
 }
 
 QString PdfRenderer::genererImagesStatistiques(const int p_annee)
@@ -1483,7 +1518,7 @@ QString PdfRenderer::genererImagesStatistiques(const int p_annee)
     QDir().mkdir(cheminSortie);
     cheminSortie = cheminSortie + "/";
 
-    QString html;
+    QString html = "";
 
     QWidget* m_contentArea = nullptr;
 

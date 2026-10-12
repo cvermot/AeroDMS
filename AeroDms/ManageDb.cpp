@@ -466,6 +466,15 @@ AeroDmsTypes::ParametresEmissionsCo2 ManageDb::lireParametresEmissionsCo2()
     parametresCo2.kgCo2ParKwh = lireParametreUnitaire("kgCo2ParKwh");
     parametresCo2.kgCo2IndirectsParHdv = lireParametreUnitaire("kgCo2IndirectsParHdv");
 
+    QSqlQuery query;
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "texteAccompagnementCo2");
+    query.exec();
+    if (query.next())
+    {
+        parametresCo2.texte = query.value("info1").toString();
+    }
+
     return parametresCo2;
 }
 
@@ -503,6 +512,11 @@ void ManageDb::enregistrerParametres(const AeroDmsTypes::ParametresMetier& p_par
     enregistrerParametreUnitaire("kgCo2ParLitreGasoil", p_parametresMetiers.emissionsCo2.kgCo2ParLitreGasoil);
     enregistrerParametreUnitaire("kgCo2ParKwh", p_parametresMetiers.emissionsCo2.kgCo2ParKwh);
     enregistrerParametreUnitaire("kgCo2IndirectsParHdv", p_parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv);
+
+    query.prepare("UPDATE parametres SET info1 = :valeur WHERE nom = :nomParametre");
+    query.bindValue(":nomParametre", "texteAccompagnementCo2");
+    query.bindValue(":valeur", p_parametresMetiers.emissionsCo2.texte);
+    query.exec();
 }
 
 void ManageDb::enregistrerParametreUnitaire(const QString & p_nomParametre,

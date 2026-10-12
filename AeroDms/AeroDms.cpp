@@ -3296,7 +3296,8 @@ void AeroDms::genererPdfRecapHdV()
                                                 parametresSysteme.cheminStockageFacturesTraitees,
                                                 signature,
                                                 calculerValeurGraphAGenererPdf(),
-                                                parametresMetiers.nomTresorier);
+                                                parametresMetiers.nomTresorier,
+                                                boutonModeDebug->text() != texteBoutonActiverModeDebogage);
 }
 
 void AeroDms::enregistrerUneFacture()

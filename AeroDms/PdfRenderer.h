@@ -52,7 +52,8 @@ public:
 		const QString p_cheminStockageFactures,
 		const AeroDmsTypes::Signature p_signature,
 		const int p_graphAGenerer,
-		const QString p_nomTresorier);
+		const QString p_nomTresorier,
+		const bool p_activerSortieHtml);
 
 private :
 	QWebEnginePage* view = nullptr;
@@ -103,6 +104,7 @@ private :
 	QString mergerPdf();
 
 	QString numeroFichierSur3Digits();
+	const QString nettoyerHtml(const QString p_html);
 
 	static int calculerNbEtapesGenerationRecapHdV(const int p_graphAGenerer);
 

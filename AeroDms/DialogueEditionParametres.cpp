@@ -496,6 +496,14 @@ void DialogueEditionParametres::initialiserOngletEmissions(const AeroDmsTypes::P
     emissionsCo2IndirectesParHdV->setValue(p_parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv);
 
     ligneActuelle = emissionsLayout->rowCount();
+    emissionsCo2Texte = new QTextEdit(this);
+    emissionsCo2Texte->setToolTip(tr("Cette zone permet d'ajouter des éléments de contexte autour des émissions de CO2."));
+    emissionsLayout->addWidget(new QLabel(tr("Verbatim : "), this), ligneActuelle, K_COLONNE_LABEL);
+    emissionsLayout->addWidget(emissionsCo2Texte, ligneActuelle, K_COLONNE_CHAMP);
+
+    emissionsCo2Texte->setHtml(p_parametresMetiers.emissionsCo2.texte);
+
+    ligneActuelle = emissionsLayout->rowCount();
     emissionsLayout->setRowStretch(ligneActuelle, 1);
 }
 
@@ -601,6 +609,7 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresMetiers.emissionsCo2.kgCo2ParLitreGasoil = emissionsCo2ParLitreGazole->value();
     parametresMetiers.emissionsCo2.kgCo2ParKwh = emissionsCo2ParKwh->value();
     parametresMetiers.emissionsCo2.kgCo2IndirectsParHdv = emissionsCo2IndirectesParHdV->value();
+    parametresMetiers.emissionsCo2.texte = emissionsCo2Texte->toHtml();
     parametresMetiers.nomTresorier = nomTresorier->text();
     parametresMetiers.delaisDeGardeBdd = delaisGardeBdd->value();
     parametresMetiers.objetMailDispoCheques = objetChequeDispo->text();

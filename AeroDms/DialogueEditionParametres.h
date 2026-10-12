@@ -85,6 +85,7 @@ private:
     QDoubleSpinBox* emissionsCo2ParLitreGazole = nullptr;
     QDoubleSpinBox* emissionsCo2ParKwh = nullptr;
     QDoubleSpinBox* emissionsCo2IndirectesParHdV = nullptr;
+    QTextEdit* emissionsCo2Texte = nullptr;
 
     void initialiserOngletMailing(const AeroDmsTypes::ParametresMetier & p_parametresMetiers);
     void initialiserOngletFinancier(const AeroDmsTypes::ParametresMetier & p_parametresMetiers,

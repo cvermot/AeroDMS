@@ -1,8 +1,5 @@
 <html>
 <head>
-</head>
-<body>
-
 <style type="text/css">
 .tg  {border-collapse:collapse;border-spacing:0;}
 .tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
@@ -47,6 +44,26 @@ svg {
     height: auto;
 }
 
+@page portraitPage {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  @page landscapePage {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+
+  .portrait {
+    page: portraitPage;
+    page-break-after: always;
+  }
+
+  .landscape {
+    page: landscapePage;
+    page-break-after: always;
+  }
+
 .last-page-footer {
         margin-top: auto;
         page-break-inside: avoid; /* Évite que le footer soit coupé sur deux pages */
@@ -54,6 +71,9 @@ svg {
         padding-top: 10px;
       }
 </style>
+</head>
+<body>
+
 <table class="tg">
 <thead>
   <tr>
@@ -104,17 +124,17 @@ svg {
 <br />
 <!--AccrocheRecapBaladesSorties-->
 <br />
-<!--AccrocheCo2-->
-<br />
 <!--AccrocheGraphiques-->
+<br />
+<!--AccrocheCo2-->
+<!--AccrocheFermetureDivPortraitApresCo2-->
 <br />
 <!--Signature-->
 
-<footer class="last-page-footer">
 <table>
     <tr>
         <td>
-            <img width="180px" src="qrc:/AeroDms/ressources/splash.webp" onerror="this.onerror=null; this.src='./ressources/splash.webp'" alt="Logo AeroDms">
+            <img width="180px" src="qrc:/AeroDms/ressources/splash.webp" onerror="this.onerror=null; this.src='./img/splash.webp'" alt="Logo AeroDms">
         </td>
         <td>
             Rapport généré avec AeroDms version __VersionAeroDms__
@@ -122,6 +142,8 @@ svg {
     </tr>
 </table>
 </footer>
+
+<!--AccrocheFermetureDivPortraitFinDeFichier-->
 
 </body>
 
