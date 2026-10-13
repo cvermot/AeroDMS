@@ -100,6 +100,16 @@ private :
 		const int p_nbLignes);
 	void completerChampsLegendeEmissions(QString& p_html,
 		const AeroDmsTypes::ParametresEmissionsCo2& p_parametresEmissionsCo2);
+	void completerVertbatim(QString& p_html,
+		const AeroDmsTypes::ParametresEmissionsCo2& p_parametresEmissionsCo2,
+		const int p_annee);
+	void completerTableauRepartitionVolsSurSemaine(QString& p_html,
+		const int p_annee);
+	void completerVolsDUnJour(QString& p_html, 
+		const QString p_nomJour, 
+		const int p_annee, 
+		const AeroDmsTypes::JourDeLaSemaine p_jour, 
+		const int p_nombreTotalDeVols);
 
 	QString mergerPdf();
 

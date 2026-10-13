@@ -1413,6 +1413,11 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
         totauxEmissionsCo2.getGrandTotalGeneral());
     completerChampsLegendeEmissions(html,
         parametresEmissionsCo2);
+    completerVertbatim(html,
+        parametresEmissionsCo2,
+        p_annee);
+
+    completerTableauRepartitionVolsSurSemaine(html, p_annee);
 
     return html;
 }
@@ -1497,8 +1502,44 @@ void PdfRenderer::completerChampsLegendeEmissions(QString& p_html,
     p_html.replace("__kgCo2CombustionLKerosene__", QString::number(p_parametresEmissionsCo2.kgCo2ParLitreGasoil, 'f', 3));
     p_html.replace("__kgCo2kWh__", QString::number(p_parametresEmissionsCo2.kgCo2ParKwh, 'f', 3));
     p_html.replace("__kgCo2Indirectes__", QString::number(p_parametresEmissionsCo2.kgCo2IndirectsParHdv, 'f', 3));
+}
 
+void PdfRenderer::completerVertbatim(QString& p_html,
+    const AeroDmsTypes::ParametresEmissionsCo2& p_parametresEmissionsCo2,
+    const int p_annee)
+{
     p_html.replace("__VerbatimEmissions__", nettoyerHtml(p_parametresEmissionsCo2.texte));
+
+    //Champs disponibles pour le verbatim
+    const double proportionVolsWeekend = (double)(db->recupererNombreDeVolsDUnJour(p_annee, AeroDmsTypes::JourDeLaSemaine_SAMEDI) +
+        db->recupererNombreDeVolsDUnJour(p_annee, AeroDmsTypes::JourDeLaSemaine_DIMANCHE)) / db->recupererNombreDeVolsAnnuels(p_annee) * 100;
+    p_html.replace("__ProportionVolsWeekend__", QString::number(proportionVolsWeekend, 'f', 2));
+}
+
+void PdfRenderer::completerTableauRepartitionVolsSurSemaine(QString& p_html, 
+    const int p_annee)
+{
+    const int nombreTotalDeVols = db->recupererNombreDeVolsAnnuels(p_annee);
+    completerVolsDUnJour(p_html, "Dimanche", p_annee, AeroDmsTypes::JourDeLaSemaine_DIMANCHE, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Lundi", p_annee, AeroDmsTypes::JourDeLaSemaine_LUNDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Mardi", p_annee, AeroDmsTypes::JourDeLaSemaine_MARDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Mercredi", p_annee, AeroDmsTypes::JourDeLaSemaine_MERCREDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Jeudi", p_annee, AeroDmsTypes::JourDeLaSemaine_JEUDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Vendredi", p_annee, AeroDmsTypes::JourDeLaSemaine_VENDREDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Samedi", p_annee, AeroDmsTypes::JourDeLaSemaine_SAMEDI, nombreTotalDeVols);
+    completerVolsDUnJour(p_html, "Dimanche", p_annee, AeroDmsTypes::JourDeLaSemaine_DIMANCHE, nombreTotalDeVols);
+}
+
+void PdfRenderer::completerVolsDUnJour(QString& p_html, 
+    const QString p_nomJour, 
+    const int p_annee, 
+    const AeroDmsTypes::JourDeLaSemaine p_jour, 
+    const int p_nombreTotalDeVols)
+{
+    const int nombreDeVol = db->recupererNombreDeVolsDUnJour(p_annee, p_jour);
+
+    p_html.replace("__nbVols" + p_nomJour + "__", QString::number(nombreDeVol));
+    p_html.replace("__proportionVols" + p_nomJour + "__", QString::number((((double)nombreDeVol / p_nombreTotalDeVols) * 100), 'f', 2));
 }
 
 const QString PdfRenderer::nettoyerHtml(const QString p_html)

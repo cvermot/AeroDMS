@@ -3055,6 +3055,34 @@ AeroDmsTypes::StatsEmissionsCo2 ManageDb::deplierRequeteEmissions(const QSqlQuer
     return stats;
 }
 
+const int ManageDb::recupererNombreDeVolsDUnJour(const int p_annee, const AeroDmsTypes::JourDeLaSemaine p_jour)
+{
+    QSqlQuery query;
+    query.prepare("SELECT strftime('%w', date) AS jour, COUNT(*) AS nombreVol FROM vol WHERE strftime('%Y', vol.date) = :annee AND jour = :jour GROUP BY strftime('%w', date)");
+    query.bindValue(":annee", QString::number(p_annee));
+    query.bindValue(":jour", QString::number(p_jour));
+
+    query.exec();
+    if (query.next())
+    {
+        return query.value("nombreVol").toInt();
+    }
+    return 0;
+}
+const int ManageDb::recupererNombreDeVolsAnnuels(const int p_annee)
+{
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(*) AS nombreVol FROM vol WHERE strftime('%Y', vol.date) = :annee");
+    query.bindValue(":annee", QString::number(p_annee));
+
+    query.exec();
+    if (query.next())
+    {
+        return query.value("nombreVol").toInt();
+    }
+    return 0;
+}
+
 const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee,
     const int p_options)
 {

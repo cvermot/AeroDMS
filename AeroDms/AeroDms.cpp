@@ -2716,10 +2716,10 @@ void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
     menuDemandesAGenererAnnees->clear();
-    listeDeroulanteAnnee->addItem("Toutes les années", 
+    listeDeroulanteAnnee->addItem("Toutes les années",
         AeroDmsTypes::K_INIT_INT_INVALIDE);
 
-    QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES), 
+    QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES),
         tr("&Toutes"), 
         this);
     actionToutesLesAnnees->setStatusTip(tr("Générer les demandes pour toutes les années pour lesquelles il existe des entrées en base de données"));

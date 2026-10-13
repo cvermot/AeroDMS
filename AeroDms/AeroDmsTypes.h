@@ -387,6 +387,17 @@ public:
         ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE = 2
     };
 
+    enum JourDeLaSemaine
+    {
+        JourDeLaSemaine_DIMANCHE = 0,
+        JourDeLaSemaine_LUNDI = 1,
+        JourDeLaSemaine_MARDI = 2,
+        JourDeLaSemaine_MERCREDI = 3,
+        JourDeLaSemaine_JEUDI = 4,
+        JourDeLaSemaine_VENDREDI = 5,
+        JourDeLaSemaine_SAMEDI = 6
+    };
+
     static const QString K_INIT_QSTRING;
     static const int K_INIT_INT_INVALIDE;
     static const int K_INIT_INT;
