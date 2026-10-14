@@ -118,7 +118,8 @@ public:
         AeronefTableElement_IMMAT = 0x0,
         AeronefTableElement_TYPE = 0x1,
         AeronefTableElement_COMPENSATION_CARBONE = 0x2,
-        AeronefTableElement_NB_COLONNES = 0x3,
+        AeronefTableElement_AERODROME_BASE = 0x3,
+        AeronefTableElement_NB_COLONNES = 0x4,
     };
 
     enum AeronefTypeTableElement 
@@ -617,6 +618,7 @@ public:
     struct Aeronef {
         QString immatriculation = K_INIT_QSTRING;
         QString type = K_INIT_QSTRING;
+        QString aerodromeBase = K_INIT_QSTRING;
 		bool emissionsSontCompensees = false;
     };
     typedef QList<Aeronef> ListeAeronefs;

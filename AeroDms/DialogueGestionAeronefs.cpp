@@ -27,7 +27,7 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db,
     database = db;
 
     QGridLayout* mainLayout = new QGridLayout(this);
-    resize(400, 450);
+    resize(480, 500);
 
     setLayout(mainLayout);
 
@@ -39,6 +39,7 @@ DialogueGestionAeronefs::DialogueGestionAeronefs(ManageDb* db,
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_IMMAT, new QTableWidgetItem("Immatriculation"));
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_TYPE, new QTableWidgetItem("Type"));
     vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_COMPENSATION_CARBONE, new QTableWidgetItem(tr("Compensation CO₂")));
+    vueAeronefs->setHorizontalHeaderItem(AeroDmsTypes::AeronefTableElement_AERODROME_BASE, new QTableWidgetItem(tr("Aérodrome d'attache")));
     vueAeronefs->setEditTriggers(QAbstractItemView::DoubleClicked);
 
     connect(vueAeronefs, &QTableWidget::cellChanged, this, &DialogueGestionAeronefs::sauvegarderDonneesSaisies);
@@ -78,6 +79,9 @@ void DialogueGestionAeronefs::peuplerListeAeronefs()
         listeCompensationCarbone->append(compensationCarbone);
         vueAeronefs->setCellWidget(i, AeroDmsTypes::AeronefTableElement_COMPENSATION_CARBONE,
             listeCompensationCarbone->last());
+
+        QTableWidgetItem* itemBase = new QTableWidgetItem(aeronef.aerodromeBase);
+        vueAeronefs->setItem(i, AeroDmsTypes::AeronefTableElement_AERODROME_BASE, itemBase);
     }
     vueAeronefs->resizeColumnsToContents();
 
@@ -88,7 +92,8 @@ void DialogueGestionAeronefs::sauvegarderDonneesSaisies(const int p_ligne,
     const int p_colonne)
 {
     database->mettreAJourTypeAeronef( vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_IMMAT)->data(Qt::DisplayRole).toString(),
-                                      vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_TYPE)->data(Qt::DisplayRole).toString());
+                                      vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_TYPE)->data(Qt::DisplayRole).toString(),
+                                      vueAeronefs->item(p_ligne, AeroDmsTypes::AeronefTableElement_AERODROME_BASE)->data(Qt::DisplayRole).toString());
 }
 
 void DialogueGestionAeronefs::changementCompensationCarbone()

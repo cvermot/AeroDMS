@@ -80,6 +80,8 @@ void  AixmParser::mettreAJourAerodromes(const QString p_fichierAixm)
             QDomNodeList nameNodes = aerodromeElement.elementsByTagName("txtName");
             QDomNodeList typeNodes = aerodromeElement.elementsByTagName("codeType");
             QDomNodeList icaoCodeNodes = aerodromeElement.elementsByTagName("codeIcao");
+            QDomNodeList latitude = aerodromeElement.elementsByTagName("geoLat");
+            QDomNodeList longitude = aerodromeElement.elementsByTagName("geoLong");
 
             if (nameNodes.count() == 2
                 && typeNodes.count() == 1
@@ -90,7 +92,10 @@ void  AixmParser::mettreAJourAerodromes(const QString p_fichierAixm)
                 const QString name = AeroDmsServices::capitaliserTexte(nameNodes.at(1).toElement().text());
                 const QString icaoCode = icaoCodeNodes.at(0).toElement().text();
 
-                const AeroDmsTypes::Status status = db->mettreAJourAerodrome(icaoCode, name);
+                const AeroDmsTypes::Status status = db->mettreAJourAerodrome(icaoCode, 
+                    name, 
+                    conversionSexagesimalVersDecimal(latitude.at(0).toElement().text()),
+                    conversionSexagesimalVersDecimal(longitude.at(0).toElement().text()));
                 switch (status)
                 {
 				    case AeroDmsTypes::Status_CREATION:
@@ -107,4 +112,40 @@ void  AixmParser::mettreAJourAerodromes(const QString p_fichierAixm)
             qApp->processEvents();
         }
     }
+}
+
+double AixmParser::conversionSexagesimalVersDecimal(QString p_coordonnees) 
+{
+    // 1) Longitude : DDDMMSS(.sss)?[EW]
+    static const QRegularExpression reLon(
+        R"(^(\d{3})([0-5]\d)([0-5]\d(?:\.\d+)?)([EW])$)"
+    );
+
+    // 2) Latitude : DDMMSS(.sss)?[NS]
+    static const QRegularExpression reLat(
+        R"(^(\d{2})([0-5]\d)([0-5]\d(?:\.\d+)?)([NS])$)"
+    );
+
+    QRegularExpressionMatch m = reLon.match(p_coordonnees);
+    if (!m.hasMatch())
+    {
+        m = reLat.match(p_coordonnees);
+    } 
+
+    if (!m.hasMatch())
+    {
+        return 0.0; // format invalide
+    }   
+
+    double negatif = 1.0;
+    if (m.captured(4) == "W" 
+        || m.captured(4) == "S")
+    {
+        negatif = -1.0;
+    }
+    const double degres = m.captured(1).toDouble();
+    const double minutes = m.captured(2).toDouble();
+    const double secondes = m.captured(3).toDouble();
+
+    return negatif * (degres + (minutes / 60.0) + (secondes / 3600.0));
 }

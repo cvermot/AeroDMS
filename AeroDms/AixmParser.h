@@ -34,6 +34,8 @@ public:
 private:
 	ManageDb* db = nullptr;
 
+	double conversionSexagesimalVersDecimal(QString p_coordonnees);
+
 signals:
 	void signalerMiseAJourAerodrome(int nombreTotal, int nombreTraite, int nombreCree, int nombreMisAJour);
 	

@@ -1984,6 +1984,7 @@ const AeroDmsTypes::ListeAeronefs ManageDb::recupererListeAeronefs()
         {
             aeronef.immatriculation = query.value("immatriculation").toString();
             aeronef.type = query.value("type").toString();
+            aeronef.aerodromeBase = query.value("aerodromeBase").toString();
             aeronef.emissionsSontCompensees = query.value("compensationCarbone").toBool();
             listeAeronefs.append(aeronef);
         }  
@@ -3174,7 +3175,8 @@ const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_a
 }
 
 void ManageDb::mettreAJourTypeAeronef( const QString p_immatAeronefAMettreAJour,
-    const QString p_nouveauType )
+    const QString p_nouveauType,
+    const QString p_nouvelAerodromeDAttache)
 {
     QSqlQuery query;
 
@@ -3193,9 +3195,10 @@ void ManageDb::mettreAJourTypeAeronef( const QString p_immatAeronefAMettreAJour,
         QThread::msleep(delaisDeGardeBdd);
     }
     
-    query.prepare("UPDATE aeronef SET type = :type WHERE immatriculation = :immat");
+    query.prepare("UPDATE aeronef SET type = :type, aerodromeBase = :aerodromeBase WHERE immatriculation = :immat");
     query.bindValue(":type", p_nouveauType);
     query.bindValue(":immat", p_immatAeronefAMettreAJour);
+    query.bindValue(":aerodromeBase", p_nouvelAerodromeDAttache);
     query.exec();
 }
 
@@ -3368,7 +3371,9 @@ const QString ManageDb::genererClauseFiltrageActivite(const int p_options)
 }
 
 const AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indicatifOaci, 
-    const QString p_nom)
+    const QString p_nom, 
+    const double p_latitude, 
+    const double p_longitude)
 {
 	QSqlQuery query;
 
@@ -3379,11 +3384,15 @@ const AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indica
     //Si le terrain existe, on vérifie si besoin de le mettre à jour
     if (query.next())
     {
-        if (query.value("nomAerodrome") != p_nom)
+        if (query.value("nomAerodrome") != p_nom 
+            || query.value("lat") != p_latitude 
+            || query.value("long") != p_longitude)
         {
-            query.prepare("UPDATE aerodrome SET nomAerodrome = :nomAerodrome WHERE identifiantOaci = :identifiantOaci");
+            query.prepare("UPDATE aerodrome SET nomAerodrome = :nomAerodrome, lat = :lat, long = :long WHERE identifiantOaci = :identifiantOaci");
             query.bindValue(":nomAerodrome", p_nom);
             query.bindValue(":identifiantOaci", p_indicatifOaci);
+            query.bindValue(":lat", p_latitude);
+            query.bindValue(":long", p_longitude);
             query.exec();
 
             QThread::msleep(delaisDeGardeBdd);
@@ -3394,9 +3403,11 @@ const AeroDmsTypes::Status ManageDb::mettreAJourAerodrome(const QString p_indica
     //Sinon on le créé
     else
 	{
-		query.prepare("INSERT INTO aerodrome ('identifiantOaci','nomAerodrome') VALUES(:identifiantOaci,:nomAerodrome)");
+		query.prepare("INSERT INTO aerodrome ('identifiantOaci','nomAerodrome','lat','long') VALUES(:identifiantOaci,:nomAerodrome,:lat,:long)");
 		query.bindValue(":identifiantOaci", p_indicatifOaci);
 		query.bindValue(":nomAerodrome", p_nom);
+        query.bindValue(":lat", p_latitude);
+        query.bindValue(":long", p_longitude);
 		query.exec();
 
         QThread::msleep(delaisDeGardeBdd);

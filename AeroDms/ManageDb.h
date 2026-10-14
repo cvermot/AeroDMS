@@ -152,7 +152,9 @@ public:
     const AeroDmsTypes::ResultatCreationBdd creerPilote( const AeroDmsTypes::Pilote p_pilote);
     const AeroDmsTypes::ResultatCreationBdd creerAeroclub(const AeroDmsTypes::Club p_aeroclub);
     const AeroDmsTypes::Status mettreAJourAerodrome(const QString p_indicatifOaci, 
-        const QString p_nom);
+        const QString p_nom,
+        const double p_latitude,
+        const double p_longitude);
     void creerSortie(const AeroDmsTypes::Sortie p_sortie);
 
     void ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitement p_demande);
@@ -191,7 +193,8 @@ public:
 
     //méthodes de mise à jour des champs de la table aeronef
     void mettreAJourTypeAeronef( const QString p_immatAeronefAMettreAJour,
-        const QString p_nouveauType);
+        const QString p_nouveauType,
+        const QString p_nouvelAerodromeDAttache);
     void mettreAJourCompensationCarboneAeronef(const QString p_immatAeronefAMettreAJour,
         const bool p_nouvelleCompensationCarbone);
 

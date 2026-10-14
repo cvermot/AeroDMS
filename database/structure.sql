@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mar. oct. 13 21:32:03 2026
+-- File generated with SQLiteStudio v3.4.4 on mer. oct. 14 22:55:14 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS aerodrome (identifiantOaci TEXT PRIMARY KEY NOT NULL 
 INSERT INTO aerodrome (identifiantOaci, nomAerodrome, lat, long) VALUES ('LF', '  Aérodrome Inconnu', NULL, NULL);
 
 -- Table: aeronef
-CREATE TABLE IF NOT EXISTS aeronef (immatriculation TEXT PRIMARY KEY UNIQUE, type TEXT DEFAULT Inconnu NOT NULL REFERENCES aeronefTypes (type), compensationCarbone NUMERIC DEFAULT (0));
-INSERT INTO aeronef (immatriculation, type, compensationCarbone) VALUES (NULL, 'Inconnu', 0);
+CREATE TABLE IF NOT EXISTS aeronef (immatriculation TEXT PRIMARY KEY UNIQUE, type TEXT DEFAULT Inconnu NOT NULL REFERENCES aeronefTypes (type), compensationCarbone NUMERIC DEFAULT (0), aerodromeBase TEXT REFERENCES aerodrome (identifiantOaci) NOT NULL DEFAULT LF);
+INSERT INTO aeronef (immatriculation, type, compensationCarbone, aerodromeBase) VALUES (NULL, 'Inconnu', 0, 'LF');
 
 -- Table: aeronefTypes
 CREATE TABLE IF NOT EXISTS aeronefTypes (type TEXT PRIMARY KEY NOT NULL UNIQUE, marque TEXT, consommation NUMERIC DEFAULT (0), unite NUMERIC DEFAULT (0), decompte NUMERIC DEFAULT (0));
@@ -67,7 +67,7 @@ INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2IndirectsParHdv'
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('texteAccompagnementCo2', NULL, NULL, NULL);
 
 -- Table: pilote
-CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId NUMERIC NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
+CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId INTEGER NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
 
 -- Table: recettes
 CREATE TABLE IF NOT EXISTS recettes (recetteId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeRecette TEXT NOT NULL REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId), Intitule TEXT NOT NULL, montant REAL NOT NULL, identifiantFormulaireSoumissionCe INTEGER REFERENCES demandeRemboursementSoumises (demandeId));
