@@ -218,6 +218,7 @@ public:
     void demanderEnvoiBdd(const bool p_envoiFinal = false);
     const QStringList recupererListeFichiersPdfFactures();
     void libererVerrouBdd();
+    void verifierBaseDeDonnees();
 
 public slots:
     void comparerSha256BddLocale(QString p_sha256BaseEnLigne);
@@ -228,7 +229,6 @@ public slots:
 signals:
     void erreurOuvertureBdd();
     void signalerChargementBaseSuiteTelechargement();
-    void demanderFermetureSplashScreenSurErreurNonFatale();
     void signalerDebutTelechargementBdd();
     void signalerBddBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
         const QDateTime p_heureVerrouInitial,

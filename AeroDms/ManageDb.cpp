@@ -340,50 +340,6 @@ const bool ManageDb::ouvrirBdd()
         QSqlQuery query;
         query.prepare("PRAGMA foreign_keys = ON;");
         query.exec();
-
-        //On fait quelques vérifications
-        query.prepare("PRAGMA integrity_check");
-        query.exec();
-        if (!query.next() 
-            || query.value("integrity_check").toString() != "ok")
-        {
-            emit demanderFermetureSplashScreenSurErreurNonFatale();
-            QMessageBox::critical(
-                this,
-                QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
-                tr("Une erreur dans la base de données a été détectée par integrity_check.\n")
-                + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
-                + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.")
-            );
-        }
-
-        query.prepare("PRAGMA foreign_key_check");
-        query.exec();
-        
-        int nombreDeLignes = 0;
-        QString chaineForeignKeyCheck = "";
-        while (query.next())
-        {
-            nombreDeLignes++;
-            chaineForeignKeyCheck = chaineForeignKeyCheck + query.value("table").toString() + " / "
-                + query.value("rowid").toString() + " / "
-                + query.value("parent").toString() + " / "
-                + query.value("fkid").toString() + "\n";
-        }
-
-        if (nombreDeLignes != 0)
-        {
-            emit demanderFermetureSplashScreenSurErreurNonFatale();
-            QMessageBox::critical(
-                this,
-                QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
-                tr("Une erreur dans la base de données a été détectée par foreign_key_check.\n")
-                + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
-                + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.\n")
-                + tr("Erreurs remontées par SQLite : \n")
-                + chaineForeignKeyCheck
-            );
-        }
     }
     else if (!bddEstOuverte)
     {
@@ -396,6 +352,52 @@ const bool ManageDb::ouvrirBdd()
     }
 
     return bddEstOuverte;
+}
+
+void ManageDb::verifierBaseDeDonnees()
+{
+    //On fait quelques vérifications
+    QSqlQuery query;
+    query.prepare("PRAGMA integrity_check");
+    query.exec();
+    if (!query.next()
+        || query.value("integrity_check").toString() != "ok")
+    {
+        QMessageBox::critical(
+            this,
+            QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
+            tr("Une erreur dans la base de données a été détectée par integrity_check.\n")
+            + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
+            + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.")
+        );
+    }
+
+    query.prepare("PRAGMA foreign_key_check");
+    query.exec();
+
+    int nombreDeLignes = 0;
+    QString chaineForeignKeyCheck = "";
+    while (query.next())
+    {
+        nombreDeLignes++;
+        chaineForeignKeyCheck = chaineForeignKeyCheck + query.value("table").toString() + " / "
+            + query.value("rowid").toString() + " / "
+            + query.value("parent").toString() + " / "
+            + query.value("fkid").toString() + "\n";
+    }
+
+    if (nombreDeLignes != 0)
+    {
+        QMessageBox::critical(
+            this,
+            QApplication::applicationName() + " - " + tr("Erreur de cohérence de la base de données"),
+            tr("Une erreur dans la base de données a été détectée par foreign_key_check.\n")
+            + tr("Cette erreur pourrait provoquer des problèmes à l'usage du logiciel.\n")
+            + tr("\nIl est conseillé de contacter l'administrateur du logiciel pour vérification.\n")
+            + tr("Erreurs remontées par SQLite : \n")
+            + chaineForeignKeyCheck
+        );
+    }
 }
 
 void ManageDb::sauvegarderLaBdd(const QString p_repertoireDeSauvegarde)
@@ -3051,6 +3053,35 @@ AeroDmsTypes::StatsEmissionsCo2 ManageDb::deplierRequeteEmissions(const QSqlQuer
     stats.idImputation = p_query.value("idImputation").toInt();
     stats.nomImputation = p_query.value("nomImputation").toString();
     stats.descriptionImputation = p_query.value("descriptionImputation").toString();
+
+    stats.chaineConsommationSelonUnite = QString::number(stats.consommationHoraireDuType, 'f', 0);
+    switch (stats.uniteTypeConsommation)
+    {
+        case AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE:
+        case AeroDmsTypes::UniteTypeConsommation_LITRES_GASOIL_KEROSENE:
+        {
+            stats.chaineConsommationSelonUnite += " L";
+        }
+        break;
+        case AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES:
+        {
+            stats.chaineConsommationSelonUnite += " kWh";
+        }
+		break;
+    }
+    switch(stats.typeDecompte)
+    {
+        case AeroDmsTypes::TypeDecompte_HORAIRE:
+        {
+            stats.chaineConsommationSelonUnite += "/h";
+        }
+        break;
+        case AeroDmsTypes::TypeDecompte_UNITAIRE:
+        {
+            stats.chaineConsommationSelonUnite += "/vol";
+        }
+        break;
+	}
 
     return stats;
 }

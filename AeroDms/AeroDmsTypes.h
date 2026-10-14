@@ -807,6 +807,8 @@ public:
         QString nomImputation = "";
         QString descriptionImputation = "";
 
+        QString chaineConsommationSelonUnite = "";
+
         //Retourne la consommation en litres ou en KWh selon la durée du vol ou en unitaire selon le cas
         const double consommationDEnergie() const
         {

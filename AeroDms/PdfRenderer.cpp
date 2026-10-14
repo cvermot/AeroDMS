@@ -1377,6 +1377,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
             }
 
             item.replace("__TypeAvion__", listeConsommations.listes.at(imputation).at(i).type);
+            item.replace("__ConsoParUnite__", listeConsommations.listes.at(imputation).at(i).chaineConsommationSelonUnite);
             completerChampsCommunsRecapEmissionsCo2(item, totauxEmissionsCo2.getCourant());
 
             compteurTypesAeronefDansLeTypeDeVol++;
@@ -1485,6 +1486,8 @@ void PdfRenderer::completerTotauxRecapEmissionsCo2(QString & p_html,
     p_item.replace("<td class=\"tg-nkdd\" <!--span-->>__Activite__</td>", "");
     p_item.replace("tg-73oq", "tg-npz6");
     p_item.replace("__TypeAvion__", "Totaux");
+    //On supprime le champ __ConsoParUnite__ (et le tiret précédent) qui n'a pas de sens pour les totaux
+    p_item.replace(" - __ConsoParUnite__", "");
     //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
     //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
     p_item.replace("__ConsoEnergie__", p_totaux.consoAvecUnites(true));

@@ -276,7 +276,6 @@ void AeroDms::lireParametresEtInitialiserBdd()
 
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(fermerSplashscreen()));
     connect(db, SIGNAL(erreurOuvertureBdd()), this, SLOT(gererEchecOuvertureBdd()));
-    connect(db, SIGNAL(demanderFermetureSplashScreenSurErreurNoFatale()), this, SLOT(fermerSplashscreen()));
 
     db->ouvrirLaBdd(database);
     db->lireParametres(parametresMetiers, parametresSysteme);
@@ -1040,9 +1039,10 @@ void AeroDms::gererBddDistante()
         barreDeProgressionStatusBar->setValue(AeroDmsTypes::EtapeChargementBdd_DEMANDE_SHA256);
         gestionnaireDonneesEnLigne->recupererSha256Bdd();
     }
-    //Sinon, on vérifie tout de suite la présence de factures du DACA
+    //Sinon, on vérifie tout de suite la BDD et la présence de factures du DACA
     else
     {
+        db->verifierBaseDeDonnees();
         verifierPresenceFacturesDaca();
     }
 }
@@ -5773,6 +5773,8 @@ void AeroDms::verifierVersionBddSuiteChargement()
 {
     passerLeLogicielEnLectureSeule(false, false);
     statusBar()->showMessage(tr("Base de données locale à jour"), 10000);
+
+    db->verifierBaseDeDonnees();
 
     if (QVersionNumber::fromString(QApplication::applicationVersion()) < db->recupererVersionLogicielleMinimale())
     {
