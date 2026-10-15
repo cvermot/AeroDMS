@@ -432,6 +432,20 @@ WHERE vol.montantRembourse != 0
 GROUP BY activite, pilote, annee
 ORDER BY nom, prenom, annee;
 
+-- View: stats_trajetsPilotesVersAerodromes
+CREATE VIEW IF NOT EXISTS stats_trajetsPilotesVersAerodromes AS  SELECT annee, nomAerodrome,identifiantOaci, COUNT(pilote) AS nbTrajet, SUM(nbVols) as nbVols FROM  
+   (SELECT vol.pilote, vol.date, strftime('%Y', vol.date) AS annee, COUNT(vol.volId) AS nbVols, COUNT(vol.pilote) AS nbPilote,
+   aerodrome.identifiantOaci, aerodrome.nomAerodrome, aerodrome.lat, aerodrome.long 
+   FROM vol 
+   INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
+   INNER JOIN aerodrome ON aerodrome.identifiantOaci = aeronef.aerodromeBase
+   --vol.pilote, vol.date,
+   --GROUP BY vol.date, aerodrome.identifiantOaci, annee
+   GROUP BY vol.pilote, vol.date
+   ORDER BY vol.date)
+GROUP BY nomAerodrome, annee
+ORDER BY annee, nomAerodrome;
+
 -- View: subventionEntrainementAlloueeParPiloteEtParAnnee
 CREATE VIEW IF NOT EXISTS subventionEntrainementAlloueeParPiloteEtParAnnee AS SELECT strftime('%Y', date) AS annee, 
 pilote, 
@@ -524,6 +538,7 @@ CREATE VIEW IF NOT EXISTS volParTypeParAnEtParPiloteSoumis_VolsAvecSubventionUni
     vol.pilote,
     vol.typeDeVol,
     vol.activite,
+    vol.montantRembourse AS subvention,
     pilote.nom,
     pilote.prenom,
     strftime('%Y', vol.date) AS annee,
