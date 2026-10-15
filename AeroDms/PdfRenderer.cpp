@@ -1274,20 +1274,25 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
     QFile table = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissions.html"));
     QFile tableBase = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsBase.html"));
     QFile tableItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsItem.html"));
+    QFile tableTrajetItem = AeroDmsServices::fichierDepuisQUrl(ressourcesHtml, QString("TableauEmissionsTrajItem.html"));
 
     QString templateTable = "";
     QString templateTableBase = "";
     QString templateTableItem = "";
+    QString templateTableTrajetItem = "";
     if (table.open(QFile::ReadOnly | QFile::Text)
         && tableBase.open(QFile::ReadOnly | QFile::Text)
-        && tableItem.open(QFile::ReadOnly | QFile::Text))
+        && tableItem.open(QFile::ReadOnly | QFile::Text)
+        && tableTrajetItem.open(QFile::ReadOnly | QFile::Text))
     {
         QTextStream inTable(&table);
         QTextStream inTableBase(&tableBase);
         QTextStream inTableItem(&tableItem);
+        QTextStream inTableTrajetItem(&tableTrajetItem);
         templateTable = inTable.readAll();
         templateTableBase = inTableBase.readAll();
         templateTableItem = inTableItem.readAll();
+        templateTableTrajetItem = inTableTrajetItem.readAll();
     }
     else
     {
@@ -1297,6 +1302,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
             + "     -\"TableauEmissions.html\"\n"
             + "     -\"TableauEmissionsBase.html\"\n"
             + "     -\"TableauEmissionsItem.html\"\n"
+            + "     -\"TableauEmissionsTrajItem.html\"\n"
             + tr("attendus dans\n")
             + ressourcesHtml.toString()
             + tr("\nsont introuvables. Impossible de générer les récapitulatifs annuels.\n\n Arrêt"));
@@ -1314,6 +1320,8 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
    
     AeroDmsTypes::TotauxConsoEmissionsCo2 totauxEmissionsCo2;
+
+    html.replace("__Annee__", QString::number(p_annee));
 
     for (int imputation = 0; imputation < listeConsommations.listes.size(); imputation++)
     {
@@ -1419,6 +1427,18 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
         p_annee);
 
     completerTableauRepartitionVolsSurSemaine(html, p_annee);
+
+    //On complete le tableau des trajets
+    const const AeroDmsTypes::ListeTrajetsPilotesAerodromes listeTrajetsPilotes = db->recupererNombreTrajetsPilotes(p_annee);
+    QString itemTrajet = templateTableTrajetItem;
+    for (AeroDmsTypes::TrajetsPilotesAerodromes trajet : listeTrajetsPilotes)
+    {
+        html.replace("<!--AccrocheTrajetsPilotes-->", itemTrajet);
+        html.replace("__Aerodrome__", trajet.aerodrome);
+        html.replace("__nbTrajets__", QString:: number(trajet.nbTrajets));
+        html.replace("__nbVols__", QString::number(trajet.nbVols));
+    }
+    html.replace("__NbTrajetsPax__", QString::number(db->recupererNombreTrajetsPassagers(p_annee)));
 
     return html;
 }

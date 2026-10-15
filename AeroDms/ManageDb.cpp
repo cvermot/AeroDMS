@@ -3115,6 +3115,43 @@ const int ManageDb::recupererNombreDeVolsAnnuels(const int p_annee)
     return 0;
 }
 
+const AeroDmsTypes::ListeTrajetsPilotesAerodromes ManageDb::recupererNombreTrajetsPilotes(const int p_annee)
+{
+    QSqlQuery query;
+    query.prepare("SELECT * FROM stats_trajetsPilotesVersAerodromes WHERE annee = :annee");
+    query.bindValue(":annee", QString::number(p_annee));
+
+    query.exec();
+
+    AeroDmsTypes::ListeTrajetsPilotesAerodromes listeTrajets;
+    while (query.next())
+    {
+        AeroDmsTypes::TrajetsPilotesAerodromes trajet;
+        trajet.aerodrome = query.value("nomAerodrome").toString() + " - " + query.value("identifiantOaci").toString();
+        trajet.nbTrajets = query.value("nbTrajet").toInt();
+        trajet.nbVols = query.value("nbVols").toInt();
+
+        listeTrajets.append(trajet);
+    }
+    return listeTrajets;
+}
+
+const int ManageDb::recupererNombreTrajetsPassagers(const int p_annee)
+{
+    QSqlQuery query;
+    query.prepare("SELECT COUNT(recetteId) as nombreTrajetPax, strftime('%Y', date) AS annee FROM recettesHorsCotisations WHERE annee = :annee GROUP BY annee");
+    query.bindValue(":annee", QString::number(p_annee));
+
+    query.exec();
+
+    AeroDmsTypes::ListeTrajetsPilotesAerodromes listeTrajets;
+    if (query.next())
+    {
+        return query.value("nombreTrajetPax").toInt();
+    }
+    return 0;
+}
+
 const AeroDmsTypes::StatsAeronefs ManageDb::recupererStatsAeronefs(const int p_annee,
     const int p_options)
 {

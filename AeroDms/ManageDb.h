@@ -178,6 +178,8 @@ public:
     AeroDmsTypes::StatsEmissionsCo2 deplierRequeteEmissions(const QSqlQuery& p_query);
     const int recupererNombreDeVolsDUnJour(const int p_annee, const AeroDmsTypes::JourDeLaSemaine p_jour);
     const int recupererNombreDeVolsAnnuels(const int p_annee);
+    const AeroDmsTypes::ListeTrajetsPilotesAerodromes recupererNombreTrajetsPilotes(const int p_annee);
+    const int recupererNombreTrajetsPassagers(const int p_annee);
     const QList<QDate> recupererDatesDesDemandesDeSubventions();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParVirement();
     const QList<QDate> recupererDatesDesDemandesDeSubventionsVerseesParCheque();

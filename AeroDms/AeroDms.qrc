@@ -156,5 +156,6 @@
         <file>ressources/link-circle-outline.svg</file>
         <file>ressources/link-circle.svg</file>
         <file>ressources/HTML/TableauEmissionsBase.html</file>
+        <file>ressources/HTML/TableauEmissionsTrajItem.html</file>
     </qresource>
 </RCC>

@@ -862,6 +862,13 @@ public:
     };
     static const QuantiteDontCompenseInt K_INIT_QUANTITE_DONT_COMPENSE_INT;
 
+    struct TrajetsPilotesAerodromes
+    {
+        QString aerodrome = "";
+        int nbTrajets = 0;
+        int nbVols = 0;
+    };
+    typedef QVector<TrajetsPilotesAerodromes> ListeTrajetsPilotesAerodromes;
 
     class TotalConsoEmissionsCo2
     {
