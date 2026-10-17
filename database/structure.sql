@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on mer. oct. 14 22:55:14 2026
+-- File generated with SQLiteStudio v3.4.4 on sam. oct. 17 22:19:30 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -433,14 +433,13 @@ GROUP BY activite, pilote, annee
 ORDER BY nom, prenom, annee;
 
 -- View: stats_trajetsPilotesVersAerodromes
-CREATE VIEW IF NOT EXISTS stats_trajetsPilotesVersAerodromes AS  SELECT annee, nomAerodrome,identifiantOaci, COUNT(pilote) AS nbTrajet, SUM(nbVols) as nbVols FROM  
+CREATE VIEW IF NOT EXISTS stats_trajetsPilotesVersAerodromes AS SELECT annee, nomAerodrome,identifiantOaci, COUNT(pilote) AS nbTrajet, SUM(nbVols) as nbVols FROM  
    (SELECT vol.pilote, vol.date, strftime('%Y', vol.date) AS annee, COUNT(vol.volId) AS nbVols, COUNT(vol.pilote) AS nbPilote,
    aerodrome.identifiantOaci, aerodrome.nomAerodrome, aerodrome.lat, aerodrome.long 
-   FROM vol 
+   FROM vol
    INNER JOIN aeronef ON vol.immatriculation = aeronef.immatriculation
    INNER JOIN aerodrome ON aerodrome.identifiantOaci = aeronef.aerodromeBase
-   --vol.pilote, vol.date,
-   --GROUP BY vol.date, aerodrome.identifiantOaci, annee
+   WHERE montantRembourse != 0
    GROUP BY vol.pilote, vol.date
    ORDER BY vol.date)
 GROUP BY nomAerodrome, annee
