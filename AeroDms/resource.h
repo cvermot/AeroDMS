@@ -13,6 +13,6 @@
 #endif
 #endif
 
-#define VER_PRODUCTVERSION          "8.3.2"
+#define VER_PRODUCTVERSION          "8.3.3"
 #define VER_PRODUCTVERSION_STR      VER_PRODUCTVERSION "\0"
 #define VER_PRODUCTNAME_STR         "AeroDMS"

@@ -58,6 +58,7 @@ bool GestionnaireDonneesEnLigne::connecter()
             case Demande_TELECHARGER_BDD:
             case Demande_TELECHARGER_FACTURE:
             { 
+                request.setHeader(QNetworkRequest::ContentLengthHeader, 0);
                 networkManager->get(request);
                 phaseTraitement = Etape_CONNEXION;
             }
