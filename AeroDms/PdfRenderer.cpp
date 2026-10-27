@@ -1431,13 +1431,19 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
     //On complete le tableau des trajets
     const const AeroDmsTypes::ListeTrajetsPilotesAerodromes listeTrajetsPilotes = db->recupererNombreTrajetsPilotes(p_annee);
     QString itemTrajet = templateTableTrajetItem;
+    int nbTotalTrajetsPilotes = 0;
+    int nbTotalVols = 0;
     for (AeroDmsTypes::TrajetsPilotesAerodromes trajet : listeTrajetsPilotes)
     {
         html.replace("<!--AccrocheTrajetsPilotes-->", itemTrajet);
         html.replace("__Aerodrome__", trajet.aerodrome);
         html.replace("__nbTrajets__", QString:: number(trajet.nbTrajets));
         html.replace("__nbVols__", QString::number(trajet.nbVols));
+        nbTotalTrajetsPilotes = nbTotalTrajetsPilotes + trajet.nbTrajets;
+        nbTotalVols = nbTotalVols + trajet.nbVols;
     }
+    html.replace("__NbTrajetTotal__", QString::number(nbTotalTrajetsPilotes));
+    html.replace("__NbVolTotal__", QString::number(nbTotalVols));
     html.replace("__NbTrajetsPax__", QString::number(db->recupererNombreTrajetsPassagers(p_annee)));
 
     return html;
