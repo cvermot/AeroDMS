@@ -45,8 +45,18 @@ int main(int argc, char *argv[])
         a.installTranslator(translator);
     }
 
-    AeroDms w;
-    w.show();
+    QCommandLineParser parser;
+    QCommandLineOption splashWidthOpt("splashWidth", "Largeur du splashscreen", "0");
+    QCommandLineOption splashHeightOpt("splashHeight", "Hauteur du splashscreen", "0");
+    parser.addOption(splashWidthOpt);
+    parser.addOption(splashHeightOpt);
+    parser.process(a);
+
+    QSize tailleSplashScreen(parser.value(splashWidthOpt).toInt(), 
+        parser.value(splashHeightOpt).toInt());
+
+    AeroDms aeroDms(tailleSplashScreen);
+    aeroDms.show();
     
     return a.exec();
 }

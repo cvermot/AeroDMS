@@ -50,7 +50,7 @@ class AeroDms : public QMainWindow
     Q_OBJECT
 
 public:
-    AeroDms(QWidget* parent = nullptr);
+    AeroDms(QSize &tailleSplashScreen, QWidget* parent = nullptr);
     ~AeroDms();
 
     QString fileName;
@@ -114,7 +114,8 @@ private:
         const bool p_interdireRetourEnModeLectureEcriture = false);
     void preparerStatusBar();
     void demanderFermetureSplashscreen();
-    void ouvrirSplashscreen();
+    void ouvrirSplashscreen(QSize& p_tailleSplashScreen);
+    void mettreAJourSplashScreen(const QString& p_message);
 
     void verifierSignatureNumerisee();
     void verifierDispoIdentifiantsDaca();

@@ -46,13 +46,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPrinter>
 #include <QPrinterInfo>
 
-AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
+AeroDms::AeroDms(QSize &tailleSplashScreen, QWidget* parent) :QMainWindow(parent)
 {
-    ouvrirSplashscreen();
+    ouvrirSplashscreen(tailleSplashScreen);
 
     initialiserBaseApplication();
     lireParametresEtInitialiserBdd();
 
+    mettreAJourSplashScreen(tr("Initialisation des onglets..."));
     initialiserOngletPilotes();
     initialiserOngletVols();
     initialiserOngletFactures();
@@ -66,11 +67,13 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
     initialiserRaccourcisClavierSansActionIhm();
 
     //=============Barres d'outils et boites de dialogue
+    mettreAJourSplashScreen(tr("Initialisation des barres d'outils..."));
     initialiserBarreDOutils();
     initialiserBarreDeFiltres();
     initialiserBoitesDeDialogues();
 
     //========================Menus
+    mettreAJourSplashScreen(tr("Initialisation des menus..."));
     initialiserMenuFichier();
     initialiserMenuOptions();
     initialiserMenuOutils();
@@ -89,6 +92,8 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
     terminerMiseAJourApplication();
     verifierPresenceDeMiseAjour();
+
+    mettreAJourSplashScreen(tr("Finalisation de l'initialisation de l'application..."));
     initialiserGestionnaireTelechargement();
    
     preparerStatusBar();
@@ -99,6 +104,7 @@ AeroDms::AeroDms(QWidget* parent) :QMainWindow(parent)
 
 void AeroDms::initialiserBaseApplication()
 {
+    mettreAJourSplashScreen(tr("Initialisation base application..."));
     QApplication::setApplicationName(VER_PRODUCTNAME_STR);
     QApplication::setApplicationVersion(VER_PRODUCTVERSION);
     QApplication::setWindowIcon(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_ICONE_APPLICATION));
@@ -122,6 +128,8 @@ void AeroDms::initialiserBaseApplication()
 
 void AeroDms::peuplerListesEtTables()
 {
+    mettreAJourSplashScreen(tr("Peuplement des tableaux..."));
+
     peuplerListeDeroulanteAnnee();
     peuplerListesPilotes();
     peuplerListeSorties();
@@ -136,6 +144,7 @@ void AeroDms::peuplerListesEtTables()
 
 void AeroDms::lireParametresEtInitialiserBdd()
 {
+    mettreAJourSplashScreen(tr("Lectures des paramètres de l'application..."));
     QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, QCoreApplication::applicationDirPath());
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, QApplication::applicationName(), QApplication::applicationName());
 
@@ -270,6 +279,7 @@ void AeroDms::lireParametresEtInitialiserBdd()
         QString("/") +
         settings.value("baseDeDonnees/nom", "").toString();
 
+    mettreAJourSplashScreen(tr("Ouverture de la BDD..."));
     db = new ManageDb(parametresMetiers.delaisDeGardeBdd,
         parametresMetiers.nomTresorier,
         gestionnaireDonneesEnLigne);
@@ -657,6 +667,8 @@ void AeroDms::initialiserOngletAjoutRecettes()
 
 void AeroDms::verifierPresenceDeMiseAjour()
 {
+    mettreAJourSplashScreen(tr("Vérification de la présence de mise à jour..."));
+
     const QString dossierAVerifier = parametresSysteme.cheminStockageBdd + "/update/";
     //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
     //  -AeroDms.exe : mise à jour de l'application
@@ -972,11 +984,30 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
     }
 }
 
-void AeroDms::ouvrirSplashscreen()
+void AeroDms::ouvrirSplashscreen(QSize& p_tailleSplashScreen)
 {
-    splash = new QSplashScreen(QPixmap(":/AeroDms/ressources/splash.webp"), Qt::WindowStaysOnTopHint);
+    QSize tailleSplashScreen = size() * 1.5;
+
+    if (p_tailleSplashScreen.width() != 0 && p_tailleSplashScreen.height())
+    {
+        tailleSplashScreen = p_tailleSplashScreen;
+    }
+
+    QPixmap pixmap(":/AeroDms/ressources/splash.webp");
+	pixmap = pixmap.scaled(tailleSplashScreen, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+    mettreAJourSplashScreen(tr("Chargement en cours..."));
     splash->show();
-    splash->showMessage(tr("Chargement en cours..."), Qt::AlignCenter | Qt::AlignBottom, Qt::black);
+}
+
+void AeroDms::mettreAJourSplashScreen(const QString& p_message)
+{
+    if (splash != nullptr)
+    {
+        splash->showMessage("AeroDms v" + QApplication::applicationVersion() + "\n"
+            + p_message,
+            Qt::AlignLeft | Qt::AlignBottom, Qt::black);
+    }
 }
 
 void AeroDms::preparerStatusBar()
@@ -1297,6 +1328,8 @@ void AeroDms::initialiserBarreDeFiltres()
 
 void AeroDms::initialiserBoitesDeDialogues()
 {
+    mettreAJourSplashScreen(tr("Initialisation des boîtes de dialogue..."));
+
     //Fenêtres
     dialogueGestionPilote = new DialogueGestionPilote(db, this);
     connect(dialogueGestionPilote, SIGNAL(accepted()), this, SLOT(ajouterUnPiloteEnBdd()));
@@ -4928,6 +4961,7 @@ void AeroDms::terminerMiseAJourApplication()
     QDirIterator it(dossierCourantApplication, QStringList() << "xxx_*", QDir::Files, QDirIterator::Subdirectories);
     while (it.hasNext())
     {
+        mettreAJourSplashScreen(tr("Finalisation de la mise à jour..."));
         QString cheminFichier = it.next();
         QFile fichier(cheminFichier);
         fichier.remove();

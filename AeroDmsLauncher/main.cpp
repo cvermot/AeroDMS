@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSplashScreen>
 #include <QThread>
 #include <QCommandLineParser>
+#include <QScreen>
 
 #include "resource.h"
 
@@ -44,9 +45,12 @@ int main(int argc, char* argv[])
 
     QApplication app(argc, argv);
 
-    QSplashScreen* splash = new QSplashScreen(QPixmap(":AeroDmsLauncher/ressources/splash.webp"), Qt::WindowStaysOnTopHint);
+    QPixmap pixmap(":/AeroDmsLauncher/ressources/splash.webp");
+    QSize tailleSplashScreen = app.primaryScreen()->size() * 0.85;
+    pixmap = pixmap.scaled(tailleSplashScreen, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QSplashScreen* splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+    splash->showMessage("Chargement en cours...", Qt::AlignLeft | Qt::AlignBottom, Qt::black);
     splash->show();
-    splash->showMessage("Chargement en cours...", Qt::AlignCenter | Qt::AlignBottom, Qt::black);
 
     QApplication::setApplicationVersion(VER_PRODUCTVERSION);
 
@@ -118,9 +122,7 @@ int main(int argc, char* argv[])
     // Chemin vers DLL legacy
     const QString legacyDll = QDir::currentPath() + QDir::separator() + "legacy.dll";
 
-    // Arguments supplémentaires (si besoin)
-    const QStringList arguments; // Exemple : arguments << "--debug" << "--config=config.ini";
-
+    splash->showMessage("AeroDmsLaucher v"+QApplication::applicationVersion() + "\nVérification de la présence de legacy.dll", Qt::AlignLeft | Qt::AlignBottom, Qt::black);
     // Vérifie si la DLL critique existe avant de le lancer
     if (!QFile::exists(legacyDll)) 
     {
@@ -147,9 +149,16 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    // Lancer AeroDms.exe
+    splash->showMessage("AeroDmsLaucher v" + QApplication::applicationVersion() + "\nLancement de " + appName, Qt::AlignLeft | Qt::AlignBottom, Qt::black);
+    // Préparer le lancement d'AeroDms.exe
     QProcess process;
     process.setProgram(program);
+
+    // Arguments supplémentaires : on passe la taille du splashscreen, ce qui évitera une désynchro entre les 2 tailles
+    // et évite de voir la transition entre le launcher et l'application principale
+    QStringList arguments; 
+    arguments << "--splashWidth" << QString::number(tailleSplashScreen.width())
+        << "--splashHeight" << QString::number(tailleSplashScreen.height());
     process.setArguments(arguments);
 
     // Lancer l'application principale
@@ -160,6 +169,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
+    splash->showMessage("AeroDmsLaucher v" + QApplication::applicationVersion() + "\nOuverture de " + appName, Qt::AlignRight | Qt::AlignBottom, Qt::black);
     //On donne un peu de temps au processus AeroDms d'afficher son propre bootscreen
     QThread::sleep(2);
 
