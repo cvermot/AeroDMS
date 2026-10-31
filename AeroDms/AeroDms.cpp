@@ -1234,6 +1234,7 @@ void AeroDms::initialiserBarreDeFiltres()
     QToolBar* selectionToolBar = addToolBar(tr("Filtres"));
 
     listeDeroulanteAnnee = new QComboBox(this);
+    listeDeroulanteAnnee->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteAnnee, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
@@ -1245,12 +1246,14 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteAnnee = selectionToolBar->addWidget(listeDeroulanteAnnee);
 
     listeDeroulantePilote = new QComboBox(this);
+    listeDeroulantePilote->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTablePilotes);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulantePilote, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableSubventionsDemandees);
     actionListeDeroulantePilote = selectionToolBar->addWidget(listeDeroulantePilote);
 
     listeDeroulanteType = new QComboBox(this);
+    listeDeroulanteType->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     listeDeroulanteType->addItems(db->recupererTypesDesVol());
     AeroDmsServices::ajouterIconesComboBox(*listeDeroulanteType);
     listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), tr("Cotisation"), "Cotisation");
@@ -1263,6 +1266,7 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteType = selectionToolBar->addWidget(listeDeroulanteType);
 
     listeDeroulanteElementsSoumis = new QComboBox(this);
+    listeDeroulanteElementsSoumis->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     listeDeroulanteElementsSoumis->addItem(tr("Éléments soumis et non soumis au CSE"), 
         AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS);
     listeDeroulanteElementsSoumis->setItemIcon(AeroDmsTypes::ElementSoumis_TOUS_LES_ELEMENTS, 
@@ -1282,6 +1286,7 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulanteElementsSoumis = selectionToolBar->addWidget(listeDeroulanteElementsSoumis);
 
     listeDeroulanteStatistique = new QComboBox(this);
+    listeDeroulanteStatistique->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     listeDeroulanteStatistique->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_STATS_BARRES_EMPILEES),
         tr("Statistiques mensuelles"),
         AeroDmsTypes::Statistiques_HEURES_ANNUELLES);
