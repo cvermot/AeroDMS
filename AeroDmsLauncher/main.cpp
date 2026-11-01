@@ -45,13 +45,6 @@ int main(int argc, char* argv[])
 
     QApplication app(argc, argv);
 
-    QPixmap pixmap(":/AeroDmsLauncher/ressources/splash.webp");
-    QSize tailleSplashScreen = app.primaryScreen()->size() * 0.85;
-    pixmap = pixmap.scaled(tailleSplashScreen, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QSplashScreen* splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
-    splash->showMessage("Chargement en cours...", Qt::AlignLeft | Qt::AlignBottom, Qt::black);
-    splash->show();
-
     QApplication::setApplicationVersion(VER_PRODUCTVERSION);
 
     QCommandLineParser parser;
@@ -62,6 +55,9 @@ int main(int argc, char* argv[])
     QCommandLineOption versionOption(QStringList() << "v" << "version",
         QApplication::tr("Affiche la version du logiciel"));
     parser.addOption(versionOption);
+    QCommandLineOption qtOption(QStringList() << "q" << "qt",
+        QApplication::tr("Affiche la version de Qt utilisée par le lanceur"));
+    parser.addOption(qtOption);
     parser.process(app);
 
     if (parser.isSet(versionOption))
@@ -84,12 +80,41 @@ int main(int argc, char* argv[])
             << heure.toString("hh'h'mm") 
             << "\n";
     }
+    if (parser.isSet(qtOption))
+    {
+        QTextStream(stdout) << "\n"
+            << "Qt version "
+            << qVersion() 
+            << " (Compilé avec Qt "
+            << QT_VERSION_STR 
+            << ")"
+            << "\n";
+
+    }
     if (parser.isSet(helpOption))
     {
         QTextStream(stdout) << "\n";
         parser.showHelp();
         QTextStream(stdout) << "\n";
     }
+
+    if (parser.isSet(versionOption)
+        || parser.isSet(qtOption)
+        || parser.isSet(helpOption))
+    {
+        exit(0);
+    }
+
+    QPixmap pixmap(":/AeroDmsLauncher/ressources/splash.webp");
+    QSize tailleSplashScreen = app.primaryScreen()->size() * 0.85;
+    pixmap = pixmap.scaled(tailleSplashScreen, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QSplashScreen* splash = new QSplashScreen(pixmap);
+    QFont splashFont;
+    splashFont.setFamily("Arial");
+    splashFont.setPixelSize(14);
+    splash->setFont(splashFont);
+    splash->showMessage("Chargement en cours...", Qt::AlignLeft | Qt::AlignBottom, Qt::black);
+    splash->show();
 
     // Chemin vers le répertoire contenant "legacy.dll"
     const QString opensslModulesPath = QDir::currentPath(); // Répertoire actuel de l'exécutable

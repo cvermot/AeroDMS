@@ -56,7 +56,6 @@ int main(int argc, char *argv[])
         parser.value(splashHeightOpt).toInt());
 
     AeroDms aeroDms(tailleSplashScreen);
-    aeroDms.show();
     
     return a.exec();
 }

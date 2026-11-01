@@ -97,6 +97,7 @@ AeroDms::AeroDms(QSize &tailleSplashScreen, QWidget* parent) :QMainWindow(parent
     initialiserGestionnaireTelechargement();
    
     preparerStatusBar();
+
     demanderFermetureSplashscreen();
 
     gererBddDistante();
@@ -113,7 +114,6 @@ void AeroDms::initialiserBaseApplication()
 
     setWindowTitle(QApplication::applicationName());
     setMinimumSize(800, 600);
-    showMaximized();
 
     installEventFilter(this);
     connect(this, &AeroDms::toucheEchapEstAppuyee, this, &AeroDms::deselectionnerVolDetecte);
@@ -995,7 +995,11 @@ void AeroDms::ouvrirSplashscreen(QSize& p_tailleSplashScreen)
 
     QPixmap pixmap(":/AeroDms/ressources/splash.webp");
 	pixmap = pixmap.scaled(tailleSplashScreen, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    splash = new QSplashScreen(pixmap, Qt::WindowStaysOnTopHint);
+    splash = new QSplashScreen(pixmap);
+    QFont splashFont;
+    splashFont.setFamily("Arial");
+    splashFont.setPixelSize(14);
+    splash->setFont(splashFont);
     mettreAJourSplashScreen(tr("Chargement en cours..."));
     splash->show();
 }
@@ -1027,6 +1031,7 @@ void AeroDms::demanderFermetureSplashscreen()
 }
 void AeroDms::fermerSplashscreen()
 {
+    showMaximized();
     if (splash != nullptr)
     {
         splash->close();
