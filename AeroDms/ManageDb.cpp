@@ -1687,7 +1687,7 @@ void ManageDb::ajouterDemandeCeEnBdd(const AeroDmsTypes::DemandeEnCoursDeTraitem
     {
         query.prepare("SELECT recetteId FROM recettesASoumettreCe WHERE annee = :annee AND nom = :nomSortie");
         query.bindValue(":annee", QString::number(p_demande.annee));
-        query.bindValue(":nomSortie", p_demande.typeDeVol);
+        query.bindValue(":nomSortie", p_demande.intitule);
         query.exec();
 
         while (query.next())

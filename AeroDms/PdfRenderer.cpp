@@ -618,7 +618,8 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_PAIEMENT_SORTIE_OU_BALADE;
         demandeEnCours.annee = recette.annee;
-        demandeEnCours.typeDeVol = recette.intitule;
+        demandeEnCours.typeDeVol = recette.typeDeSortie;
+        demandeEnCours.intitule = recette.intitule;
         demandeEnCours.nomBeneficiaire = "CSE Thales";
         demandeEnCours.montant = recette.montant;
         demandeEnCours.nomFichier = ".RecetteBalades_"

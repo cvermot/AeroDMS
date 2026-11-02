@@ -413,6 +413,7 @@ public:
         QString idPilote = K_INIT_QSTRING;
         QString typeDeVol = K_INIT_QSTRING;
         QString nomBeneficiaire = K_INIT_QSTRING;
+        QString intitule = K_INIT_QSTRING;
         double montant = 0.0;
         ModeDeReglement modeDeReglement = ModeDeReglement_CHEQUE;
         int annee = K_INIT_INT_INVALIDE;
