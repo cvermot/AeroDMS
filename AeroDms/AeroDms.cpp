@@ -1259,12 +1259,14 @@ void AeroDms::initialiserBarreDeFiltres()
     actionListeDeroulantePilote = selectionToolBar->addWidget(listeDeroulantePilote);
 
     listeDeroulanteType = new QComboBox(this);
+    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS), tr("Tous les types de vol"), "*");
     listeDeroulanteType->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     listeDeroulanteType->addItems(db->recupererTypesDesVol());
     AeroDmsServices::ajouterIconesComboBox(*listeDeroulanteType);
     listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_COTISATION), tr("Cotisation"), "Cotisation");
-    listeDeroulanteType->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS), tr("Tous les types de vol"), "*");
-    listeDeroulanteType->setCurrentIndex(4);
+    //On remet l'icone de tous les vols, qui a été écrasée par l'appel à ajouterIconesComboBox();
+    listeDeroulanteType->setItemIcon(0, AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS));
+    listeDeroulanteType->setCurrentIndex(0);
 
     connect(listeDeroulanteType, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableVols);
     connect(listeDeroulanteType, &QComboBox::currentIndexChanged, this, &AeroDms::peuplerTableRecettes);
@@ -2767,7 +2769,8 @@ void AeroDms::peuplerListeDeroulanteAnnee()
 {
     listeDeroulanteAnnee->clear();
     menuDemandesAGenererAnnees->clear();
-    listeDeroulanteAnnee->addItem("Toutes les années",
+    listeDeroulanteAnnee->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUS),
+        "Toutes les années",
         AeroDmsTypes::K_INIT_INT_INVALIDE);
 
     QAction* actionToutesLesAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_TOUTES_LES_ANNEES),
@@ -5222,11 +5225,11 @@ void AeroDms::gererChangementOnglet()
     actionListeDeroulantePilote->setVisible(true);
     actionListeDeroulanteType->setVisible(false);
     selecteurFiltreInformationsSupplementaires->setVisible(false);
-    listeDeroulanteType->setItemText(4, tr("Tous les types de vols"));
+    listeDeroulanteType->setItemText(0, tr("Tous les types de vols"));
     //On affiche la ligne "Entrainement"
-    static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(2, false);
+    static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(3, false);
     //On masque la ligne "Cotisation" qui n'existe qu'en recette
-    static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(3, true);
+    static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(4, true);
 
     //Pour la liste type, on peut avoir des types qui n'existent que dans certaines vues
     //(Cotisation en vue recette)
@@ -5234,7 +5237,7 @@ void AeroDms::gererChangementOnglet()
     if (listeDeroulanteType->currentData().toString() == "Cotisation")
     {
         //On repasse a tous les types
-        listeDeroulanteType->setCurrentIndex(4);
+        listeDeroulanteType->setCurrentIndex(0);
     }
 
     if (mainTabWidget->currentWidget() == vuePilotes)
@@ -5249,7 +5252,7 @@ void AeroDms::gererChangementOnglet()
     else if (mainTabWidget->currentWidget() == vueSubventions)
     {
         ajusterTableSubventionsDemandeesAuContenu();
-        listeDeroulanteType->setItemText(4, tr("Tous les types de demandes"));
+        listeDeroulanteType->setItemText(0, tr("Tous les types de demandes"));
         actionListeDeroulanteType->setVisible(true);
     }
     else if (mainTabWidget->currentWidget() == vueFactures)
@@ -5261,16 +5264,16 @@ void AeroDms::gererChangementOnglet()
         actionListeDeroulanteElementsSoumis->setVisible(true);
         actionListeDeroulanteType->setVisible(true);
 
-        listeDeroulanteType->setItemText(4, tr("Tous les types de recettes"));
+        listeDeroulanteType->setItemText(0, tr("Tous les types de recettes"));
         //On masque la ligne "Entrainement" qui n'existe pas en recette
-        static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(2, true);
+        static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(3, true);
         //On affiche la ligne "Entrainement" qui n'existe qu'en recette
-        static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(3, false);
+        static_cast<QListView*>(listeDeroulanteType->view())->setRowHidden(4, false);
 
         if (listeDeroulanteType->currentText() == "Entrainement")
         {
             //On repasse a tous les types
-            listeDeroulanteType->setCurrentIndex(4);
+            listeDeroulanteType->setCurrentIndex(0);
         }
     }
     else if ( mainTabWidget->currentWidget() == widgetAjoutRecette)
