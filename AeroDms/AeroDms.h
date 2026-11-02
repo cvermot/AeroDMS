@@ -410,6 +410,7 @@ public slots:
     void mettreAJourBarreStatusFinGenerationPdf(const QString p_cheminDossier, const QString p_cheminFichierPdfMerge);
     void mettreAJourEchecGenerationPdf();
     void aPropos();
+    void afficherLicences();
     void ouvrirAide();
     void menuContextuelPilotes(const QPoint& pos);
     void menuContextuelSubvention(const QPoint& pos);

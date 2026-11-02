@@ -338,6 +338,11 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/information-slab-circle.svg");
         }
         break;
+        case AeroDmsTypes::Icone_LICENCE:
+        {
+            return QIcon(":/AeroDms/ressources/script-text-outline.svg");
+        }
+        break;
         case AeroDmsTypes::Icone_RATIO:
         {
             return QIcon(":/AeroDms/ressources/aspect-ratio.svg");

@@ -157,5 +157,8 @@
         <file>ressources/link-circle.svg</file>
         <file>ressources/HTML/TableauEmissionsBase.html</file>
         <file>ressources/HTML/TableauEmissionsTrajItem.html</file>
+        <file>ressources/licences/BSD-3-Clause.txt</file>
+        <file>ressources/licences/GPL-3.0-or-later.txt</file>
+        <file>ressources/script-text-outline.svg</file>
     </qresource>
 </RCC>

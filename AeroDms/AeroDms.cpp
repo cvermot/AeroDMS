@@ -33,6 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonuts.h"
 
 #include "DialogueEditionParametres.h"
+#include "DialogueLicence.h"
 
 #include "resource.h"
 
@@ -1991,6 +1992,13 @@ void AeroDms::initialiserMenuAide()
         });
 
     helpMenu->addSeparator();
+
+    QAction* licenceAction = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_LICENCE),
+        tr("Licences"),
+        this);
+    licenceAction->setStatusTip(tr("Voir les licences applicables à cette application"));
+    helpMenu->addAction(licenceAction);
+    connect(licenceAction, SIGNAL(triggered()), this, SLOT(afficherLicences()));
 
     QAction* aboutQtAction = new QAction(QIcon(":/AeroDms/ressources/qt-logo.svg"), tr("À propos de &Qt"), this);
     aboutQtAction->setStatusTip(tr("Voir la fenêtre à propos de Qt"));
@@ -4139,6 +4147,13 @@ void AeroDms::aPropos()
         "<br />< br/>"
         "You should have received a copy of the GNU General Public License"
         " along with this program.  If not, see <a href=\"http://www.gnu.org/licenses/\">http://www.gnu.org/licenses/</a>.");
+}
+
+void AeroDms::afficherLicences()
+{
+    DialogueLicence dialogueLicence;
+
+    dialogueLicence.exec();
 }
 
 void AeroDms::ouvrirAide()
