@@ -587,47 +587,47 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
         break;
         case AeroDmsTypes::Icone_1:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-1.svg");
+            return QIcon(":/AeroDms/ressources/numeric-1.svg");
         }
         break;
         case AeroDmsTypes::Icone_2:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-2.svg");
+            return QIcon(":/AeroDms/ressources/numeric-2.svg");
         }
         break;
         case AeroDmsTypes::Icone_3:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-3.svg");
+            return QIcon(":/AeroDms/ressources/numeric-3.svg");
         }
         break;
         case AeroDmsTypes::Icone_4:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-4.svg");
+            return QIcon(":/AeroDms/ressources/numeric-4.svg");
         }
         break;
         case AeroDmsTypes::Icone_5:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-5.svg");
+            return QIcon(":/AeroDms/ressources/numeric-5.svg");
         }
         break;
         case AeroDmsTypes::Icone_6:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-6.svg");
+            return QIcon(":/AeroDms/ressources/numeric-6.svg");
         }
         break;
         case AeroDmsTypes::Icone_7:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-7.svg");
+            return QIcon(":/AeroDms/ressources/numeric-7.svg");
         }
         break;
         case AeroDmsTypes::Icone_8:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-8.svg");
+            return QIcon(":/AeroDms/ressources/numeric-8.svg");
         }
         break;
         case AeroDmsTypes::Icone_9:
         {
-            return QIcon(":/AeroDms/ressources/numeric-positive-9.svg");
+            return QIcon(":/AeroDms/ressources/numeric-9.svg");
         }
         break;
 

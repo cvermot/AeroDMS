@@ -2786,7 +2786,9 @@ void AeroDms::peuplerListeDeroulanteAnnee()
     QList<int> listeAnnees = db->recupererAnnees();
     for (int i = 0; i < listeAnnees.size(); i++)
     {
-        listeDeroulanteAnnee->addItem(QString::number(listeAnnees.at(i)), listeAnnees.at(i));
+        listeDeroulanteAnnee->addItem(AeroDmsServices::recupererIcone(QString::number(listeAnnees.at(i)).back()),
+            QString::number(listeAnnees.at(i)), 
+            listeAnnees.at(i));
 
         QAction* actionAnnees = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_UNE_ANNEE), QString::number(listeAnnees.at(i)), this);
         actionAnnees->setStatusTip(tr("Générer uniquement les demandes pour l'année ") + QString::number(listeAnnees.at(i)));
