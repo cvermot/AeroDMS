@@ -4769,34 +4769,62 @@ void AeroDms::envoyerMail()
                 {
                     QString stringListeVirement = "";
                     QString stringListeVols = "";
+                    QSet<int> listeAnnees;
+                    //On ajoute toujours l'année courante pour faire un rappel de cotisation non payées le cas échéant sur les
+                    //changements d'années
+                    listeAnnees.insert(QDate::currentDate().year());
                     for (int virement = 0; virement < listeVirements.at(pilote).listeMontantsVirements.size(); virement++)
                     {
                         stringListeVirement = stringListeVirement 
                             + tr("Montant virement ") 
                             + QString::number(virement + 1) 
+                            + " à "
+                            + listeVirements.at(pilote).listeBeneficiairesVirements.at(virement)
                             + " : " 
                             + QString::number(listeVirements.at(pilote).listeMontantsVirements.at(virement), 'f', 2)
-                            + "€\n";
+                            + "€ ("
+                            + listeVirements.at(pilote).listeTypeDeVol.at(virement)
+                            +")\n";
                         const AeroDmsTypes::ListeVols listeVols = db->recupererVolsParDemandeDeRemboursement(listeVirements.at(pilote).listeIdVirements.at(virement));
                         for (const AeroDmsTypes::Vol vol : listeVols)
                         {
-                            stringListeVols = stringListeVols + "\t\tVol du " + vol.date.toString("dd/MM/yyyy") + " d'une durée de " + vol.duree + " pour un coût de vol de " + QString::number(vol.coutVol, 'f', 2) + "€ (subvention allouée pour ce vol : "+ QString::number(vol.montantRembourse, 'f', 2)  + "€)\n";
+                            stringListeVols = stringListeVols 
+                                + "\t\tVol "
+                                + vol.typeDeVol
+                                + " du " 
+                                + vol.date.toString("dd/MM/yyyy") 
+                                + " d'une durée de " 
+                                + vol.duree 
+                                + " pour un coût de vol de " 
+                                + QString::number(vol.coutVol, 'f', 2) 
+                                + "€ (subvention allouée pour ce vol : "
+                                + QString::number(vol.montantRembourse, 'f', 2)  
+                                + "€)\n";
+                            listeAnnees.insert(vol.date.year());
                         }
                     }
-                    stringListeVirement = stringListeVirement + tr("\nPour information : subvention entrainement restante pour l'année ");
-                    stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
-                    stringListeVirement = stringListeVirement + " : ";
-                    stringListeVirement = stringListeVirement + QString::number(db->recupererSubventionRestante(listeVirements.at(pilote).pilote, QDate::currentDate().year()), 'f', 2);
-                    stringListeVirement = stringListeVirement + " €";
-                    if (!db->piloteEstAJourDeCotisation(listeVirements.at(pilote).pilote, QDate::currentDate().year()))
-                    {
-                        stringListeVirement = stringListeVirement + tr(" (cotisation non payée pour l'année ");
-                        stringListeVirement = stringListeVirement + QString::number(QDate::currentDate().year());
-                        stringListeVirement = stringListeVirement + ")";
-                    }
-                    stringListeVirement = stringListeVirement + ".\n\n";
 
-                    stringListeVirement = stringListeVirement + "Ce remboursement couvre le ou les vol(s) suivant(s) :\n" + stringListeVols;
+                    stringListeVirement = stringListeVirement 
+                        + "\nCe(s) remboursement(s) couvre(nt) le ou les vol(s) suivant(s) :\n" 
+                        + stringListeVols;
+
+                    stringListeVirement = stringListeVirement + "\n";
+
+                    for (const int annee : listeAnnees) {
+                        stringListeVirement = stringListeVirement + tr("Pour information : subvention entrainement restante pour l'année ");
+                        stringListeVirement = stringListeVirement + QString::number(annee);
+                        stringListeVirement = stringListeVirement + " : ";
+                        stringListeVirement = stringListeVirement + QString::number(db->recupererSubventionRestante(listeVirements.at(pilote).pilote, annee), 'f', 2);
+                        stringListeVirement = stringListeVirement + " €";
+                        if (!db->piloteEstAJourDeCotisation(listeVirements.at(pilote).pilote, annee))
+                        {
+                            stringListeVirement = stringListeVirement + tr(" (cotisation non payée pour l'année ");
+                            stringListeVirement = stringListeVirement + QString::number(annee);
+                            stringListeVirement = stringListeVirement + ")";
+                        }
+                        stringListeVirement = stringListeVirement + ".\n";
+                    }
+                    stringListeVirement = stringListeVirement + "\n";
 
                     QString texteMail = parametresMetiers.texteMailVirementSubvention;
                     texteMail = texteMail.replace("#listeVirements", stringListeVirement);

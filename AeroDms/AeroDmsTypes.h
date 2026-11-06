@@ -774,6 +774,8 @@ public:
         QString mail = "";
         QString pilote = "";
         QList<double> listeMontantsVirements;
+        QList<QString> listeBeneficiairesVirements;
+        QList<QString> listeTypeDeVol;
         QList<int> listeIdVirements;
     };
     typedef QList<MailEtVirements> ListeMailsEtVirements;

@@ -2823,10 +2823,15 @@ const AeroDmsTypes::ListeMailsEtVirements ManageDb::recupererMailsVirements(cons
             mailEtVirements.pilote = query.value("pilote").toString();
             mailEtVirements.listeMontantsVirements.clear();
             mailEtVirements.listeIdVirements.clear();
+            mailEtVirements.listeBeneficiairesVirements.clear();
+            mailEtVirements.listeTypeDeVol.clear();
             mail = query.value("mail").toString();
         }
         mailEtVirements.listeMontantsVirements.append(query.value("montant").toDouble());
         mailEtVirements.listeIdVirements.append(query.value("demandeId").toInt());
+        mailEtVirements.listeBeneficiairesVirements.append(query.value("nomBeneficiaire").toString());
+        mailEtVirements.listeTypeDeVol.append(query.value("typeDeDemande").toString());
+        
     }
     listeVirements.append(mailEtVirements);
 
