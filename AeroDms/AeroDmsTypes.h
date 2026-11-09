@@ -749,6 +749,7 @@ public:
         QString loginServeurModeExterne = "";
         QString motDePasseServeurModeExterne = "";
         bool utiliserRessourcesHtmlInternes = false;
+        QVersionNumber versionIgnoree;
     };
 
     struct TotauxRecettes {

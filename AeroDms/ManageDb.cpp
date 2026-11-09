@@ -548,6 +548,23 @@ const QVersionNumber ManageDb::recupererVersionLogicielleMinimale()
     return version;
 }
 
+const QVersionNumber ManageDb::recupererVersionLogicielleAvancee()
+{
+    QVersionNumber version(0);
+
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "miseAJourFacultative");
+    query.exec();
+    if (query.next())
+    {
+        if (!(QVersionNumber::fromString(query.value("info3").toString()).isNull()))
+            version = QVersionNumber::fromString(query.value("info3").toString());
+    }
+    return version;
+}
+
 void ManageDb::enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber &p_version, 
     const QString &p_nomFichier)
 {
@@ -574,6 +591,38 @@ const QString ManageDb::recupererNomFichierMiseAJour()
         return query.value("info2").toString().replace("/", "");
     }
     return "";
+}
+
+const QString ManageDb::recupererNomFichierMiseAJourAvancee()
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "miseAJourFacultative");
+    query.exec();
+    if (query.next())
+    {
+        //On retourne la valeur de info2 en supprimant les éventuels "/" du nom du fichier (sécurité 
+        //empéchant de télécharger un zip provenant d'un autre dépot que le dépot légitime)
+        return query.value("info2").toString().replace("/", "");
+    }
+    return "";
+}
+
+const QVersionNumber ManageDb::recupererVersionReleaseMiseAJourAvancee()
+{
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM parametres WHERE nom = :nomParam");
+    query.bindValue(":nomParam", "miseAJourFacultative");
+    query.exec();
+    if (query.next())
+    {
+        //On retourne la valeur de info2 en supprimant les éventuels "/" du nom du fichier (sécurité 
+        //empéchant de télécharger un zip provenant d'un autre dépot que le dépot légitime)
+        return QVersionNumber::fromString(query.value("info1").toString().replace("/", ""));
+    }
+    return QVersionNumber(0);
 }
 
 const AeroDmsTypes::ListeAeroclubs ManageDb::recupererAeroclubs()

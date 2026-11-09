@@ -43,7 +43,10 @@ public:
     void sauvegarderLaBdd( const QString p_repertoireDeSauvegarde);
     const bool laBddEstALaVersionAttendue() const;
     const QVersionNumber recupererVersionLogicielleMinimale();
+    const QVersionNumber recupererVersionLogicielleAvancee();
     const QString recupererNomFichierMiseAJour();
+    const QString recupererNomFichierMiseAJourAvancee();
+    const QVersionNumber recupererVersionReleaseMiseAJourAvancee();
     void enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber& p_version,
         const QString& p_nomFichier);
 

@@ -259,6 +259,8 @@ void AeroDms::lireParametresEtInitialiserBdd()
 
     parametresSysteme.motDePasseSiteDaca = settings.value("siteDaca/password", "").toString();
     parametresSysteme.motDePasseServeurModeExterne = settings.value("modeFonctionnementLogiciel/password", "").toString();
+
+    parametresSysteme.versionIgnoree = QVersionNumber::fromString(settings.value("version/versionIgnoree", QApplication::applicationVersion()).toString());
     
     //Permet de fournir un fichier .ini avec les mots de passe en clair pour la conf initiale
     //Si on est pas à 1, cela veut dire que le mot de passe était chiffré => on le déchiffre
@@ -671,8 +673,8 @@ void AeroDms::verifierPresenceDeMiseAjour()
     mettreAJourSplashScreen(tr("Vérification de la présence de mise à jour..."));
 
     const QString dossierAVerifier = parametresSysteme.cheminStockageBdd + "/update/";
-    //On vérifie dans les répertoire d'update si 2 fichiers ont bougé :
-    //  -AeroDms.exe : mise à jour de l'application
+    //On vérifie dans les répertoire d'update si 5 fichiers ont bougé :
+    //  -AeroDms.exe : mise à jour de l'application (peut aussi être nommé Aero.exe)
     //  -AeroDmsLauncher.exe : mise à jour du lanceur de l'application
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
     // de sécurité/maintenance de Qt avec compatibilité des interfaces)
@@ -837,7 +839,7 @@ void AeroDms::traiterZipMiseAJourDispo()
 void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
     const qint64 p_nbOctetsTotal)
 {
-    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours... (")
+    statusBar()->showMessage(tr("Mise à jour. Téléchargement en cours... (")
     + QString::number(p_nbOctetsRecus / 1024.0 / 1024.0 , 'f', 2)
     + "/"
     + QString::number(p_nbOctetsTotal / 1024.0 / 1024.0, 'f', 2)
@@ -850,7 +852,7 @@ void AeroDms::afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus,
 
 void AeroDms::afficherProgressionDecompressionMaJ(uint64_t p_nbOctetsDecompresses, uint64_t p_nbOctetsTotaux)
 {
-    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Décompression en cours... (")
+    statusBar()->showMessage(tr("Mise à jour. Décompression en cours... (")
         + QString::number(p_nbOctetsDecompresses / 1024.0 / 1024.0, 'f', 2)
         + "/"
         + QString::number(p_nbOctetsTotaux / 1024.0 / 1024.0, 'f', 2)
@@ -4641,6 +4643,10 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.setValue("periodiciteVerification", parametresSysteme.periodiciteVerificationPresenceFactures);
     settings.endGroup();
 
+    settings.beginGroup("version");
+    settings.setValue("versionIgnoree", parametresSysteme.versionIgnoree.toString());
+    settings.endGroup();
+
     parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
     parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
 
@@ -5850,14 +5856,15 @@ void AeroDms::verifierDispoIdentifiantsDaca()
     }
 }
 
-void AeroDms::demanderTelechargementMiseAJourLogiciel()
+void AeroDms::demanderTelechargementMiseAJourLogiciel(const QString p_tagRelease, 
+    const QString p_nomFichier)
 {
-    statusBar()->showMessage(tr("Une mise à jour du logiciel est nécessaire. Téléchargement en cours..."));
+    statusBar()->showMessage(tr("Mise à jour. Téléchargement en cours..."));
 
     const QString url = "https://github.com/cvermot/AeroDMS/releases/download/v"
-        + db->recupererVersionLogicielleMinimale().toString()
+        + p_tagRelease
         + "/"
-        + db->recupererNomFichierMiseAJour();
+        + p_nomFichier;
     gestionnaireDonneesEnLigne->telechargerMiseAJour(url);
 }
 
@@ -5873,7 +5880,8 @@ void AeroDms::verifierVersionBddSuiteChargement()
         passerLeLogicielEnLectureSeule(true, false, true);
         if (parametresSysteme.modeFonctionnementLogiciel == AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
         {
-            demanderTelechargementMiseAJourLogiciel();
+            demanderTelechargementMiseAJourLogiciel(db->recupererVersionLogicielleMinimale().toString(),
+                db->recupererNomFichierMiseAJour());
         }
         else
         {
@@ -5903,6 +5911,32 @@ Consultez le développeur / responsable de l'application pour plus d'information
         dialogueMiseAJour.exec();
 
         passerLeLogicielEnLectureSeule(true, false);
+    }
+    else if (QVersionNumber::fromString(QApplication::applicationVersion()) < db->recupererVersionLogicielleAvancee()
+        && parametresSysteme.versionIgnoree < db->recupererVersionLogicielleAvancee())
+    {
+        QMessageBox dialogueMiseAJour;
+        dialogueMiseAJour.setText(tr("Une nouvelle version de l'application est disponible (")
+            + db->recupererVersionLogicielleAvancee().toString()
+            + tr("). Cette mise à jour est factultative.\n\n")
+            + tr("Souhaitez vous effectuer cette mise à jour maintenant ?"));
+        dialogueMiseAJour.setWindowTitle(QApplication::applicationName() + " - " + tr("Une mise à jour est disponible"));
+        dialogueMiseAJour.setIcon(QMessageBox::Information);
+        dialogueMiseAJour.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        QPushButton nePlusDemander("Ne plus me demander pour cette mise à jour");
+        dialogueMiseAJour.addButton(&nePlusDemander, QMessageBox::NoRole);
+        const int actionDialogueMiseAJour = dialogueMiseAJour.exec();
+
+        if (dialogueMiseAJour.clickedButton() == &nePlusDemander) 
+        {
+            parametresSysteme.versionIgnoree = db->recupererVersionLogicielleAvancee();
+            enregistrerParametresApplication(parametresMetiers, parametresSysteme);
+        }
+        else if (actionDialogueMiseAJour == QMessageBox::Yes)
+        {
+            demanderTelechargementMiseAJourLogiciel(db->recupererVersionReleaseMiseAJourAvancee().toString(),
+                db->recupererNomFichierMiseAJourAvancee());
+        }
     }
 }
 

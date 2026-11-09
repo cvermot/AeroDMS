@@ -478,7 +478,8 @@ public slots:
 
     //Gestion du chargement de la BDD en ligne
     void verifierVersionBddSuiteChargement();
-    void demanderTelechargementMiseAJourLogiciel();
+    void demanderTelechargementMiseAJourLogiciel(const QString p_tagRelease, 
+        const QString p_nomFichier);
     void afficherStatusDebutTelechargementBdd();
     void afficherEtapesChargementBdd(const AeroDmsTypes::EtapeChargementBdd p_etape);
     void signalerBaseDeDonneesBloqueeParUnAutreUtilisateur(const QString p_nomVerrou,
