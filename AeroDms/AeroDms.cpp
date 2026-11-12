@@ -93,6 +93,7 @@ AeroDms::AeroDms(QSize &tailleSplashScreen, QWidget* parent) :QMainWindow(parent
 
     terminerMiseAJourApplication();
     verifierPresenceDeMiseAjour();
+    verifierPresenceDll7Zip();
 
     mettreAJourSplashScreen(tr("Finalisation de l'initialisation de l'application..."));
     initialiserGestionnaireTelechargement();
@@ -673,17 +674,19 @@ void AeroDms::verifierPresenceDeMiseAjour()
     mettreAJourSplashScreen(tr("Vérification de la présence de mise à jour..."));
 
     const QString dossierAVerifier = parametresSysteme.cheminStockageBdd + "/update/";
-    //On vérifie dans les répertoire d'update si 5 fichiers ont bougé :
+    //On vérifie dans les répertoire d'update si 7 fichiers ont bougé :
     //  -AeroDms.exe : mise à jour de l'application (peut aussi être nommé Aero.exe)
     //  -AeroDmsLauncher.exe : mise à jour du lanceur de l'application
     //  -Qt6Core.dll : mise à jour de Qt sans mise à jour de l'application (mise à jour
     // de sécurité/maintenance de Qt avec compatibilité des interfaces)
     //  -podofo.dll : mise à jour de la librairie PDF et des librairies associées
+	//  -7z.dll : mise à jour de la librairie 7zip
     if ( uneMaJEstDisponible(dossierAVerifier, "AeroDms.exe")
          || uneMaJEstDisponible(dossierAVerifier, "AeroDmsLauncher.exe")
          || uneMaJEstDisponible(dossierAVerifier, "Aero.exe")
          || uneMaJEstDisponible(dossierAVerifier, "Qt6Core.dll")
-         || uneMaJEstDisponible(dossierAVerifier, "podofo.dll"))
+         || uneMaJEstDisponible(dossierAVerifier, "podofo.dll")
+         || uneMaJEstDisponible(dossierAVerifier, "7z.dll"))
     {
         fermerSplashscreen();
 
@@ -748,6 +751,28 @@ Consultez le développeur / responsable de l'application pour plus d'information
         dialogueErreurVersionBdd.setStandardButtons(QMessageBox::Close);
         dialogueErreurVersionBdd.exec();
     }
+}
+
+void AeroDms::verifierPresenceDll7Zip()
+{
+#ifdef Q_OS_WIN
+    mettreAJourSplashScreen(tr("Vérification de la présence de la DLL 7z.dll..."));
+    const QString cheminDll7Zip = QApplication::applicationDirPath() + "/7z.dll";
+    if (!QFile::exists(cheminDll7Zip))
+    {
+        fermerSplashscreen();
+
+        QMessageBox dialogueErreurDll7Zip;
+        dialogueErreurDll7Zip.setTextFormat(Qt::RichText);
+        dialogueErreurDll7Zip.setText(tr("La librairie 7zip (7z.dll) est manquante.<br><br>") +
+tr("La mise à jour de l'application sera impossible.<br><br>") +
+tr("Pour corriger ce problème, merci de contacter le développeur / responsable de l'application ou télécharger la DLL 7z.dll sur <a href=\"https://www.7-zip.org/download.html\">le site de 7Zip</a> et copiez la dans ")+ QApplication::applicationDirPath() +".");
+        dialogueErreurDll7Zip.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur librairie 7zip manquante"));
+        dialogueErreurDll7Zip.setIcon(QMessageBox::Information);
+        dialogueErreurDll7Zip.setStandardButtons(QMessageBox::Close);
+        dialogueErreurDll7Zip.exec();
+    }
+#endif
 }
 
 void AeroDms::mettreAJourVersionMiniExigee()
@@ -4132,7 +4157,7 @@ void AeroDms::aPropos()
         + tr("Ce programme utilise les libraires :<ul>")
         + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() + " (Compilé avec Qt " + QT_VERSION_STR + ")</li>"
         + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "+ PODOFO_VERSION_STRING +"</li>"
-        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0</li>"
+        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0 (version DLL 7zip : "+ AeroDmsServices::getVersionDll(QApplication::applicationDirPath()+"/7z.dll").toString() +")</li>"
         + "<li><a href = \"https://wiki.qt.io/QtWebEngine/ChromiumVersions\">Chromium (Qt WebEngine)</a> "+ qWebEngineChromiumVersion() + "</li>"
         + "<li><a href = \"https://www.sqlite.org/\">SQLite</a> "+ db->recupererVersionSQLite() + " ("+ db->recupererVerificationClesEtrangereActif() + ")< / li>"
         + "</ul>"

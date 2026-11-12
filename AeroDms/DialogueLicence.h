@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef DIALOGUELICENCE_H
 #define DIALOGUELICENCE_H
 #include <QDialog>
+#include <QtWidgets>
 
 class DialogueLicence : public QDialog
 {
@@ -27,6 +28,10 @@ public:
     DialogueLicence(QWidget* parent = nullptr);
 
 private:
+    void ajouterLicenceADialogue(QTabWidget* tabLicences,
+        QString p_nomLicence,
+        QString p_nomBibSousLicence,
+        QString p_nomFichierLicence);
 
 public slots:
   

@@ -116,6 +116,7 @@ private:
     void demanderFermetureSplashscreen();
     void ouvrirSplashscreen(QSize& p_tailleSplashScreen);
     void mettreAJourSplashScreen(const QString& p_message);
+    void verifierPresenceDll7Zip();
 
     void verifierSignatureNumerisee();
     void verifierDispoIdentifiantsDaca();

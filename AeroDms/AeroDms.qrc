@@ -160,5 +160,7 @@
         <file>ressources/licences/BSD-3-Clause.txt</file>
         <file>ressources/licences/GPL-3.0-or-later.txt</file>
         <file>ressources/script-text-outline.svg</file>
+        <file>ressources/licences/MPL-2.0.txt</file>
+        <file>ressources/licences/LGPL-3.0-only.txt</file>
     </qresource>
 </RCC>

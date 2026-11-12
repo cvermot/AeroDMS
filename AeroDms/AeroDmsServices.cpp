@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma comment(lib, "crypt32.lib")
 #include <windows.h>
 #include <wincrypt.h>
+#pragma comment(lib, "Version.lib")
 #endif
 
 const QString AeroDmsServices::convertirMinutesEnHeuresMinutes(const int p_minutes)
@@ -1285,4 +1286,42 @@ const double AeroDmsServices::recupererFacteurDEmissions(const AeroDmsTypes::Uni
     break;
     }
     return 0;
+}
+
+const QVersionNumber AeroDmsServices::getVersionDll(const QString& p_chemin ) 
+{
+#ifdef Q_OS_WIN
+    std::wstring wPath = p_chemin.toStdWString();
+
+    DWORD dummy = 0;
+    DWORD infoSize = GetFileVersionInfoSizeW(wPath.c_str(), &dummy);
+    if (infoSize == 0) 
+    {
+        return QVersionNumber(); // Retourne un QVersionNumber vide (isNull() == true)
+    }
+
+    QByteArray data(infoSize, 0);
+    if (!GetFileVersionInfoW(wPath.c_str(), 0, infoSize, data.data())) 
+    {
+        return QVersionNumber();
+    }
+
+    VS_FIXEDFILEINFO* fileInfo = nullptr;
+    UINT len = 0;
+    if (VerQueryValueW(data.constData(), L"\\", reinterpret_cast<LPVOID*>(&fileInfo), &len) && len > 0) 
+    {
+        // Construction directe à partir des 4 segments numériques
+        return QVersionNumber({
+            HIWORD(fileInfo->dwFileVersionMS),
+            LOWORD(fileInfo->dwFileVersionMS),
+            HIWORD(fileInfo->dwFileVersionLS),
+            LOWORD(fileInfo->dwFileVersionLS)
+            });
+    }
+
+    return QVersionNumber();
+#elif
+#warning Récupération Version libraire 7Zip non implémentée
+    return QVersionNumber();
+#endif
 }

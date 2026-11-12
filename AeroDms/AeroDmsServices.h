@@ -62,6 +62,8 @@ public:
     static void afficherErreur(const QNetworkReply* p_reponse);
 
     static const QColor preferredLabelColor(const QColor& color);
+
+    static const QVersionNumber getVersionDll(const QString& p_chemin);
 };
 
 // Sous-classes pour ignorer les événements de molette
