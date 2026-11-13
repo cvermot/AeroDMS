@@ -69,9 +69,9 @@ jobs:
           & "$vcpkg/bootstrap-vcpkg.bat" -disableMetrics
           if ($LASTEXITCODE -ne 0) { throw 'Échec du bootstrap de vcpkg.' }
           & "$vcpkg/vcpkg.exe" install podofo:x64-windows bit7z:x64-windows 7zip:x64-windows
-          if ($LASTEXITCODE -ne 0) { throw 'Échec de l’installation des bibliothèques vcpkg.' }
+          if ($LASTEXITCODE -ne 0) { throw 'Vcpkg library installation failed.' }
           & "$vcpkg/vcpkg.exe" integrate install
-          if ($LASTEXITCODE -ne 0) { throw 'Échec de l’intégration MSBuild de vcpkg.' }
+          if ($LASTEXITCODE -ne 0) { throw 'Vcpkg MSBuild integration failed.' }
 
       - name: Préparer les ressources des projets
         shell: pwsh
