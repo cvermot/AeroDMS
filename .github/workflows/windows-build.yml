@@ -1,0 +1,142 @@
+name: Compilation Windows
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 180
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Installer Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.0'
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine qtpositioning
+
+      - name: Configurer MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Ajouter MSBuild au PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Installer Qt/MSBuild
+        shell: pwsh
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'qtmsbuild.zip'
+          $directory = Join-Path $env:RUNNER_TEMP 'qtmsbuild'
+          Invoke-WebRequest 'https://download.qt.io/official_releases/vsaddin/msbuild/qtmsbuild_latest.zip' -OutFile $archive
+          Expand-Archive $archive -DestinationPath $directory
+          $targets = @(Get-ChildItem $directory -Filter qt.targets -Recurse)
+          if ($targets.Count -ne 1 -or !(Test-Path (Join-Path $targets[0].DirectoryName 'qt_tasks.targets'))) {
+            throw 'Impossible de trouver une installation complète de Qt/MSBuild.'
+          }
+          "QtMsBuild=$($targets[0].DirectoryName)" >> $env:GITHUB_ENV
+
+      - name: Récupérer vcpkg
+        uses: actions/checkout@v4
+        with:
+          repository: microsoft/vcpkg
+          ref: a429e00e5e726285a4b59fc1465efe92373b0df4
+          path: .ci/vcpkg
+          persist-credentials: false
+
+      - name: Installer les bibliothèques vcpkg
+        shell: pwsh
+        run: |
+          $vcpkg = Join-Path $env:GITHUB_WORKSPACE '.ci/vcpkg'
+          & "$vcpkg/bootstrap-vcpkg.bat" -disableMetrics
+          if ($LASTEXITCODE -ne 0) { throw 'Échec du bootstrap de vcpkg.' }
+          & "$vcpkg/vcpkg.exe" install podofo:x64-windows bit7z:x64-windows 7zip:x64-windows
+          if ($LASTEXITCODE -ne 0) { throw 'Échec de l’installation des bibliothèques vcpkg.' }
+          & "$vcpkg/vcpkg.exe" integrate install
+          if ($LASTEXITCODE -ne 0) { throw 'Échec de l’intégration MSBuild de vcpkg.' }
+
+      - name: Préparer les ressources des projets
+        shell: pwsh
+        run: |
+          foreach ($project in @('AeroDms', 'AeroDmsLauncher')) {
+            $destination = Join-Path $project 'ressources'
+            New-Item -ItemType Directory -Path $destination -Force | Out-Null
+            Get-ChildItem ressources -Force | Copy-Item -Destination $destination -Recurse -Force
+          }
+
+      - name: Compiler les deux applications
+        shell: pwsh
+        run: |
+          msbuild AeroDms.sln /m /p:Configuration=Release /p:Platform=x64 "/p:QtInstall=$env:QT_ROOT_DIR" "/p:QtMsBuild=$env:QtMsBuild" /p:VcpkgTriplet=x64-windows
+          if ($LASTEXITCODE -ne 0) { throw 'Échec de la compilation.' }
+
+      - name: Préparer les exécutables
+        shell: pwsh
+        run: |
+          $build = Join-Path $env:GITHUB_WORKSPACE 'x64/Release'
+          $executables = Join-Path $env:RUNNER_TEMP 'executables'
+          New-Item -ItemType Directory -Path $executables | Out-Null
+          foreach ($name in @('AeroDms.exe', 'AeroDmsLauncher.exe')) {
+            $source = Join-Path $build $name
+            if (!(Test-Path $source)) { throw "Exécutable introuvable : $source" }
+            Copy-Item $source $executables
+          }
+
+      - name: Publier les exécutables seuls
+        uses: actions/upload-artifact@v4
+        with:
+          name: AeroDms-Windows-x64-executables
+          path: ${{ runner.temp }}/executables/
+          if-no-files-found: error
+
+      - name: Préparer le déploiement complet
+        shell: pwsh
+        run: |
+          $build = Join-Path $env:GITHUB_WORKSPACE 'x64/Release'
+          $deploy = Join-Path $env:RUNNER_TEMP 'deployment'
+          New-Item -ItemType Directory -Path $deploy | Out-Null
+          Copy-Item "$env:RUNNER_TEMP/executables/*.exe" $deploy
+          # Les DLL transitives copiées par l'intégration MSBuild de vcpkg.
+          Copy-Item "$build/*.dll" $deploy
+          $vcpkgBin = Join-Path $env:GITHUB_WORKSPACE '.ci/vcpkg/installed/x64-windows/bin'
+          Copy-Item "$vcpkgBin/7zip.dll" "$deploy/7z.dll"
+          $legacy = @(Get-ChildItem $vcpkgBin -Filter legacy.dll -Recurse)
+          if ($legacy.Count -ne 1) { throw 'Le fournisseur OpenSSL legacy.dll est introuvable ou ambigu.' }
+          Copy-Item $legacy[0].FullName $deploy
+          & windeployqt --release --include-plugins qoffscreen --qmldir "$env:GITHUB_WORKSPACE/ressources" "$deploy/AeroDms.exe"
+          if ($LASTEXITCODE -ne 0) { throw 'Échec du déploiement Qt pour AeroDms.' }
+          & windeployqt --release "$deploy/AeroDmsLauncher.exe"
+          if ($LASTEXITCODE -ne 0) { throw 'Échec du déploiement Qt pour le lanceur.' }
+          foreach ($file in @('7z.dll', 'legacy.dll', 'podofo.dll', 'QtWebEngineProcess.exe', 'platforms/qwindows.dll', 'qml/QtGraphs/qmldir')) {
+            if (!(Test-Path (Join-Path $deploy $file))) { throw "Fichier de déploiement manquant : $file" }
+          }
+
+      - name: Vérifier le lancement du lanceur déployé
+        shell: pwsh
+        run: |
+          $env:PATH = "$env:SystemRoot/system32;$env:SystemRoot"
+          $env:QT_QPA_PLATFORM = 'offscreen'
+          Remove-Item Env:QT_PLUGIN_PATH, Env:QML2_IMPORT_PATH -ErrorAction SilentlyContinue
+          $process = Start-Process "$env:RUNNER_TEMP/deployment/AeroDmsLauncher.exe" -ArgumentList '--version' -WorkingDirectory "$env:RUNNER_TEMP/deployment" -PassThru
+          if (!$process.WaitForExit(30000)) {
+            $process.Kill()
+            throw 'Le lancement du lanceur a dépassé le délai de 30 secondes.'
+          }
+          if ($process.ExitCode -ne 0) { throw "Échec du lancement du lanceur : $($process.ExitCode)" }
+
+      - name: Publier le déploiement complet
+        uses: actions/upload-artifact@v4
+        with:
+          name: AeroDms-Windows-x64-complet
+          path: ${{ runner.temp }}/deployment/
+          if-no-files-found: error

@@ -61,6 +61,14 @@ Visual Studio déploie automatiquement les DLL nécéssaires aux librairies util
 
 Depuis la version 7.1 d'AeroDMS, un lanceur est proposé afin de positionner les variables d'environement adaptées avant l'exécution d'AeroDMS : il n'est donc plus nécessaire de déployer les DLL pour SSL dans un autre repertoire, elles ont seulement besoind d'être présentes dans le répertoire d'AeroDMS.
 
+### Compilation GitHub Actions
+
+Le workflow « Compilation Windows » compile les deux applications en Release x64 avec MSVC 2022, Qt 6.11.0, PoDoFo 1.1.1 et bit7z 4.1.0 via vcpkg. Il se lance sur les push, les pull requests et manuellement depuis l'onglet Actions.
+
+Avant compilation, le contenu de `ressources` est copié dans les dossiers `ressources` des deux projets. Les fichiers partagés remplacent les fichiers de même nom dans la copie utilisée par la CI, notamment l'icône du lanceur.
+
+Chaque exécution réussie fournit deux artefacts téléchargeables : `AeroDms-Windows-x64-executables`, contenant uniquement les deux exécutables, et `AeroDms-Windows-x64-complet`, contenant également les DLL, plugins Qt, modules QML et fichiers de Qt WebEngine. Les exécutables seuls nécessitent un environnement où leurs dépendances sont déjà installées. Pour le déploiement complet, extraire tous les fichiers ensemble et lancer `AeroDmsLauncher.exe` depuis ce répertoire.
+
 ## Configuration, utilisation
 Voir le [Wiki](https://github.com/cvermot/AeroDMS/wiki).
 
