@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 class DialogueLicence : public QDialog
 {
-    Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS(DialogueLicence)
 
 public:
     DialogueLicence(QWidget* parent = nullptr);
@@ -32,9 +32,6 @@ private:
         QString p_nomLicence,
         QString p_nomBibSousLicence,
         QString p_nomFichierLicence);
-
-public slots:
-  
 };
 
 #endif // DIALOGUELICENCE_H
