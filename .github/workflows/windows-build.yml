@@ -14,17 +14,17 @@ jobs:
     timeout-minutes: 180
     steps:
       - name: Récupérer le dépôt
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurer Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
       - name: Installer Qt
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.11.0'
+          version: '6.11.2'
           host: windows
           target: desktop
           arch: win64_msvc2022_64
@@ -39,7 +39,7 @@ jobs:
           arch: x64
 
       - name: Ajouter MSBuild au PATH
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v3
 
       - name: Installer Qt/MSBuild
         shell: pwsh
@@ -55,7 +55,7 @@ jobs:
           "QtMsBuild=$($targets[0].DirectoryName)" >> $env:GITHUB_ENV
 
       - name: Récupérer vcpkg
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: microsoft/vcpkg
           ref: a429e00e5e726285a4b59fc1465efe92373b0df4
@@ -101,7 +101,7 @@ jobs:
           }
 
       - name: Publier les exécutables seuls
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AeroDms-Windows-x64-executables
           path: ${{ runner.temp }}/executables/
@@ -143,7 +143,7 @@ jobs:
           if ($process.ExitCode -ne 0) { throw "Échec du lancement du lanceur : $($process.ExitCode)" }
 
       - name: Publier le déploiement complet
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: AeroDms-Windows-x64-complet
           path: ${{ runner.temp }}/deployment/
