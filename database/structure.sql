@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on sam. oct. 17 22:19:30 2026
+-- File generated with SQLiteStudio v3.4.4 on ven. nov. 13 14:41:22 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -65,6 +65,7 @@ INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParLitreGasoil',
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2ParKwh', '0.015', NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('kgCo2IndirectsParHdv', '2.3', NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('texteAccompagnementCo2', NULL, NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('miseAJourFacultative', NULL, NULL, NULL);
 
 -- Table: pilote
 CREATE TABLE IF NOT EXISTS pilote (piloteId TEXT PRIMARY KEY UNIQUE NOT NULL, nom TEXT NOT NULL, prenom TEXT NOT NULL, aeroclubId INTEGER NOT NULL REFERENCES aeroclub (aeroclubId) DEFAULT (0), estAyantDroit INTEGER NOT NULL, mail TEXT, telephone TEXT, remarque TEXT, activitePrincipale TEXT REFERENCES activite (nom) NOT NULL, estActif NUMERIC NOT NULL DEFAULT (1), estBrevete NUMERIC NOT NULL DEFAULT (1));
@@ -84,6 +85,9 @@ INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, est
 INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Entrainement', 3, 0, 1, 1);
 INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Cotisation', 4, 1, 0, 0);
 INSERT INTO typeDeRecetteDepense (typeDeRecetteDepenseId, identifiantCompta, estRecette, estDepense, estVol) VALUES ('Fonctionnement', 6, 0, 1, 0);
+
+-- Table: utilisateurs
+CREATE TABLE IF NOT EXISTS utilisateurs (nom TEXT UNIQUE NOT NULL, versionAeroDms TEXT NOT NULL, dateDerniereConnexion TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP), message);
 
 -- Table: vol
 CREATE TABLE IF NOT EXISTS vol (volId INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL, typeDeVol TEXT REFERENCES typeDeRecetteDepense (typeDeRecetteDepenseId) NOT NULL, pilote TEXT REFERENCES pilote (piloteId) NOT NULL, date TEXT NOT NULL, duree INTEGER NOT NULL, cout REAL NOT NULL, montantRembourse REAL NOT NULL, facture INTEGER NOT NULL REFERENCES fichiersFacture (factureId), activite TEXT REFERENCES activite (nom) NOT NULL, sortie INTEGER REFERENCES sortie (sortieId), demandeRemboursement INTEGER REFERENCES demandeRemboursementSoumises (demandeId), remarque TEXT, immatriculation TEXT REFERENCES aeronef (immatriculation), imputation INTEGER REFERENCES imputation (id) NOT NULL DEFAULT (0));

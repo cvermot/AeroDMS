@@ -5930,7 +5930,7 @@ void AeroDms::verifierVersionBddSuiteChargement()
         dialogueMiseAJour.setText(tr("La version de la base de données ne correspond pas à la version attendue par le logiciel.\n\n\
 L'application va passer en mode lecture seule pour éviter tout risque d'endommagement de la BDD.\n\n\
 Consultez le développeur / responsable de l'application pour plus d'informations."));
-        dialogueMiseAJour.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur de version de base de données"));
+        dialogueMiseAJour.setWindowTitle(QApplication::applicationName() + " - " + tr("Mise à jour facultative disponible"));
         dialogueMiseAJour.setIcon(QMessageBox::Critical);
         dialogueMiseAJour.setStandardButtons(QMessageBox::Close);
         dialogueMiseAJour.exec();

@@ -111,6 +111,12 @@ void ManageDb::gererVerrouBdd()
         query.bindValue(":dateVerrouInitial", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
         query.bindValue(":derniereDateVerrou", QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss"));
         query.exec();
+
+        //On met a jour la deniere utilisation pour l'utilisateur courant :
+        query.prepare("INSERT OR REPLACE INTO utilisateurs(nom, versionAeroDms) VALUES (:nom, :versionAeroDms)");
+        query.bindValue(":nom", nomDuVerrou);
+        query.bindValue(":versionAeroDms", QApplication::applicationVersion());
+        query.exec();
         //On demande l'envoi de la BDD en ligne avec le verrou
         demanderEnvoiBdd();
     }

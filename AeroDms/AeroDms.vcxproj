@@ -120,6 +120,7 @@
     <ClCompile Include="DialogueGestionAeroclub.cpp" />
     <ClCompile Include="DialogueGestionAeronefs.cpp" />
     <ClCompile Include="DialogueGestionTypesAeronefs.cpp" />
+    <ClCompile Include="DialogueLicence.cpp" />
     <ClCompile Include="DialogueModifierImputation.cpp" />
     <ClCompile Include="DialogueProgressionGenerationPdf.cpp" />
     <ClCompile Include="DialogueProgressionImpression.cpp" />
@@ -173,6 +174,7 @@
     <QtMoc Include="GestionnaireDonneesEnLigne.h" />
     <QtMoc Include="DialogueGestionTypesAeronefs.h" />
     <QtMoc Include="DialogueModifierImputation.h" />
+    <QtMoc Include="DialogueLicence.h" />
     <ClInclude Include="RccGenerator.h" />
     <ClInclude Include="StatistiqueDonutCombine.h" />
     <QtMoc Include="StatistiqueDonutCombinePartie.h" />

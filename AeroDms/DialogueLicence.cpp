@@ -49,47 +49,6 @@ DialogueLicence::DialogueLicence(QWidget* parent) : QDialog(parent)
         tr("Licence de Bit7z"),
         "MPL-2.0.txt");
 
-   
-
-    /*QWidget* ongletGnuGpl = new QWidget(this);
-    QVBoxLayout* layoutOngletGnuGpl = new QVBoxLayout(ongletGnuGpl);
-    QLabel* labelGnuGpl = new QLabel(tr("Licence de l'application\nLicence de Qt"), ongletGnuGpl);
-    layoutOngletGnuGpl->addWidget(labelGnuGpl);
-    QTextEdit* texteLicenceGnuGpl = new QTextEdit(ongletGnuGpl);
-    texteLicenceGnuGpl->setReadOnly(true);
-    layoutOngletGnuGpl->addWidget(texteLicenceGnuGpl);
-    QFile licenceGnuGpl(":/AeroDms/ressources/licences/GPL-3.0-or-later.txt");
-    if (licenceGnuGpl.open(QIODevice::ReadOnly))
-    {
-        QTextStream licence(&licenceGnuGpl);
-        QString texteLicense = licence.readAll();
-        texteLicenceGnuGpl->setText(texteLicense);
-    }
-    ongletGnuGpl->setLayout(layoutOngletGnuGpl);
-    tabLicences->addTab(ongletGnuGpl, tr("GNU GPL v3"));
-
-    QTextEdit* texteLicenceBsd3Clause = new QTextEdit(this);
-    texteLicenceBsd3Clause->setReadOnly(true);
-    tabLicences->addTab(texteLicenceBsd3Clause, tr("3-Clause BSD"));
-    QFile licenceBsd3Clause(":/AeroDms/ressources/licences/BSD-3-Clause.txt");
-    if (licenceBsd3Clause.open(QIODevice::ReadOnly)) 
-    {
-        QTextStream licence(&licenceBsd3Clause);
-        QString texteLicense = licence.readAll();
-        texteLicenceBsd3Clause->setText(texteLicense);
-    }
-
-    QTextEdit* texteLicenceMpl2 = new QTextEdit(this);
-    texteLicenceMpl2->setReadOnly(true);
-    tabLicences->addTab(texteLicenceMpl2, tr("MPL 2.0"));
-    QFile licenceMpl2(":/AeroDms/ressources/licences/MPL-2.0.txt");
-    if (licenceMpl2.open(QIODevice::ReadOnly))
-    {
-        QTextStream licence(&licenceMpl2);
-        QString texteLicense = licence.readAll();
-        texteLicenceMpl2->setText(texteLicense);
-    }*/
-
     mainLayout->addWidget(tabLicences);
 
     mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
