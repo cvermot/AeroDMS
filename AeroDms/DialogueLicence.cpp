@@ -118,6 +118,13 @@ void DialogueLicence::ajouterLicenceADialogue(QTabWidget* tabLicences,
         QString texteLicense = licenceStream.readAll();
         texteLicence->setText(texteLicense);
     }
+
     onglet->setLayout(layoutOnglet);
     tabLicences->addTab(onglet, p_nomLicence);
+}
+
+void afficherDialogueLicence()
+{
+    DialogueLicence dialogueLicence;
+    dialogueLicence.exec();
 }

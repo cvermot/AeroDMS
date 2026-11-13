@@ -33,7 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "StatistiqueDonuts.h"
 
 #include "DialogueEditionParametres.h"
-#include "DialogueLicence.h"
 
 #include "resource.h"
 
@@ -46,6 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPrinterInfo>
+
+void afficherDialogueLicence();
 
 AeroDms::AeroDms(QSize &tailleSplashScreen, QWidget* parent) :QMainWindow(parent)
 {
@@ -4183,9 +4184,7 @@ void AeroDms::aPropos()
 
 void AeroDms::afficherLicences()
 {
-    DialogueLicence dialogueLicence;
-
-    dialogueLicence.exec();
+    afficherDialogueLicence();
 }
 
 void AeroDms::ouvrirAide()
