@@ -1,0 +1,86 @@
+name: Publier une pré-release Windows
+on:
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: windows-prerelease
+      cancel-in-progress: false
+    steps:
+      - name: Sélectionner la dernière compilation réussie
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          push_runs=$(gh api --method GET "repos/$REPOSITORY/actions/workflows/windows-build.yml/runs" \
+            -f branch="$DEFAULT_BRANCH" -f status=success -f event=push -F per_page=1)
+          manual_runs=$(gh api --method GET "repos/$REPOSITORY/actions/workflows/windows-build.yml/runs" \
+            -f branch="$DEFAULT_BRANCH" -f status=success -f event=workflow_dispatch -F per_page=1)
+          build=$(jq -sn --argjson push "$push_runs" --argjson manual "$manual_runs" \
+            '[$push.workflow_runs[], $manual.workflow_runs[]] | max_by([.created_at, .id]) // empty')
+          if [[ -z "$build" ]]; then
+            echo "::error::Aucune compilation Windows réussie sur la branche principale."
+            exit 1
+          fi
+          echo "id=$(jq -r '.id' <<< "$build")" >> "$GITHUB_OUTPUT"
+          echo "attempt=$(jq -r '.run_attempt' <<< "$build")" >> "$GITHUB_OUTPUT"
+          echo "sha=$(jq -r '.head_sha' <<< "$build")" >> "$GITHUB_OUTPUT"
+          echo "url=$(jq -r '.html_url' <<< "$build")" >> "$GITHUB_OUTPUT"
+      - name: Télécharger les artefacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          BUILD_ID: ${{ steps.build.outputs.id }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          artifacts=$(gh api --paginate --slurp \
+            "repos/$REPOSITORY/actions/runs/$BUILD_ID/artifacts?per_page=100")
+          mkdir -p "$RUNNER_TEMP/release"
+          for name in AeroDms-Windows-x64-executables AeroDms-Windows-x64-complet; do
+            id=$(jq -er --arg name "$name" \
+              '[.[].artifacts[] | select(.name == $name and .expired == false)] |
+               if length == 1 then .[0].id else error("Artefact absent, expiré ou ambigu : \($name)") end' \
+              <<< "$artifacts")
+            gh api "repos/$REPOSITORY/actions/artifacts/$id/zip" > "$RUNNER_TEMP/release/$name.zip"
+            unzip -tq "$RUNNER_TEMP/release/$name.zip"
+          done
+      - name: Publier la pré-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          BUILD_ID: ${{ steps.build.outputs.id }}
+          BUILD_ATTEMPT: ${{ steps.build.outputs.attempt }}
+          BUILD_SHA: ${{ steps.build.outputs.sha }}
+          BUILD_URL: ${{ steps.build.outputs.url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="windows-build-$BUILD_ID-$BUILD_ATTEMPT"
+          gh api --method POST "repos/$REPOSITORY/git/refs" \
+            -f ref="refs/tags/$tag" -f sha="$BUILD_SHA"
+          gh release create "$tag" --repo "$REPOSITORY" --verify-tag \
+            --draft --prerelease --title "Compilation Windows $BUILD_ID (essai $BUILD_ATTEMPT)" \
+            --notes "Compilation : $BUILD_URL
+          Commit : $BUILD_SHA"
+          gh release upload "$tag" --repo "$REPOSITORY" \
+            "$RUNNER_TEMP/release/AeroDms-Windows-x64-executables.zip" \
+            "$RUNNER_TEMP/release/AeroDms-Windows-x64-complet.zip"
+          gh release edit "$tag" --repo "$REPOSITORY" --draft=false
+      - name: Attester les archives publiées
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            ${{ runner.temp }}/release/AeroDms-Windows-x64-executables.zip
+            ${{ runner.temp }}/release/AeroDms-Windows-x64-complet.zip
