@@ -144,6 +144,7 @@
     <ClCompile Include="DialogueGestionPilote.cpp" />
     <ClCompile Include="ManageDb.cpp" />
     <ClCompile Include="PdfRenderer.cpp" />
+    <ClCompile Include="SurveillanceActivite.cpp" />
     <ClCompile Include="ZipExtractorWorker.cpp" />
     <QtRcc Include="AeroDms.qrc" />
     <QtUic Include="AeroDms.ui" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <ClInclude Include="AeroDmsServices.h" />
     <ClInclude Include="AeroDmsTypes.h" />
+    <QtMoc Include="SurveillanceActivite.h" />
     <QtMoc Include="ZipExtractorWorker.h" />
     <QtMoc Include="DialogueProgressionGenerationPdf.h" />
     <QtMoc Include="DialogueEditionParametres.h" />

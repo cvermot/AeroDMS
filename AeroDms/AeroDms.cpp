@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "PdfDownloader.h"
 #include "AixmParser.h"
 #include "ZipExtractorWorker.h"
+#include "SurveillanceActivite.h"
 
 #include "RccGenerator.h"
 
@@ -262,6 +263,9 @@ void AeroDms::lireParametresEtInitialiserBdd()
     parametresSysteme.motDePasseServeurModeExterne = settings.value("modeFonctionnementLogiciel/password", "").toString();
 
     parametresSysteme.versionIgnoree = QVersionNumber::fromString(settings.value("version/versionIgnoree", QApplication::applicationVersion()).toString());
+
+    parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto = settings.value("fermetureAuto/delaiEnMinutesSansActiviteAvantFermetureAuto", "10").toInt();
+    parametresSysteme.delaiEnSecondesAnnulationFermetureAuto = settings.value("fermetureAuto/delaiEnSecondesAnnulationFermetureAuto", "120").toInt();
     
     //Permet de fournir un fichier .ini avec les mots de passe en clair pour la conf initiale
     //Si on est pas à 1, cela veut dire que le mot de passe était chiffré => on le déchiffre
@@ -300,6 +304,10 @@ void AeroDms::lireParametresEtInitialiserBdd()
             parametresSysteme.margesHautBas,
             parametresSysteme.margesGaucheDroite,
             parametresSysteme.margesHautBas));
+
+    surveillanceActivite = new SurveillanceActivite(parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto,
+        parametresSysteme.delaiEnSecondesAnnulationFermetureAuto, 
+        this);
 
     enregistrerParametresApplication(parametresMetiers, parametresSysteme);
 }
@@ -4680,8 +4688,10 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
     settings.setValue("versionIgnoree", parametresSysteme.versionIgnoree.toString());
     settings.endGroup();
 
-    parametresMetiers.texteMailDispoCheques = settings.value("mailing/texteChequesDisponibles", "").toString();
-    parametresMetiers.texteMailSubventionRestante = settings.value("mailing/texteSubventionRestante", "").toString();
+    settings.beginGroup("fermetureAuto");
+    settings.setValue("delaiEnMinutesSansActiviteAvantFermetureAuto", QString::number(parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto));
+    settings.setValue("delaiEnSecondesAnnulationFermetureAuto", QString::number(parametresSysteme.delaiEnSecondesAnnulationFermetureAuto));
+    settings.endGroup();
 
     //Fichier de conf commun => le fichier AeroDMS.ini est mis au même endroit que la BDD SQLite
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, settings.value("baseDeDonnees/chemin", "").toString() + QString("/"));
@@ -4704,6 +4714,9 @@ void AeroDms::enregistrerParametresApplication( const AeroDmsTypes::ParametresMe
             parametresSysteme.margesHautBas));
     //... et le chemin des templates
     pdf->mettreAJourCheminRessourcesHtml(elaborerCheminRessourcesHtml());
+    //... et les délais de fermeture automatique sur inactivité
+    surveillanceActivite->mettreAJourDelais(parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto,
+        parametresSysteme.delaiEnSecondesAnnulationFermetureAuto);
 
     verifierDispoIdentifiantsDaca();
 }

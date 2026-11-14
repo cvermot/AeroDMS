@@ -70,6 +70,8 @@ private:
     QLineEdit* loginDaca = nullptr;
     QLineEdit* motDePasseDaca = nullptr;
     QSpinBox* periodiciteVerificationNouvellesFactures = nullptr;
+    QSpinBox* delaiEnMinutesSansActiviteAvantFermetureAuto = nullptr;
+    QSpinBox* delaiEnSecondesAnnulationFermetureAuto = nullptr;
 
     QComboBox* impressionCouleur = nullptr;
     QComboBox* resolutionImpression = nullptr;

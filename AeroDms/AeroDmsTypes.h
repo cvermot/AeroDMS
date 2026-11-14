@@ -750,6 +750,8 @@ public:
         QString motDePasseServeurModeExterne = "";
         bool utiliserRessourcesHtmlInternes = false;
         QVersionNumber versionIgnoree;
+        int delaiEnMinutesSansActiviteAvantFermetureAuto;
+        int delaiEnSecondesAnnulationFermetureAuto;
     };
 
     struct TotauxRecettes {

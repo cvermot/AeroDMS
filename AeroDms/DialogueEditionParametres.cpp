@@ -450,6 +450,28 @@ void DialogueEditionParametres::initialiserOngletSysteme(const AeroDmsTypes::Par
     periodiciteVerificationNouvellesFactures->setValue(p_parametresSysteme.periodiciteVerificationPresenceFactures);
 
     ligneActuelle = systemeLayout->rowCount();
+    delaiEnMinutesSansActiviteAvantFermetureAuto = new QSpinBox(this);
+    delaiEnMinutesSansActiviteAvantFermetureAuto->setSuffix(" minutes");
+    delaiEnMinutesSansActiviteAvantFermetureAuto->setToolTip(tr("Temps d'inactivité après lequel le logiciel prooposera la fermeture automatique. 0 = désactivé."));
+    delaiEnMinutesSansActiviteAvantFermetureAuto->setMinimum(0);
+    delaiEnMinutesSansActiviteAvantFermetureAuto->setMaximum(60);
+    systemeLayout->addWidget(new QLabel(tr("Délai d'inactivité avant fermeture automatique : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(delaiEnMinutesSansActiviteAvantFermetureAuto, ligneActuelle, K_COLONNE_CHAMP);
+
+    delaiEnMinutesSansActiviteAvantFermetureAuto->setValue(p_parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto);
+
+    ligneActuelle = systemeLayout->rowCount();
+    delaiEnSecondesAnnulationFermetureAuto = new QSpinBox(this);
+    delaiEnSecondesAnnulationFermetureAuto->setSuffix(" secondes");
+    delaiEnSecondesAnnulationFermetureAuto->setToolTip(tr("Temps en secondes dont disposera l'utilisateur pour annuler la demande de fermeture automatique"));
+    delaiEnSecondesAnnulationFermetureAuto->setMinimum(0);
+    delaiEnSecondesAnnulationFermetureAuto->setMaximum(300);
+    systemeLayout->addWidget(new QLabel(tr("Délai de grâce avant fermeture automatique : "), this), ligneActuelle, K_COLONNE_LABEL);
+    systemeLayout->addWidget(delaiEnSecondesAnnulationFermetureAuto, ligneActuelle, K_COLONNE_CHAMP);
+
+    delaiEnSecondesAnnulationFermetureAuto->setValue(p_parametresSysteme.delaiEnSecondesAnnulationFermetureAuto);
+
+    ligneActuelle = systemeLayout->rowCount();
     systemeLayout->setRowStretch(ligneActuelle, 1);
 }
 
@@ -638,6 +660,8 @@ void DialogueEditionParametres::enregistrerParametres()
     parametresSysteme.loginSiteDaca = loginDaca->text();
     parametresSysteme.motDePasseSiteDaca = motDePasseDaca->text();
     parametresSysteme.periodiciteVerificationPresenceFactures = periodiciteVerificationNouvellesFactures->value();
+    parametresSysteme.delaiEnMinutesSansActiviteAvantFermetureAuto = delaiEnMinutesSansActiviteAvantFermetureAuto->value();
+    parametresSysteme.delaiEnSecondesAnnulationFermetureAuto = delaiEnSecondesAnnulationFermetureAuto->value();
 
     parametresSysteme.parametresImpression.imprimante = imprimante->text();
     parametresSysteme.parametresImpression.resolutionImpression = resolutionImpression->currentData().toInt();

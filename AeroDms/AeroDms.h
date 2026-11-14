@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "DialogueModifierImputation.h"
 #include "DialogueProgressionGenerationPdf.h"
 #include "StatistiqueWidget.h"
+#include "SurveillanceActivite.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -136,6 +137,7 @@ private:
     PdfRenderer* pdf = nullptr;
     PdfDownloader* pdfdl = nullptr;
     GestionnaireDonneesEnLigne* gestionnaireDonneesEnLigne = nullptr;
+    SurveillanceActivite* surveillanceActivite = nullptr;
 
     AeroDmsTypes::Signature signature = AeroDmsTypes::Signature_SANS;
     AeroDmsTypes::TypeGenerationPdf typeGenerationPdf = AeroDmsTypes::TypeGenerationPdf_TOUTES;
