@@ -4155,11 +4155,19 @@ void AeroDms::aPropos()
         + tr("Le code source de ce programme est disponible sous")
         + " <a href=\"https://github.com/cvermot/AeroDMS\">GitHub</a>.<br/><br/>"
         + tr("Ce programme utilise les libraires :<ul>")
-        + "<li><a href = \"https://www.qt.io\">Qt</a> "+ qVersion() + " (Compilé avec Qt " + QT_VERSION_STR + ")</li>"
-        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "+ PODOFO_VERSION_STRING +"</li>"
-        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0 (version DLL 7zip : "+ AeroDmsServices::getVersionDll(QApplication::applicationDirPath()+"/7z.dll").toString() +")</li>"
-        + "<li><a href = \"https://wiki.qt.io/QtWebEngine/ChromiumVersions\">Chromium (Qt WebEngine)</a> "+ qWebEngineChromiumVersion() + "</li>"
-        + "<li><a href = \"https://www.sqlite.org/\">SQLite</a> "+ db->recupererVersionSQLite() + " ("+ db->recupererVerificationClesEtrangereActif() + ")< / li>"
+        + "<li><a href = \"https://www.qt.io\">Qt</a> "
+            + qVersion() 
+            + " (Compilé avec Qt " + QT_VERSION_STR + ")</li>"
+        + "<li><a href = \"https://github.com/podofo/podofo\">PoDoFo</a> "
+            + AeroDmsServices::getVersionDll(QApplication::applicationDirPath() + "/podofo.dll").toString() 
+            +" (Compilé avec Podofo "+ PODOFO_VERSION_STRING +")</li>"
+        + "<li><a href = \"https://github.com/rikyoz/bit7z\">bit7z</a> 4.1.0 (version DLL 7zip : "
+            + AeroDmsServices::getVersionDll(QApplication::applicationDirPath()+"/7z.dll").toString() +")</li>"
+        + "<li><a href = \"https://wiki.qt.io/QtWebEngine/ChromiumVersions\">Chromium (Qt WebEngine)</a> "
+            + qWebEngineChromiumVersion() + "</li>"
+        + "<li><a href = \"https://www.sqlite.org/\">SQLite</a> "
+            + db->recupererVersionSQLite() + " ("
+            + db->recupererVerificationClesEtrangereActif() + ")</li>"
         + "</ul>"
         + tr("Les icones sont issues de")
         + " <a href = \"https://pictogrammers.com/\">pictogrammers.com</a>.< br />< br />"
