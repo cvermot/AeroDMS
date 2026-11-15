@@ -28,7 +28,7 @@ jobs:
           host: windows
           target: desktop
           arch: win64_msvc2022_64
-          modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine qtpdf qtpositioning
+          modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine qtpdf qtpositioning qtimageformats
           setup-python: false
           # aqtinstall 3.3.0 ne prend pas en charge les dépôts Windows Qt 6.11.
           aqtsource: git+https://github.com/miurahr/aqtinstall.git@5a49f2b391ae8ee1d3c0dd87f8b33c1d49a4deb7
@@ -121,11 +121,11 @@ jobs:
           $legacy = @(Get-ChildItem $vcpkgBin -Filter legacy.dll -Recurse)
           if ($legacy.Count -ne 1) { throw 'Le fournisseur OpenSSL legacy.dll est introuvable ou ambigu.' }
           Copy-Item $legacy[0].FullName $deploy
-          & windeployqt --release --include-plugins qoffscreen --qmldir "$env:GITHUB_WORKSPACE/ressources" "$deploy/AeroDms.exe"
+          & windeployqt --release --include-plugins qoffscreen,qwebp --qmldir "$env:GITHUB_WORKSPACE/ressources" "$deploy/AeroDms.exe"
           if ($LASTEXITCODE -ne 0) { throw 'Échec du déploiement Qt pour AeroDms.' }
           & windeployqt --release "$deploy/AeroDmsLauncher.exe"
           if ($LASTEXITCODE -ne 0) { throw 'Échec du déploiement Qt pour le lanceur.' }
-          foreach ($file in @('7z.dll', 'legacy.dll', 'podofo.dll', 'QtWebEngineProcess.exe', 'platforms/qwindows.dll', 'qml/QtGraphs/qmldir')) {
+          foreach ($file in @('7z.dll', 'legacy.dll', 'podofo.dll', 'QtWebEngineProcess.exe', 'platforms/qwindows.dll', 'imageformats/qwebp.dll', 'qml/QtGraphs/qmldir')) {
             if (!(Test-Path (Join-Path $deploy $file))) { throw "Fichier de déploiement manquant : $file" }
           }
 
