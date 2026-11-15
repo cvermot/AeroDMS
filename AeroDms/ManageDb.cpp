@@ -583,6 +583,20 @@ void ManageDb::enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber
     query.exec();
 }
 
+void ManageDb::enregistrerNouvelleVersionLogicielleAvancee(const QVersionNumber& p_version,
+    const QVersionNumber& p_tagGithub,
+    const QString& p_nomFichier)
+{
+    QSqlQuery query;
+
+    query.prepare("UPDATE parametres SET info1 = :tag, info2 = :fichier, info3 = :version WHERE nom = :nomParametre");
+    query.bindValue(":nomParametre", "miseAJourFacultative");
+    query.bindValue(":tag", p_tagGithub.toString());
+    query.bindValue(":fichier", p_nomFichier);
+    query.bindValue(":version", p_version.toString());
+    query.exec();
+}
+
 const QString ManageDb::recupererNomFichierMiseAJour()
 {
     QSqlQuery query;

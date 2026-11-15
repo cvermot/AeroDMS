@@ -38,13 +38,15 @@ public:
         const int p_delaisDeGraceEnSecondes,
         QObject* parent);
 
-    void pause();
-    void resume();
+    void reprendre();
+    void arreter();
     void mettreAJourDelais(const int p_delaiDInactiviteEnMinutes,
         const int p_delaisDeGraceEnSecondes);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* event) override;
+    void pause();
+    void resume();
 
 private slots:
     void afficherDialogueInactivite();
@@ -64,6 +66,7 @@ private:
     int delaiDeGraceEnMs;
     bool boiteDeDialogueEstOuverte = false;
     bool demandeFermeture = false;
+    bool surveillanceEstEnPause = false;
 };
 
 #endif

@@ -1116,6 +1116,7 @@ public:
         Icone_TOUTES_LES_ANNEES,
         Icone_UNE_ANNEE,
         Icone_INFOS_COMPLEMENTAIRES,
+        Icone_INACTIVITE,
         Icone_LICENCE,
 
         Icone_RATIO,

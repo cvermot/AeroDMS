@@ -344,6 +344,10 @@ const QIcon AeroDmsServices::recupererIcone(const AeroDmsTypes::Icone p_icone)
             return QIcon(":/AeroDms/ressources/script-text-outline.svg");
         }
         break;
+        case AeroDmsTypes::Icone_INACTIVITE:
+        {
+            return QIcon(":/AeroDms/ressources/bell-off.svg");
+        }
         case AeroDmsTypes::Icone_RATIO:
         {
             return QIcon(":/AeroDms/ressources/aspect-ratio.svg");

@@ -49,6 +49,9 @@ public:
     const QVersionNumber recupererVersionReleaseMiseAJourAvancee();
     void enregistrerNouvelleVersionLogicielleMinimale(const QVersionNumber& p_version,
         const QString& p_nomFichier);
+    void enregistrerNouvelleVersionLogicielleAvancee(const QVersionNumber& p_version,
+        const QVersionNumber& p_tagGithub,
+        const QString& p_nomFichier);
 
     const AeroDmsTypes::ListePilotes recupererPilotes();
     const AeroDmsTypes::Pilote recupererPilote( const QString p_idPilote);

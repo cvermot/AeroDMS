@@ -44,10 +44,26 @@ void SurveillanceActivite::pause()
     compteurMiseAJourDialogue.stop();
 }
 
+void SurveillanceActivite::arreter()
+{
+    compteurDInactivite.stop();
+    compteurMiseAJourDialogue.stop();
+    surveillanceEstEnPause = true;
+}
+
+
+void SurveillanceActivite::reprendre()
+{
+    compteurDInactivite.start();
+    compteurMiseAJourDialogue.start();
+    surveillanceEstEnPause = false;
+}
+
 void SurveillanceActivite::resume()
 {
     if (!boiteDeDialogueEstOuverte
-        && compteurDInactivite.interval() != 0)
+        && compteurDInactivite.interval() != 0
+        && !surveillanceEstEnPause)
     {
         compteurDInactivite.start();
     }

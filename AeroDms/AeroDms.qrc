@@ -163,5 +163,7 @@
         <file>ressources/licences/MPL-2.0.txt</file>
         <file>ressources/licences/LGPL-3.0-only.txt</file>
         <file>ressources/numeric-1.svg</file>
+        <file>ressources/bell-off.svg</file>
+        <file>ressources/update.svg</file>
     </qresource>
 </RCC>

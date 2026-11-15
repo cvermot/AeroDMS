@@ -788,7 +788,7 @@ void AeroDms::mettreAJourVersionMiniExigee()
     bool ok = false;
     const QString numeroDeVersion = QInputDialog::getText(this, 
         QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Numéro de version"),
-        tr("Le numéro de version saisi ici doit correspondre à un tag vX.Y(.Z) dans le dépot https://github.com/cvermot/AeroDMS. \n\n")
+        tr("Le numéro de version saisi ici doit correspondre à un tag vX.Y(.Z) dans le dépot https://github.com/cvermot/AeroDMS.\n\n")
             + tr("Nouvelle version X.Y(.Z) minimale d'") + QApplication::applicationName() + tr(" exigée :"),
         QLineEdit::Normal,
         db->recupererVersionLogicielleMinimale().toString(), 
@@ -841,6 +841,90 @@ void AeroDms::mettreAJourVersionMiniExigee()
             }
         }
     } 
+}
+
+void AeroDms::mettreAJourVersionFacultative()
+{
+    bool ok = false;
+    const QString numeroDeVersionAvancee = QInputDialog::getText(this,
+        QApplication::applicationName() + " - " + tr("Nouvelle version suggerée - Numéro de la version"),
+        tr("Le numéro de version saisi ici doit correspondre à un tag vX.Y(.Z) dans le dépot https://github.com/cvermot/AeroDMS.\n\n")
+        + tr("Nouvelle version X.Y(.Z) minimale d'") + QApplication::applicationName() + tr(" exigée :"),
+        QLineEdit::Normal,
+        db->recupererVersionLogicielleAvancee().toString(),
+        &ok);
+
+    if (ok)
+    {
+        const QVersionNumber version = QVersionNumber::fromString(numeroDeVersionAvancee);
+
+        if (version.isNull())
+        {
+            QMessageBox dialogueSaisieVersionInvalide;
+            dialogueSaisieVersionInvalide.setText(tr("La saisie ne correspond pas à un numéro de version valide (nommage attendu : X.Y(.Z))."));
+            dialogueSaisieVersionInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("La saisie ne correspond pas à un numéro de version"));
+            dialogueSaisieVersionInvalide.setIcon(QMessageBox::Critical);
+            dialogueSaisieVersionInvalide.setStandardButtons(QMessageBox::Close);
+            dialogueSaisieVersionInvalide.exec();
+        }
+        else
+        {
+            const QString numeroTagGithub = QInputDialog::getText(this,
+                QApplication::applicationName() + " - " + tr("Nouvelle version suggerée - Tag GitHub"),
+                tr("Le numéro de version saisi ici doit correspondre à un tag vX.Y(.Z) dans le dépot https://github.com/cvermot/AeroDMS.\n\n")
+                + tr("Nouvelle version X.Y(.Z) minimale d'") + QApplication::applicationName() + tr(" exigée :"),
+                QLineEdit::Normal,
+                db->recupererVersionReleaseMiseAJourAvancee().toString(),
+                &ok);
+            if (ok)
+            {
+                const QVersionNumber tag = QVersionNumber::fromString(numeroTagGithub);
+
+                if (version.isNull())
+                {
+                    QMessageBox dialogueSaisieVersionInvalide;
+                    dialogueSaisieVersionInvalide.setText(tr("La saisie ne correspond pas à un numéro de version valide (nommage attendu : X.Y(.Z))."));
+                    dialogueSaisieVersionInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("La saisie ne correspond pas à un numéro de version"));
+                    dialogueSaisieVersionInvalide.setIcon(QMessageBox::Critical);
+                    dialogueSaisieVersionInvalide.setStandardButtons(QMessageBox::Close);
+                    dialogueSaisieVersionInvalide.exec();
+                }
+
+                const QString url = "https://github.com/cvermot/AeroDMS/releases/tag/v" + tag.toString() + "/";
+
+                const QString nomDuFichier = QInputDialog::getText(this,
+                    QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Nom du fichier"),
+                    tr("Le nom de fichier saisi ici doit correspondre à un fichier ZIP disponible dans les assets présent<br />à l'adresse <a href=\"")
+                    + url
+                    + "\">"
+                    + url
+                    + "</a>.<br /><br />"
+                    + tr("Nouveau nom du fichier ZIP à télécharger :"),
+                    QLineEdit::Normal,
+                    db->recupererNomFichierMiseAJourAvancee(),
+                    &ok);
+                if (ok)
+                {
+                    if (nomDuFichier.isEmpty())
+                    {
+                        QMessageBox dialogueSaisieNomFichierInvalide;
+                        dialogueSaisieNomFichierInvalide.setText(tr("Le nom de fichier saisi est vide. <br/><br/>Les nouvelles exigences en termes de version minimales ne seront pas enregistrées."));
+                        dialogueSaisieNomFichierInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("Nom de fichier invalide"));
+                        dialogueSaisieNomFichierInvalide.setIcon(QMessageBox::Critical);
+                        dialogueSaisieNomFichierInvalide.setStandardButtons(QMessageBox::Close);
+                        dialogueSaisieNomFichierInvalide.exec();
+                    }
+                    else
+                    {
+                        db->enregistrerNouvelleVersionLogicielleAvancee(version, 
+                            tag, 
+                            nomDuFichier);
+                        db->demanderEnvoiBdd();
+                    }
+                }
+            }
+        }
+    }
 }
 
 void AeroDms::traiterZipMiseAJourDispo()
@@ -994,6 +1078,7 @@ void AeroDms::passerLeLogicielEnLectureSeule(const bool p_lectureSeuleEstDemande
         facturesDaca->setEnabled(!p_lectureSeuleEstDemandee);
 
         mettreAJourDonneesVersionMiniAction->setEnabled(!p_lectureSeuleEstDemandee);
+        mettreAJourDonneesVersionFacultativeAction->setEnabled(!p_lectureSeuleEstDemandee);
 
         boutonEditerUnAeroclub->setEnabled(!p_lectureSeuleEstDemandee);
         boutonGestionTypesAeronefs->setEnabled(!p_lectureSeuleEstDemandee);
@@ -1763,6 +1848,16 @@ void AeroDms::initialiserMenuOptions()
 
     connect(selecteurFiltreInformationsSupplementaires, &QAction::triggered, this, &AeroDms::switchAffichageInfosComplementaires);
 
+    selecteurSortieAutomatiqueInactivite = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_INACTIVITE),
+        tr("Désactiver la sortie automatique en cas d'inactivité"),
+        this);
+    selecteurSortieAutomatiqueInactivite->setToolTip(tr("En cas d'inactivité, le logiciel se ferme automatiquement (délai paramétrable dans les paramètres du logiciel, onglet Système). Cette option permet de désactiver cette fermeture automatique pour la session courante."));
+    selecteurSortieAutomatiqueInactivite->setCheckable(true);
+    selecteurSortieAutomatiqueInactivite->setChecked(false);
+    menuOption->addAction(selecteurSortieAutomatiqueInactivite);
+
+    connect(selecteurSortieAutomatiqueInactivite, &QAction::triggered, this, &AeroDms::switchSortieAutomatiqueInactivite);
+
     menuOption->addSeparator();
 
     boutonParametresDuLogiciel = new QAction(QIcon(":/AeroDms/ressources/cog.svg"), tr("&Paramètres du logiciel"), this);
@@ -1979,6 +2074,13 @@ void AeroDms::initialiserMenuAide()
     connect(mettreAJourDonneesVersionMiniAction, SIGNAL(triggered()), this, SLOT(mettreAJourVersionMiniExigee()));
     //De base on masque : fonction accessible uniquement en mode debug
     mettreAJourDonneesVersionMiniAction->setVisible(false);
+
+    mettreAJourDonneesVersionFacultativeAction = new QAction(QIcon(":/AeroDms/ressources/update.svg"), tr("Modifier les informations de version facultative"), this);
+    mettreAJourDonneesVersionFacultativeAction->setStatusTip(tr("Met à jour les exigences de version dont la mise à jour est facultative"));
+    helpMenu->addAction(mettreAJourDonneesVersionFacultativeAction);
+    connect(mettreAJourDonneesVersionFacultativeAction, SIGNAL(triggered()), this, SLOT(mettreAJourVersionFacultative()));
+    //De base on masque : fonction accessible uniquement en mode debug
+    mettreAJourDonneesVersionFacultativeAction->setVisible(false);
 
     boutonModeDebug = new QAction(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_DEBUG), 
         texteBoutonActiverModeDebogage,
@@ -4561,6 +4663,7 @@ void AeroDms::switchModeDebug()
     vueRecettes->setColumnHidden(AeroDmsTypes::RecetteTableElement_ID, masquageEstDemande);
     vueSubventions->setColumnHidden(AeroDmsTypes::SubventionDemandeeTableElement_ID_DEMANDE, masquageEstDemande);
     mettreAJourDonneesVersionMiniAction->setVisible(!masquageEstDemande);
+    mettreAJourDonneesVersionFacultativeAction->setVisible(!masquageEstDemande);
 
     //fonction de mise à jour update locale non nécessaire en mode externe à l'extérieur de l'organisation
     if (parametresSysteme.modeFonctionnementLogiciel != AeroDmsTypes::ModeFonctionnementLogiciel_EXERNE_AUTORISE_MODE_EXTERNE)
@@ -4599,6 +4702,18 @@ void AeroDms::switchAffichageInfosComplementaires()
 {
     vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_AEROCLUB, !selecteurFiltreInformationsSupplementaires->isChecked());
     vuePilotes->setColumnHidden(AeroDmsTypes::PiloteTableElement_TERRAIN, !selecteurFiltreInformationsSupplementaires->isChecked());
+}
+
+void AeroDms::switchSortieAutomatiqueInactivite()
+{
+    if (selecteurSortieAutomatiqueInactivite->isChecked())
+    {
+        surveillanceActivite->arreter();
+    }
+    else
+    {
+        surveillanceActivite->reprendre();
+    }
 }
 
 void AeroDms::switchScanAutomatiqueDesFactures()

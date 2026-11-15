@@ -220,6 +220,7 @@ private:
     QAction* miseAJourAction = nullptr;
     QAction* miseAJourUpdateLocale = nullptr;
     QAction* mettreAJourDonneesVersionMiniAction = nullptr;
+    QAction* mettreAJourDonneesVersionFacultativeAction = nullptr;
     QAction* boutonModeDebug = nullptr;
     QAction* boutonAjouterUnVol = nullptr;
     QAction* boutonAjouterUnAeroclub = nullptr;
@@ -247,6 +248,7 @@ private:
     QAction* boutonFusionnerLesPdf = nullptr;
     QAction* boutonNePasFusionnerLesPdf = nullptr;
     QAction* boutonActivationScanAutoFactures = nullptr;
+    QAction* selecteurSortieAutomatiqueInactivite = nullptr;
     QAction* boutonParametresDuLogiciel = nullptr;
     QAction* boutonOptionRecapAnnuelRecettes = nullptr;
     QAction* boutonOptionRecapAnnuelBaladesSorties = nullptr;
@@ -454,6 +456,7 @@ public slots:
     void initialiserGestionnaireTelechargement();
     void switchOnglet();
     void switchAffichageInfosComplementaires();
+    void switchSortieAutomatiqueInactivite();
     void imprimerLaDemande();
     void imprimerLaDemandeAgrafage();
     void imprimerLaDerniereDemande();
@@ -469,6 +472,7 @@ public slots:
     //Gestion des mises à jour
     void verifierPresenceDeMiseAjour();
     void mettreAJourVersionMiniExigee();
+    void mettreAJourVersionFacultative();
     void traiterZipMiseAJourDispo();
     void afficherProgressionTelechargementMaJ(const qint64 p_nbOctetsRecus, 
         const qint64 p_nbOctetsTotal);
