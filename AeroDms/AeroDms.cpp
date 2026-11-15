@@ -880,7 +880,7 @@ void AeroDms::mettreAJourVersionFacultative()
             {
                 const QVersionNumber tag = QVersionNumber::fromString(numeroTagGithub);
 
-                if (version.isNull())
+                if (tag.isNull())
                 {
                     QMessageBox dialogueSaisieVersionInvalide;
                     dialogueSaisieVersionInvalide.setText(tr("La saisie ne correspond pas à un numéro de version valide (nommage attendu : X.Y(.Z))."));
@@ -889,39 +889,41 @@ void AeroDms::mettreAJourVersionFacultative()
                     dialogueSaisieVersionInvalide.setStandardButtons(QMessageBox::Close);
                     dialogueSaisieVersionInvalide.exec();
                 }
-
-                const QString url = "https://github.com/cvermot/AeroDMS/releases/tag/v" + tag.toString() + "/";
-
-                const QString nomDuFichier = QInputDialog::getText(this,
-                    QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Nom du fichier"),
-                    tr("Le nom de fichier saisi ici doit correspondre à un fichier ZIP disponible dans les assets présent<br />à l'adresse <a href=\"")
-                    + url
-                    + "\">"
-                    + url
-                    + "</a>.<br /><br />"
-                    + tr("Nouveau nom du fichier ZIP à télécharger :"),
-                    QLineEdit::Normal,
-                    db->recupererNomFichierMiseAJourAvancee(),
-                    &ok);
-                if (ok)
+                else
                 {
-                    if (nomDuFichier.isEmpty())
+                    const QString url = "https://github.com/cvermot/AeroDMS/releases/tag/v" + tag.toString() + "/";
+
+                    const QString nomDuFichier = QInputDialog::getText(this,
+                        QApplication::applicationName() + " - " + tr("Nouvelle version minimale exigée - Nom du fichier"),
+                        tr("Le nom de fichier saisi ici doit correspondre à un fichier ZIP disponible dans les assets présent<br />à l'adresse <a href=\"")
+                        + url
+                        + "\">"
+                        + url
+                        + "</a>.<br /><br />"
+                        + tr("Nouveau nom du fichier ZIP à télécharger :"),
+                        QLineEdit::Normal,
+                        db->recupererNomFichierMiseAJourAvancee(),
+                        &ok);
+                    if (ok)
                     {
-                        QMessageBox dialogueSaisieNomFichierInvalide;
-                        dialogueSaisieNomFichierInvalide.setText(tr("Le nom de fichier saisi est vide. <br/><br/>Les nouvelles exigences en termes de version minimales ne seront pas enregistrées."));
-                        dialogueSaisieNomFichierInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("Nom de fichier invalide"));
-                        dialogueSaisieNomFichierInvalide.setIcon(QMessageBox::Critical);
-                        dialogueSaisieNomFichierInvalide.setStandardButtons(QMessageBox::Close);
-                        dialogueSaisieNomFichierInvalide.exec();
+                        if (nomDuFichier.isEmpty())
+                        {
+                            QMessageBox dialogueSaisieNomFichierInvalide;
+                            dialogueSaisieNomFichierInvalide.setText(tr("Le nom de fichier saisi est vide. <br/><br/>Les nouvelles exigences en termes de version minimales ne seront pas enregistrées."));
+                            dialogueSaisieNomFichierInvalide.setWindowTitle(QApplication::applicationName() + " - " + tr("Nom de fichier invalide"));
+                            dialogueSaisieNomFichierInvalide.setIcon(QMessageBox::Critical);
+                            dialogueSaisieNomFichierInvalide.setStandardButtons(QMessageBox::Close);
+                            dialogueSaisieNomFichierInvalide.exec();
+                        }
+                        else
+                        {
+                            db->enregistrerNouvelleVersionLogicielleAvancee(version,
+                                tag,
+                                nomDuFichier);
+                            db->demanderEnvoiBdd();
+                        }
                     }
-                    else
-                    {
-                        db->enregistrerNouvelleVersionLogicielleAvancee(version, 
-                            tag, 
-                            nomDuFichier);
-                        db->demanderEnvoiBdd();
-                    }
-                }
+                }      
             }
         }
     }
