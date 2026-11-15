@@ -207,4 +207,20 @@
   </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  
+  <ItemDefinitionGroup>
+  <ResourceCompile>
+    <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+  </ResourceCompile>
+</ItemDefinitionGroup>
+
+<Target Name="GenerateCopyright" BeforeTargets="ResourceCompile">
+  <MakeDir Directories="$(IntDir)" />
+  <WriteLinesToFile
+    File="$(IntDir)copyright.h"
+    Lines="#define COPYRIGHT_TEXT &quot;Copyright (C) 2023-$([System.DateTime]::Now.Year) Clément VERMOT-DESROCHES&quot;"
+    Overwrite="true"
+    WriteOnlyWhenDifferent="true"
+    Encoding="Unicode" />
+</Target>
 </Project>
