@@ -1,5 +1,5 @@
 --
--- File generated with SQLiteStudio v3.4.4 on ven. nov. 13 14:41:22 2026
+-- File generated with SQLiteStudio v3.4.4 on dim. nov. 15 18:06:44 2026
 --
 -- Text encoding used: UTF-8
 --
@@ -50,7 +50,7 @@ INSERT INTO imputation (id, nom, description) VALUES (0, 'Section aéro', 'Vols 
 
 -- Table: parametres
 CREATE TABLE IF NOT EXISTS parametres (nom TEXT PRIMARY KEY NOT NULL UNIQUE, info1 TEXT, info2 TEXT, info3 TEXT);
-INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.15', NULL, NULL);
+INSERT INTO parametres (nom, info1, info2, info3) VALUES ('versionBdd', '1.16', NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('lock', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('autoriserReglementParVirement', NULL, NULL, NULL);
 INSERT INTO parametres (nom, info1, info2, info3) VALUES ('proportionParticipationBalade', NULL, NULL, NULL);

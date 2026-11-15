@@ -256,7 +256,7 @@ private:
     QString nomDuVerrou = "";
     bool envoiTerminalAvantFermetureLogiciel = false;
 
-    const double versionBddAttendue = 1.15;
+    const double versionBddAttendue = 1.16;
 
     const bool ouvrirBdd();
     const AeroDmsTypes::Club depilerRequeteAeroclub(const QSqlQuery p_query);
