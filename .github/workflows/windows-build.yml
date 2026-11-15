@@ -62,10 +62,28 @@ jobs:
           path: .ci/vcpkg
           persist-credentials: false
 
-      - name: Installer les bibliothèques vcpkg
+      - name: Identifier l'image Windows
+        id: image
         shell: pwsh
         run: |
+          if (!$env:ImageVersion) { throw "Version de l'image Windows introuvable." }
+          "version=$env:ImageVersion" >> $env:GITHUB_OUTPUT
+
+      - name: Restaurer le cache binaire vcpkg
+        uses: actions/cache@v5
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ runner.os }}-${{ steps.image.outputs.version }}-${{ hashFiles('.github/workflows/windows-build.yml') }}
+          restore-keys: |
+            vcpkg-${{ runner.os }}-
+
+      - name: Installer les bibliothèques vcpkg
+        shell: pwsh
+        env:
+          VCPKG_DEFAULT_BINARY_CACHE: ${{ runner.temp }}/vcpkg-cache
+        run: |
           $vcpkg = Join-Path $env:GITHUB_WORKSPACE '.ci/vcpkg'
+          New-Item -ItemType Directory -Path $env:VCPKG_DEFAULT_BINARY_CACHE -Force | Out-Null
           & "$vcpkg/bootstrap-vcpkg.bat" -disableMetrics
           if ($LASTEXITCODE -ne 0) { throw 'Échec du bootstrap de vcpkg.' }
           & "$vcpkg/vcpkg.exe" install podofo:x64-windows bit7z:x64-windows 7zip:x64-windows
