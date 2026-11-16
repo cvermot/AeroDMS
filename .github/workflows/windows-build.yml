@@ -28,7 +28,7 @@ jobs:
           host: windows
           target: desktop
           arch: win64_msvc2022_64
-          modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine qtpdf qtpositioning qtimageformats
+          modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine@6.140.0 qtpdf@6.140.0 qtpositioning qtimageformats
           setup-python: false
           # aqtinstall 3.3.0 ne prend pas en charge les dépôts Windows Qt 6.11.
           aqtsource: git+https://github.com/miurahr/aqtinstall.git@5a49f2b391ae8ee1d3c0dd87f8b33c1d49a4deb7
