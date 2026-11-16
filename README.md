@@ -12,19 +12,19 @@ Logiciel de gestion de subventions d'une section aéronautique d'un CSE.
 
 - Développé en C++
 - Base de données [SQLite](https://www.sqlite.org/)
-- Librairie [Qt](https://www.qt.io/) (6.9.0)
-  - GUI (Qt Gui)
-  - Lecture PDF (Qt Pdf)
-  - Écriture PDF à partir d’un template HTML via WebEngine (Qt Web Engine)
-  - Accès à la BDD SQLite (Qt Sql)
-  - Affichage des statistiques (Qt Charts)
-  - Parsing fichier AIXM (Qt Xml)
-  - Export des graphiques en SVG (Qt Svg)
-  - Impression (Qt Print Support)
-  - Chargement de données de sites Web (Qt Network)
-  - Gestion multithread (Qt Concurrent)
-- Librairie [PoDoFo](https://github.com/podofo/podofo) (1.0.0) pour le parsing et l'assemblage des PDF
-- Librairie [Bit7z](https://github.com/rikyoz/bit7z) (4.0.10) pour la décompression des mises à jour
+- Librairie [Qt](https://www.qt.io/) (6.12.0) :
+  - GUI (Qt Gui),
+  - Lecture PDF (Qt Pdf),
+  - Écriture PDF à partir d’un template HTML via WebEngine (Qt Web Engine),
+  - Accès à la BDD SQLite (Qt Sql),
+  - Affichage des statistiques (Qt Graphs),
+  - Parsing fichier AIXM (Qt Xml),
+  - Export des graphiques en SVG (Qt Svg),
+  - Impression (Qt Print Support),
+  - Chargement de données de sites Web (Qt Network),
+  - Gestion multithread (Qt Concurrent),
+- Librairie [PoDoFo](https://github.com/podofo/podofo) (1.1.0) pour le parsing et l'assemblage des PDF,
+- Librairie [Bit7z](https://github.com/rikyoz/bit7z) (4.1.0) pour la décompression des mises à jour, via la librairie 7Zip,
 - Librairie Dpapi (Win32/crypt32.lib) pour le chiffrement des mots de passe stockés en local, à défaut de support d'un mécanisme générique par Qt. Si on souhaite compiler pour Mac OS ou Linux, il sera nécessaire d'implémenter les mécanismes spécifiques à ces systèmes d'exploitation.
 
 ## Mise en place de l’environnement de développement
@@ -41,16 +41,16 @@ L’installation de vcpkg nécessite que git soit installé sur la machine.
 
 Suivre [les étapes d’installation de vcpkg](https://vcpkg.io/en/getting-started).
 
-#### Compilation et installation de PoDoFo
-Récupérer et compiler PoDoFo :
+#### Compilation et installation des dependances via vcpkg
+Récupérer et compiler les dépendances (bit7z et PoDoFo) :
 ```
 vcpkg install podofo 7zip bit7z
 ```
-Après la compilation de PoDoFo et de ses dépendances, installer PoDoFo (nécessite un accès administrateur sur la machine) :
+Après la compilation des dépendances, les installer (nécessite un accès administrateur sur la machine) :
 ```
 vcpkg integrate install
 ```
-Une fois installée, PoDoFo est directement disponible sous MSVC sans manipulations supplémentaires.
+Une fois installée, les dépendances est directement disponible sous MSVC sans manipulations supplémentaires.
 
 ## Déploiement
 Le déploiement est réalisé sous forme d'archives ZIP.
@@ -72,18 +72,5 @@ Le splashscreen est généré via IA avec [Microsoft Designer](https://designer.
 ![Splashscreen](https://github.com/cvermot/AeroDMS/blob/main/ressources/splash.svg)
 
 ## Licence
-Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de code sous licence BSD.
-
-
-
- 
-
-
-
- 
-
-
-
- 
-
+Le logiciel est diffusé sous licence GNU GPL v3. Il intègre des portions de code sous licence BSD, MPL et GNU LGPL.
 

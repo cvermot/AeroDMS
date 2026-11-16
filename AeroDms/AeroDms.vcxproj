@@ -43,7 +43,7 @@
     <QtPlugin>true</QtPlugin>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.10.1_msvc2022_64</QtInstall>
+    <QtInstall>6.12.0_msvc2022_64</QtInstall>
     <QtModules>core;gui;network;quick;widgets;concurrent;printsupport;quickwidgets;sql;svg;webenginecore;xml;webenginewidgets;pdf;pdfwidgets;graphs</QtModules>
     <QtBuildConfig>release</QtBuildConfig>
     <QtPlugin>true</QtPlugin>
@@ -207,20 +207,13 @@
   </ImportGroup>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
-  
   <ItemDefinitionGroup>
-  <ResourceCompile>
-    <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-  </ResourceCompile>
-</ItemDefinitionGroup>
-
-<Target Name="GenerateCopyright" BeforeTargets="ResourceCompile">
-  <MakeDir Directories="$(IntDir)" />
-  <WriteLinesToFile
-    File="$(IntDir)copyright.h"
-    Lines="#define COPYRIGHT_TEXT &quot;Copyright (C) 2023-$([System.DateTime]::Now.Year) Clément VERMOT-DESROCHES&quot;"
-    Overwrite="true"
-    WriteOnlyWhenDifferent="true"
-    Encoding="Unicode" />
-</Target>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <Target Name="GenerateCopyright" BeforeTargets="ResourceCompile">
+    <MakeDir Directories="$(IntDir)" />
+    <WriteLinesToFile File="$(IntDir)copyright.h" Lines="#define COPYRIGHT_TEXT &quot;Copyright (C) 2023-$([System.DateTime]::Now.Year) Clément VERMOT-DESROCHES&quot;" Overwrite="true" WriteOnlyWhenDifferent="true" Encoding="Unicode" />
+  </Target>
 </Project>
