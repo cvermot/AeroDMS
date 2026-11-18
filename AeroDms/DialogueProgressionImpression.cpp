@@ -100,7 +100,7 @@ void DialogueProgressionImpression::traitementPageSuivante(int currentPage, int 
 	if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()
 		&& barreDeProgressionFichier->value() == barreDeProgressionFichier->maximum()-1)
 	{
-		label->setText(tr("Finalisation en cours, veuillez patientier..."));
+		label->setText(tr("Finalisation en cours, veuillez patienter..."));
 	}
 
 	else if (barreDeProgressionPage->value() >= barreDeProgressionPage->maximum()

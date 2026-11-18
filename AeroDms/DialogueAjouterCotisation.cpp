@@ -181,7 +181,7 @@ void DialogueAjouterCotisation::editerLaCotisation( const QString p_pilote,
 
 void DialogueAjouterCotisation::rincerFenetre()
 {
-    //On remet aux valeur par défaut les champs changées en cas d'édition :
+    //On remet aux valeurs par défaut les champs changés en cas d'édition :
     listePilote->setEnabled(true);
     annee->setEnabled(true);
     montant->setEnabled(true);

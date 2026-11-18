@@ -899,7 +899,7 @@ public:
             TotalConsoEmissionsCo2();
             //Cette méthode retourne la consommation avec les unités.
             //Si le type contient plusieurs types de consommation (des litres et des kWh par exemple,
-            //possible sur les totaux généraux, le string retournée inclu l'ensemble avec les unités 
+            //possible sur les totaux généraux, le string retourné inclut l'ensemble avec les unités
             // associées ("76L + 32 kWh", par exemple)
             const QString consoAvecUnites(const bool p_total = false) const;
             //Le total donne la somme émissions directes + indirectes
@@ -911,7 +911,7 @@ public:
     {
         public:
 
-            //Calcules les émissions pour un nouveau type et réaliser les sommes
+            //Calcule les émissions pour un nouveau type et réalise les sommes
             void calculerEmissions( const StatsEmissionsCo2 & p_statsDuType, 
                                     const StatsEmissionsCo2 & p_dontCompense,
                                     const ParametresEmissionsCo2 & p_parametresEmissionsCo2);

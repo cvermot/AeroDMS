@@ -97,7 +97,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuPdf( const 
             index++;
         }
 
-        //Si on a pas identifié de club, on tente le tout pour le tout avec la méthode générique 1 passe...
+        //Si on n'a pas identifié de club, on tente le tout pour le tout avec la méthode générique 1 passe...
         if (aeroclub == AeroDmsTypes::Aeroclub_INCONNU)
         {
             aeroclub = AeroDmsTypes::Aeroclub_GENERIQUE_1_PASSE;
@@ -279,7 +279,7 @@ AeroDmsTypes::DonneesFacture PdfExtractor::extraireDonneesACAndernos( std::vecto
         }
         else if (data.contains("Total TTC"))
         {
-            //On ne sais pas pourquoi mais parfois la ligne total TTC ne contient pas le montant et il faut chercher en dessous...
+            //On ne sait pas pourquoi mais parfois la ligne total TTC ne contient pas le montant et il faut chercher en dessous...
             if (data.contains("€"))
             {
                 donneesFacture.coutDuVol = recupererMontantAca(data);
@@ -397,7 +397,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesSepavia( std::vec
                 str = p_entries.at(index).Text.data();
                 donneesFactures.dureeDuVol = AeroDmsServices::convertirHeuresDecimalesEnQTime(str.replace(",",".").toDouble());
 
-                //Cout du vol, index +3 par rapport à la date
+                //Coût du vol, index +3 par rapport à la date
                 index = index + 1;
                 str = QString(p_entries.at(index).Text.data()).replace(",",".").replace(" ", "");
                 if (str.contains("€")
@@ -707,8 +707,8 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::extraireDonneesGenerique1Passe( 
                 && donneesFactures.coutDuVol == AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol)
             {
                 QRegularExpressionMatch match = euroRe.match(str);
-                //La condition évite d'écraser un évenutel montant déjà trouvé par un montant nul
-                //(certaines factures indiquent un credit nul en dernière ligne)
+                //La condition évite d'écraser un éventuel montant déjà trouvé par un montant nul
+                //(certaines factures indiquent un crédit nul en dernière ligne)
                 if (match.captured("montant").toDouble() != 0)
                 {
                     donneesFactures.coutDuVol = match.captured("montant").toDouble();
@@ -776,7 +776,7 @@ const QTime PdfExtractor::extraireDureeRegex(const QString p_str)
 
 const double PdfExtractor::recupererMontantAca(QString p_chaine)
 {
-    //On ne sais pas trop pourquoi mais parfois (pas toujours...) les montant sont
+    //On ne sait pas trop pourquoi mais parfois (pas toujours...) les montants sont
     // encodés en partie avec des \uXXXX
     // => "Total TTC 10\u0017,\u0013\u0013€" pour 104,00€ par exemple
         
@@ -840,7 +840,7 @@ AeroDmsTypes::ListeDonneesFacture PdfExtractor::recupererLesDonneesDuCsv(const Q
                     donnesFacture.immat = match.captured("immat");
                 }
             }
-            //On remonte toute donnes pour laquelle on a récupéré au moins un champ...
+            //On remonte toute donnée pour laquelle on a récupéré au moins un champ...
             if (donnesFacture.coutDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.coutDuVol
                 || donnesFacture.immat != AeroDmsTypes::K_INIT_DONNEES_FACTURE.immat
                 || donnesFacture.dateDuVol != AeroDmsTypes::K_INIT_DONNEES_FACTURE.dateDuVol

@@ -84,7 +84,7 @@ void PdfPrinter::imprimerLaDemandeAgrafage()
 
         liste = repertoire.entryInfoList();
         //Le fichier assemblé est forcément le dernier de la liste car tous les fichiers sont suffixés
-        //par un chiffre dans l'ordre de génération. Si la fichier assemblé est présent, on le supprime 
+        //par un chiffre dans l'ordre de génération. Si le fichier assemblé est présent, on le supprime
         //de la liste
         if (liste.last().filePath().contains("FichiersAssembles.pdf"))
         {
@@ -131,7 +131,7 @@ bool PdfPrinter::selectionnerImprimante(QPrinter& p_printer,
     }
     p_printer.setResolution(p_parametresImpression.resolutionImpression);
     //En mode forçage recto on force le mode à recto-verso : on insèrera ensuite
-    //un page blanche entre chaque page qui fera que le rendu sera un recto simple
+    //une page blanche entre chaque page qui fera que le rendu sera un recto simple
     if (p_parametresImpression.forcageImpressionRecto)
     {
         p_printer.setDuplex(QPrinter::DuplexLongSide);

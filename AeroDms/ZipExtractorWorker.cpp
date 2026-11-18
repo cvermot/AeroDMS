@@ -29,7 +29,7 @@ void ZipExtractorWorker::run()
         Bit7zLibrary lib{ "7z.dll" };
         BitFileExtractor extractor{ lib, BitFormat::Zip };
 
-        // Configureration des callback
+        // Configuration des callback
         extractor.setProgressCallback([this](uint64_t inProgress) {
             return this->traiterProgressionDecompression(inProgress);
             });

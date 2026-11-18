@@ -45,7 +45,7 @@ void PdfPrinterWorker::run()
             QSize( pageSize.width() * m_printer->resolution() / 72,
                    pageSize.height() * m_printer->resolution() / 72));
 
-        //Si la page du PDF est en paysage, on retourne l'image pour la place en portrait
+        //Si la page du PDF est en paysage, on retourne l'image pour la placer en portrait
         //pour l'impression
         if (pageSize.width() > pageSize.height())
         {

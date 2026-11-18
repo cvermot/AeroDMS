@@ -522,7 +522,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
         rincerInfosIban(templateCeTmp);
         //Bénéficiaire : le CSE
         templateCeTmp.replace("xxBeneficiaire", "CSE Thales");
-        //Jusitificatif => pas de justificatif pour une remise...
+        //Justificatif => pas de justificatif pour une remise...
         templateCeTmp.replace("xxJustificatif", "-");
         //Montant
         remplirLeChampMontant(templateCeTmp, recette.montant);
@@ -593,7 +593,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
             {
                 //On ajoute la recette à la ligne
                 observation.append(listeRecettes.at(i));
-                //Si on est pas sur le dernier élément, on ajoute " | "
+                //Si on n'est pas sur le dernier élément, on ajoute " | "
                 if (i != listeRecettes.size() - 1)
                 {
                     observation.append(" | ");
@@ -684,7 +684,7 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLaProchaineDemandeDeSubvention
 
         //On met à jour l'info de demande en cours, pour mettre à jour la base de données une fois le PDF généré
         demandeEnCours.typeDeDemande = AeroDmsTypes::PdfTypeDeDemande_FACTURE;
-        //L'année n'est pas utile pour la facture => on fourni directement l'ID facture
+        //L'année n'est pas utile pour la facture => on fournit directement l'ID facture
         demandeEnCours.annee = demandeRembousement.id;
         demandeEnCours.typeDeVol = demandeRembousement.typeDeSortie;
         demandeEnCours.nomBeneficiaire = demandeRembousement.payeur;
@@ -756,7 +756,7 @@ void PdfRenderer::completerTemplateCeAvecVols(QString& p_templateCe,
             + "     -\"RappelRegleSubventionBalade.html\"\n"
             + tr("attendus dans\n")
             + ressourcesHtml.toString()
-            + tr("\nsont introuvables. Le détail des vols ne sera pas ajouté aux demande de subventions"));
+            + tr("\nsont introuvables. Le détail des vols ne sera pas ajouté aux demandes de subventions"));
     }
 
     if (poursuiteTraitement)
@@ -889,8 +889,8 @@ AeroDmsTypes::EtatGeneration PdfRenderer::imprimerLeFichierPdfDeRecapAnnuel( con
         const QString htmlRecapEmissionsCo2 = genererHtmlRecapEmissionsCo2(p_annee, etatGenerationARetourner);
         templateTable.replace("<!--AccrocheCo2-->", htmlRecapEmissionsCo2);
 		
-        //Si on a ajouté les tableaux des émissions, on doit décider ou se termine le div de passage en portrait.
-        //1) si on a pas inseré les images des graphiques, on ferme le div portrait à la fin du fichier
+        //Si on a ajouté les tableaux des émissions, on doit décider où se termine le div de passage en portrait.
+        //1) si on n'a pas inséré les images des graphiques, on ferme le div portrait à la fin du fichier
         //2) si on a inséré les images des graphiques, on ferme le div portrait après les émissions CO2, 
         //   pour que les graphiques soient en mode paysage
         if (demandeEnCours.recapHdvGraphAGenerer == AeroDmsTypes::Statistiques_AUCUNES)
@@ -1103,7 +1103,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
         idsVolsDejaAjoute.append(listeDetails.at(0).volId);
         idsRecettesDejaAjoute.append(listeDetails.at(0).idRecette);
 
-        //1) on parcours la liste des listeDetails pour élaborer listesParIdSortie
+        //1) on parcourt la liste des listeDetails pour élaborer listesParIdSortie
         for (int i = 0; i < listeDetails.size(); i++)
         {
             AeroDmsTypes::DetailsBaladesEtSorties details = listeDetails.at(i);
@@ -1136,7 +1136,7 @@ QString PdfRenderer::genererHtmlRecapBaladesSorties( const int p_annee,
             if (idsVolsDejaAjoute.contains(details.volId)
                 || idsRecettesDejaAjoute.contains(details.idRecette))
             {
-                //Sî l'une des 2 listes contient déjà l'identifiant associé, alors on ajoute l'identifiant à l'autre liste, s'il ne s'y trouve pas déjà
+                //Si l'une des 2 listes contient déjà l'identifiant associé, alors on ajoute l'identifiant à l'autre liste, s'il ne s'y trouve pas déjà
                 if (!idsVolsDejaAjoute.contains(details.volId))
                 {
                     idsVolsDejaAjoute.append(details.volId);
@@ -1326,13 +1326,13 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
     for (int imputation = 0; imputation < listeConsommations.listes.size(); imputation++)
     {
-        //Debut pour une imputation
+        //Début pour une imputation
         QString typeVol = "";
         int compteurTypesAeronefDansLeTypeDeVol = -1;
         html.replace("<!--AccrocheTableauEmissions-->", templateTableBase);
         totauxEmissionsCo2.rincerTotalGeneral();
 
-        //Par convention, on utilise le nom et la description présente dans la première case mais ça pourrait être
+        //Par convention, on utilise le nom et la description présents dans la première case mais ça pourrait être
         //n'importe laquelle
         html.replace("__NomImputation__", listeConsommations.listes.at(imputation).at(0).nomImputation);
         html.replace("__DescriptionImputation__", nettoyerHtml(listeConsommations.listes.at(imputation).at(0).descriptionImputation));
@@ -1403,7 +1403,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
         //On remplit le total général
         html.replace("__Totaux", "__");
-        //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+        //le champ __ConsoEnergie__ est spécifique pour les totaux => on le remplit ici
         //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
         html.replace("__ConsoEnergie__", totauxEmissionsCo2.getTotalGeneral().consoAvecUnites(true));
         completerChampsCommunsRecapEmissionsCo2(html,
@@ -1413,10 +1413,10 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
         html.replace("<!--AccrocheEmissions-->", "");
     }
 
-    //Fin des tableaux de chaque imputations => on remplit les grands totaux, et la légende
+    //Fin des tableaux de chaque imputation => on remplit les grands totaux, et la légende
     //On remplit le grand total
     html.replace("__GrandTotaux", "__");
-    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le remplit ici
     //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
     html.replace("__ConsoEnergie__", totauxEmissionsCo2.getGrandTotalGeneral().consoAvecUnites(true));
     completerChampsCommunsRecapEmissionsCo2(html,
@@ -1429,7 +1429,7 @@ QString PdfRenderer::genererHtmlRecapEmissionsCo2(const int p_annee,
 
     completerTableauRepartitionVolsSurSemaine(html, p_annee);
 
-    //On complete le tableau des trajets
+    //On complète le tableau des trajets
     const const AeroDmsTypes::ListeTrajetsPilotesAerodromes listeTrajetsPilotes = db->recupererNombreTrajetsPilotes(p_annee);
     QString itemTrajet = templateTableTrajetItem;
     int nbTotalTrajetsPilotes = 0;
@@ -1465,7 +1465,7 @@ void PdfRenderer::completerChampsCommunsRecapEmissionsCo2(QString &p_item, const
     p_item.replace("__EmissionsIndirectes__", p_totaux.emissionsAvecUnite(AeroDmsTypes::TotalConsoEmissionsCo2::TypeEmissionsDemande_INDIRECTES));
     p_item.replace("__EmissionsTotales__", p_totaux.emissionsAvecUnite(AeroDmsTypes::TotalConsoEmissionsCo2::TypeEmissionsDemande_TOTALES));
 
-    //On rempli la couleur de la case type selon le type de décompte
+    //On remplit la couleur de la case type selon le type de décompte
     if (p_totaux.typeDecompte == AeroDmsTypes::TypeDecompte_HORAIRE)
     {
         //rouge
@@ -1482,7 +1482,7 @@ void PdfRenderer::completerChampsCommunsRecapEmissionsCo2(QString &p_item, const
         p_item.replace("__CouleurTypeAvion__", "tg-npz6");
     }
 
-    //On rempli la couleur de la case type selon le type de décompte
+    //On remplit la couleur de la case type selon le type de décompte
     if (p_totaux.unite == AeroDmsTypes::UniteTypeConsommation_LITRES_ESSENCE)
     {
         //bleu comme la 100LL
@@ -1515,7 +1515,7 @@ void PdfRenderer::completerTotauxRecapEmissionsCo2(QString & p_html,
     p_item.replace("__TypeAvion__", "Totaux");
     //On supprime le champ __ConsoParUnite__ (et le tiret précédent) qui n'a pas de sens pour les totaux
     p_item.replace(" - __ConsoParUnite__", "");
-    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le rempli ici
+    //le champ __ConsoEnergie__ est spécifique pour les totaux => on le remplit ici
     //ainsi il sera forcé et non remplacé dans l'appel de completerChampsCommunsRecapEmissionsCo2();
     p_item.replace("__ConsoEnergie__", p_totaux.consoAvecUnites(true));
 
