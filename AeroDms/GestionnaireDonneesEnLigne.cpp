@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 GestionnaireDonneesEnLigne::GestionnaireDonneesEnLigne(const AeroDmsTypes::ParametresSysteme & p_parametres)
 {
-    // On demande a utiliser le proxy système, si défini
+    // On demande à utiliser le proxy système, si défini
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
     networkManager = new QNetworkAccessManager(this);
@@ -161,7 +161,7 @@ bool GestionnaireDonneesEnLigne::connecter()
             + parametres.adresseServeurModeExterne
             + ".");*/
 
-        //3 erreurs sur cette requete. On passe à la suivante
+        //3 erreurs sur cette requête. On passe à la suivante
         libererMutex();
 
         return false;
@@ -182,7 +182,7 @@ void GestionnaireDonneesEnLigne::enregistrerDonneesRecues()
         break;
         default:
         {
-            //rien a faire dans les autres cas de demandes
+            //rien à faire dans les autres cas de demandes
         }
         break;
     }
@@ -206,7 +206,7 @@ void GestionnaireDonneesEnLigne::finaliserTelechargement()
         break;
         default:
         {
-            //rien a faire dans les autres cas de demandes
+            //rien à faire dans les autres cas de demandes
         }
         break;
     }

@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
     {
         appName = "Aero.exe";
     }
-    //Sinon, on lancer AeroDms.exe
+    //Sinon, on lance AeroDms.exe
 
     // Chemin vers l'application principale
     const QString program = QDir::currentPath() + QDir::separator() + appName;
@@ -148,7 +148,7 @@ int main(int argc, char* argv[])
     const QString legacyDll = QDir::currentPath() + QDir::separator() + "legacy.dll";
 
     splash->showMessage("AeroDmsLaucher v"+QApplication::applicationVersion() + "\nVérification de la présence de legacy.dll", Qt::AlignLeft | Qt::AlignBottom, Qt::black);
-    // Vérifie si la DLL critique existe avant de le lancer
+    // Vérifie si la DLL critique existe avant de lancer l'application
     if (!QFile::exists(legacyDll)) 
     {
         splash->close();

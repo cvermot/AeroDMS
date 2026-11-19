@@ -24,7 +24,7 @@ PdfDownloader::PdfDownloader(const QString p_cheminFacturesATraiter,
 {
     db = p_db;
 
-    // On demande a utiliser le proxy système, si défini
+    // On demande à utiliser le proxy système, si défini
     QNetworkProxyFactory::setUseSystemConfiguration(true);
 
     networkManager = new QNetworkAccessManager(this);

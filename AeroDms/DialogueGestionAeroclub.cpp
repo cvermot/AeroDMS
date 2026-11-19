@@ -43,7 +43,7 @@ DialogueGestionAeroclub::DialogueGestionAeroclub(ManageDb* db, QWidget* parent) 
     okButton = new QPushButton(tr("&Ajouter"), this);
     okButton->setDisabled(true);
     okButton->setDefault(true);
-    okButton->setToolTip("Remplir à minima le champ nom de l'aéroclub");
+    okButton->setToolTip("Remplir a minima le champ nom de l'aéroclub");
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
     buttonBox = new QDialogButtonBox(Qt::Horizontal, this);

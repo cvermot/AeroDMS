@@ -124,7 +124,7 @@ void DialogueGestionTypesAeronefs::peuplerListeTypesAeronefs()
             tr("Kilowatt-heures"), 
             AeroDmsTypes::UniteTypeConsommation_KILOWATTHEURES);
         uniteTypeConso->setCurrentIndex(uniteTypeConso->findData(aeronefType.uniteTypeConsommation));
-        uniteTypeConso->setToolTip(tr("Unité utilsée pour la consommation de cet avion.\nLa sélection essence ou gasoil/kérosène modifie la quantité\nde CO₂ émises pour chaque litre consommé."));
+        uniteTypeConso->setToolTip(tr("Unité utilisée pour la consommation de cet avion.\nLa sélection essence ou gasoil/kérosène modifie la quantité\nde CO₂ émise pour chaque litre consommé."));
         uniteTypeConso->setProperty("type", aeronefType.type);
         connect(uniteTypeConso, &QComboBox::currentIndexChanged, this, &DialogueGestionTypesAeronefs::changementUnite);
 		listeUniteTypeConso->append(uniteTypeConso);
@@ -141,7 +141,7 @@ void DialogueGestionTypesAeronefs::peuplerListeTypesAeronefs()
         typeDecompte->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_UNITAIRE),
             tr("Unitaire"),
             AeroDmsTypes::TypeDecompte_UNITAIRE);
-        typeDecompte->setToolTip(tr("Permet d'indiquer si la consommation indiquée depend de la durée du vol ou si elle est unitaire pour chaque vol.\nLe cas unitaire est utilisé par exemple pour les vols planeurs, ou les émission de CO₂\nliées à la mise en l'air sont \"forfataire\" pour chaque vol et ne dépend pas de la durée du vol."));
+        typeDecompte->setToolTip(tr("Permet d'indiquer si la consommation indiquée dépend de la durée du vol ou si elle est unitaire pour chaque vol.\nLe cas unitaire est utilisé par exemple pour les vols planeurs, où les émissions de CO₂\nliées à la mise en l'air sont \"forfaitaires\" pour chaque vol et ne dépendent pas de la durée du vol."));
         typeDecompte->setCurrentIndex(typeDecompte->findData(aeronefType.typeDecompte));
         typeDecompte->setProperty("type", aeronefType.type);
         connect(typeDecompte, &QComboBox::currentIndexChanged, this, &DialogueGestionTypesAeronefs::changementRecurrence);

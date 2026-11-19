@@ -700,7 +700,7 @@ void AeroDms::verifierPresenceDeMiseAjour()
 
         QMessageBox dialogueMiseAJourDisponible;
         dialogueMiseAJourDisponible.setText(QString(tr("Une mise à jour d'AeroDMS est disponible.\n"))
-            + tr("Voulez vous l'exécuter maintenant ?"));
+            + tr("Voulez-vous l'exécuter maintenant ?"));
         dialogueMiseAJourDisponible.setInformativeText(tr("La liste des nouveautés est disponible sur <a href=\"https://github.com/cvermot/AeroDMS/compare/v") + QApplication::applicationVersion() + "...main\">GitHub</a>.");
         dialogueMiseAJourDisponible.setWindowTitle(QApplication::applicationName() + " - " + tr("Mise à jour disponible"));
         dialogueMiseAJourDisponible.setIcon(QMessageBox::Question);
@@ -3075,7 +3075,7 @@ void AeroDms::ajouterUnPiloteEnBdd()
             statusBar()->showMessage(tr("Échec ajout pilote : le pilote existe déjà"));
             QMessageBox::critical(this, 
                 QApplication::applicationName() + " - " + tr("Échec ajoute pilote"), 
-                tr("Un pilote existe avec ce nom\nexiste déjà. Ajout impossible."));
+                tr("Un pilote avec ce nom\nexiste déjà. Ajout impossible."));
             break;
         }
         case AeroDmsTypes::ResultatCreationBdd_AUTRE:
@@ -3122,7 +3122,7 @@ void AeroDms::ajouterUnAeroclubEnBdd()
 		    statusBar()->showMessage(tr("Échec ajout aéroclub : l'aéroclub existe déjà"));
 		    QMessageBox::critical(this,
 			    QApplication::applicationName() + " - " + tr("Échec ajoute aéroclub"),
-			    tr("Un aéroclub existe avec ce nom\nexiste déjà. Ajout impossible."));
+			    tr("Un aéroclub avec ce nom\nexiste déjà. Ajout impossible."));
 		    break;
 	    }
         case AeroDmsTypes::ResultatCreationBdd_AUTRE:
@@ -3426,7 +3426,7 @@ void AeroDms::genererPdf()
     //TODO ajouter le traitement de boutonOptionRecapAnnuelConsommationsEmissions
 
     QMessageBox demandeConfirmationGeneration;
-    demandeConfirmationGeneration.setText(QString("Voulez vous générer les PDF de demande de subventions ? <br /><br />")
+    demandeConfirmationGeneration.setText(QString("Voulez-vous générer les PDF de demande de subventions ? <br /><br />")
         + "La génération sera réalisée avec les options suivantes : <br />"
 		+ "<b>Année</b> : " + anneeAGenererTexte + "<br />"
         + texteSignature + "<br />"
@@ -4397,7 +4397,7 @@ void AeroDms::ajouterUneNoteSubvention()
     QInputDialog dialogueNote;
     dialogueNote.setInputMode(QInputDialog::TextInput);
     dialogueNote.setWindowTitle(QApplication::applicationName() + " - " + tr("Ajout d'une note sur une subvention demandée"));
-    dialogueNote.setLabelText(tr("Cette note est destinée à un usge interne et permet de tracer par exemple à\nqui a été remis le chèque s'il n'a pas été remis en direct à son destinataire.\n\nNote à ajouter à cette demande de subvention :"));
+    dialogueNote.setLabelText(tr("Cette note est destinée à un usage interne et permet de tracer par exemple à\nqui a été remis le chèque s'il n'a pas été remis en direct à son destinataire.\n\nNote à ajouter à cette demande de subvention :"));
 
     dialogueNote.setTextValue(subventionAAnoter.texteActuel);
     
@@ -4583,7 +4583,7 @@ void AeroDms::editerVol()
 void AeroDms::supprimerVol()
 {
     QMessageBox demandeConfirmationSuppression;
-    demandeConfirmationSuppression.setText(tr("Voulez vous réellement supprimer le vol ?"));
+    demandeConfirmationSuppression.setText(tr("Voulez-vous réellement supprimer le vol ?"));
     demandeConfirmationSuppression.setWindowTitle(QApplication::applicationName() + " - " + tr("Suppression d'un vol"));
     demandeConfirmationSuppression.setIcon(QMessageBox::Question);
     demandeConfirmationSuppression.setStandardButtons(QMessageBox::Yes | QMessageBox::No);

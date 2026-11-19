@@ -332,7 +332,7 @@ private:
     int idFactureDetectee = AeroDmsTypes::K_INIT_INT_INVALIDE;
     bool scanAutomatiqueDesFacturesEstActif = true;
 
-    //Etats internes application
+    //États internes de l'application
     bool logicielEnModeLectureSeule = false;
     bool retourEnModeLectureEcritureEstInterdit = false;
     bool miseAJourApplicationEstEnCours = false;
@@ -350,7 +350,7 @@ private:
     bool factureRecupereeEnLigneEstNonTraitee = false;
     QAction* actionFactureDacaEnCours = nullptr;
 
-    //Parametres
+    //Paramètres
     AeroDmsTypes::ParametresMetier parametresMetiers;
     AeroDmsTypes::ParametresSysteme parametresSysteme;
 

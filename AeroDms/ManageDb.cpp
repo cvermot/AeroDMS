@@ -1815,7 +1815,7 @@ void ManageDb::executerRequeteAvecControle(QSqlQuery &p_query,
             + tr("Nombre d'essais pour cette requête : ")
 			+ QString::number(nbEssais)
             + "\n"
-            + tr("Voulez vous réexécuter cette requete ?"));
+            + tr("Voulez-vous réexécuter cette requête ?"));
         dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Erreur d'exécution d'une requête"));
         dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
         dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
@@ -2298,7 +2298,7 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
 				+ "\n"
                 + "Intitulé " + intitule
                 + "\n" + "\n"
-                + tr("Voulez vous réexécuter cette requete ?"));
+                + tr("Voulez-vous réexécuter cette requête ?"));
             dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Enregistrement de la recette"));
             dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
             dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);
@@ -2330,7 +2330,7 @@ void ManageDb::ajouterCotisation(const AeroDmsTypes::CotisationAnnuelle& p_infos
                 + "\n"
                 + "Id recette " + QString::number(idRecette)
                 + "\n" + "\n"
-                + tr("Voulez vous réexécuter cette requete ?"));
+                + tr("Voulez-vous réexécuter cette requête ?"));
             dialogueErreurExecutionRequete.setWindowTitle(QApplication::applicationName() + " - " + tr("Enregistrement de la cotisation"));
             dialogueErreurExecutionRequete.setIcon(QMessageBox::Critical);
             dialogueErreurExecutionRequete.setStandardButtons(QMessageBox::Retry | QMessageBox::Cancel);

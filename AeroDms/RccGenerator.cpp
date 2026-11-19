@@ -141,7 +141,7 @@ void RCCFileInfo::writeDataInfo(RCCResourceLibrary& lib)
         lib.writeNumber4(m_dataOffset);
     }
 
-	//On ne gère que les version de format supérieur ou égale à 2
+	//On ne gère que les versions de format supérieures ou égales à 2
     // last modified time stamp
     const QDateTime lastModified = m_fileInfo.lastModified(QTimeZone::UTC);
     quint64 lastmod = quint64(lastModified.isValid() ? lastModified.toMSecsSinceEpoch() : 0);

@@ -284,7 +284,7 @@ void DialogueEditionParametres::initialiserOngletImpression(const AeroDmsTypes::
     margesGaucheDroite = new QSpinBox(this);
     margesGaucheDroite->setSuffix(" px");
     margesGaucheDroite->setMaximum(100);
-    margesGaucheDroite->setToolTip(tr("Marges latérale des tableaux de récapitulatif des heures de vol et des formulaires de demandes de subventions."));
+    margesGaucheDroite->setToolTip(tr("Marges latérales des tableaux de récapitulatif des heures de vol et des formulaires de demandes de subventions."));
     impressionLayout->addWidget(new QLabel(tr("Marges gauche et droite"), this), ligneActuelle, K_COLONNE_LABEL);
     impressionLayout->addWidget(margesGaucheDroite, ligneActuelle, K_COLONNE_CHAMP);
 
@@ -322,7 +322,7 @@ void DialogueEditionParametres::initialiserOngletSysteme(const AeroDmsTypes::Par
     ligneActuelle = systemeLayout->rowCount();
     delaisGardeBdd = new QSpinBox(this);
     delaisGardeBdd->setSuffix(" ms");
-    delaisGardeBdd->setToolTip(tr("Délais entre 2 insertions en BDD, en millisecondes : ce délais permet de régler des soucis de double génération PDF liés au fait\nque le fichier SQLite est stocké sur un lecteur réseau.\nUne valeur de 50 ms semble suffisante. En cas d'occurrence de mauvaise insertion, augmenter cette valeur.\n\n") + texteToolTipChampSecurise);
+    delaisGardeBdd->setToolTip(tr("Délai entre 2 insertions en BDD, en millisecondes : ce délai permet de régler des soucis de double génération PDF liés au fait\nque le fichier SQLite est stocké sur un lecteur réseau.\nUne valeur de 50 ms semble suffisante. En cas d'occurrence de mauvaise insertion, augmenter cette valeur.\n\n") + texteToolTipChampSecurise);
     QLabel* delaisGardeBddLabel = new QLabel(tr("Délais de garde BDD : "), this);
     systemeLayout->addWidget(delaisGardeBddLabel, ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(delaisGardeBdd, ligneActuelle, K_COLONNE_CHAMP);
@@ -356,7 +356,7 @@ void DialogueEditionParametres::initialiserOngletSysteme(const AeroDmsTypes::Par
 
     ligneActuelle = systemeLayout->rowCount();
     sortieFichiersGeneres = new QLineEdit(this);
-    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockées les formulaires de demandes de subventions générées.\nDans le cadre d'une installation utilisée par plusieurs utilisateurs, ce répertoire doit être accessible par tous les utilisateurs.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
+    sortieFichiersGeneres->setToolTip(tr("Dossier où seront stockés les formulaires de demandes de subventions générées.\nDans le cadre d'une installation utilisée par plusieurs utilisateurs, ce répertoire doit être accessible par tous les utilisateurs.\nAttention : en cas de déplacement de ce dossier, le logiciel n'assurera pas la copie des anciennes demandes vers la nouvelle\ndestination. C'est à l'utilisateur d'assurer le déplacement des demandes existantes vers le nouveau dossier, si nécessaire.\n\n") + texteToolTipChampSecurise);
     systemeLayout->addWidget(new QLabel(tr("Dossier de sortie des fichiers générés : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(sortieFichiersGeneres, ligneActuelle, K_COLONNE_CHAMP);
     boutonSelectionSortieFichiersGeneres = new QPushButton("Sélectionner", this);
@@ -369,7 +369,7 @@ void DialogueEditionParametres::initialiserOngletSysteme(const AeroDmsTypes::Par
 
     ligneActuelle = systemeLayout->rowCount();
     modeFonctionnementLogiciel = new QComboBox(this);
-    modeFonctionnementLogiciel->setToolTip(tr("Ce parametre permet d'utiliser le logiciel en mode interne pur ou en mode externe. En mode externe, les données et base de données sont uploadées sur un serveur distant, ce qui permet d'acceder aux données du logiciel en dehors de l'entreprise"));
+    modeFonctionnementLogiciel->setToolTip(tr("Ce paramètre permet d'utiliser le logiciel en mode interne pur ou en mode externe. En mode externe, les données et la base de données sont uploadées sur un serveur distant, ce qui permet d'accéder aux données du logiciel en dehors de l'entreprise"));
     systemeLayout->addWidget(new QLabel(tr("Mode de fonctionnement : "), this), ligneActuelle, K_COLONNE_LABEL);
     systemeLayout->addWidget(modeFonctionnementLogiciel, ligneActuelle, K_COLONNE_CHAMP);
     modeFonctionnementLogiciel->addItem(AeroDmsServices::recupererIcone(AeroDmsTypes::Icone_RESSOURCE_EXTERNE), tr("Mode interne uniquement"), AeroDmsTypes::ModeFonctionnementLogiciel_INTERNE_UNIQUEMENT);
@@ -511,7 +511,7 @@ void DialogueEditionParametres::initialiserOngletEmissions(const AeroDmsTypes::P
     emissionsCo2IndirectesParHdV = new QDoubleSpinBox(this);
     emissionsCo2IndirectesParHdV->setSuffix(" kgCO₂/heure de vol");
     emissionsCo2IndirectesParHdV->setDecimals(3);
-    emissionsCo2IndirectesParHdV->setToolTip(tr("Cette valeur permet de prendre en compte les émissions indirectes liées\nà la fabrication des aéronefs, la maintanence, la déplacement des équipages\net passagers."));
+    emissionsCo2IndirectesParHdV->setToolTip(tr("Cette valeur permet de prendre en compte les émissions indirectes liées\nà la fabrication des aéronefs, la maintenance, le déplacement des équipages\net passagers."));
     emissionsLayout->addWidget(new QLabel(tr("Émissions de CO₂ indirectes par HdV : "), this), ligneActuelle, K_COLONNE_LABEL);
     emissionsLayout->addWidget(emissionsCo2IndirectesParHdV, ligneActuelle, K_COLONNE_CHAMP);
 

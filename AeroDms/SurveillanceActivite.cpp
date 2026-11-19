@@ -117,7 +117,7 @@ void SurveillanceActivite::afficherDialogueInactivite()
     barreDeProgressionDialogue = new QProgressBar();
     barreDeProgressionDialogue->setRange(0, delaiDeGraceEnMs);
     barreDeProgressionDialogue->setValue(delaiDeGraceEnMs);
-    // On affiche pas le pourcentage
+    // On n'affiche pas le pourcentage
     barreDeProgressionDialogue->setTextVisible(false);
     layout->addWidget(barreDeProgressionDialogue);
 
@@ -186,7 +186,7 @@ void SurveillanceActivite::mettreAJourDialogueInactivite(int p_tempsRestantEnMs)
     {
         int tempsRestantEnSecondes = qCeil((delaiDeGraceEnMs - p_tempsRestantEnMs) / 1000.0);
         labelDialogue->setText(
-            tr("Aucune activité detectée depuis plus de ") + QString::number(compteurDInactivite.interval() / 1000) + tr(" secondes.\n\n")
+            tr("Aucune activité détectée depuis plus de ") + QString::number(compteurDInactivite.interval() / 1000) + tr(" secondes.\n\n")
             + tr("Sans action, ") + QApplication::applicationName() + tr(" va fermer automatiquement dans ") + QString::number(tempsRestantEnSecondes) + tr(" secondes."));
     }
 }
