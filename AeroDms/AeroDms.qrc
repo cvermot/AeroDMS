@@ -165,5 +165,6 @@
         <file>ressources/numeric-1.svg</file>
         <file>ressources/bell-off.svg</file>
         <file>ressources/update.svg</file>
+        <file>ressources/licences/Apache-2.0.txt</file>
     </qresource>
 </RCC>

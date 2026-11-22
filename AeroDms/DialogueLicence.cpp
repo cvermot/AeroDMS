@@ -49,6 +49,11 @@ DialogueLicence::DialogueLicence(QWidget* parent) : QDialog(parent)
         tr("Licence de Bit7z"),
         "MPL-2.0.txt");
 
+    ajouterLicenceADialogue(tabLicences,
+        tr("Apache 2.0"),
+        tr("Licence des icones Pictogrammers"),
+        "Apache-2.0.txt");
+
     mainLayout->addWidget(tabLicences);
 
     mainLayout->addWidget(buttonBox, 7, 0, 1, 2);
