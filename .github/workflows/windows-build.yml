@@ -30,7 +30,7 @@ jobs:
           arch: win64_msvc2022_64
           modules: qtgraphs qtquick3d qtshadertools qtwebchannel qtwebengine@6.140.0 qtpdf@6.140.0 qtpositioning qtimageformats
           setup-python: false
-          aqtsource: git+https://github.com/jdpurcell/aqtinstall.git@6f0f842da47c744cdc814cd94da9828d934d7bf0
+          #aqtsource: git+https://github.com/jdpurcell/aqtinstall.git@6f0f842da47c744cdc814cd94da9828d934d7bf0
           #^ correction de la nouvelle infra Qt avec QtWebEngine et QtPdf basés sur la version de Chrominum (donc v6.140 au lieu de 6.12) depuis Qt 6.12
 
       - name: Configurer MSVC
